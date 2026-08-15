@@ -1,0 +1,379 @@
+# 源文件索引：packages/storage
+
+本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `47f943859bef60e4160492346772ded9b24f765a` 生成，共 28 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
+
+### [packages/storage/storage-domain/src/domain.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/domain.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：功能实现
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“Runtime of one open domain: authoritative in-memory state, the single per-domain write chain, and change-event emission. Reads are synchronous from memory; every write queues on the chain, awaits backend durability FIRST, then mutates memory, then emits dom...”。固定提交中扫描到的公开或顶层声明包括 `DomainGlobal`、`KvTable`、`DomainGlobalHandleOf`、`Domain`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“Runtime of one open domain: authoritative in-memory state, the single per-domain write chain, and change-event emission. Reads are synchronous from memory; every write queues on the chain, awaits backend durability FIRST, then mutates memory, then emits dom...”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/storage/storage-domain/src/error.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/error.ts)、[packages/storage/storage-domain/src/events.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/events.ts)、[packages/storage/storage-domain/src/spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/spec.ts)、[packages/storage/storage-domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/index.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[apps/web/tests/sidebar-subagent-activity.e2e.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/web/tests/sidebar-subagent-activity.e2e.ts)、[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/host/apiproxy/tests/api-proxy-agent-preset.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-agent-preset.spec.ts)、[packages/host/apiproxy/tests/api-proxy-approval.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-approval.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 357 行；扫描到的声明包括 `DomainGlobal`、`KvTable`、`DomainGlobalHandleOf`、`Domain`、`DomainImpl`、`KvTableImpl`；文件顶部注释线索：Runtime of one open domain: authoritative in-memory state, the single per-domain write chain, and change-event emission. Reads are synchronous from memory; every write queues on the chain, awaits backend durability FIRST, then mutates memory, then emits dom...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/src/error.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/error.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：错误模型
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“Error vocabulary of the domain data form. @module @deepseek-ai/dsh-storage-domain/src/error”。固定提交中扫描到的公开或顶层声明包括 `DomainErrorCode`、`InvalidRecordDetail`、`DomainErrorOptions`、`DomainError`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“Error vocabulary of the domain data form. @module @deepseek-ai/dsh-storage-domain/src/error”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/storage/storage-domain/src/domain.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/domain.ts)、[packages/storage/storage-domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/index.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[apps/web/tests/sidebar-subagent-activity.e2e.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/web/tests/sidebar-subagent-activity.e2e.ts)、[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/host/apiproxy/tests/api-proxy-agent-preset.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-agent-preset.spec.ts)、[packages/host/apiproxy/tests/api-proxy-approval.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-approval.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 53 行；扫描到的声明包括 `DomainErrorCode`、`InvalidRecordDetail`、`DomainErrorOptions`、`DomainError`；文件顶部注释线索：Error vocabulary of the domain data form. @module @deepseek-ai/dsh-storage-domain/src/error。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/src/events.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/events.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：事件契约
+- 这个文件有什么用：它列出 存储、事件 可以发送和接收的事件。用事件传递信息，能让生产者和消费者少互相导入，插件也更容易替换。
+- 为什么这样设计：事件和钩子是插件之间的连接点。把连接点单独定义，可以让新增能力接入流程而不必修改所有旧消费者。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/storage/storage-domain/src/domain.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/domain.ts)、[packages/storage/storage-domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/index.ts)、[packages/storage/storage-domain/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/invariant.ts)
+- 对应测试：[packages/storage/storage-domain/tests/domain.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/domain.spec.ts)、[packages/storage/storage-domain/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/invariant.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 测试支持：[packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 48 行；扫描到的声明包括 `DomainChangedBase`、`DomainChangedPut`、`DomainChangedDeleted`、`DomainChanged`；文件顶部注释线索：Change-event vocabulary of the domain data form. Every durable write emits one event after the backend resolves durability, carrying the new snapshot and an operation discriminant — never the old value (a diffing consumer keeps its own previous snapshot). T...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/index.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：模块入口
+- 这个文件有什么用：它把 存储 相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
+- 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/storage/storage-domain/src/domain.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/domain.ts)、[packages/storage/storage-domain/src/error.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/error.ts)、[packages/storage/storage-domain/src/events.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/events.ts)、[packages/feedback/message-feedback/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/src/index.ts)
+- 对应测试：[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/host/apiproxy/tests/api-proxy-workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-workspace.spec.ts)、[packages/session/session-projection-cache/tests/cache.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/session/session-projection-cache/tests/cache.spec.ts)、[packages/storage/storage-domain/tests/domain.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/domain.spec.ts)、[packages/storage/storage-domain/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/invariant.spec.ts)、[packages/subagent/subagent/tests/list-children.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/subagent/subagent/tests/list-children.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 测试支持：[packages/core/agent-loop/tests/mock-adapter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/core/agent-loop/tests/mock-adapter.ts)、[packages/feedback/message-feedback/tests/helpers.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/helpers.ts)、[packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 220 行；扫描到的声明包括 `name`、`inject`、`Config`、`DomainFacility`、`apply`、`parseRecord`；文件顶部注释线索：Domain data form (ctx.storage.domain): schema-validated, change-emitting KV domains over storage backends. The single implementation of the domain layer — consumers depend on this package and never touch backends directly. Plugin Config is schemastery; reco...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/invariant.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：运行时不变量
+- 这个文件有什么用：它检查 存储 必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
+- 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/runtime-diagnostics/invariants/src/index.ts)、[packages/storage/storage-domain/src/events.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/events.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/index.ts)、[packages/storage/storage-domain/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/invariant.spec.ts)
+- 对应测试：[packages/storage/storage-domain/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/invariant.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 测试支持：[packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 67 行；扫描到的声明包括 `name`、`inject`、`apply`；文件顶部注释线索：Package-owned invariant companion for @deepseek-ai/dsh-storage-domain: every domain/changed event must agree with the emitting domain's authoritative in-memory state (the owned event-stream ↔ mutable-data relationship of this package). Writes emit strictly ...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/src/spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/spec.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：功能实现
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“Domain declaration vocabulary. A spec object is the single source of a domain's identity, layout, and record schemas: the owning package defines it once with defineDomain and both the type surface and the runtime (validation, descriptor projection) derive f...”。固定提交中扫描到的公开或顶层声明包括 `DomainGlobalSpec`、`DomainTableSpec`、`DomainSpec`、`TableKeyOf`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“Domain declaration vocabulary. A spec object is the single source of a domain's identity, layout, and record schemas: the owning package defines it once with defineDomain and both the type surface and the runtime (validation, descriptor projection) derive f...”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage-domain/src/domain.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/domain.ts)、[packages/storage/storage-domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/index.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[apps/web/tests/sidebar-subagent-activity.e2e.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/web/tests/sidebar-subagent-activity.e2e.ts)、[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/host/apiproxy/tests/api-proxy-agent-preset.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-agent-preset.spec.ts)、[packages/host/apiproxy/tests/api-proxy-approval.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-approval.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 112 行；扫描到的声明包括 `DomainGlobalSpec`、`DomainTableSpec`、`DomainSpec`、`TableKeyOf`、`TableValueOf`、`GlobalValueOf`、`domainTable`、`defineDomain`；文件顶部注释线索：Domain declaration vocabulary. A spec object is the single source of a domain's identity, layout, and record schemas: the owning package defines it once with defineDomain and both the type surface and the runtime (validation, descriptor projection) derive f...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/tests/domain.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/domain.spec.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：测试用例
+- 这个文件有什么用：它直接验证 存储 的成功、失败或边界行为，把“应该发生什么”变成可以重复运行的证据。
+- 为什么这样设计：把一个行为写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/storage/storage-domain/src/events.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/events.ts)、[packages/storage/storage-domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/index.ts)、[packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)
+- 对应测试：本文件本身就是测试用例。
+- 测试关联依据：本文件本身就是测试用例，不把同目录的其他测试冒充成它的“对应测试”。
+- 测试支持：[packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 358 行；扫描到的声明包括 `harness`；扫描到的测试主题包括 “defineDomain”、“rejects invalid names and versions loudly”、“rejects a global schema that accepts null (the never-written sentinel)”、“DomainFacility.open”、“opens, reads back stored records, and rejects a second open of the same name”、“routes per domain name and fails loud on an unregistered route target”。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：测试支持
+- 这个文件有什么用：它为 存储 的测试提供共享准备或环境支持；真正的行为断言由导入它的测试用例完成。
+- 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/host/apiproxy/tests/api-proxy-workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-workspace.spec.ts)、[packages/session/session-projection-cache/tests/cache.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/session/session-projection-cache/tests/cache.spec.ts)、[packages/storage/storage-domain/tests/domain.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/domain.spec.ts)
+- 对应测试：[packages/host/apiproxy/tests/api-proxy-workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-workspace.spec.ts)、[packages/session/session-projection-cache/tests/cache.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/session/session-projection-cache/tests/cache.spec.ts)、[packages/storage/storage-domain/tests/domain.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/domain.spec.ts)、[packages/storage/storage-domain/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/invariant.spec.ts)、[packages/subagent/subagent/tests/list-children.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/subagent/subagent/tests/list-children.spec.ts)、[packages/workspace/workspace/tests/workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/workspace/workspace/tests/workspace.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；这些测试用例实际使用了本支持文件。
+- 测试支持：[packages/core/agent-loop/tests/mock-adapter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/core/agent-loop/tests/mock-adapter.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 160 行；扫描到的声明包括 `MemoryMedium`、`MemoryMediaPool`、`MemoryStorageBackend`、`MemoryKvUnit`；文件顶部注释线索：In-memory StorageBackend test double implementing the full KvUnit primitive set. Shared test infrastructure: the domain suite uses it to exercise open/route/write semantics without touching disk, and the workspace package's tests import it by relative path ...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-domain/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/invariant.spec.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：测试用例
+- 这个文件有什么用：它直接验证 存储 的成功、失败或边界行为，把“应该发生什么”变成可以重复运行的证据。
+- 为什么这样设计：把一个行为写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
+- 直接协作者：[packages/storage/storage-domain/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/runtime-diagnostics/invariants/src/index.ts)、[packages/storage/storage-domain/src/events.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/events.ts)、[packages/storage/storage-domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/src/index.ts)
+- 对应测试：本文件本身就是测试用例。
+- 测试关联依据：本文件本身就是测试用例，不把同目录的其他测试冒充成它的“对应测试”。
+- 测试支持：[packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 91 行；扫描到的声明包括 `setup`；扫描到的测试主题包括 “domain change-event invariants”、“accepts every write shape emitted by the real write paths”、“rejects an event for a domain that is not open”、“rejects a put event whose value is not the in-memory record”、“rejects a deletion event while the record is still in memory”、“rejects a global event whose value is not the in-memory global”。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-json/src/atomic.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/atomic.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：功能实现
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“Atomic whole-file replacement for the JSON backend. Publish protocol: write a same-directory temp file, fsync it, then rename() over the target. Rename is an atomic replace on POSIX and on Windows (libuv maps it to MoveFileExW(..., MOVEFILE_REPLACE_EXISTING...”。固定提交中扫描到的公开或顶层声明包括 `writeAtomic`、`fsyncDirectory`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“Atomic whole-file replacement for the JSON backend. Publish protocol: write a same-directory temp file, fsync it, then rename() over the target. Rename is an atomic replace on POSIX and on Windows (libuv maps it to MoveFileExW(..., MOVEFILE_REPLACE_EXISTING...”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage-json/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/README.md)、[packages/storage/storage-json/src/unit.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/unit.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 53 行；扫描到的声明包括 `writeAtomic`、`fsyncDirectory`；文件顶部注释线索：Atomic whole-file replacement for the JSON backend. Publish protocol: write a same-directory temp file, fsync it, then rename() over the target. Rename is an atomic replace on POSIX and on Windows (libuv maps it to MoveFileExW(..., MOVEFILE_REPLACE_EXISTING...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-json/src/format.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/format.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：功能实现
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“On-disk JSON unit format: the file is always the current net state, kept human-readable (pretty-printed, stable key order from insertion) — that legibility is this backend's reason to exist. @module @deepseek-ai/dsh-storage-json/src/format”。固定提交中扫描到的公开或顶层声明包括 `UnitState`、`serialize`、`parse`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“On-disk JSON unit format: the file is always the current net state, kept human-readable (pretty-printed, stable key order from insertion) — that legibility is this backend's reason to exist. @module @deepseek-ai/dsh-storage-json/src/format”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage-json/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/README.md)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage-json/src/unit.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/unit.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 84 行；扫描到的声明包括 `UnitState`、`serialize`、`parse`；文件顶部注释线索：On-disk JSON unit format: the file is always the current net state, kept human-readable (pretty-printed, stable key order from insertion) — that legibility is this backend's reason to exist. @module @deepseek-ai/dsh-storage-json/src/format。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-json/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/index.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：模块入口
+- 这个文件有什么用：它把 存储 相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
+- 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
+- 直接协作者：[packages/storage/storage-json/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/README.md)、[packages/storage/storage-json/src/unit.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/unit.ts)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/index.ts)、[packages/feedback/message-feedback/tests/helpers.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/helpers.ts)
+- 对应测试：[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 测试支持：[packages/feedback/message-feedback/tests/helpers.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/helpers.ts)、[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 114 行；扫描到的声明包括 `name`、`inject`、`Config`、`JsonStorageBackend`、`apply`、`validateDescriptor`；文件顶部注释线索：JSON storage backend: one human-readable file per unit under a configured root, published by atomic whole-file rewrite. Registers as backend json on the storage hub. @module @deepseek-ai/dsh-storage-json。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-json/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/invariant.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：运行时不变量
+- 这个文件有什么用：它检查 存储 必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
+- 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
+- 直接协作者：[packages/storage/storage-json/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/index.ts)、[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+- 对应测试：[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 测试支持：[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 32 行；扫描到的声明包括 `name`、`inject`、`apply`；文件顶部注释线索：Package-owned invariant companion for @deepseek-ai/dsh-storage-json. @module @deepseek-ai/dsh-storage-json/invariant。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-json/src/unit.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/unit.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：功能实现
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“One opened JSON unit. The in-memory state is authoritative; every write primitive mutates it and republishes the whole file atomically. Writes are NOT queued here — per the backend contract, write ordering belongs to the caller (the domain layer's write cha...”。固定提交中扫描到的公开或顶层声明包括 `openJsonUnit`、`JsonKvUnit`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“One opened JSON unit. The in-memory state is authoritative; every write primitive mutates it and republishes the whole file atomically. Writes are NOT queued here — per the backend contract, write ordering belongs to the caller (the domain layer's write cha...”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage-json/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/README.md)、[packages/storage/storage-json/src/atomic.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/atomic.ts)、[packages/storage/storage-json/src/format.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/format.ts)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage-json/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/index.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 141 行；扫描到的声明包括 `openJsonUnit`、`JsonKvUnit`；文件顶部注释线索：One opened JSON unit. The in-memory state is authoritative; every write primitive mutates it and republishes the whole file atomically. Writes are NOT queued here — per the backend contract, write ordering belongs to the caller (the domain layer's write cha...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：测试用例
+- 这个文件有什么用：它直接验证 存储 的成功、失败或边界行为，把“应该发生什么”变成可以重复运行的证据。
+- 为什么这样设计：把一个行为写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
+- 直接协作者：[packages/storage/storage-json/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/runtime-diagnostics/invariants/src/index.ts)、[packages/storage/storage-json/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/index.ts)、[packages/storage/storage-json/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/src/invariant.ts)
+- 对应测试：本文件本身就是测试用例。
+- 测试关联依据：本文件本身就是测试用例，不把同目录的其他测试冒充成它的“对应测试”。
+- 测试支持：[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 228 行；扫描到的声明包括 `freshRoot`；扫描到的测试主题包括 “json backend specifics”、“publishes a human-readable pretty-printed file”、“defers materialization until the first write”、“rejects a malformed medium”、“rejects a foreign unit header”、“rejects double-open of one unit as a plain caller error”。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-sqlite/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/index.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：模块入口
+- 这个文件有什么用：它把 存储 相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
+- 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
+- 直接协作者：[packages/storage/storage-sqlite/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/README.md)、[packages/storage/storage-sqlite/src/schema.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/schema.ts)、[packages/storage/storage-sqlite/src/unit.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/unit.ts)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts)
+- 对应测试：[packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 测试支持：[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 168 行；扫描到的声明包括 `name`、`inject`、`Config`、`SqliteStorageBackend`、`apply`；文件顶部注释线索：SQLite storage backend for the storage hub: one database file hosts every routed unit, document-per-row (key TEXT / value TEXT JSON). Registers as backend sqlite; the disposer unregisters first, then closes the medium. @module @deepseek-ai/dsh-storage-sqlite。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-sqlite/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/invariant.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：运行时不变量
+- 这个文件有什么用：它检查 存储 必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
+- 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
+- 直接协作者：[packages/storage/storage-sqlite/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/index.ts)、[packages/storage/storage-sqlite/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/invariant.spec.ts)
+- 对应测试：[packages/storage/storage-sqlite/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/invariant.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 32 行；扫描到的声明包括 `name`、`inject`、`apply`；文件顶部注释线索：Package-owned invariant companion for @deepseek-ai/dsh-storage-sqlite. @module @deepseek-ai/dsh-storage-sqlite/invariant。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-sqlite/src/schema.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/schema.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：配置与数据形状
+- 这个文件有什么用：它定义 存储、数据 schema 的配置、输入形状或工具链规则，让错误在进入深层逻辑前暴露，并让重复运行使用同一套参数。
+- 为什么这样设计：先把形状和规则集中声明，执行代码只负责使用已经检查过的数据；这样错误更早暴露，读代码时也有一张共同的地图。
+- 直接协作者：[packages/storage/storage-sqlite/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/README.md)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage-sqlite/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/index.ts)、[packages/storage/storage-sqlite/src/unit.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/unit.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 120 行；扫描到的声明包括 `STORAGE_SQLITE_SCHEMA_VERSION`、`JournalMode`、`openDatabase`、`recordTableName`、`createDatabaseFile`、`configureDatabase`；文件顶部注释线索：Schema + open-time helpers for the SQLite storage backend: the physical layout version, the database open/configure sequence (permissions, pragmas, version stamp/reject), and the unit metadata tables. Unit record tables are created per descriptor in unit.ts...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-sqlite/src/unit.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/unit.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：功能实现
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“One opened SQLite KV unit: prepared per-table statements over the u_<unit>_<table> record tables plus this unit's row in the shared unit_globals table. Each primitive is a single statement, so atomicity comes from SQLite itself — no explicit transactions, a...”。固定提交中扫描到的公开或顶层声明包括 `SqliteKvUnit`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“One opened SQLite KV unit: prepared per-table statements over the u_<unit>_<table> record tables plus this unit's row in the shared unit_globals table. Each primitive is a single statement, so atomicity comes from SQLite itself — no explicit transactions, a...”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage-sqlite/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/README.md)、[packages/storage/storage-sqlite/src/schema.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/schema.ts)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage-sqlite/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/index.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 156 行；扫描到的声明包括 `SqliteKvUnit`；文件顶部注释线索：One opened SQLite KV unit: prepared per-table statements over the u_<unit>_<table> record tables plus this unit's row in the shared unit_globals table. Each primitive is a single statement, so atomicity comes from SQLite itself — no explicit transactions, a...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-sqlite/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/invariant.spec.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：测试用例
+- 这个文件有什么用：它直接验证 存储 的成功、失败或边界行为，把“应该发生什么”变成可以重复运行的证据。
+- 为什么这样设计：把一个行为写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
+- 直接协作者：[packages/storage/storage-sqlite/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/runtime-diagnostics/invariants/src/index.ts)、[packages/storage/storage-sqlite/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/invariant.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/index.ts)
+- 对应测试：本文件本身就是测试用例。
+- 测试关联依据：本文件本身就是测试用例，不把同目录的其他测试冒充成它的“对应测试”。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 12 行；扫描到的测试主题包括 “invariant companion”、“registers under the package name with an explained-empty installer”。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：测试用例
+- 这个文件有什么用：它直接验证 存储 的成功、失败或边界行为，把“应该发生什么”变成可以重复运行的证据。
+- 为什么这样设计：把一个行为写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
+- 直接协作者：[packages/storage/storage-sqlite/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/README.md)、[packages/storage/storage-sqlite/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/src/index.ts)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 对应测试：本文件本身就是测试用例。
+- 测试关联依据：本文件本身就是测试用例，不把同目录的其他测试冒充成它的“对应测试”。
+- 测试支持：[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 272 行；扫描到的声明包括 `backendAt`、`freshDbPath`；扫描到的测试主题包括 “sqlite backend specifics”、“opens an in-memory database”、“materializes STRICT record tables and stamps the schema version”、“rejects a mismatched database schema version”、“rejects invalid unit and table names before touching the medium”、“rejects a second open of the same unit name”。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage/src/backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/backend.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：外部能力适配层
+- 这个文件有什么用：它把外部协议转换成 存储 能理解的内部协议。转换集中在边界，核心逻辑就不必到处处理供应商差异。
+- 为什么这样设计：把“接口是什么”和“这一版怎样实现”分开，替换实现或写测试替身时不必改动使用者。
+- 直接协作者：[packages/storage/storage/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/README.md)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage/src/registry.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/registry.ts)、[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[apps/web/tests/sidebar-subagent-activity.e2e.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/web/tests/sidebar-subagent-activity.e2e.ts)、[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/host/apiproxy/tests/api-proxy-fork.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-fork.spec.ts)、[packages/host/apiproxy/tests/api-proxy-workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-workspace.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 104 行；扫描到的声明包括 `UNIT_NAME_RE`、`StorageBackend`、`KvFacet`、`KvUnitDescriptor`、`KvUnit`；文件顶部注释线索：Backend-facing vocabulary of the storage hub: a backend owns one medium (a file-tree root, a database file) and exposes operation groups over it. This module defines the normative contract text for backend implementers; the shared conformance suite in tests...。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage/src/error.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/error.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：错误模型
+- 这个文件有什么用：它负责 存储；文件顶部注释把它定位为“Error vocabulary for the storage hub and its backends. @module @deepseek-ai/dsh-storage/src/error”。固定提交中扫描到的公开或顶层声明包括 `StorageErrorCode`、`StorageError`。把这块责任留在自己的层里，可以让调用关系清楚，修改时只影响需要它的部分。
+- 为什么这样设计：固定提交的文件顶部注释把它定位为“Error vocabulary for the storage hub and its backends. @module @deepseek-ai/dsh-storage/src/error”；把这项职责单独放置，可以让边界、输入和失败处理在一个地方被阅读和测试。
+- 直接协作者：[packages/storage/storage/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/README.md)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[packages/storage/storage/src/registry.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/registry.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[apps/web/tests/sidebar-subagent-activity.e2e.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/web/tests/sidebar-subagent-activity.e2e.ts)、[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/host/apiproxy/tests/api-proxy-fork.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-fork.spec.ts)、[packages/host/apiproxy/tests/api-proxy-workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-workspace.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 35 行；扫描到的声明包括 `StorageErrorCode`、`StorageError`；文件顶部注释线索：Error vocabulary for the storage hub and its backends. @module @deepseek-ai/dsh-storage/src/error。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：模块入口
+- 这个文件有什么用：它把 存储 相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
+- 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
+- 直接协作者：[packages/storage/storage/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/README.md)、[packages/storage/storage/src/backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/backend.ts)、[packages/storage/storage/src/error.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/error.ts)、[packages/storage/storage/src/registry.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/registry.ts)、[packages/feedback/message-feedback/tests/helpers.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/helpers.ts)
+- 对应测试：[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/host/apiproxy/tests/api-proxy-workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-workspace.spec.ts)、[packages/session/session-projection-cache/tests/cache.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/session/session-projection-cache/tests/cache.spec.ts)、[packages/storage/storage-domain/tests/domain.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/domain.spec.ts)、[packages/storage/storage-domain/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/invariant.spec.ts)、[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
+- 测试支持：[packages/feedback/message-feedback/tests/helpers.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/helpers.ts)、[packages/storage/storage-domain/tests/helpers/memory-backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-domain/tests/helpers/memory-backend.ts)、[packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 98 行；扫描到的声明包括 `storageBackendServiceKey`、`StorageForms`、`Storage`；文件顶部注释线索：Storage hub (ctx.storage): a named backend registry plus mounted data-form facilities. The hub itself performs no IO — backends own media, data forms (the domain layer first) own semantics. @module @deepseek-ai/dsh-storage。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/invariant.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：运行时不变量
+- 这个文件有什么用：它检查 存储 必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
+- 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
+- 直接协作者：[packages/storage/storage/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/index.ts)
+- 对应测试：没有确认到直接测试；公共入口可能仍有间接覆盖。
+- 测试关联依据：固定提交中没有找到直接或传递的本地静态 import，也没有找到明显的同包同名测试；公共入口可能仍有间接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 32 行；扫描到的声明包括 `name`、`inject`、`apply`；文件顶部注释线索：Package-owned invariant companion for @deepseek-ai/dsh-storage. @module @deepseek-ai/dsh-storage/invariant。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage/src/registry.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/registry.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：服务或提供方
+- 这个文件有什么用：它定义或提供 存储 的可取得服务，负责注册、查找或具体实现；接口和实现分开后，同一能力可以换成本地、远程或测试版本。
+- 为什么这样设计：把“接口是什么”和“这一版怎样实现”分开，替换实现或写测试替身时不必改动使用者。
+- 直接协作者：[packages/storage/storage/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/README.md)、[packages/storage/storage/src/backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/backend.ts)、[packages/storage/storage/src/error.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/error.ts)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)
+- 对应测试：间接测试线索（通过本地 import 链，非直接覆盖）：[apps/web/tests/sidebar-subagent-activity.e2e.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/web/tests/sidebar-subagent-activity.e2e.ts)、[packages/feedback/message-feedback/tests/invariant.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/invariant.spec.ts)、[packages/feedback/message-feedback/tests/loader-composition.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/loader-composition.spec.ts)、[packages/feedback/message-feedback/tests/message-feedback.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/feedback/message-feedback/tests/message-feedback.spec.ts)、[packages/host/apiproxy/tests/api-proxy-fork.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-fork.spec.ts)、[packages/host/apiproxy/tests/api-proxy-workspace.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/host/apiproxy/tests/api-proxy-workspace.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 传递引用；这些测试通过包入口或中间模块到达本文件，不等于本文件被直接覆盖。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 62 行；扫描到的声明包括 `BackendRegistry`；文件顶部注释线索：Named backend registry of the storage hub. @module @deepseek-ai/dsh-storage/src/registry。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage/tests/contract.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/contract.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：共享测试契约
+- 这个文件有什么用：它为 存储 定义多种实现都必须通过的共同测试规则，避免 JSONL、SQLite 或不同宿主各自测试出不同标准。
+- 为什么这样设计：多个实现共享同一组契约测试，才能比较它们是否遵守相同的外部行为；契约与具体实现分开也能减少复制断言。
+- 直接协作者：[packages/storage/storage/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/README.md)、[packages/storage/storage/src/backend.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/backend.ts)、[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)、[packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts)
+- 对应测试：[packages/storage/storage-json/tests/json-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-json/tests/json-backend.spec.ts)、[packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage-sqlite/tests/sqlite-backend.spec.ts)
+- 测试关联依据：固定提交源码中的本地静态 import 直接引用；这些测试用例实际使用了本支持文件。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 102 行；扫描到的声明包括 `KvBackendContractHarness`、`runKvBackendContract`；扫描到的测试主题包括 “kv backend contract: ${label}”、“opens a missing unit as empty and serves loadAll immediately”、“round-trips records and global durably across reopen”、“putRecord overwrites and deleteRecord is idempotent”、“rejects a version mismatch on reopen without touching the data”、“rejects operations after unit close, and close is idempotent”；文件顶部注释线索：Shared KV-backend conformance suite. Each backend's spec file calls runKvBackendContract with a factory bound to its own medium; the suite asserts every clause of the src/backend.ts contract so both backends are held to identical semantics. @module。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+### [packages/storage/storage/tests/registry.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/tests/registry.spec.ts)
+
+- 所属层：packages/storage：可复用的 Harness 功能包
+- 文件角色：测试用例
+- 这个文件有什么用：它直接验证 存储 的成功、失败或边界行为，把“应该发生什么”变成可以重复运行的证据。
+- 为什么这样设计：把一个行为写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
+- 直接协作者：[packages/storage/storage/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/README.md)、[packages/storage/storage/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/storage/storage/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/index.ts)
+- 对应测试：本文件本身就是测试用例。
+- 测试关联依据：本文件本身就是测试用例，不把同目录的其他测试冒充成它的“对应测试”。
+- 阅读顺序：先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试；本条是自动索引，复杂行为需要回到源码和测试确认。
+- 代码证据：固定提交归档实际读取结果：约 89 行；扫描到的测试主题包括 “BackendRegistry”、“registers, resolves, and disposes names”、“rejects duplicate names”、“Storage service”、“derives stable lifecycle service keys for named backends”、“mounts on the context and exposes registry plus form mounting”。 这些数字和声明用于定位，不替代源码阅读。
+- 固定版本：源码链接固定到官方提交 `47f943859bef60e4160492346772ded9b24f765a`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
