@@ -1,0 +1,48 @@
+{
+  "profile": "normal",
+  "agent": "default",
+  "registered": [
+    {
+      "name": "read_file",
+      "source": "example",
+      "version": "1.0.0"
+    },
+    {
+      "name": "search_text",
+      "source": "example",
+      "version": "1.0.0"
+    },
+    {
+      "name": "run_command",
+      "source": "example",
+      "version": "1.0.0"
+    }
+  ],
+  "visible": [
+    {
+      "name": "read_file",
+      "presentation": "native",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": ["path"]
+      }
+    }
+  ],
+  "execution": [
+    {
+      "name": "read_file",
+      "allowed": true,
+      "reason": "policy"
+    },
+    {
+      "name": "run_command",
+      "allowed": false,
+      "reason": "approval-required"
+    }
+  ]
+}

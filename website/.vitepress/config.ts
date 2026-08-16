@@ -188,6 +188,82 @@ const wordmark = readFileSync(resolve(import.meta.dirname, '../public/wordmark.s
  * stay behind a query only Firefox answers.
  */
 const siteStyle = `
+:root {
+  --vp-c-brand-1: #3157c8;
+  --vp-c-brand-2: #466fe0;
+  --vp-c-brand-3: #dfe7ff;
+  --vp-c-brand-soft: rgba(49, 87, 200, 0.14);
+  --dsh-page-glow: rgba(83, 121, 229, 0.12);
+  --dsh-card-shadow: 0 12px 34px rgba(37, 58, 112, 0.08);
+}
+.dark {
+  --vp-c-brand-1: #91aaff;
+  --vp-c-brand-2: #7895ff;
+  --vp-c-brand-3: #202b55;
+  --vp-c-brand-soft: rgba(145, 170, 255, 0.18);
+  --dsh-page-glow: rgba(91, 122, 229, 0.18);
+  --dsh-card-shadow: 0 14px 38px rgba(0, 0, 0, 0.22);
+}
+.VPNavBar {
+  background: color-mix(in srgb, var(--vp-c-bg) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+.VPHome .VPHero {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+.VPHome .VPHero::before {
+  position: absolute;
+  z-index: -1;
+  inset: -120px -12vw auto;
+  height: 470px;
+  content: '';
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 35%, var(--dsh-page-glow), transparent 42%),
+    radial-gradient(circle at 82% 12%, var(--vp-c-brand-soft), transparent 36%);
+}
+.VPHome .VPHero .name {
+  letter-spacing: -0.045em;
+}
+.VPHome .VPHero .tagline {
+  max-width: 760px;
+}
+.VPHome .VPFeature {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 82%, transparent);
+  box-shadow: var(--dsh-card-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.VPHome .VPFeature:hover {
+  border-color: var(--vp-c-brand-soft);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 42px rgba(37, 58, 112, 0.14);
+}
+.vp-doc h2 {
+  letter-spacing: -0.02em;
+}
+.vp-doc blockquote {
+  border-left-width: 4px;
+  border-radius: 0 10px 10px 0;
+  background: var(--vp-c-brand-soft);
+}
+.vp-doc table {
+  display: block;
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--vp-c-divider);
+}
+.vp-doc th {
+  background: var(--vp-c-bg-soft);
+}
+.vp-doc pre {
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: 0 10px 26px rgba(37, 58, 112, 0.08);
+}
 .dsh-lockup { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
 .dsh-wordmark { display: block; height: 22px; width: auto; color: var(--vp-c-text-1); }
 .dsh-tag {

@@ -128,18 +128,30 @@ function studyPageLabel(source: string): string {
 }
 
 /**
+ * Give dot-prefixed generated index files a VitePress-safe route.
+ *
+ * GitHub can link to `.agents.md` and `.github.md` directly, but VitePress
+ * normalises a relative link to those hidden pages as `./.agents` and
+ * `./.github`, which its dead-link checker does not resolve reliably. The
+ * canonical source and sidebar label keep the real filename; only the public
+ * site URL uses a visible `dot-` prefix.
+ */
+export function studyIndexRouteFilename(source: string): string {
+  const filename = basename(source, '.md')
+  return filename.startsWith('.') ? `dot-${filename.slice(1)}.md` : `${filename}.md`
+}
+
+/**
  * Chinese-only learning pages; the English site keeps the official documentation tree.
  *
- * The large generated file-index pages stay in the repository and are linked by
- * the index navigation page. Rendering those multi-megabyte reference pages in
- * VitePress makes the static build needlessly fragile, while GitHub remains the
- * better surface for searching their complete contents.
+ * The generated file-index pages are part of the study material, so they are
+ * published as a collapsed reference section rather than being left GitHub-only.
+ * Their content stays in the canonical `study/文件索引/` tree; this manifest only
+ * gives each page a searchable web route.
  */
 const studyPages: DocsPage[] = [
   'START-HERE.md',
-  ...markdownFiles(resolve(repositoryRoot, 'study')).filter(source => (
-    !source.startsWith('study/文件索引/') || source === 'study/文件索引/README.md'
-  )),
+  ...markdownFiles(resolve(repositoryRoot, 'study')),
 ].map((source, order) => {
   const index = source.startsWith('study/文件索引/')
   const filename = basename(source, '.md')
@@ -149,7 +161,7 @@ const studyPages: DocsPage[] = [
     source,
     route: source === 'START-HERE.md'
       ? 'study/index.md'
-      : index ? `study/files/${filename}.md` : `study/lessons/${filename}.md`,
+      : index ? `study/files/${studyIndexRouteFilename(source)}` : `study/lessons/${filename}.md`,
     label: studyPageLabel(source),
     sidebar: 'zh-study',
     section: index ? '逐文件索引' : '学习路线',

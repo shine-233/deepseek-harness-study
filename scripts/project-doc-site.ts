@@ -326,6 +326,17 @@ function withoutRepositoryChrome(markdown: string): string {
 }
 
 /**
+ * Generated source-index prose may quote placeholders such as
+ * `packages/<package>/bin/`. GitHub renders those as ordinary Markdown text,
+ * while VitePress compiles the projected file as a Vue template and treats the
+ * placeholder as an HTML element. Escape only the generated catalog surface;
+ * canonical Markdown and intentionally authored HTML keep their original form.
+ */
+function escapeGeneratedIndexTags(markdown: string): string {
+  return markdown.replace(/<([A-Za-z][^>\n]{0,120})>/g, '&lt;$1&gt;')
+}
+
+/**
  * Select the Markdown rendered for one published page.
  *
  * @param markdown Rewritten canonical Markdown content.
@@ -333,7 +344,12 @@ function withoutRepositoryChrome(markdown: string): string {
  * @returns Full Markdown for ordinary pages or frontmatter-only Markdown for a locale home page.
  */
 export function projectedPageContent(markdown: string, page: DocsPage): string {
-  if (page.sidebar !== null) return withoutRepositoryChrome(markdown)
+  if (page.sidebar !== null) {
+    const content = withoutRepositoryChrome(markdown)
+    return page.source.startsWith('study/文件索引/') && page.source !== 'study/文件索引/README.md'
+      ? escapeGeneratedIndexTags(content)
+      : content
+  }
   // The study fork deliberately owns a Chinese learning home. The upstream
   // locale home remains a redirect to the ordinary product guide.
   if (page.source === 'SITE-HOME.md') return withoutRepositoryChrome(markdown)

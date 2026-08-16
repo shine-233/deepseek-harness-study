@@ -1,7 +1,7 @@
 /** Tests for the documentation website projection adapter. */
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, globSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, globSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -298,10 +298,22 @@ describe('docsPages locale routes', () => {
 
   it('publishes the Chinese source-learning tree as its own root-only module', () => {
     const study = docsPages.filter(page => page.sidebar === 'zh-study')
+    const indexSources = readdirSync(join(repositoryRoot, 'study/文件索引'))
+      .filter(page => page.endsWith('.md'))
+      .map(page => `study/文件索引/${page}`)
+      .sort()
+    const publishedIndexSources = study
+      .filter(page => page.source.startsWith('study/文件索引/'))
+      .map(page => page.source)
+      .sort()
     expect(study.length).toBeGreaterThan(20)
     expect(study.every(page => page.locale === 'root' && page.contentLocale === 'zh-CN')).toBe(true)
     expect(study.some(page => page.route === 'study/index.md' && page.source === 'START-HERE.md')).toBe(true)
     expect(study.some(page => page.route === 'study/files/README.md' && page.source === 'study/文件索引/README.md')).toBe(true)
+    expect(study.some(page => page.route === 'study/files/dot-agents.md' && page.source === 'study/文件索引/.agents.md')).toBe(true)
+    expect(study.some(page => page.route === 'study/files/dot-github.md' && page.source === 'study/文件索引/.github.md')).toBe(true)
+    expect(publishedIndexSources).toEqual(indexSources)
+    expect(study.filter(page => page.section === '逐文件索引').every(page => page.route.startsWith('study/files/'))).toBe(true)
   })
 
   it('indexes every subsystem page in both sides of the folder README', () => {
@@ -502,6 +514,14 @@ describe('projectedPageContent', () => {
     // A tutorial showing the convention must still render the example.
     const sample = '# Guide\n\nA\n\nB\n\nC\n\nD\n\nE\n\nEnglish | [中文](./x)\n'
     expect(projectedPageContent(sample, page('zh-guide'))).toBe(sample)
+  })
+
+  it('escapes angle-bracket placeholders only in generated source indexes', () => {
+    const generatedIndex = { ...page('zh-study'), source: 'study/文件索引/native.md' }
+    expect(projectedPageContent('A `packages/<package>/bin/` placeholder.\n', generatedIndex))
+      .toBe('A `packages/&lt;package&gt;/bin/` placeholder.\n')
+    expect(projectedPageContent('A `packages/<package>/bin/` placeholder.\n', page('zh-study')))
+      .toBe('A `packages/<package>/bin/` placeholder.\n')
   })
 
   it('rejects a locale home source without frontmatter', () => {
