@@ -22,6 +22,7 @@ const required = [
   '- 文件角色：',
   '- 这个文件有什么用：',
   '- 为什么这样设计：',
+  '- 文件级设计证据：',
   '- 直接协作者：',
   '- 对应测试：',
   '- 测试关联依据：',
@@ -31,12 +32,25 @@ const required = [
 ]
 
 if (!existsSync(indexDir)) errors.push(`索引目录不存在：${indexDir}`)
+if (!Array.isArray(manifest.files)) errors.push('清单 files 不是数组')
+if (Array.isArray(manifest.files) && manifest.files.length !== expected.size) {
+  errors.push(`清单 files 原始长度 ${manifest.files.length} 与去重后长度 ${expected.size} 不同，存在重复路径`)
+}
+if (manifest.upstreamRepository !== 'https://github.com/deepseek-ai/deepseek-harness') {
+  errors.push(`清单 upstreamRepository 不正确：${manifest.upstreamRepository}`)
+}
 
 for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).sort()) {
   const full = join(indexDir, name)
   const text = readFileSync(full, 'utf8')
   const headingPattern = /^### \[([^\]]+)\]\((https:\/\/github\.com\/deepseek-ai\/deepseek-harness\/blob\/([^/]+)\/([^\)]+))\)$/gm
   const matches = [...text.matchAll(headingPattern)]
+  const headingLikeCount = text.split(/\r?\n/).filter(line => line.startsWith('### [')).length
+  if (headingLikeCount !== matches.length) errors.push(`${name}: 有 ${headingLikeCount - matches.length} 个无法解析的源文件标题`)
+  const declared = text.match(/^本页由 .* 共 (\d+) 个代码或界面源文件。$/m)?.[1]
+  if (declared !== undefined && Number(declared) !== matches.length) {
+    errors.push(`${name}: 页头声明 ${declared} 个源文件，但实际解析 ${matches.length} 个`)
+  }
   for (const match of matches) {
     const path = match[1]
     const commit = match[3]
@@ -47,7 +61,12 @@ for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).so
     seen.get(path).push(name)
     if (commit !== manifest.commit) errors.push(`${name}: ${path} 的链接提交 ${commit} 不等于清单提交 ${manifest.commit}`)
     for (const label of required) {
-      if (!block.includes(label)) errors.push(`${name}: ${path} 缺少字段 ${label}`)
+      if (!block.includes(label)) {
+        errors.push(`${name}: ${path} 缺少字段 ${label}`)
+        continue
+      }
+      const value = block.match(new RegExp(`^${label}(.*)$`, 'm'))?.[1]?.trim() ?? ''
+      if (!value || value === '：') errors.push(`${name}: ${path} 字段 ${label} 为空`)
     }
     const purpose = block.match(/^- 这个文件有什么用：(.*)$/m)?.[1]?.trim() ?? ''
     const design = block.match(/^- 为什么这样设计：(.*)$/m)?.[1]?.trim() ?? ''
@@ -102,6 +121,17 @@ const tree = execFileSync('git', ['ls-tree', '-r', '--name-only', manifest.commi
   .map(value => value.trim().replace(/^\/+/, ''))
   .filter(Boolean)
 const treeSet = new Set(tree)
+const sourceExtensions = new Set((manifest.sourceExtensions ?? []).map(value => String(value).toLowerCase()))
+const candidates = tree.filter(path => {
+  const dot = path.lastIndexOf('.')
+  return dot >= 0 && sourceExtensions.has(path.slice(dot).toLowerCase())
+})
+if (manifest.sourceFileCount !== candidates.length) {
+  errors.push(`清单 sourceFileCount ${manifest.sourceFileCount} 不等于按 sourceExtensions 重算的候选数 ${candidates.length}`)
+}
+const candidateSet = new Set(candidates)
+for (const path of candidateSet) if (!expected.has(path)) errors.push(`固定提交候选源文件未进入清单：${path}`)
+for (const path of expected) if (!candidateSet.has(path)) errors.push(`清单路径不是 sourceExtensions 候选源文件：${path}`)
 for (const path of expected) if (!treeSet.has(path)) errors.push(`清单路径不在 Git tree 中：${path}`)
 
 for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).sort()) {

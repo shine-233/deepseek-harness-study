@@ -55,7 +55,7 @@ const ROLE_RULES = [
   { test: p => /(^|\/)(contract|coordinator-contract)\.[^.]+$/i.test(p), role: '共享测试契约', purpose: '这个文件把一组后端或实现都必须满足的测试规则集中起来，让多个实现用同一份契约比较。' },
   { test: p => /(^|\/)(assemble|event-script|.*helper|fake-api|tool-details-render)\.[^.]+$/i.test(p) && /\/tests\//i.test(p), role: '测试工具', purpose: '这个文件给多个测试提供组装、模拟或渲染辅助；它帮助测试表达意图，但自己通常不负责最终断言。' },
   { test: p => isTestCase(p), role: '测试用例', purpose: '这个文件用自动化检查一个行为、边界或回归问题。它把“应该发生什么”写成可以重复运行的证据。' },
-  { test: p => /(^|\/)fixtures?(\/|$)|snapshot/i.test(p), role: '测试夹具', purpose: '这个文件提供测试需要的固定输入、输出或快照。它不是线上功能本身，而是让测试每次使用同一份材料。' },
+  { test: p => isFixtureFile(p), role: '测试夹具', purpose: '这个文件提供测试需要的固定输入、输出或快照。它不是线上功能本身，而是让测试每次使用同一份材料。' },
   { test: p => isTestFile(p), role: '测试支持', purpose: '这个文件是测试运行需要的支持代码；它准备输入、启动替身或复用断言，但不把自己冒充成最终测试用例。' },
   { test: p => /(^|\/)scripts?\//i.test(p), role: '仓库自动化脚本', purpose: '这个文件执行构建、检查、生成、打包、发布或开发辅助命令，把容易重复出错的步骤固定成可复用的自动化流程。' },
   { test: p => /(^|\/)native\/[^/]+\/scripts?\//i.test(p), role: '原生包自动化脚本', purpose: '这个文件为原生包执行构建、打包或平台验证，把编译器、目标平台和发布产物规则集中在原生边界内。' },
@@ -178,12 +178,12 @@ function git(args, cwd) {
 }
 
 function isTestFile(file) {
-  return /(^|\/)(test|tests|__tests__|fixtures?)(\/|$)|\.(test|spec|e2e|compat|snapshot)\.[^.]+$/i.test(file)
+  return /(^|\/)(test|tests|__tests__|fixtures?)(\/|$)|\.(test|spec|e2e|compat|snapshot|stress|perf)\.[^.]+$/i.test(file)
 }
 
 function isTestCase(file) {
   return /(^|\/)test_[^/]+\.[^.]+$/i.test(file)
-    || /\.(test|spec|e2e|compat|snapshot)\.[^.]+$/i.test(file)
+    || /\.(test|spec|e2e|compat|snapshot|stress|perf)\.[^.]+$/i.test(file)
 }
 
 function isTestSupportFile(file) {
@@ -191,7 +191,8 @@ function isTestSupportFile(file) {
 }
 
 function isFixtureFile(file) {
-  return /(^|\/)fixtures?(\/|$)|snapshot/i.test(file)
+  return /(^|\/)(fixtures?|snapshots?)(\/|$)/i.test(file)
+    || /\.snapshot\.[^.]+$/i.test(basename(file))
 }
 
 function extension(file) {
@@ -247,7 +248,7 @@ function bucketFor(file) {
 }
 
 function stem(file) {
-  return basename(file).replace(/\.[^.]+$/, '').replace(/\.(test|spec|e2e|compat|snapshot)$/i, '')
+  return basename(file).replace(/\.[^.]+$/, '').replace(/\.(test|spec|e2e|compat|snapshot|stress|perf)$/i, '')
 }
 
 function packageRootFor(file) {
@@ -268,7 +269,10 @@ const ROLE_OVERRIDES = new Map([
   ['apps/web/index.html', { role: 'HTML 页面壳', purpose: '它提供浏览器启动所需的 #root、manifest、favicon 和 TypeScript 入口。' }],
   ['apps/web/src/main.ts', { role: 'Web 启动入口', purpose: '它找到 #root，检查页面契约，再创建并运行 AppWebEntry。' }],
   ['apps/web/src/node-module-stub.ts', { role: '浏览器兼容桩', purpose: '它为浏览器构建提供故意失败的 node:module 桩，防止 Node-only 动态模块路径静默失效。' }],
-  ['apps/web/stress-tests/reasoning-chunks.stress.ts', { role: '浏览器压力测试', purpose: '它用大量 reasoning chunk 测量浏览器事件处理和交互延迟，验证增量内容不会阻塞界面。' }],
+  ['apps/web/stress-tests/reasoning-chunks.stress.ts', { role: '浏览器压力测试', purpose: '它是一个需要显式运行的浏览器压力测试，用 100,000 个 reasoning chunk 测量事件处理和交互延迟；它不是默认功能测试，也不是线上业务入口。' }],
+  ['apps/web/tests/complex-history.perf.ts', { role: '浏览器性能基准', purpose: '它是一个需要显式运行的浏览器性能基准，构造高基数 workspace、history 和 trajectory 场景并报告测量结果；它没有严格的耗时断言，因此不能被当成性能门禁。' }],
+  ['vitest.snapshot.config.ts', { role: '构建或测试配置', purpose: '它为 snapshot 测试套件选择运行环境、文件范围和共享测试配置，让快照更新与普通单元测试使用明确且可重复的规则。' }],
+  ['packages/sandbox/sandbox-windows-acl/verify/abi-probe.cpp', { role: 'Windows ABI 探针', purpose: '它读取实际 MinGW Windows 头文件中的 sizeof、offsetof 和枚举值，为 Node.js/Koffi FFI 定义提供 ABI 事实；它是验证探针，不是生产沙箱实现。' }],
   ['apps/web/tests/assembled-boot.ts', { role: '测试启动脚手架', purpose: '它装配 Web 测试插件、模拟浏览器环境并清理状态，供多个场景复用。' }],
   ['apps/web/tests/chat-scroll-fixture.ts', { role: '会话日志测试夹具', purpose: '它生成可重复的长会话 JSONL，供滚动、历史分页和虚拟列表测试使用。' }],
   ['apps/web/tests/scaffold.ts', { role: '浏览器 E2E 测试基础设施', purpose: '它统一 Web E2E 的真实组合、replay、临时目录、端口和清理流程。' }],
@@ -289,6 +293,10 @@ const ROLE_OVERRIDES = new Map([
   ['packages/core/tools/src/json-schema.ts', { role: 'JSON Schema 子集验证器', purpose: '它验证 DSH 支持的 JSON Schema 子集、关键字组合和 object-root 约束。' }],
   ['packages/core/tools/src/presentation.ts', { role: '工具呈现契约', purpose: '它定义工具调用和结果如何呈现，不负责真正执行工具。' }],
   ['packages/core/tools/src/testing.ts', { role: '工具测试夹具工厂', purpose: '它提供 canonical tool-definition 测试夹具，让各个工具测试共享一致的定义材料。' }],
+  ['packages/llm/llm-deepseek/src/index.ts', { role: 'DeepSeek 模型插件入口', purpose: '它把 DeepSeek provider 注册到 `ctx.llm`，在每次请求解析最新的 endpoint、凭据、模型目录和超时配置，并只在 retry policy 改变时原位替换注册；这样设置变化不会让进行中的流失去已经采用的连接事实。' }],
+  ['packages/terminal/tool-terminal/src/invariant.ts', { role: '不变量伴随插件', purpose: '它是终端工具包的 Cordis companion：声明需要 `invariants` 服务并注册一个空安装器，明确记录这个包不拥有可检查的运行时不变量，PTY 生命周期和后台任务关系仍由组合它的服务负责。' }],
+  ['packages/client/ui-conversation/src/client/chat/accessibility.module.css', { role: '界面无障碍样式', purpose: '它提供 `.visuallyHidden` 样式：元素仍留在可访问性树中，但从视觉布局中移开，供屏幕阅读器读取隐藏的辅助文本。' }],
+  ['packages/client/ui-conversation/src/client/skeleton/ConversationRoot.module.css', { role: '对话列布局样式', purpose: '它定义 ConversationRoot 的列布局、标题、标签、滚动区、composer seat、hero 阶段和窄屏宽度变量，让会话正文与输入区在不同视图状态下共享同一条几何规则。' }],
   ['packages/core/session/src/preparation.ts', { role: '会话发布前生命周期', purpose: '它管理尚未发布的 Session 及 provider-owned 状态，明确 prepare、publish、release 的幂等边界。' }],
   ['packages/core/session/src/chunk-rows.ts', { role: '会话分页行构建器', purpose: '它把会话事件整理成可分页、可渲染的读取行。' }],
   ['packages/core/session/src/request-header.ts', { role: '请求配置持久化锚点', purpose: '它记录请求配置变化，让会话恢复时能解释每次请求使用的选择。' }],
@@ -421,7 +429,7 @@ function fileSubject(file) {
     if (value && !labels.includes(value)) labels.push(value)
   }
   if (labels.length > 0) return `${labels.slice(0, 3).join('、')}（\`${base}\`）`
-  return `\`${base}\` 文件对应的功能`
+  return `\`${base}\``
 }
 
 const SPECIFIC_PURPOSES = new Map([
@@ -479,6 +487,13 @@ const SPECIFIC_DESIGN_REASONS = new Map([
   ['apps/web/src/main.ts', '页面根节点检查和 AppWebEntry 创建是 Web 启动的唯一宿主责任；入口保持薄并尽早报告缺失的 `#root`，可以把 HTML 错误与应用组合错误区分开。'],
   ['apps/web/src/node-module-stub.ts', '浏览器构建不能真正提供 Node 的动态模块能力，因此用显式失败桩取代假实现；这样错误会在错误路径第一次被执行时暴露，而不是以静默缺功能的方式传播到界面。'],
   ['apps/web/stress-tests/reasoning-chunks.stress.ts', '增量 reasoning 的性能风险来自事件数量和主线程调度，不应与普通功能测试混在一起；独立压力场景可以固定输入规模、测量延迟，并避免把性能假设藏在业务断言里。'],
+  ['apps/web/tests/complex-history.perf.ts', '浏览器速度会受到机器和宿主影响，不能把一次耗时读数当成跨机器的正确性断言；把高基数数据构造、结构性断言和观测报告放在 opt-in 基准中，既能发现退化，也不会把环境噪声误报成产品失败。'],
+  ['vitest.snapshot.config.ts', '快照测试需要稳定的环境、文件选择和更新边界；把这些规则单独放在配置文件中，运行器和贡献者都能看见何时会读取或更新快照，避免快照行为藏在业务代码里。'],
+  ['packages/sandbox/sandbox-windows-acl/verify/abi-probe.cpp', 'FFI 的结构体布局和枚举值不能靠手工猜测；在目标 MinGW 头文件环境中编译并打印 sizeof、offsetof 和枚举值，再由 probe 测试与 Node.js/Koffi 定义交叉核对，可以把 ABI 漂移尽早暴露。'],
+  ['packages/llm/llm-deepseek/src/index.ts', 'DeepSeek provider 的可变连接事实和 Cordis 注册事实不是同一种状态；把每次请求的 endpoint、凭据和 catalog 解析，与 retry policy 的原位 replace 分开，既能让新设置进入下一次请求，又不会让路由在 dispose/re-register 的空窗期短暂消失。'],
+  ['packages/terminal/tool-terminal/src/invariant.ts', '不拥有运行时不变量的包也需要明确的 companion 入口，否则自动化工具会把“没有 companion”误读为遗漏；空 installer 把责任边界写进插件树，同时让真正拥有 PTY 和后台任务关系的服务保留唯一维护位置。'],
+  ['packages/client/ui-conversation/src/client/chat/accessibility.module.css', '无障碍辅助文本需要从布局中移开但不能使用 `display: none` 或 `visibility: hidden`；把这条视觉隐藏规则独立成 CSS module，可以让组件复用同一套可访问样式而不把屏幕阅读器语义散落在 JSX 中。'],
+  ['packages/client/ui-conversation/src/client/skeleton/ConversationRoot.module.css', 'ConversationRoot 同时承载 header、transcript、view overlay 和 composer seat；把共享宽度、滚动条预留、sticky/absolute seat 以及 hero/active/settling 状态放在根样式中，兄弟子树才能使用同一几何约束而不各自计算输入区位置。'],
   ['apps/web/tests/assembled-boot.ts', 'Web 测试需要真实的插件组合和可控的浏览器环境；共享启动脚手架把装配和清理固定下来，场景测试才能只改变一个行为变量并避免各自启动出不同的应用。'],
   ['apps/web/tests/chat-scroll-fixture.ts', '滚动和虚拟列表回归依赖事件顺序、消息长度和分页边界；用 Session 生成固定 JSONL，比复制一堆 UI 假对象更接近真实读取侧，同时仍然不依赖用户数据。'],
   ['apps/web/tests/scaffold.ts', 'E2E 测试同时占用插件树、端口、临时目录和 replay 状态；把这些资源的获取与释放集中处理，才能保证测试之间隔离，并在失败时保留可诊断证据。'],
@@ -733,7 +748,14 @@ function rawPurposeFor(file, role, meta = {}) {
   }
   if (role.role === '工具呈现模型') return `它为工具结果准备可展示的 ${fileSubject(file)} 模型，供 UI 读取和渲染；它不负责启动、审批或执行工具。`
   if (role.role === '轨迹界面逻辑') return `它实现 ${fileSubject(file)} 的时间线或 ledger 展示逻辑，处理用户可见的顺序、折叠和筛选状态。`
-  if (role.role === '仓库自动化脚本') return `它执行 ${concept}相关的构建、检查、打包、发布或开发辅助步骤，把容易重复出错的操作固定成可复用命令。`
+  if (role.role === '仓库自动化脚本') {
+    const sourceHint = meta.doc
+      ? `固定提交的顶部注释把它定位为“${meta.doc}”`
+      : scannedDeclarationSummary(meta)
+        ? `固定提交中扫描到的声明包括 ${scannedDeclarationSummary(meta)}`
+        : '固定提交没有扫描到顶部注释或顶层声明'
+    return `它执行 ${concept}相关的构建、检查、打包、发布或开发辅助步骤，把容易重复出错的操作固定成可复用命令；${sourceHint}，具体命令和输入输出仍应回到源码确认。`
+  }
   if (role.role === '原生实现') return `它实现 ${concept}需要的操作系统或底层能力；上层通过边界接口使用它，不必把平台细节散落到业务代码中。`
   if (role.role === 'Python 模块') return `它实现 ${concept}的 Python 侧职责，把 SDK 调用、runtime 载体或示例流程连接到 Harness 的协议边界。`
   if (role.role === '数据库脚本') return `它定义 ${concept}使用的数据库结构、查询或迁移步骤，让持久化变化可以被审查、重复执行和验证。`
@@ -857,7 +879,14 @@ function designReason(file, role, meta = {}, graph = {}) {
   if (role === '界面样式') return `把 ${fileSubject(file)} 的样式与业务流程分开，浏览器端可以调整外观而不改变服务端或 agent 的行为；组件只通过 class 和状态选择器使用它。`
   if (role === '工具呈现模型') return '工具执行结果和 UI 卡片不是同一种结构；单独维护呈现模型，能让 CLI/Web 选择各自的视觉表达，而不会把执行层绑死在某个组件上。'
   if (role === '轨迹界面逻辑') return '轨迹时间线需要把事件顺序、耗时和折叠状态呈现给用户，但这些状态不应反向修改 Session 原始事实；单独的界面层保留了这种读取侧边界。'
-  if (role === '原生包自动化脚本') return '原生构建和平台验证依赖编译器、目标系统和产物布局；把这组步骤留在原生包的自动化边界中，JavaScript 业务层就不必携带平台分支。'
+  if (role === '原生包自动化脚本') {
+    const sourceHint = meta.doc
+      ? `固定提交的顶部注释把它定位为“${meta.doc}”`
+      : scannedDeclarationSummary(meta)
+        ? `固定提交中扫描到的声明包括 ${scannedDeclarationSummary(meta)}`
+        : '固定提交没有扫描到顶部注释或顶层声明'
+    return `原生构建和平台验证依赖编译器、目标系统和产物布局；把这组步骤留在原生包的自动化边界中，JavaScript 业务层就不必携带平台分支。${sourceHint}。`
+  }
   if (role === '功能实现') {
     const importedCount = graph.importsByFile?.get(file)?.length ?? 0
     const importerCount = graph.importersByTarget?.get(file)?.size ?? 0
@@ -875,6 +904,24 @@ function designReason(file, role, meta = {}, graph = {}) {
     return `固定提交中它与 ${importedCount} 个相对依赖和 ${importerCount} 个直接使用者相连；保持这个文件职责较窄，可以让依赖方向和替换边界清楚。`
   }
   return `它位于 ${file.split('/').slice(0, -1).join('/') || '仓库根部'}的${role}层；固定提交没有解析到本地依赖或顶层声明，因此先把它作为独立边界阅读，再回到源码确认具体实现。`
+}
+
+function designEvidenceFor(file, meta = {}, graph = {}, sourceRead = false) {
+  if (!sourceRead) {
+    return '本次生成没有提供固定提交的源码归档，未执行顶部注释、声明、结构或本地 import 扫描；不能把 import 数量写成 0，也不能把路径模板当成源码事实。这是文件级证据不可用的提醒，仍不替代人工源码阅读。'
+  }
+  const parts = []
+  const imports = graph.importsByFile?.get(file) ?? []
+  const importers = [...(graph.importersByTarget?.get(file) ?? [])].sort()
+  const declarations = scannedDeclarationSummary(meta)
+  if (meta.doc) parts.push(`源码顶部注释把它定位为“${meta.doc}”`)
+  if (declarations) parts.push(`固定提交中扫描到的声明包括 ${declarations}`)
+  if (meta.structure) parts.push(`固定提交中扫描到的结构线索是：${meta.structure}`)
+  parts.push(`本地静态 import 图显示它直接依赖 ${imports.length} 个源文件，并被 ${importers.length} 个源文件直接引用`)
+  if (parts.length === 1) {
+    parts.unshift('本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索')
+  }
+  return `${parts.join('；')}。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。`
 }
 
 function sourceFilePath(file, sourceRoot) {
@@ -1245,36 +1292,50 @@ function pathList(paths, fallback) {
     : fallback
 }
 
-function readingOrderFor(file, role, relation, graph) {
-  const packageRoot = packageRootFor(file)
+function readmeInstructionFor(file, pathSet) {
+  const readme = packageReadme(file, pathSet)
+  return readme
+    ? `先读 \`${readme}\``
+    : '固定提交没有找到近邻 README，直接阅读当前文件和它的真实消费者'
+}
+
+function readingOrderFor(file, role, relation, graph, pathSet) {
   const imports = (graph.importsByFile.get(file) ?? []).filter(candidate => candidate !== file)
   const importers = [...(graph.importersByTarget.get(file) ?? [])].sort().filter(candidate => candidate !== file)
   const tests = [...(relation.files ?? []), ...(relation.indirectFiles ?? [])]
   const testHint = pathList(tests, '同包中与它同名或覆盖相近场景的测试')
   const importerHint = pathList(importers, '所在包的入口或服务')
   const importHint = pathList(imports, '相关类型、协议或实现')
+  const readmeHint = readmeInstructionFor(file, pathSet)
   const manualHint = MANUAL_FILES.has(file)
     ? '本文件另有人工精读，可继续看 [核心文件精读](../03-核心文件精读.md)；自动索引只提供定位线索，复杂行为需要回到源码和测试确认。'
     : '自动索引只提供定位线索，复杂行为需要回到源码和测试确认。'
 
   if (isTestCase(file)) {
     const productionImports = imports.filter(candidate => !isTestFile(candidate))
-    const productionHint = productionImports.length > 0
-      ? `它直接导入的被测实现 ${pathList(productionImports, importHint)}`
-      : `源码中与它对应的被测实现或契约 ${importHint}`
-    return `先看${productionHint}，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。${manualHint}`
+    const supportImports = imports.filter(candidate => isTestSupportFile(candidate))
+    if (productionImports.length > 0) {
+      return `先看它直接导入的被测实现 ${pathList(productionImports, importHint)}，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。${manualHint}`
+    }
+    if (supportImports.length > 0) {
+      return `先看它直接使用的测试支持 ${pathList(supportImports, importHint)}，再读本文件的测试主题、输入和断言；最后回到被测表面和失败输出。${manualHint}`
+    }
+    return `先看源码中与它对应的被测实现或契约 ${importHint}，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。${manualHint}`
   }
   if (role === '测试夹具' || role === '测试支持' || role === '测试工具' || role === '测试服务器') {
     return `先看它提供的固定输入或环境，再跳到实际使用它的测试 ${testHint}，最后回看被测实现和清理路径。${manualHint}`
   }
+  if (role === 'Windows ABI 探针') {
+    return `${readmeHint}、Node/Koffi FFI 定义和实际头文件，再读当前探针，最后对照 ${testHint}，确认打印出来的布局和枚举值确实被交叉核对。${manualHint}`
+  }
   if (/构建或测试配置|配置与数据形状|Profile 配置解析|文档网站构建配置|文档发布清单|.*构建器|.*发布构建器|.*门禁|.*验证器/.test(role)) {
-    return `先读 \`${packageRoot}\` 的 README 或发布说明，再读本配置/脚本，沿着 ${importerHint} 确认它如何影响入口和产物，最后对照对应 gate 或快照测试。${manualHint}`
+    return `${readmeHint}，再读本配置/脚本，沿着 ${importerHint} 确认它如何影响入口和产物，最后对照对应 gate 或快照测试。${manualHint}`
   }
   if (/程序入口|HTML 页面壳|页面模板|启动入口|启动服务|Bundle 组合/.test(role)) {
-    return `先读 \`${packageRoot}\` 的 README 和组合清单，再读当前入口，沿着它交给的应用或 ${importerHint} 继续，最后对照启动、配置和 E2E 测试。${manualHint}`
+    return `${readmeHint} 和组合清单，再读当前入口，沿着它交给的应用或 ${importerHint} 继续，最后对照启动、配置和 E2E 测试。${manualHint}`
   }
   if (/模块入口|类型契约|类型声明|数据规格|配置与数据形状|事件契约|协议边界|JSON Schema|JSON 边界|扩展槽位契约|品牌类型|消息模型/.test(role)) {
-    return `先读 \`${packageRoot}\` 的入口和消费者，再读当前契约，沿着 ${importerHint} 看它怎样约束运行时，最后对照 ${testHint}。${manualHint}`
+    return `${readmeHint}、入口和消费者，再读当前契约，沿着 ${importerHint} 看它怎样约束运行时，最后对照 ${testHint}。${manualHint}`
   }
   if (/持久化|会话|状态投影|状态存储|不变量|故障修复|查询|队列|状态管理器|领域模型/.test(role)) {
     return `先读相关类型和事件，再读当前状态或存储实现，沿着 ${importHint} 和 ${importerHint} 理解状态变化，最后对照 ${testHint}。${manualHint}`
@@ -1283,12 +1344,12 @@ function readingOrderFor(file, role, relation, graph) {
     return `先读客户端运行时契约或呈现模型，再读当前界面文件，沿着 ${importerHint} 确认状态如何进入 UI，最后对照 ${testHint}。${manualHint}`
   }
   if (/脚本|生成器|发布|清理|清单|翻译|Wine/.test(role) || file.startsWith('scripts/')) {
-    return `先读仓库贡献或发布说明，再读当前脚本，沿它调用的配置、命令和 ${importHint} 确认输入输出，最后对照同目录的门禁或发布测试。${manualHint}`
+    return `${readmeHint} 和贡献/发布配置，再读当前脚本，沿它调用的配置、命令和 ${importHint} 确认输入输出，最后对照同目录的门禁或发布测试。${manualHint}`
   }
   if (file.startsWith('vendor/') || file.startsWith('native/')) {
-    return `先读 ${file.startsWith('vendor/') ? '`vendor/README.md` 和上游 Manifest' : `\`${packageRoot}\` 的 README 和平台说明`}，再读当前边界，沿 wrapper 和 ${importerHint} 确认平台影响，最后对照原生或兼容性测试。${manualHint}`
+    return `${readmeHint}、上游 Manifest 和平台说明，再读当前边界，沿 wrapper 和 ${importerHint} 确认平台影响，最后对照原生或兼容性测试。${manualHint}`
   }
-  return `先读 \`${packageRoot}\` 的 README 和入口，再读当前实现，沿着 ${importHint} 和 ${importerHint} 确认输入输出，最后对照 ${testHint}。${manualHint}`
+  return `${readmeHint} 和入口，再读当前实现，沿着 ${importHint} 和 ${importerHint} 确认输入输出，最后对照 ${testHint}。${manualHint}`
 }
 
 function markdownLink(file, commit) {
@@ -1351,13 +1412,14 @@ function main() {
       lines.push(`- 文件角色：${role.role}`)
       lines.push(`- 这个文件有什么用：${cleanChineseSpacing(purposeFor(file, role, meta))}`)
       lines.push(`- 为什么这样设计：${cleanChineseSpacing(designReason(file, role.role, meta, importGraph))}`)
-      lines.push(`- 直接协作者：${links.length > 0 ? links.map(link => markdownLink(link, commit)).join('、') : '同目录没有可由路径确定的相邻源文件；先看所在包的 README 和入口文件。'}`)
+      lines.push(`- 文件级设计证据：${cleanChineseSpacing(designEvidenceFor(file, meta, importGraph, sourceTexts.has(file)))}`)
+      lines.push(`- 直接协作者：${links.length > 0 ? links.map(link => markdownLink(link, commit)).join('、') : '同目录没有可由路径确定的相邻源文件；先读当前文件的真实消费者和所在层入口。'}`)
       lines.push(`- 对应测试：${testFiles.length > 0 ? testFiles.map(test => markdownLink(test, commit)).join('、') : indirectTestFiles.length > 0 ? `间接测试线索（通过本地 import 链，非直接覆盖）：${indirectTestFiles.map(test => markdownLink(test, commit)).join('、')}` : isTestCase(file) ? '本文件本身就是测试用例。' : isTestSupportFile(file) ? '没有发现直接使用本支持文件的测试用例。' : '没有确认到直接测试；公共入口可能仍有间接覆盖。'}`)
       lines.push(`- 测试关联依据：${cleanChineseSpacing(relation.basis)}`)
       if (testSupport.length > 0) {
         lines.push(`- 测试支持：${testSupport.map(test => markdownLink(test, commit)).join('、')}`)
       }
-      lines.push(`- 阅读顺序：${cleanChineseSpacing(readingOrderFor(file, role.role, relation, importGraph))}`)
+      lines.push(`- 阅读顺序：${cleanChineseSpacing(readingOrderFor(file, role.role, relation, importGraph, pathSet))}`)
       lines.push(`- 代码证据：${details.length > 0 ? `固定提交归档实际读取结果：${details.join('；')}。` : '本次索引只读取了固定提交的 Git tree；没有把未经读取的实现细节写成确定事实。'} 这些数字和声明用于定位，不替代源码阅读。`)
       lines.push(`- 固定版本：源码链接固定到官方提交 \`${commit}\`；如果当前条目与运行版本不同，应先重新生成索引再下结论。`)
       lines.push('')
