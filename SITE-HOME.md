@@ -14,6 +14,9 @@ hero:
       text: 我只想查一个文件
       link: /study/files/README
     - theme: alt
+      text: 15 分钟照着做
+      link: /study/lessons/25-首页到第一次产出的傻瓜式任务单
+    - theme: alt
       text: 了解网页与云端学习
       link: /study/lessons/21-GitHub网页与Codespaces学习路线
 features:
@@ -33,6 +36,8 @@ features:
 
 > 如果你只是想阅读，停留在 GitHub 网页就够了；不要为了打开教材点击 `Code`、下载源码或创建 Codespace。
 
+> 不想选择路线？直接打开[15 分钟傻瓜式任务单](study/25-首页到第一次产出的傻瓜式任务单.md)，按顺序点击并写下第一条源码结论。
+
 ## 第二步：按你的问题只选一条
 
 | 你的问题 | 点击这里 | 第一轮结束时应能回答 |
@@ -44,6 +49,7 @@ features:
 | 我只想查一个源文件 | [逐文件索引导航](study/文件索引/README.md) | 这个文件的用途、协作者、测试线索和下一跳在哪里 |
 | 我想知道索引卡片是否真的准确 | [高风险索引人工抽查](study/24-高风险索引人工抽查.md) | 自动索引、源码事实和运行时证据怎样分开 |
 | 我想运行检查或实验 | [网页、github.dev 与 Codespaces](study/21-GitHub网页与Codespaces学习路线.md) | 哪些事只需网页，哪些事才需要云端终端 |
+| 我想知道以后还能做什么 | [后续研究路线](study/26-后续研究路线.md) | 哪些工作值得做，哪些工作需要宿主、模型或仓库权限 |
 
 ## 这份教材怎样保证不乱说
 

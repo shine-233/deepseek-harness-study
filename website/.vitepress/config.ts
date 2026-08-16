@@ -228,6 +228,9 @@ const siteStyle = `
 .VPHome .VPHero .name {
   letter-spacing: -0.045em;
 }
+.VPHome .VPHero .text {
+  max-width: 700px;
+}
 .VPHome .VPHero .tagline {
   max-width: 760px;
 }
@@ -346,7 +349,7 @@ export default withMermaid({
       label: '简体中文',
       lang: 'zh-CN',
       themeConfig: {
-        siteTitle: siteTitle('技术预览'),
+        siteTitle: siteTitle('中文教材'),
         nav: [
           { text: '源码学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/' },
           { text: '入门', link: landingLink('root', guideModules.root.guide), activeMatch: '^/guide/' },
