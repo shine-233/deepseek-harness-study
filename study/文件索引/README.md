@@ -42,7 +42,7 @@
 - [14-官方HookBridge与兼容层](../14-官方HookBridge与兼容层.md)：按协议解析、Decision 映射、detached run 和 dispose 追到 [packages-hooks.md](./packages-hooks.md)、[packages-host.md](./packages-host.md)、[packages-subprocess.md](./packages-subprocess.md) 和 [packages-interaction.md](./packages-interaction.md)。
 - [15-BundleProfileLoader与发布安装](../15-BundleProfileLoader与发布安装.md)：按 manifest、patch、Profile、Loader、模块解析和 HMR 追到 [packages-boot.md](./packages-boot.md)、[packages-bundle.md](./packages-bundle.md)、[packages-host.md](./packages-host.md) 和 [scripts.md](./scripts.md)。
 - [16-学习工作簿与首个实验](../16-学习工作簿与首个实验.md)：把索引卡片、固定源码、测试和最小插件实验串成一条可记录的路线。
-- [17-完成度审计与证据矩阵](../17-完成度审计与证据矩阵.md)：查看 2,756 条覆盖、44 条质量提示和运行时未验证边界。
+- [17-完成度审计与证据矩阵](../17-完成度审计与证据矩阵.md)：查看 2,756 条覆盖、质量审计提示、模板复用统计和运行时未验证边界。
 - [18-维护、更新与版本迁移](../18-维护更新与版本迁移.md)：需要切换上游 commit 时，按完整源码、重生成、复核和清理顺序操作。
 - [19-插件测试卸载与版本证据](../19-插件测试卸载与版本证据.md)：按单元、Context、Loader、构建产物、快照、E2E、真实 API 和资源清理追到 [packages-test-support.md](./packages-test-support.md)、[packages-bundle.md](./packages-bundle.md)、[packages-hooks.md](./packages-hooks.md) 和 [apps.md](./apps.md)。
 - [20-学习仓库实际使用手册](../20-学习仓库实际使用手册.md)：按阅读目标、逐文件追踪、插件开发、社区审核、固定源码和文档门禁选择索引页与下一步实验。

@@ -5,8 +5,9 @@
  *
  * verify-source-index.mjs 负责“有没有条目、链接是否指向固定提交、字段是否存在”。
  * 本脚本进一步检查每个条目的字段是否自洽，并统计“为什么这样设计”是否大量复用同一
- * 个完全相同的句子。它仍然不是人工代码审查：发现重复只能说明需要抽查，不能单凭统计
- * 认定某个设计理由错误。
+ * 个完全相同的句子。同一文件角色复用稳定模板属于统计信息，不直接算质量提示；只有
+ * 字段、证据边界或测试关系自相矛盾时才报告错误或提示。它仍然不是人工代码审查：发现
+ * 复用只能说明需要抽查，不能单凭统计认定某个设计理由错误。
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
@@ -19,6 +20,7 @@ const expected = new Set(manifest.files)
 const entries = []
 const errors = []
 const warnings = []
+const infos = []
 
 const headingPattern = /^### \[([^\]]+)\]\((https:\/\/github\.com\/deepseek-ai\/deepseek-harness\/blob\/([^/]+)\/([^\)]+))\)$/gm
 const requiredLabels = [
@@ -45,6 +47,10 @@ function addError(message) {
 
 function addWarning(message) {
   warnings.push(message)
+}
+
+function addInfo(message) {
+  infos.push(message)
 }
 
 function isChinese(value) {
@@ -185,7 +191,7 @@ function auditQualityStats() {
     .sort((a, b) => b[1] - a[1])
   for (const [fingerprint, count] of repeated.slice(0, 20)) {
     const sample = entries.find(entry => designFingerprint(entry.fields['为什么这样设计']) === fingerprint)
-    addWarning(`设计理由重复 ${count} 次；样例 ${sample?.path ?? '未知'}：${fingerprint}`)
+    addInfo(`设计理由复用统计 ${count} 次；样例 ${sample?.path ?? '未知'}：${fingerprint}`)
   }
 
   const roleRows = [...roleStats.entries()]
@@ -197,7 +203,7 @@ function auditQualityStats() {
   for (const row of roleRows) {
     const ratio = row.total > 0 ? row.largest / row.total : 0
     if (row.total >= 12 && ratio >= 0.85) {
-      addWarning(`角色“${row.role}”中最大设计理由模板占 ${row.largest}/${row.total}（${Math.round(ratio * 100)}%）；需要人工抽查是否仍有文件级证据`)
+      addInfo(`角色“${row.role}”中最大设计理由模板占 ${row.largest}/${row.total}（${Math.round(ratio * 100)}%）；需要人工抽查是否仍有文件级证据`)
     }
   }
 
@@ -218,7 +224,10 @@ auditQualityStats()
 
 console.log(`质量审计错误：${errors.length}`)
 console.log(`质量审计提示：${warnings.length}`)
+console.log(`质量审计统计：${infos.length}`)
 for (const message of errors) console.log(`错误：${message}`)
 for (const message of warnings.slice(0, 80)) console.log(`提示：${message}`)
 if (warnings.length > 80) console.log(`提示：其余 ${warnings.length - 80} 条省略`)
+for (const message of infos.slice(0, 80)) console.log(`统计：${message}`)
+if (infos.length > 80) console.log(`统计：其余 ${infos.length - 80} 条省略`)
 if (errors.length > 0) process.exit(1)

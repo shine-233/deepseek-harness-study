@@ -2,7 +2,7 @@
 
 /**
  * 检查手写学习材料中的官方源文件路径，避免教程把读者送到固定提交中不存在的文件。
- * 逐文件索引的链接由 verify-source-index.mjs 检查；这里补充 README 和 study/*.md。
+ * 逐文件索引的链接由 verify-source-index.mjs 检查；这里补充 README、START-HERE 和 study/*.md。
  */
 
 import { execFileSync } from 'node:child_process'
@@ -24,6 +24,7 @@ const treeSet = new Set(tree)
 const sourcePrefixes = ['.agents/', '.github/', 'apps/', 'examples/', 'native/', 'packages/', 'python/', 'scripts/', 'vendor/', 'website/']
 const sourceLikePattern = /(?:^|\/)[^/]+\.(?:ts|tsx|js|jsx|mjs|cjs|vue|svelte|py|c|cc|cpp|h|hh|hpp|rs|go|java|kt|kts|sh|bash|ps1|bat|cmd|sql|html|css|scss|md)$/i
 const manualFiles = [
+  'START-HERE.md',
   'README.md',
   'README.zh.md',
   'UPSTREAM.md',
