@@ -47,13 +47,17 @@ for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).so
   const matches = [...text.matchAll(headingPattern)]
   const headingLikeCount = text.split(/\r?\n/).filter(line => line.startsWith('### [')).length
   if (headingLikeCount !== matches.length) errors.push(`${name}: 有 ${headingLikeCount - matches.length} 个无法解析的源文件标题`)
-  const declared = text.match(/^本页由 .* 共 (\d+) 个代码或界面源文件。$/m)?.[1]
+  const declared = text.match(/^本页由 .*?生成[，,]\s*共\s*(\d+) 个代码或界面源文件。$/m)?.[1]
   if (declared !== undefined && Number(declared) !== matches.length) {
     errors.push(`${name}: 页头声明 ${declared} 个源文件，但实际解析 ${matches.length} 个`)
   }
   for (const match of matches) {
     const path = match[1]
+    const linkedPath = match[4]
     const commit = match[3]
+    if (path !== linkedPath) {
+      errors.push(`${name}: 标题路径 ${path} 与固定 URL 路径 ${linkedPath} 不一致`)
+    }
     const blockStart = match.index + match[0].length
     const nextHeading = text.indexOf('\n### ', blockStart)
     const block = text.slice(blockStart, nextHeading === -1 ? text.length : nextHeading)

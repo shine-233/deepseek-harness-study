@@ -259,6 +259,8 @@ function packageRootFor(file) {
 }
 
 const ROLE_OVERRIDES = new Map([
+  ['packages/mcp/mcp-client/src/tools.ts', { role: 'MCP 工具桥接', purpose: '它把外部 MCP server 发现到的工具转换成 Harness ToolRuntime 能注册和调用的定义，生成带 server 命名空间的稳定工具名，并在连接代际变化时同步增删。' }],
+  ['packages/feedback/message-feedback/src/spec.ts', { role: '反馈数据规格', purpose: '它集中定义 message feedback 的版本、评分、会话身份和条目 schema，让反馈服务、持久化和读取方共享同一份可校验数据规格。' }],
   ['.github/issue-management/policy.mjs', { role: 'GitHub Issue 规则验证器', purpose: '它解析 issue、pull request 和命令文本，检查可见字符、模板要求、标签和状态规则，避免自动化流程接受不符合项目政策的输入。' }],
   ['apps/cli/src/args.ts', { role: 'CLI 参数与 patch 解析', purpose: '它解析 Commander 参数、Profile 选择、patch overlay，并把未知剩余参数原样交给插件命令。' }],
   ['apps/cli/src/dump-config.ts', { role: '配置组合与诊断命令', purpose: '它组合 Profile、overlay 和补丁层，并输出最终配置或诊断信息，让用户看到实际生效的配置。' }],
