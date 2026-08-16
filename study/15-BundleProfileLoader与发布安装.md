@@ -70,7 +70,7 @@ cordis:include 负责引入一组条目，cordis:group 可以把提供方和消�
 
 ## Profile 怎样选择 Bundle
 
-Profile 位于 $DSH_HOME/profiles/<name>。它的 manifest 保存 dsh.profile.bundles 有序列表和树外插件依赖，Profile 自己还可以拥有 cordis.patch.yml。loadProfile 读取这些信息，按顺序找到每一个 Bundle 的 patch，再由 composeEntries 组合出最终条目。
+Profile 位于 `$DSH_HOME/profiles/<name>`。它的 manifest 保存 `dsh.profile.bundles` 有序列表和树外插件依赖，Profile 自己还可以拥有 `cordis.patch.yml`。`loadProfile` 读取这些信息，按顺序找到每一个 Bundle 的 patch，再由 `composeEntries` 组合出最终条目。
 
 Profile 的顺序有实际意义：后面的层可以覆盖前面层的同 id 条目。通常可以把 Bundle 看成默认产品组合，把 Profile patch 看成某个用户或某个部署的选择，把 home patch 和 --patch 看成更高优先级的本地覆盖。
 

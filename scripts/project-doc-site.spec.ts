@@ -266,7 +266,7 @@ describe('docsPages locale routes', () => {
 
   it('publishes every route in both locales and uses every available Chinese counterpart', () => {
     const byRoute = new Map(docsPages.map(page => [page.route, page]))
-    for (const page of docsPages.filter(page => page.locale === 'root')) {
+    for (const page of docsPages.filter(page => page.locale === 'root' && page.sidebar !== 'zh-study')) {
       const counterpart = byRoute.get(`en/${page.route}`)
       expect(counterpart, page.route).toBeDefined()
       expect(counterpart?.locale).toBe('en')
@@ -285,6 +285,14 @@ describe('docsPages locale routes', () => {
         ).toBe(false)
       }
     }
+  })
+
+  it('publishes the Chinese source-learning tree as its own root-only module', () => {
+    const study = docsPages.filter(page => page.sidebar === 'zh-study')
+    expect(study.length).toBeGreaterThan(20)
+    expect(study.every(page => page.locale === 'root' && page.contentLocale === 'zh-CN')).toBe(true)
+    expect(study.some(page => page.route === 'study/index.md' && page.source === 'START-HERE.md')).toBe(true)
+    expect(study.some(page => page.route === 'study/files/README.md' && page.source === 'study/文件索引/README.md')).toBe(true)
   })
 
   it('indexes every subsystem page in both sides of the folder README', () => {
@@ -390,7 +398,7 @@ describe('sidebar ordering', () => {
     // The navigation bar named `/guide/` while the manifest published the guide's
     // first page at `guide/quickstart.md`, so the item served a 404.
     const collections = [
-      ['root', 'zh-guide'], ['root', 'zh-develop'], ['root', 'zh-reference'],
+      ['root', 'zh-study'], ['root', 'zh-guide'], ['root', 'zh-develop'], ['root', 'zh-reference'],
       ['en', 'en-guide'], ['en', 'en-develop'], ['en', 'en-reference'],
     ] as const
     const published = new Set(docsPages.map(page => routeLink(page.route)))

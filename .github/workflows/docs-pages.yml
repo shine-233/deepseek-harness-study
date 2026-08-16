@@ -6,6 +6,9 @@ on:
     paths:
       - '.github/workflows/docs-pages.yml'
       - 'docs/**'
+      - 'study/**'
+      - 'START-HERE.md'
+      - 'study-tools/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -23,6 +26,7 @@ permissions:
 
 env:
   PRIMARY_NODE_VERSION: '24'
+  NODE_OPTIONS: '--max-old-space-size=4096'
   # CI runs must never report to the production telemetry endpoint baked
   # into apps/cli/cordis.yml (AppCLIEntry disables the row when set).
   DSH_TELEMETRY_DISABLED: '1'

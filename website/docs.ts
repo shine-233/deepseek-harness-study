@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { basename, relative, resolve, sep } from 'node:path'
+
 /**
  * Canonical publication manifest for the documentation website.
  *
@@ -12,6 +15,7 @@ export type DocsLocale = 'root' | 'en'
 
 /** Sidebar collection rendered for one locale and top-level module. */
 export type DocsSidebar =
+  | 'zh-study'
   | 'zh-guide'
   | 'zh-develop'
   | 'zh-reference'
@@ -103,6 +107,55 @@ function pairedPages(pages: PairedPage[]): DocsPage[] {
     }
   }))
 }
+
+const repositoryRoot = resolve(import.meta.dirname, '..')
+
+function markdownFiles(directory: string): string[] {
+  const files: string[] = []
+  for (const entry of readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+    const absolute = resolve(directory, entry.name)
+    if (entry.isDirectory()) files.push(...markdownFiles(absolute))
+    else if (entry.isFile() && entry.name.endsWith('.md')) files.push(relative(repositoryRoot, absolute).split(sep).join('/'))
+  }
+  return files
+}
+
+function studyPageLabel(source: string): string {
+  if (source === 'START-HERE.md') return '从这里开始'
+  if (source.startsWith('study/文件索引/')) return `文件索引：${basename(source, '.md')}`
+  const heading = readFileSync(resolve(repositoryRoot, source), 'utf8').match(/^#\s+(.+)$/m)?.[1]
+  return heading ?? basename(source, '.md')
+}
+
+/**
+ * Chinese-only learning pages; the English site keeps the official documentation tree.
+ *
+ * The large generated file-index pages stay in the repository and are linked by
+ * the index navigation page. Rendering those multi-megabyte reference pages in
+ * VitePress makes the static build needlessly fragile, while GitHub remains the
+ * better surface for searching their complete contents.
+ */
+const studyPages: DocsPage[] = [
+  'START-HERE.md',
+  ...markdownFiles(resolve(repositoryRoot, 'study')).filter(source => (
+    !source.startsWith('study/文件索引/') || source === 'study/文件索引/README.md'
+  )),
+].map((source, order) => {
+  const index = source.startsWith('study/文件索引/')
+  const filename = basename(source, '.md')
+  return {
+    locale: 'root',
+    contentLocale: 'zh-CN',
+    source,
+    route: source === 'START-HERE.md'
+      ? 'study/index.md'
+      : index ? `study/files/${filename}.md` : `study/lessons/${filename}.md`,
+    label: studyPageLabel(source),
+    sidebar: 'zh-study',
+    section: index ? '逐文件索引' : '学习路线',
+    order,
+  }
+})
 
 const homeAndGuide = pairedPages([
   {
@@ -427,6 +480,7 @@ export interface DocsSection {
  */
 const sections: Record<DocsLocale, readonly DocsSection[]> = {
   root: [
+    { label: '学习路线' }, { label: '逐文件索引', collapsed: true },
     { label: '入门' }, { label: 'SDK' },
     { label: '基础' }, { label: '框架能力' }, { label: '实战' }, { label: 'Cordis 框架教程' },
     { label: '概念' }, { label: '生成参考' }, { label: 'Cordis API' }, { label: '开发手册' },
@@ -471,6 +525,7 @@ export function sectionSpec(locale: DocsLocale, label: string): DocsSection & { 
 
 /** Every canonical page published by the documentation website. */
 export const docsPages: DocsPage[] = [
+  ...studyPages,
   ...homeAndGuide,
   ...develop,
   ...cordisTutorial,

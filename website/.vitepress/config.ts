@@ -115,6 +115,9 @@ function escapeVueInterpolation(html: string): string {
   return html.replaceAll('{{', '&#123;&#123;').replaceAll('}}', '&#125;&#125;')
 }
 
+const OFFICIAL_REPOSITORY_URL = 'https://github.com/deepseek-ai/deepseek-harness'
+const STUDY_REPOSITORY_URL = 'https://github.com/shine-233/deepseek-harness-study'
+
 const sharedTheme: Pick<DefaultTheme.Config, 'search' | 'socialLinks' | 'editLink'> = {
   search: {
     provider: 'local',
@@ -147,14 +150,17 @@ const sharedTheme: Pick<DefaultTheme.Config, 'search' | 'socialLinks' | 'editLin
     },
   },
   socialLinks: [
-    { icon: 'github', link: 'https://github.com/deepseek-ai/deepseek-harness' },
+    { icon: 'github', link: STUDY_REPOSITORY_URL },
   ],
   editLink: {
     pattern: ({ frontmatter }: PageData) => {
       const data: unknown = frontmatter
       const editSource: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'editSource') : undefined
       if (typeof editSource !== 'string') throw new Error('Projected documentation page has no editSource frontmatter.')
-      return `https://github.com/deepseek-ai/deepseek-harness/edit/master/${editSource}`
+      const repository = editSource === 'START-HERE.md' || editSource.startsWith('study/')
+        ? 'https://github.com/shine-233/deepseek-harness-study'
+        : 'https://github.com/deepseek-ai/deepseek-harness'
+      return `${repository}/edit/master/${editSource}`
     },
     text: '在 GitHub 上编辑此页',
   },
@@ -247,8 +253,8 @@ function siteTitle(previewTag: string): string {
 }
 
 export default withMermaid({
-  title: 'DeepSeek Harness',
-  description: '用于构建 Agent Harness 的插件化 SDK',
+  title: 'DSH 源码学习与官方文档',
+  description: 'DeepSeek Harness 官方文档与中文源码学习教材',
   base,
   head: [
     // VitePress leaves head hrefs untouched, so the base belongs here explicitly.
@@ -267,10 +273,12 @@ export default withMermaid({
       themeConfig: {
         siteTitle: siteTitle('技术预览'),
         nav: [
+          { text: '源码学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/' },
           { text: '入门', link: landingLink('root', guideModules.root.guide), activeMatch: '^/guide/' },
           ...moduleNav('root'),
         ],
         sidebar: {
+          '/study/': sidebar('root', 'zh-study'),
           '/guide/': guideSidebar('root'),
           '/develop/': sidebar('root', 'zh-develop'),
           '/reference/': sidebar('root', 'zh-reference'),
@@ -293,6 +301,7 @@ export default withMermaid({
       themeConfig: {
         siteTitle: siteTitle('Preview'),
         nav: [
+          { text: '源码学习（中文）', link: landingLink('root', 'zh-study'), activeMatch: '^/study/' },
           { text: 'Guide', link: landingLink('en', guideModules.en.guide), activeMatch: '^/en/guide/' },
           ...moduleNav('en'),
         ],
@@ -306,7 +315,10 @@ export default withMermaid({
             const data: unknown = frontmatter
             const editSource: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'editSource') : undefined
             if (typeof editSource !== 'string') throw new Error('Projected documentation page has no editSource frontmatter.')
-            return `https://github.com/deepseek-ai/deepseek-harness/edit/master/${editSource}`
+            const repository = editSource === 'START-HERE.md' || editSource.startsWith('study/')
+              ? 'https://github.com/shine-233/deepseek-harness-study'
+              : 'https://github.com/deepseek-ai/deepseek-harness'
+            return `${repository}/edit/master/${editSource}`
           },
           text: 'Edit this page on GitHub',
         },

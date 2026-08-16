@@ -46,6 +46,15 @@ describe('inspectSiteFragments', () => {
     expect(inspectSiteFragments(root)).toEqual({ checked: 6, broken: [] })
   })
 
+  it('resolves URL-encoded Unicode route names', () => {
+    const root = fixture()
+    mkdirSync(join(root, '中文'), { recursive: true })
+    writeFileSync(join(root, '中文/开始.html'), '<h1 id="就绪">开始</h1>')
+    writeFileSync(join(root, 'guide/unicode.html'), '<a href="/中文/开始#就绪">中文</a>')
+
+    expect(inspectSiteFragments(root).broken).toEqual([])
+  })
+
   it('rejects ambiguous built routes', () => {
     const root = fixture()
     writeFileSync(join(root, 'guide.html'), '<h1 id="flat">Flat</h1>')

@@ -69,6 +69,16 @@ function decodedFragment(hash: string): string {
   }
 }
 
+function decodedPathname(url: URL): string {
+  try {
+    return decodeURIComponent(url.pathname)
+  } catch (error) {
+    if (!(error instanceof URIError)) throw error
+    // Keep the encoded pathname so a malformed URL is reported as an unresolved route.
+    return url.pathname
+  }
+}
+
 /**
  * Check fragment-bearing links in a VitePress output directory.
  *
@@ -124,7 +134,7 @@ export function inspectSiteFragments(distRoot: string): SiteFragmentReport {
       const fragment = decodedFragment(targetUrl.hash)
       if (fragment === '') continue
       checked++
-      const target = byRoute.get(targetUrl.pathname)
+      const target = byRoute.get(decodedPathname(targetUrl))
       if (target === undefined || !target.ids.has(fragment)) {
         broken.push({
           source: page.file,

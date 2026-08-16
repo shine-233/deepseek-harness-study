@@ -16,6 +16,7 @@ import type { Nodes } from 'mdast'
 import { docsPages, type DocsLocale, type DocsPage } from '../website/docs.ts'
 
 const REPOSITORY_URL = 'https://github.com/deepseek-ai/deepseek-harness'
+const STUDY_REPOSITORY_URL = 'https://github.com/shine-233/deepseek-harness-study'
 const root = resolve(import.meta.dirname, '..')
 const generatedRoot = resolve(root, 'website/.generated')
 
@@ -209,10 +210,11 @@ function githubTarget(
   image: boolean,
 ): string {
   const path = repoPath(absPath, repoRoot)
-  if (image) return `https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/${repositoryRef}/${path}${suffix}`
+  const repository = path === 'START-HERE.md' || path.startsWith('study/') ? STUDY_REPOSITORY_URL : REPOSITORY_URL
+  if (image) return `${repository.replace('github.com', 'raw.githubusercontent.com')}/${repositoryRef}/${path}${suffix}`
   const kind = lstatSync(absPath).isDirectory() ? 'tree' : 'blob'
   const lineSuffix = line === undefined ? suffix : `#L${line}`
-  return `${REPOSITORY_URL}/${kind}/${repositoryRef}/${path}${lineSuffix}`
+  return `${repository}/${kind}/${repositoryRef}/${path}${lineSuffix}`
 }
 
 /**
