@@ -4,7 +4,7 @@
 >
 > 只看 GitHub 网页就能开始：不需要下载源码、不需要 API key、不需要安装 pnpm，也不需要先会 TypeScript。进入后按“第一课 → 仓库地图 → 选择一条路线”走；暂时不要点 `Code`，也不要从 2,756 个逐文件索引条目开始。
 
-中文主入口与中文镜像：[README.md](README.md) | [README.zh.md](README.zh.md)
+英文入口：[README.md](README.md)
 
 这是基于 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的非官方学习型 fork。它不属于 DeepSeek AI，不由 DeepSeek AI 维护，也不代表 DeepSeek AI 的官方立场。
 

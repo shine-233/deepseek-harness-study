@@ -158,8 +158,8 @@ const sharedTheme: Pick<DefaultTheme.Config, 'search' | 'socialLinks' | 'editLin
       const editSource: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'editSource') : undefined
       if (typeof editSource !== 'string') throw new Error('Projected documentation page has no editSource frontmatter.')
       const repository = editSource === 'START-HERE.md' || editSource.startsWith('study/')
-        ? 'https://github.com/shine-233/deepseek-harness-study'
-        : 'https://github.com/deepseek-ai/deepseek-harness'
+        ? STUDY_REPOSITORY_URL
+        : OFFICIAL_REPOSITORY_URL
       return `${repository}/edit/master/${editSource}`
     },
     text: '在 GitHub 上编辑此页',
@@ -316,8 +316,8 @@ export default withMermaid({
             const editSource: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'editSource') : undefined
             if (typeof editSource !== 'string') throw new Error('Projected documentation page has no editSource frontmatter.')
             const repository = editSource === 'START-HERE.md' || editSource.startsWith('study/')
-              ? 'https://github.com/shine-233/deepseek-harness-study'
-              : 'https://github.com/deepseek-ai/deepseek-harness'
+              ? STUDY_REPOSITORY_URL
+              : OFFICIAL_REPOSITORY_URL
             return `${repository}/edit/master/${editSource}`
           },
           text: 'Edit this page on GitHub',
