@@ -62,6 +62,12 @@
 - `vendor/` 是 Cordis、Schemastery 等第三方项目的固定副本，但官方 DSH 对它们做了重命名、构建配置和部分行为修改。索引会列出它们；精读时先看固定版本的 [`vendor/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/README.md) 的 Manifest 和 Local modifications，不能把每项实现都直接归因于上游，也不能把它们全部当成 DSH 原创代码。
 - 本仓库新增的导读、索引和生成器不代表官方 API，也不承诺跟随 DSH 的未来兼容性。
 
+## 为什么这个 fork 只保留一条 Actions 工作流
+
+这是学习仓库，不是官方 DSH 的发布镜像。因此 `.github/workflows/` 只保留 `docs-pages.yml`：它负责把中文导读和官方文档构建成 GitHub Pages。上游带来的完整 CI、真实 API E2E、E2B 沙箱、跨平台 Sandbox、npm/PyPI 发布和官方 issue 自动化工作流都已从本 fork 移除，避免误跑外部服务、消耗凭据或把学习仓库误当成官方发布源。
+
+GitHub Actions 的绿色运行只证明“这次文档构建和 Pages 部署通过”；它不证明 DSH 运行时、真实模型调用、插件安装卸载或社区项目安全。要研究这些内容，请回到固定 commit 的源码，按[插件测试、卸载与版本证据](study/19-插件测试卸载与版本证据.md)记录实际命令、输入、输出和清理结果。
+
 ## 运行官方 DSH
 
 如果只是想运行官方项目，仍按官方方式安装 Node.js 和 pnpm：
