@@ -47,7 +47,7 @@ Agent 有 inbox。直接用户消息、注入的运行时上下文和 goal conti
 
 ## `agent/pre-step` 为什么重要
 
-这是模型真正看到输入之前的最后一个可扩展点。插件可以在这里加入工作区指令、时间、技能或目标上下文，也可以因为权限、状态或策略拒绝本次输入。首次领取被拒绝时，DSH 仍然记录一个没有 Step 的 Turn 结束，这让日志能解释“为什么用户发了话却没有模型请求”。
+这是决定哪些消息进入 Step、并可以拒绝本次输入的关键扩展点。插件可以在这里加入工作区指令、时间、技能或目标上下文；之后仍会经过 `agent/request` 和 `llm/stream`。首次领取被拒绝时，DSH 仍然记录一个没有 Step 的 Turn 结束，这让日志能解释“为什么用户发了话却没有模型请求”。
 
 ## 工具调用怎样回来
 
@@ -59,7 +59,7 @@ Agent 有 inbox。直接用户消息、注入的运行时上下文和 goal conti
 
 ## 推荐阅读和验证
 
-先读[核心文件精读](03-核心文件精读.md)里的 `agent-loop/src/agent.ts`、`tool-calls.ts` 和 `runtime-context.ts`，再读官方[架构中的 Turn flow](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/architecture.md#turn-flow)。测试从这些开始：
+先读[核心文件精读](03-核心文件精读.md)里的 `packages/core/agent-loop/src/agent.ts`、`packages/core/agent-loop/src/tool-calls.ts` 和 `packages/core/agent-loop/src/runtime-context.ts`，再读官方[架构中的 Turn flow](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/architecture.md#turn-flow)。测试从这些开始：
 
 - `packages/core/agent-loop/tests/loop.spec.ts`
 - `packages/core/agent-loop/tests/tool-order.spec.ts`

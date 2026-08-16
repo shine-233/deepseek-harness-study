@@ -10,7 +10,7 @@
 Profile
   -> 按顺序列出 Bundle
   -> 每个 Bundle 提供代码包和 cordis.patch.yml
-  -> Profile、用户目录、命令行 overlay 继续修改配置行
+  -> Profile、用户目录、命令行覆盖层（overlay，在已有配置上再叠加一层修改）继续修改配置行
   -> Cordis Loader 读取最终配置
   -> 创建 Context 和插件 Fiber
   -> 插件注册 Service、Event 和可撤销 Effect
@@ -88,7 +88,7 @@ Consumer            使用接口，不关心具体实现
 - Agent scoped 服务只对某个 Agent 的子树可见。
 - 测试可以在隔离 Context 中安装 fake provider，不影响另一个测试。
 
-这就是“能力 seam”的直观版本：接口和实现之间留一个插座，插件通过插座协作。
+这就是“能力扩展边界（seam）”的直观版本：接口和实现之间留一个插座，插件通过这个预留边界协作；它不是一条具体函数调用，而是让实现可以替换的连接位置。
 
 ## Event：插件之间的通知和拦截点
 
@@ -105,7 +105,7 @@ DSH 中要区分两种事实：
 - `parallel` 适合彼此独立的监听器同时工作。
 - `serial` 适合按顺序观察或处理。
 - `bail` 在某个监听器给出足够结果后停止。
-- `waterfall` 要求监听器调用 `next()`，这样监听器可以在委托前后检查或改写数据。
+- `waterfall`（瀑布式派发）要求监听器调用 `next()`，这样监听器可以在委托前后检查或改写数据；如果监听器不继续委托，后面的处理就会停在这里。
 
 选错事件域会造成难以恢复的设计问题。必须恢复的事实应该进入 Session 日志；只影响当前请求的拦截和策略则更适合使用 live event。模型能看到的内容原则上都应该能够从 Session 日志重建，这条不变量是 DSH 可恢复设计的核心。
 
@@ -119,7 +119,7 @@ DSH 中要区分两种事实：
   -> Profile 列出的下一个 Bundle
   -> Profile 自己的 cordis.patch.yml
   -> Harness home 层的 patch
-  -> 命令行 --patch overlay
+  -> 命令行 --patch 覆盖层（overlay）
   -> Cordis Loader 挂载最终 Entry List
 ```
 
@@ -159,3 +159,5 @@ DSH 中要区分两种事实：
 5. 最后回到[核心文件精读](03-核心文件精读.md)和[逐文件索引](08-逐文件索引怎么读.md)，沿着 `Session -> Agent Loop -> Tools -> LLM` 主链路阅读。
 
 每读一个 Service，都问自己三个问题：它定义了什么能力？谁提供实现？谁在消费它？每读一个 Event，都问：它是持久事实还是 live extension point？这些问题比背目录名更容易真正掌握 DSH 的设计。
+
+如果要把自己的功能接入 DSH，继续阅读[社区生态与扩展边界](10-社区生态与扩展边界.md)和[如何写一个合规插件](11-如何写一个合规插件.md)。它们把本页的 Context、Service、Event、Fiber 和 Profile 具体化为插件选择、Bundle manifest、卸载清理和测试证据。

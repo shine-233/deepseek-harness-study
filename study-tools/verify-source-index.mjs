@@ -49,6 +49,39 @@ for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).so
     for (const label of required) {
       if (!block.includes(label)) errors.push(`${name}: ${path} 缺少字段 ${label}`)
     }
+    const purpose = block.match(/^- 这个文件有什么用：(.*)$/m)?.[1]?.trim() ?? ''
+    const design = block.match(/^- 为什么这样设计：(.*)$/m)?.[1]?.trim() ?? ''
+    const role = block.match(/^- 文件角色：(.*)$/m)?.[1]?.trim() ?? ''
+    const readingOrder = block.match(/^- 阅读顺序：(.*)$/m)?.[1]?.trim() ?? ''
+    if (!/[\u3400-\u9fff]/.test(purpose)) errors.push(`${name}: ${path} 的用途说明没有中文解释`)
+    if (!/[\u3400-\u9fff]/.test(design)) errors.push(`${name}: ${path} 的设计说明没有中文解释`)
+    if (purpose.includes('这个文件承担所在目录的一项功能')) {
+      errors.push(`${name}: ${path} 仍使用旧的空泛用途模板`)
+    }
+    if (/一个功能实现文件|承担一项相对集中的职责/.test(purpose)) {
+      errors.push(`${name}: ${path} 的用途说明仍是“功能实现文件”泛化模板`)
+    }
+    if (/定义 .* 的配置、输入形状或工具链规则/.test(purpose)) {
+      errors.push(`${name}: ${path} 的配置用途说明是循环表述`)
+    }
+    if (/具体行为仍应结合直接协作者和测试阅读/.test(purpose)) {
+      errors.push(`${name}: ${path} 的用途说明没有先给出中文功能摘要`)
+    }
+    if (/^它负责 .*；(?:文件顶部注释把它定位为|固定提交中扫描到的)/.test(purpose)) {
+      errors.push(`${name}: ${path} 的用途说明只是在转述证据，没有给出中文功能摘要`)
+    }
+    if (/^把“[^”]+”作为独立边界，可以让调用者只依赖这一项职责；它的实现变化不会迫使整个应用层一起重写。$/.test(design)) {
+      errors.push(`${name}: ${path} 的设计说明仍使用统一独立边界模板`)
+    }
+    if (/^先看所在层的说明，再看包 README 和入口，然后读本文件，最后对照测试/.test(readingOrder)) {
+      errors.push(`${name}: ${path} 的阅读顺序仍使用统一路线模板`)
+    }
+    if (role === '测试用例' && /(?:直接验证|自动化测试直接验证) .*成功、失败或边界行为/.test(purpose)) {
+      errors.push(`${name}: ${path} 的测试用途说明是自我重复的模板`)
+    }
+    if (/[㐀-鿿] +[㐀-鿿]/.test(purpose)) {
+      errors.push(`${name}: ${path} 的中文用途存在多余粒子空格`)
+    }
     if (block.includes('自动索引') && !block.includes('复杂行为需要回到源码和测试确认')) {
       warnings.push(`${name}: ${path} 没有明显的自动索引边界提醒`)
     }
@@ -83,6 +116,14 @@ for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).so
 }
 if (manifest.sourceReadFileCount !== undefined && manifest.sourceReadFileCount !== expected.size) {
   errors.push(`清单源码读取数 ${manifest.sourceReadFileCount} 不等于源文件数 ${expected.size}`)
+}
+if (manifest.sourceRootVerification?.status === 'verified') {
+  if (manifest.sourceRootVerification.method !== 'git-blob') {
+    errors.push(`清单源码校验方法不是 git-blob：${manifest.sourceRootVerification.method}`)
+  }
+  if (manifest.sourceRootVerification.fileCount !== expected.size) {
+    errors.push(`清单源码校验数 ${manifest.sourceRootVerification.fileCount} 不等于源文件数 ${expected.size}`)
+  }
 }
 if (manifest.staticImportEdgeCount !== undefined && manifest.staticImportEdgeCount < 0) {
   errors.push(`清单本地静态 import 边数非法：${manifest.staticImportEdgeCount}`)

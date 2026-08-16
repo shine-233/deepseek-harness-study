@@ -34,6 +34,11 @@
   ],
   "sourceFileCount": 2756,
   "sourceReadFileCount": 2756,
+  "sourceRootVerification": {
+    "status": "verified",
+    "method": "git-blob",
+    "fileCount": 2756
+  },
   "staticImportEdgeCount": 9289,
   "localPackageAliasCount": 248,
   "localPythonModuleAliasCount": 6,

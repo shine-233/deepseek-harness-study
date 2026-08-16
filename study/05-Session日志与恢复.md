@@ -34,14 +34,14 @@
 
 ## 恢复、fork 和修复
 
-- **恢复**：从持久化后端取回 header 和 event seed，先由 `preparation.ts` 校验，再公开给其他插件。
+- **恢复**：持久化层先取回 header 和 event seed，再由 `packages/core/session/src/index.ts` 的恢复入口和 `packages/session/session-persistence/src/preparations.ts` 协调准备；`packages/core/session/src/preparation.ts` 只持有尚未公开的 Session 并负责 provider 资源释放。
 - **fork**：子 Session 可以继承父日志的前缀，并记录 parent、seed length 和边界，之后的事件属于子工作。
 - **修复**：如果进程在工具或 Turn 中间崩溃，恢复阶段可以根据日志中的未闭合事实补出 interrupted 状态；这不等于假装工具成功。
 - **版本**：`SESSION_FORMAT_VERSION` 保护磁盘格式。读取器不能因为“能解析 JSON”就默默忽略会影响重建的字段。
 
 ## 相关源码和测试
 
-推荐顺序是 `packages/core/session/src/types.ts`、`preparation.ts`、`index.ts`、`surface.ts`，然后读：
+推荐顺序是 `packages/core/session/src/types.ts`、`packages/core/session/src/index.ts`、`packages/core/session/src/preparation.ts`、`packages/core/session/src/surface.ts`，然后读：
 
 - `packages/core/session/tests/session.spec.ts`
 - `packages/core/session/tests/invariant.spec.ts`
@@ -49,6 +49,8 @@
 - `packages/core/session/tests/surface.spec.ts`
 - `packages/core/session/tests/repair.spec.ts`
 - `packages/core/session/tests/request-header.spec.ts`
-- `packages/session/session-persistence/tests` 下的 JSONL／SQLite 后端测试
+- `packages/session/session-persistence/tests/` 下的通用 contract、coordinator 和 persistence orchestration 测试
+- `packages/session/session-persistence-jsonl/tests/` 下的 JSONL、Windows 和 zstd 测试
+- `packages/session/session-persistence-sqlite/tests/` 下的 SQLite 后端测试
 
 注意：索引和这些文档只说明固定提交的结构。是否真的能从某个磁盘文件恢复，还要运行对应 persistence 测试或做实际恢复实验。
