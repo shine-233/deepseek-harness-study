@@ -6,6 +6,8 @@
 >
 > **想看真正的首页分流：** [打开 GitHub Pages 学习首页](https://shine-233.github.io/deepseek-harness-study/)。第一屏会按“从零、查文件、工具上下文、写插件、研究 Hook、运行实验”告诉你下一步点哪里。
 
+> **只想先判断工具和插件边界：** [打开一页决策卡](study/27-工具预算与插件责任决策卡.md)。它先解释工具预算，再告诉你什么时候是普通插件、Bundle、Hook bridge、patch、fork 或注入器。
+
 英文入口：[README.md](README.md)
 
 这是基于 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的非官方学习型 fork。它不属于 DeepSeek AI，不由 DeepSeek AI 维护，也不代表 DeepSeek AI 的官方立场。
@@ -39,6 +41,7 @@
 - [官方工具插件完整契约](study/13-官方工具插件完整契约.md)：从工具流水线、呈现模式、权限可见性、并发、取消到结果事件，按官方扩展点解释怎样写工具插件。
 - [工具可见性与非侵入扩展](study/22-工具可见性与非侵入扩展.md)：解释“已注册、模型可见、执行允许”三层，工具 schema 的上下文成本，以及普通插件作者和 patch/fork 维护者的责任边界。
 - [工具可见集合观测与性能实验](study/23-工具可见集合观测与性能实验.md)：给出脱敏快照格式、离线检查器、A/B 变量和结果表，把“工具太多”变成可复核的实验问题。
+- [工具预算与插件责任决策卡](study/27-工具预算与插件责任决策卡.md)：用三层直译和五问决策卡，把工具可见性、插件责任、社区生态分层和后续研究串成一条新手路线。
 - [高风险索引人工抽查](study/24-高风险索引人工抽查.md)：抽查工具入口、提示词组装、Profile 启动和 Hook codec，说明自动索引能证明什么、还不能证明什么。
 - [官方 Hook Bridge 与兼容层](study/14-官方HookBridge与兼容层.md)：区分 Hook 协议桥接、普通 Cordis 插件、源码 patch 和运行时注入，说明协议映射与生命周期边界。
 - [Bundle、Profile、Loader 与发布安装](study/15-BundleProfileLoader与发布安装.md)：解释组合包、运行 Profile、patch 覆盖、模块解析、启动失败和 HMR。
@@ -59,7 +62,7 @@
 
 [索引验证器](study-tools/verify-source-index.mjs)、[索引质量审计器](study-tools/audit-source-index-quality.mjs) 和[手写路径验证器](study-tools/verify-study-links.mjs) 可以检查覆盖、固定版本、文件级静态证据和教程中的官方路径。普通条目是结构化自动导读，核心链路文件另外有人工精读，不能把自动分类当成完整代码审查。
 
-如果你关心“不改源码怎么 hook”，先读[社区生态与扩展边界](study/10-社区生态与扩展边界.md)，再读[如何写一个合规插件](study/11-如何写一个合规插件.md)。这里明确区分官方维护包、合规第三方插件、配置组合层、源码 fork、运行时注入和私有 registry 改写；“能 hook”本身不等于“是插件”。
+如果你关心“不改源码怎么 hook”，先读[工具预算与插件责任决策卡](study/27-工具预算与插件责任决策卡.md)，再读[社区生态与扩展边界](study/10-社区生态与扩展边界.md)和[如何写一个合规插件](study/11-如何写一个合规插件.md)。这里明确区分官方维护包、合规第三方插件、配置组合层、源码 fork、运行时注入和私有 registry 改写；“能 hook”本身不等于“是插件”。
 
 ## 官方源码与本仓库材料的边界
 
