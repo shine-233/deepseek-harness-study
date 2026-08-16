@@ -251,22 +251,31 @@ describe('rewriteMarkdown', () => {
 })
 
 describe('docsPages locale routes', () => {
-  it('redirects both locale roots to their locale-relative quick-start page', () => {
+  it('uses the Chinese study home and keeps the English product redirect', () => {
     const homes = docsPages.filter(page => page.sidebar === null)
     expect(homes.map(page => page.route).sort()).toEqual(['en/index.md', 'index.md'])
-    for (const page of homes) {
-      const source = readFileSync(resolve(repositoryRoot, page.source), 'utf8')
-      const projected = projectedPageContent(source, page)
-      expect(projected).toContain('layout: false')
-      expect(projected).toContain('http-equiv: refresh')
-      expect(projected).toContain('content: 0; url=./guide/quickstart')
-      expect(projected).not.toContain('# DeepSeek Harness')
-    }
+    const studyHome = homes.find(page => page.route === 'index.md')
+    expect(studyHome?.source).toBe('SITE-HOME.md')
+    expect(projectedPageContent(readFileSync(resolve(repositoryRoot, 'SITE-HOME.md'), 'utf8'), studyHome!))
+      .toContain('text: 从“我不知道点哪里”开始')
+
+    const englishHome = homes.find(page => page.route === 'en/index.md')
+    expect(englishHome?.source).toBe('docs/user/index.md')
+    const projected = projectedPageContent(
+      readFileSync(resolve(repositoryRoot, 'docs/user/index.md'), 'utf8'),
+      englishHome!,
+    )
+    expect(projected).toContain('layout: false')
+    expect(projected).toContain('http-equiv: refresh')
+    expect(projected).toContain('content: 0; url=./guide/quickstart')
+    expect(projected).not.toContain('# DeepSeek Harness')
   })
 
   it('publishes every route in both locales and uses every available Chinese counterpart', () => {
     const byRoute = new Map(docsPages.map(page => [page.route, page]))
-    for (const page of docsPages.filter(page => page.locale === 'root' && page.sidebar !== 'zh-study')) {
+    for (const page of docsPages.filter(page => (
+      page.locale === 'root' && page.sidebar !== 'zh-study' && page.sidebar !== null
+    ))) {
       const counterpart = byRoute.get(`en/${page.route}`)
       expect(counterpart, page.route).toBeDefined()
       expect(counterpart?.locale).toBe('en')

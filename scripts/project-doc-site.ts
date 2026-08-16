@@ -334,6 +334,9 @@ function withoutRepositoryChrome(markdown: string): string {
  */
 export function projectedPageContent(markdown: string, page: DocsPage): string {
   if (page.sidebar !== null) return withoutRepositoryChrome(markdown)
+  // The study fork deliberately owns a Chinese learning home. The upstream
+  // locale home remains a redirect to the ordinary product guide.
+  if (page.source === 'SITE-HOME.md') return withoutRepositoryChrome(markdown)
   if (!markdown.startsWith('---\n')) {
     throw new Error(`project-doc-site: locale home source ${JSON.stringify(page.source)} must start with YAML frontmatter.`)
   }

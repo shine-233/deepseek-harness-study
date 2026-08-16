@@ -3,6 +3,8 @@
 > **第一次来？先点这一个链接：** [打开傻瓜式入口：START-HERE.md](START-HERE.md)
 >
 > 只看 GitHub 网页就能开始：不需要下载源码、不需要 API key、不需要安装 pnpm，也不需要先会 TypeScript。进入后按“第一课 → 仓库地图 → 选择一条路线”走；暂时不要点 `Code`，也不要从 2,756 个逐文件索引条目开始。
+>
+> **想看真正的首页分流：** [打开 GitHub Pages 学习首页](https://shine-233.github.io/deepseek-harness-study/)。第一屏会按“从零、查文件、工具上下文、写插件、研究 Hook、运行实验”告诉你下一步点哪里。
 
 英文入口：[README.md](README.md)
 
@@ -35,6 +37,7 @@
 - [如何写一个合规插件](study/11-如何写一个合规插件.md)：从最小观察插件开始，讲公开 API、Bundle 安装、生命周期、测试、卸载和发布信任。
 - [GitHub 生态检索与插件实战核验](study/12-GitHub生态检索与插件实战核验.md)：重新核对每个源文件的学习入口，解释 topic、目录、registry、普通 Bundle、管理器和运行时注入器的区别，并给出安装前审计和写插件的完整路线。
 - [官方工具插件完整契约](study/13-官方工具插件完整契约.md)：从工具流水线、呈现模式、权限可见性、并发、取消到结果事件，按官方扩展点解释怎样写工具插件。
+- [工具可见性与非侵入扩展](study/22-工具可见性与非侵入扩展.md)：解释“已注册、模型可见、执行允许”三层，工具 schema 的上下文成本，以及普通插件作者和 patch/fork 维护者的责任边界。
 - [官方 Hook Bridge 与兼容层](study/14-官方HookBridge与兼容层.md)：区分 Hook 协议桥接、普通 Cordis 插件、源码 patch 和运行时注入，说明协议映射与生命周期边界。
 - [Bundle、Profile、Loader 与发布安装](study/15-BundleProfileLoader与发布安装.md)：解释组合包、运行 Profile、patch 覆盖、模块解析、启动失败和 HMR。
 - [学习工作簿与首个实验](study/16-学习工作簿与首个实验.md)：按“阅读、追文件、画 Turn、静态插件、组合实验、社区审核”的顺序实际使用本仓库。

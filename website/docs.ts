@@ -157,15 +157,17 @@ const studyPages: DocsPage[] = [
   }
 })
 
+const homePages = mirroredPages([{
+  source: { root: 'SITE-HOME.md', en: 'docs/user/index.md' },
+  route: 'index.md',
+  contentLocale: { root: 'zh-CN', en: 'en-US' },
+  label: { root: 'DSH 源码学习', en: 'DeepSeek Harness' },
+  sidebar: { root: null, en: null },
+  section: { root: '首页', en: 'Home' },
+  order: 0,
+}])
+
 const homeAndGuide = pairedPages([
-  {
-    source: 'docs/user/index.md',
-    route: 'index.md',
-    label: { root: 'DeepSeek Harness', en: 'DeepSeek Harness' },
-    sidebar: { root: null, en: null },
-    section: { root: '首页', en: 'Home' },
-    order: 0,
-  },
   {
     source: 'docs/user/guide/index.md',
     route: 'guide/quickstart.md',
@@ -526,6 +528,7 @@ export function sectionSpec(locale: DocsLocale, label: string): DocsSection & { 
 /** Every canonical page published by the documentation website. */
 export const docsPages: DocsPage[] = [
   ...studyPages,
+  ...homePages,
   ...homeAndGuide,
   ...develop,
   ...cordisTutorial,
