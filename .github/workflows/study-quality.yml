@@ -1,0 +1,198 @@
+name: Study material quality
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/AGENT_REVIEW.md'
+      - '.github/pull_request_template.md'
+      - '.agents/**'
+      - 'docs/**'
+      - 'scripts/**'
+      - 'apps/**'
+      - 'packages/**'
+      - 'vendor/**'
+      - 'native/**'
+      - 'study/**'
+      - 'study-examples/**'
+      - 'study-tools/**'
+      - 'START-HERE.md'
+      - 'SITE-HOME.md'
+      - 'README.md'
+      - 'README.zh.md'
+      - 'README.i18n.yaml'
+      - 'scripts/project-doc-site.ts'
+      - 'scripts/project-doc-site.spec.ts'
+      - 'scripts/verify-doc-site-fragments.spec.ts'
+      - 'website/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/**'
+      - '.github/AGENT_REVIEW.md'
+      - '.github/pull_request_template.md'
+      - '.agents/**'
+      - 'docs/**'
+      - 'scripts/**'
+      - 'apps/**'
+      - 'packages/**'
+      - 'vendor/**'
+      - 'native/**'
+      - 'study/**'
+      - 'study-examples/**'
+      - 'study-tools/**'
+      - 'START-HERE.md'
+      - 'SITE-HOME.md'
+      - 'README.md'
+      - 'README.zh.md'
+      - 'README.i18n.yaml'
+      - 'scripts/project-doc-site.ts'
+      - 'scripts/project-doc-site.spec.ts'
+      - 'scripts/verify-doc-site-fragments.spec.ts'
+      - 'website/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+  workflow_dispatch:
+
+concurrency:
+  group: study-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PRIMARY_NODE_VERSION: '24'
+  NODE_OPTIONS: '--max-old-space-size=4096'
+  DSH_TELEMETRY_DISABLED: '1'
+
+jobs:
+  verify:
+    name: Verify learning material
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.PRIMARY_NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install (immutable)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build DSH source and web artifacts
+        run: pnpm run build
+
+      - name: Run DSH unit tests
+        run: pnpm test
+
+      - name: Run DSH lint
+        run: pnpm lint
+
+      - name: Run one-command offline study smoke
+        run: pnpm run study:quick-check -- --example --runtime
+
+      - name: Test the minimal observer example
+        run: pnpm --dir study-examples/minimal-observer-plugin run test
+
+      - name: Run the minimal observer demo
+        run: pnpm --dir study-examples/minimal-observer-plugin run demo
+
+      - name: Lint the minimal observer example
+        run: pnpm --dir study-examples/minimal-observer-plugin run lint
+
+      - name: Check study-tool JavaScript syntax
+        shell: bash
+        run: |
+          for file in study-tools/*.mjs; do
+            node --check "$file"
+          done
+
+      - name: Test the tool-visibility A/B preflight
+        run: node --test study-tools/*.test.mjs
+
+      - name: Compare committed teaching snapshots
+        run: node study-tools/compare-tool-visibility-ab.mjs study-tools/tool-visibility-ab.a.example.json study-tools/tool-visibility-ab.b.example.json
+
+      - name: Benchmark offline tool-visibility preparation
+        run: node study-tools/benchmark-tool-visibility-ab.mjs study-tools/tool-visibility-ab.a.example.json study-tools/tool-visibility-ab.b.example.json --iterations 1000 --warmup 100
+
+      - name: Observe real ToolRuntime and prompt assembly locally
+        run: pnpm run study:runtime-benchmark -- --iterations 100 --warmup 10
+
+      - name: Verify hand-written study links
+        run: node study-tools/verify-study-links.mjs
+
+      - name: Verify the click-through learning entry
+        run: node study-tools/verify-study-entry.mjs
+
+      - name: Verify the actionable learning contract
+        run: node study-tools/verify-study-learning-contract.mjs
+
+      - name: Verify homepage status metrics
+        run: node study-tools/verify-study-home-metrics.mjs
+
+      - name: Verify source-index coverage
+        run: node study-tools/verify-source-index.mjs
+
+      - name: Audit source-index quality signals
+        run: node study-tools/audit-source-index-quality.mjs
+
+      - name: Verify agent-review contract
+        run: pnpm run study:agent-review
+
+      - name: Verify documentation and build Pages input
+        run: pnpm run doc-sync
+
+      - name: Verify the built Pages study shell
+        run: pnpm run study:quick-check -- --site
+
+      - name: Upload built study site for inspection
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-study-site-${{ github.sha }}
+          path: website/.dist
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Check committed whitespace
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_BASE: ${{ github.event.pull_request.base.sha }}
+          EVENT_SHA: ${{ github.sha }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            git diff --check "$EVENT_BASE...$EVENT_SHA"
+          elif [[ "$EVENT_NAME" == "push" && "$EVENT_BEFORE" != "0000000000000000000000000000000000000000" ]]; then
+            git diff --check "$EVENT_BEFORE...$EVENT_SHA"
+          elif git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            git diff --check "HEAD^...HEAD"
+          else
+            git diff-tree --check --root -r "$EVENT_SHA"
+          fi
+
+      - name: Write evidence boundary to job summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## DSH 学习仓库质量摘要'
+            echo
+            echo '- 本工作流覆盖：源码 build/test/lint、最小示例 test/demo/lint、学习工具、固定源码链接、索引、Pages 投影和 Agent-review 接线。'
+            echo '- 这些通过项是可重复的静态或离线证据，不等于真实 DSH Profile/Loader、provider、模型 token/延迟/质量或安全审计已经完成。'
+            echo '- Pages 构建成功时会上传 `dsh-study-site-${GITHUB_SHA}` 工件，供维护者检查实际生成的网页；工件不是运行时录屏或模型实验结果。'
+            echo '- Agent-review 仍是辅助审阅，不能自动批准合并，也不能代替维护者对侵入式扩展、密钥和真实运行证据的判断。'
+          } >> "$GITHUB_STEP_SUMMARY"

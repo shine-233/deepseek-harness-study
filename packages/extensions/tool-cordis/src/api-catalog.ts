@@ -1926,6 +1926,12 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
         returns: 'one deep-cloned schema per visible tool.',
       },
       {
+        signature: 'debugSnapshot(scope?: ScopeKey): ToolRuntimeDebugSnapshot',
+        description: 'Return a frozen, JSON-serializable observation of one registry view.\n\n`registered` names belong to the exact addressed layer; `known` retains pre-restriction inherited names; `visible` is the effective runtime lookup set, including `run_code` when the mode presents it. `visibleSchemas` is the separate model-facing wire projection, so Code Mode can intentionally report a small direct schema set while its SDK still reaches the other visible runtime tools. Only names, mode, and UTF-8 byte counts are exposed.',
+        parameters: [{ name: 'scope', description: 'the scope to inspect; omitted addresses the global layer.' }],
+        returns: 'a deeply frozen snapshot containing no callbacks or call data.',
+      },
+      {
         signature: 'executionMode(exec: ToolExecutionInput): ToolExecutionMode',
         description: 'Classify a pending call through the caller\'s visible tool definition. Only an exact `true` is parallel; unknown, hidden, undeclared, invalid, or throwing classifiers are exclusive.',
         parameters: [{ name: 'exec', description: 'call name, parsed arguments, and optional agent scope.' }],
@@ -4439,7 +4445,15 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   },
   {
     name: 'ToolRuntime',
-    declaration: 'export class ToolRuntime extends Service {\n    static inject;\n    static Config: z<Config>;\n    readonly [TOOL_RUNTIME_SCHEDULER]: ToolRuntimeScheduler;\n    constructor(ctx: Context, config: Config = {});\n    presentAs(mode: ToolPresentationMode): () => void;\n    register(definition: ToolDefinition): () => void;\n    restrict(filter: ToolRestriction): () => void;\n    guard(guard: ToolGuard): () => void;\n    get(name: string, scope?: ScopeKey): ToolDefinition | undefined;\n    schemas(scope?: ScopeKey): ToolSchema[];\n    executionMode(exec: ToolExecutionInput): ToolExecutionMode;\n    async execute(exec: ToolExecutionInput): Promise<ToolExecutionResult>;\n}',
+    declaration: 'export class ToolRuntime extends Service {\n    static inject;\n    static Config: z<Config>;\n    readonly [TOOL_RUNTIME_SCHEDULER]: ToolRuntimeScheduler;\n    constructor(ctx: Context, config: Config = {});\n    presentAs(mode: ToolPresentationMode): () => void;\n    register(definition: ToolDefinition): () => void;\n    restrict(filter: ToolRestriction): () => void;\n    guard(guard: ToolGuard): () => void;\n    get(name: string, scope?: ScopeKey): ToolDefinition | undefined;\n    schemas(scope?: ScopeKey): ToolSchema[];\n    debugSnapshot(scope?: ScopeKey): ToolRuntimeDebugSnapshot;\n    executionMode(exec: ToolExecutionInput): ToolExecutionMode;\n    async execute(exec: ToolExecutionInput): Promise<ToolExecutionResult>;\n}',
+  },
+  {
+    name: 'ToolRuntimeDebugSnapshot',
+    declaration: 'export interface ToolRuntimeDebugSnapshot {\n    readonly scope: \'global\' | \'scoped\';\n    readonly presentationMode: ToolPresentationMode;\n    readonly registered: readonly string[];\n    readonly known: readonly string[];\n    readonly visible: readonly string[];\n    readonly hiddenByRestriction: readonly string[];\n    readonly visibleSchemas: readonly ToolRuntimeDebugVisibleSchema[];\n    readonly visibleSchemaUtf8Bytes: number;\n}',
+  },
+  {
+    name: 'ToolRuntimeDebugVisibleSchema',
+    declaration: 'export interface ToolRuntimeDebugVisibleSchema {\n    readonly name: string;\n    readonly utf8Bytes: number;\n}',
   },
   {
     name: 'ToolRuntimeScheduler',

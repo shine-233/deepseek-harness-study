@@ -1,6 +1,6 @@
 # 14｜官方 HookBridge 与兼容层
 
-> 证据范围：本文只解释上游 `deepseek-ai/deepseek-harness` 固定提交 [`47f943859bef60e4160492346772ded9b24f765a`][fixed-tree] 中的 `hook-protocol`、Claude Code bridge、Codex bridge、对应 README、Agent Note 和测试源码。
+> 证据范围：本文只解释 2026-08-16（Asia/Shanghai）复核的上游 `deepseek-ai/deepseek-harness` 固定提交 [`47f943859bef60e4160492346772ded9b24f765a`][fixed-tree] 中的 `hook-protocol`、Claude Code bridge、Codex bridge、对应 README、Agent Note 和测试源码。
 
 > 证据状态：下面写“测试证据”时，意思是静态阅读了固定提交中的测试断言和测试名称；本次没有运行上游测试，没有启动 DSH 或任何 `Test-DSH*`，也没有做真实 shell hook、模型、Profile 或 state 验证。
 
@@ -200,7 +200,20 @@ turn-scoped point 在有开放 turn 时为每次命令写一对 log-only session
 | 源码 patch 或维护 fork | 修改 DSH 自己的 loop、事件类型或 bridge/工具实现，可增加真正新的 typed point | 这是 fork 的维护选择，不是固定上游公开扩展点的兼容证明；每次升级都要重放 patch 并补测试 | 必须改变核心语义、需要新的一致性保证，且团队愿意维护 fork | 合并冲突、版本漂移、构建/测试矩阵和长期同步成本都由 fork 维护者承担 |
 | 运行时注入 | 触碰 loader 内部对象、模块缓存、Fiber/private Map、目录链接或进程运行时状态 | 固定上游 Hook README、typed interception Note 和 bridge tests 没有把它定义成 hook API；社区项目的自述也不能补足官方兼容证据 | 诊断、实验或无法改源时的临时研究，不宜作为稳定产品扩展面 | 私有实现漂移、卸载/重复注册/缓存残留、权限和供应链风险；很难证明 dispose 后真的 quiescent |
 
-一句话决策是：已有兼容性债务选 bridge；新能力选原生 typed plugin；必须改核心契约才考虑源码 fork；运行时注入只能被标成非官方、版本敏感的实验手段。GitHub 上采用 DSH Bundle 格式、叫作 plugin、能被某个 loader 找到的社区仓库，都不能仅凭名称、manifest 或可加载性称为 DeepSeek 官方插件；社区项目的身份和风险边界另见[社区生态与扩展边界](10-社区生态与扩展边界.md)。
+### 社区样本的证据对照（2026-08-16）
+
+本节把“上游 bridge”和社区仓库放在同一张表里，是为了防止读者因它们都能被装入 DSH 而混淆身份。日期是本轮访问时间；“项目自述”不是上游背书，也不是安全或兼容性结论。
+
+| 样本 | 本轮公开证据 | 应归入的层 | 尚未证明的事项 |
+|---|---|---|---|
+| `@deepseek-ai/dsh-hooks-claude-code`、`@deepseek-ai/dsh-hooks-codex` | 上游固定提交的包 README、源码和测试把它们写成 Cordis bridge plugin；README 分别列出 7 个和 5 个外部事件子集。共享 `dsh-hook-protocol` README 明确写着 library 不注册、不注入。见[上游 bridge README][claude-readme]、[Codex bridge README][codex-readme]、[协议 README][protocol-readme]。 | 上游仓库交付的协议适配器；“官方”仅指事实来源在上游仓库，不能外推为安全认证或未来版本承诺。 | 没有证明未来协议仍保持相同子集，也没有证明外部 hook 获得 OS 沙箱、全局 hard halt 或 input rewrite。 |
+| `omdsh-dev/dsh-annotation`、`vlln/dsh-navbar` | 固定 README 自称 `dsh.bundle`/`dsh.client` 或纯浏览器 bundle，分别说明 Node half 为空或 0 patch；它们的 package/README 是社区仓库证据。见[批注 README][community-annotation-readme]和[导航条 README][community-navbar-readme]。 | 普通第三方 Bundle/客户端插件候选。 | 没有证明上游维护、固定 DSH 版本运行、权限安全、完整卸载或任何“官方插件”身份。 |
+| `rpmalouin/deepseek-harness` | GitHub 页面显示 forked from `deepseek-ai/deepseek-harness`；README 自称增加 graph-first review、OpenRouter routing 和 Hermes/delegation。见[fork 页面][community-rpm-fork]和[README][community-rpm-readme]。 | GitHub fork；其额外改动先按项目自述记录，不能仅因 fork 关系称为已验证 patched fork。 | 本轮未完成与上游的逐文件差异、构建、运行和同步矩阵核验。 |
+| `yjh051108/dsh-super-injector` | 固定提交源码出现 junction、`loader.create()`、`loader.internal.loadCache`、Fiber/registry 关联和内部路由/客户端表清理；其 `cordis.patch.yml` 只装入引导器。见[注入器源码][super-injector-source]和[注入器 patch][super-injector-patch]。 | 第三方 Bundle 引导器 + 运行时注入/热重载兼容层。 | 项目自测、README 的成功数字和静态源码都没有证明官方兼容、生产安全、卸载无残留或跨版本稳定。 |
+
+这里的证据等级顺序是：固定上游源码/测试 > 固定社区源码和 manifest > README/页面自述 > 搜索结果与 stars/count。等级越低，越只能用于发现和分类，越不能支持兼容性、安全性或质量结论。
+
+一句话决策是：已有兼容性债务选 bridge；新能力选原生 typed plugin；必须改核心语义才考虑源码 fork；运行时注入只能被标成非官方、版本敏感的实验手段。GitHub 上采用 DSH Bundle 格式、叫作 plugin、能被某个 loader 找到的社区仓库，都不能仅凭名称、manifest 或可加载性称为 DeepSeek 官方插件；社区项目的身份和风险边界另见[社区生态与扩展边界](10-社区生态与扩展边界.md)。
 
 ## 七、初学者核对清单
 
@@ -254,3 +267,7 @@ turn-scoped point 在有开放 turn 时为每次命令写一对 log-only session
 [codex-config-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-codex/tests/config.spec.ts#L4-L74
 [bridge-note]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/.agents/notes/implemented/feature/2026-06-30-hook-bridges.md#L7-L43
 [interception-note]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/.agents/notes/implemented/feature/2026-06-30-interception-extension-points.md#L7-L34
+[community-annotation-readme]: https://github.com/omdsh-dev/dsh-annotation/blob/40216642260821da1c16d6d219150c3e4f31a222/README.md
+[community-navbar-readme]: https://github.com/vlln/dsh-navbar/blob/10e9d1546db28c499687d66a369e548cd3f52237/README.md
+[community-rpm-fork]: https://github.com/rpmalouin/deepseek-harness
+[community-rpm-readme]: https://github.com/rpmalouin/deepseek-harness/blob/master/README.md

@@ -3,9 +3,8 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import type { DefaultTheme, PageData } from 'vitepress'
-import type { ViteDevServer } from 'vite'
 import { withMermaid } from 'vitepress-plugin-mermaid'
-import { landingLink, orderedPages, routeLink, sectionSpec, type DocsLocale, type DocsPage, type DocsSidebar } from '../docs.ts'
+import { docsPages, landingLink, orderedPages, routeLink, sectionSpec, type DocsLocale, type DocsPage, type DocsSidebar } from '../docs.ts'
 import { docsSourceFiles, projectDocs } from '../../scripts/project-doc-site.ts'
 
 projectDocs()
@@ -87,6 +86,44 @@ function guideSidebar(locale: DocsLocale): DefaultTheme.SidebarItem[] {
 }
 
 /**
+ * Link to a canonical study page without duplicating its generated route.
+ *
+ * @param source - Repository-relative study Markdown source.
+ * @returns The published site route for the source.
+ * @throws When the source is not part of the Chinese study collection.
+ */
+function studyPageLink(source: string): string {
+  const page = docsPages.find(candidate => candidate.locale === 'root' && candidate.source === source && candidate.sidebar === 'zh-study')
+  if (page === undefined) throw new Error(`Study navigation source "${source}" is not published.`)
+  return routeLink(page.route)
+}
+
+/**
+ * Study sidebar with a short route card before the complete lesson and index
+ * collections. The route card keeps first-time readers oriented without
+ * changing the order or content of the canonical study pages.
+ *
+ * @returns Sidebar groups for the Chinese study route.
+ */
+function studySidebar(): DefaultTheme.SidebarItem[] {
+  return [
+    {
+      text: '阅读路线',
+      collapsed: false,
+      items: [
+        { text: '从这里开始', link: landingLink('root', 'zh-study') },
+        { text: '15 分钟任务单', link: studyPageLink('study/25-从首页到第一次产出的动手任务单.md') },
+        { text: '工具与插件决策卡', link: studyPageLink('study/27-工具预算与插件责任决策卡.md') },
+        { text: '学习工具箱', link: studyPageLink('study/31-学习工具箱.md') },
+        { text: '先跑一个最小示例', link: studyPageLink('study-examples/minimal-observer-plugin/README.zh.md') },
+        { text: '按目录查文件', link: studyPageLink('study/文件索引/README.md') },
+      ],
+    },
+    ...sidebar('root', 'zh-study'),
+  ]
+}
+
+/**
  * Navigation-bar items for the modules the guide sidebar links into, reading
  * their labels and collections from the shared per-locale record.
  *
@@ -102,7 +139,15 @@ function moduleNav(locale: DocsLocale): DefaultTheme.NavItem[] {
   ]
 }
 
-function watchCanonicalDocs(server: ViteDevServer): void {
+/** The small Vite watcher surface used by the documentation projector. */
+interface CanonicalDocsServer {
+  watcher: {
+    add(paths: string[]): void
+    on(event: 'change', listener: (changed: string) => void): void
+  }
+}
+
+function watchCanonicalDocs(server: CanonicalDocsServer): void {
   const sources = docsSourceFiles()
   server.watcher.add(sources)
   server.watcher.on('change', (changed) => {
@@ -116,6 +161,7 @@ function escapeVueInterpolation(html: string): string {
 }
 
 const STUDY_REPOSITORY_URL = 'https://github.com/shine-233/deepseek-harness-study'
+const STUDY_ISSUES_URL = `${STUDY_REPOSITORY_URL}/issues/new/choose`
 
 const sharedTheme: Pick<DefaultTheme.Config, 'search' | 'socialLinks' | 'editLink'> = {
   search: {
@@ -156,7 +202,9 @@ const sharedTheme: Pick<DefaultTheme.Config, 'search' | 'socialLinks' | 'editLin
       const data: unknown = frontmatter
       const editSource: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'editSource') : undefined
       if (typeof editSource !== 'string') throw new Error('Projected documentation page has no editSource frontmatter.')
-      const repository = editSource === 'START-HERE.md' || editSource.startsWith('study/')
+      const repository = editSource === 'START-HERE.md'
+        || editSource.startsWith('study/')
+        || editSource.startsWith('study-examples/')
         ? 'https://github.com/shine-233/deepseek-harness-study'
         : 'https://github.com/deepseek-ai/deepseek-harness'
       return `${repository}/edit/master/${editSource}`
@@ -193,7 +241,6 @@ const siteStyle = `
   --vp-c-brand-2: #466fe0;
   --vp-c-brand-3: #dfe7ff;
   --vp-c-brand-soft: rgba(49, 87, 200, 0.14);
-  --dsh-page-glow: rgba(83, 121, 229, 0.12);
   --dsh-card-shadow: 0 12px 34px rgba(37, 58, 112, 0.08);
 }
 .dark {
@@ -201,7 +248,6 @@ const siteStyle = `
   --vp-c-brand-2: #7895ff;
   --vp-c-brand-3: #202b55;
   --vp-c-brand-soft: rgba(145, 170, 255, 0.18);
-  --dsh-page-glow: rgba(91, 122, 229, 0.18);
   --dsh-card-shadow: 0 14px 38px rgba(0, 0, 0, 0.22);
 }
 .VPNavBar {
@@ -209,35 +255,16 @@ const siteStyle = `
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--vp-c-divider);
 }
-.VPHome .VPHero {
-  position: relative;
-  isolation: isolate;
-  overflow-x: clip;
-}
-.VPHome .VPHero::before {
-  position: absolute;
-  z-index: -1;
-  inset: -120px -12vw auto;
-  height: 470px;
-  content: '';
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 18% 35%, var(--dsh-page-glow), transparent 42%),
-    radial-gradient(circle at 82% 12%, var(--vp-c-brand-soft), transparent 36%);
-}
 .VPHome .VPHero .name {
-  letter-spacing: -0.045em;
-}
-.VPHome .VPHero .text {
-  max-width: 700px;
+  letter-spacing: 0;
 }
 .VPHome .VPHero .tagline {
   max-width: 760px;
 }
 .VPHome .VPFeature {
   border: 1px solid var(--vp-c-divider);
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--vp-c-bg-soft) 82%, transparent);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
   box-shadow: var(--dsh-card-shadow);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
@@ -247,17 +274,17 @@ const siteStyle = `
   box-shadow: 0 18px 42px rgba(37, 58, 112, 0.14);
 }
 .vp-doc h2 {
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 .vp-doc blockquote {
   border-left-width: 4px;
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 8px 8px 0;
   background: var(--vp-c-brand-soft);
 }
 .vp-doc table {
   display: block;
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: 0 0 0 1px var(--vp-c-divider);
 }
 .vp-doc th {
@@ -297,7 +324,51 @@ const siteStyle = `
 `
 
 /**
- * Mark the sidebar while it scrolls, so its scrollbar rests invisible.
+ * Update a tiny, non-interactive reading marker while the reader moves through
+ * a long lesson or the generated file index. It deliberately stores only a
+ * percentage on the document root; no reading history or page content leaves
+ * the browser.
+ */
+const readingProgressScript = `
+(() => {
+  const start = () => {
+    let frame = 0
+    let refreshTimer
+    const update = () => {
+      frame = 0
+      const distance = document.documentElement.scrollHeight - window.innerHeight
+      const ratio = distance <= 0 ? 1 : Math.min(1, Math.max(0, window.scrollY / distance))
+      const percent = (ratio * 100).toFixed(2) + '%'
+      document.documentElement.style.setProperty('--dsh-reading-progress', percent)
+      document.documentElement.dataset.dshReading = ratio >= 0.98 ? 'complete' : ratio > 0.02 ? 'started' : 'new'
+    }
+    const schedule = () => {
+      if (frame !== 0) return
+      frame = requestAnimationFrame(update)
+    }
+    const refreshAfterRouteChange = () => {
+      clearTimeout(refreshTimer)
+      refreshTimer = setTimeout(schedule, 80)
+    }
+    addEventListener('scroll', schedule, { passive: true })
+    addEventListener('resize', schedule)
+    addEventListener('hashchange', schedule)
+    addEventListener('load', schedule)
+    addEventListener('popstate', refreshAfterRouteChange)
+    new MutationObserver(refreshAfterRouteChange).observe(document.body, { childList: true, subtree: true })
+    schedule()
+  }
+
+  if (document.body === null) {
+    addEventListener('DOMContentLoaded', start, { once: true })
+  } else {
+    start()
+  }
+})()
+`
+
+/**
+* Mark the sidebar while it scrolls, so its scrollbar rests invisible.
  *
  * A sized `::-webkit-scrollbar` opts the element out of the platform's
  * self-hiding overlay bar, leaving one painted at all times; nothing in CSS
@@ -331,13 +402,22 @@ function siteTitle(previewTag: string): string {
 }
 
 export default withMermaid({
-  title: 'DSH 源码学习与官方文档',
-  description: 'DeepSeek Harness 官方文档与中文源码学习教材',
+  title: 'DSH 社区源码学习与生态导读',
+  description: '面向 DSH 社区的非官方中文源码学习、插件实践与生态研究材料',
   base,
   head: [
     // VitePress leaves head hrefs untouched, so the base belongs here explicitly.
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }],
+    ['link', { rel: 'stylesheet', href: `${base}reading.css` }],
+    ['meta', { name: 'theme-color', content: '#3157c8' }],
+    ['meta', { name: 'color-scheme', content: 'light dark' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'DSH 社区源码学习｜非官方中文导读' }],
+    ['meta', { property: 'og:description', content: '面向 DSH 社区的非官方源码学习和生态研究材料：从首页分流到固定版本源文件，按步骤理解插件、工具和运行边界。' }],
+    ['meta', { property: 'og:url', content: 'https://shine-233.github.io/deepseek-harness-study/' }],
+    ['meta', { name: 'twitter:card', content: 'summary' }],
     ['style', {}, siteStyle],
+    ['script', {}, readingProgressScript],
     ['script', {}, scrollbarScript],
   ],
   cleanUrls: true,
@@ -349,20 +429,28 @@ export default withMermaid({
       label: '简体中文',
       lang: 'zh-CN',
       themeConfig: {
-        siteTitle: siteTitle('中文教材'),
+        siteTitle: siteTitle('社区导读'),
         nav: [
-          { text: '源码学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/' },
+          { text: '开始学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/(?:$|lessons/)' },
+          { text: '最小示例', link: studyPageLink('study-examples/minimal-observer-plugin/README.zh.md'), activeMatch: '^/study/examples' },
+          { text: '工具箱', link: studyPageLink('study/31-学习工具箱.md'), activeMatch: '^/study/lessons/31-' },
+          { text: '逐文件索引', link: studyPageLink('study/文件索引/README.md'), activeMatch: '^/study/files' },
           { text: '入门', link: landingLink('root', guideModules.root.guide), activeMatch: '^/guide/' },
           ...moduleNav('root'),
         ],
         sidebar: {
-          '/study/': sidebar('root', 'zh-study'),
+          '/study/': studySidebar(),
           '/guide/': guideSidebar('root'),
           '/develop/': sidebar('root', 'zh-develop'),
           '/reference/': sidebar('root', 'zh-reference'),
         },
         outline: { label: '本页目录' },
         docFooter: { prev: '上一篇', next: '下一篇' },
+        lastUpdated: { text: '最后核对' },
+        footer: {
+          message: `非官方学习仓库 · 发现文档问题？<a href="${STUDY_ISSUES_URL}">在 GitHub 提交反馈</a>。`,
+          copyright: 'DSH Study · MIT License',
+        },
         darkModeSwitchLabel: '外观',
         lightModeSwitchTitle: '切换到浅色主题',
         darkModeSwitchTitle: '切换到深色主题',
@@ -393,7 +481,9 @@ export default withMermaid({
             const data: unknown = frontmatter
             const editSource: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'editSource') : undefined
             if (typeof editSource !== 'string') throw new Error('Projected documentation page has no editSource frontmatter.')
-            const repository = editSource === 'START-HERE.md' || editSource.startsWith('study/')
+            const repository = editSource === 'START-HERE.md'
+              || editSource.startsWith('study/')
+              || editSource.startsWith('study-examples/')
               ? 'https://github.com/shine-233/deepseek-harness-study'
               : 'https://github.com/deepseek-ai/deepseek-harness'
             return `${repository}/edit/master/${editSource}`
@@ -402,6 +492,11 @@ export default withMermaid({
         },
         outline: { label: 'On this page' },
         docFooter: { prev: 'Previous', next: 'Next' },
+        lastUpdated: { text: 'Last checked' },
+        footer: {
+          message: `Unofficial study repository · Found a documentation issue? <a href="${STUDY_ISSUES_URL}">Report it on GitHub</a>.`,
+          copyright: 'DSH Study · MIT License',
+        },
       },
     },
   },

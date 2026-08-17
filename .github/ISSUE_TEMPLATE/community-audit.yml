@@ -1,0 +1,36 @@
+name: 社区扩展审计线索
+description: 提交一个 DSH 社区插件、Bundle、patch 或注入项目的可核验线索。
+title: "[社区审计] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        这是研究线索，不是安全背书。请只提供公开 URL 和脱敏观察；不要运行未知项目，也不要提交凭据、私有源码或个人数据。
+  - type: input
+    id: project_url
+    attributes:
+      label: 项目 URL
+      placeholder: https://github.com/...
+    validations:
+      required: true
+  - type: textarea
+    id: claimed_layer
+    attributes:
+      label: 项目自称是什么
+      description: 例如普通插件、官方 Bundle、Hook bridge、patch、fork、注入器或注册表修改。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 公开证据
+      description: 给出 manifest、入口文件、固定 commit、README 或公开 issue；区分“项目自述”和“源码已核对”。
+    validations:
+      required: true
+  - type: textarea
+    id: risk_questions
+    attributes:
+      label: 需要核对的风险
+      description: 可填写是否触碰私有 registry、Loader、模块缓存、进程、系统设置、Windows Registry、凭据或卸载路径。
+    validations:
+      required: true

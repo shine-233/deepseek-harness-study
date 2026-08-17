@@ -1,0 +1,6 @@
+- insert:
+    - id: dsh-study-minimal-observer-plugin
+      name: dsh-study-minimal-observer-plugin
+      config:
+        maxPreviewBlocks: 3
+        maxPreviewCharacters: 160

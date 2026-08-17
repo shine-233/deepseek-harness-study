@@ -1,0 +1,30 @@
+{
+  "name": "dsh-study-minimal-observer-plugin",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Study-only minimum third-party DSH Bundle that observes final tool results through the public tools/result event.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": "./src/index.js",
+  "files": [
+    "src/index.js",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.0-rc <5",
+    "@deepseek-ai/dsh-tools": ">=0.1.0-rc <2",
+    "@deepseek-ai/schemastery": ">=3.18.1 <4"
+  },
+  "scripts": {
+    "demo": "node demo.mjs",
+    "test": "node --test tests/plugin.test.js",
+    "lint": "pnpm exec oxlint --config .oxlintrc.json demo.mjs src/index.js tests/plugin.test.js && node --check demo.mjs && node --check src/index.js && node --check tests/plugin.test.js"
+  }
+}

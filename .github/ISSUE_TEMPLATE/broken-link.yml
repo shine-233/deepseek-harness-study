@@ -1,0 +1,39 @@
+name: 链接或页面无法阅读
+description: 报告 Pages 路由、站内链接、代码块或页面布局问题。
+title: "[页面问题] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先确认问题发生在当前 Pages 地址还是 GitHub 仓库页面。不要把浏览器 Cookie、访问令牌或私有内容贴进 issue。
+  - type: input
+    id: url
+    attributes:
+      label: 页面或链接
+      placeholder: https://shine-233.github.io/deepseek-harness-study/study/...
+    validations:
+      required: true
+  - type: textarea
+    id: symptom
+    attributes:
+      label: 看到了什么
+      description: 例如 404、跳回首页、代码块溢出、目录缺失、按钮点不开或页面横向滚动。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 最小复现步骤
+      placeholder: |
+        1. 打开……
+        2. 点击……
+        3. 看到……
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 浏览器与屏幕
+      placeholder: Edge 1280px / 手机 390px / GitHub 网页
+    validations:
+      required: true

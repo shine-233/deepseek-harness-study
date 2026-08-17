@@ -1,1 +1,8 @@
 blank_issues_enabled: true
+contact_links:
+  - name: 先从开始学习入口开始
+    url: https://shine-233.github.io/deepseek-harness-study/
+    about: 第一次来先看路线，不需要下载源码、API key 或 pnpm。
+  - name: 阅读仓库使用说明
+    url: https://github.com/shine-233/deepseek-harness-study/blob/master/START-HERE.md
+    about: 先确认这是文档、索引和学习工具仓库，不要把静态检查当成真实 DSH 运行证据。

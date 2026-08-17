@@ -259,6 +259,12 @@ describe('translation structural signature', () => {
       'table (row x column count) #1 diverges between the pair: "3x2" vs "2x2"',
     ])
   })
+
+  it('accepts a link to the localised counterpart of the same document', () => {
+    const source = signature('[Example](study-examples/minimal-observer-plugin/README.md#run)\n')
+    const counterpart = signature('[示例](study-examples/minimal-observer-plugin/README.zh.md#run)\n')
+    expect(translationStructureDiff(source, counterpart)).toEqual([])
+  })
 })
 
 describe('pair CLI arguments', () => {

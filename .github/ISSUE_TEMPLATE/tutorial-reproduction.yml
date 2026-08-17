@@ -1,0 +1,44 @@
+name: 教程无法复现
+description: 报告课程命令、最小示例或学习工具无法按页面说明完成。
+title: "[无法复现] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        教程中的“示例 test/lint 通过”不等于真实 DSH、provider 或模型已经运行。请把运行层级写清楚，也不要提交任何凭据。
+  - type: input
+    id: lesson
+    attributes:
+      label: 课程或示例
+      placeholder: study/28-最小插件示例与学习检查.md
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 运行步骤
+      description: 从仓库根目录开始写；包括使用的命令和是否在 Codespaces。
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: 脱敏后的输出
+      description: 请删除 token、密钥、Cookie、真实用户名和完整请求正文。
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: 环境
+      placeholder: Windows 11, Node 24.15.0, pnpm 11.x
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期与实际
+      description: 分别写“页面说应该看到什么”和“实际看到了什么”。
+    validations:
+      required: true

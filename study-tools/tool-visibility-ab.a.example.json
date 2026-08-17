@@ -1,0 +1,33 @@
+{
+  "profile": "audit",
+  "agent": "default",
+  "fixed": {
+    "provider": "未配置",
+    "model": "未配置",
+    "taskId": "fixed-study-task",
+    "temperature": 0
+  },
+  "registered": [
+    { "name": "read_file", "source": "example", "version": "1.0.0" },
+    { "name": "search_text", "source": "example", "version": "1.0.0" },
+    { "name": "run_command", "source": "example", "version": "1.0.0" }
+  ],
+  "visible": [
+    {
+      "name": "read_file",
+      "presentation": "native",
+      "schema": { "type": "object", "properties": { "path": { "type": "string" } }, "required": ["path"] }
+    },
+    {
+      "name": "search_text",
+      "presentation": "native",
+      "schema": { "type": "object", "properties": { "query": { "type": "string" } }, "required": ["query"] }
+    },
+    {
+      "name": "run_command",
+      "presentation": "native",
+      "schema": { "type": "object", "properties": { "command": { "type": "string" } }, "required": ["command"] }
+    }
+  ],
+  "execution": []
+}

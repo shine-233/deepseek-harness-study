@@ -1,0 +1,1672 @@
+/*
+ * Reading-layer styles for the stock VitePress theme.
+ *
+ * The canonical Markdown remains responsible for content and the generated
+ * projection remains responsible for routes. This file only establishes
+ * spacing, focus, overflow, and responsive behavior shared by those pages.
+ */
+
+:root {
+  --dsh-reading-line-height: 1.78;
+  --dsh-reading-radius: 8px;
+  --dsh-reading-radius-lg: 16px;
+  --dsh-reading-focus: color-mix(in srgb, var(--vp-c-brand-1) 22%, transparent);
+  --dsh-reading-surface: color-mix(in srgb, var(--vp-c-bg-soft) 88%, transparent);
+  --dsh-reading-shadow: 0 16px 42px rgba(37, 58, 112, 0.08);
+  --dsh-reading-shadow-strong: 0 22px 52px rgba(37, 58, 112, 0.14);
+  --dsh-reading-progress: 0%;
+}
+
+/* The script only updates this percentage; it never records a reading history. */
+body::before {
+  position: fixed;
+  z-index: 1001;
+  inset: 0 auto auto 0;
+  width: var(--dsh-reading-progress);
+  height: 3px;
+  background: var(--vp-c-brand-1);
+  box-shadow: 0 1px 8px color-mix(in srgb, var(--vp-c-brand-1) 36%, transparent);
+  content: '';
+  pointer-events: none;
+  transition: width 120ms ease-out;
+}
+
+.vp-doc {
+  font-size: 16px;
+  line-height: var(--dsh-reading-line-height);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 26%, transparent);
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc :is(h1, h2, h3, h4) {
+  scroll-margin-top: calc(var(--vp-nav-height) + 24px);
+}
+
+.vp-doc h1 {
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.vp-doc h2 {
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc :is(p, ul, ol, blockquote) {
+  text-wrap: pretty;
+}
+
+.vp-doc :is(ul, ol) {
+  padding-left: 1.35rem;
+}
+
+.vp-doc .custom-block {
+  border-radius: var(--dsh-reading-radius);
+  box-shadow: 0 8px 24px rgba(37, 58, 112, 0.06);
+}
+
+.vp-doc .custom-block-title {
+  letter-spacing: 0;
+}
+
+.vp-doc :is(pre, div[class*='language-']) {
+  border-radius: var(--dsh-reading-radius);
+}
+
+.vp-doc div[class*='language-'] {
+  overflow-x: auto;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: 0 10px 26px rgba(37, 58, 112, 0.08);
+  -webkit-overflow-scrolling: touch;
+}
+
+.vp-doc div[class*='language-'] > pre {
+  border: 0;
+  box-shadow: none;
+}
+
+.vp-doc div[class*='language-'] code {
+  min-width: max-content;
+}
+
+.vp-doc :is(code, pre) {
+  font-variant-ligatures: none;
+}
+
+.vp-doc :is(h1, h2, h3, h4) {
+  text-wrap: balance;
+}
+
+.vp-doc :is(a, button) {
+  text-underline-offset: 3px;
+}
+
+.vp-doc :not(pre) > code {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 5px;
+  background: var(--vp-c-bg-soft);
+  padding: 0.12em 0.34em;
+}
+
+.vp-doc kbd {
+  border: 1px solid var(--vp-c-divider);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  font-size: 0.82em;
+  padding: 0.1em 0.4em;
+}
+
+.vp-doc table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc th,
+.vp-doc td {
+  min-width: 7rem;
+  vertical-align: top;
+}
+
+.vp-doc thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: inset 0 -1px 0 var(--vp-c-divider);
+}
+
+.vp-doc :is(a, button):focus-visible,
+.VPSidebarItem .item:focus-visible,
+.VPDocAsideOutline .outline-link:focus-visible {
+  outline: 3px solid var(--dsh-reading-focus);
+  outline-offset: 3px;
+}
+
+.VPDocAsideOutline {
+  border-left: 1px solid var(--vp-c-divider);
+}
+
+.VPDocAsideOutline .outline-link.active {
+  color: var(--vp-c-brand-1);
+  font-weight: 650;
+}
+
+.VPFooter {
+  border-top: 1px solid var(--vp-c-divider);
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 56%, transparent);
+}
+
+.VPFooter .message,
+.VPFooter .copyright {
+  line-height: 1.7;
+}
+
+.VPFooter a {
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
+.VPFooter a:hover {
+  color: var(--vp-c-brand-2);
+}
+
+.VPSidebarItem.level-0 > .item {
+  margin-top: 0.35rem;
+  border-radius: 8px;
+  font-weight: 650;
+}
+
+.VPSidebarItem .item {
+  border-radius: 8px;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.VPSidebarItem .item:hover {
+  background: var(--vp-c-bg-soft);
+}
+
+.VPSidebarItem.is-active > .item {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  font-weight: 650;
+}
+
+.VPHome .VPHero .actions {
+  gap: 12px;
+}
+
+.VPHome .VPHero .name {
+  color: var(--vp-c-brand-1);
+  font-size: 1.08rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.VPHome .VPHero .text {
+  max-width: 820px;
+  font-size: 3.55rem;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.VPHome .VPHero .tagline {
+  width: min(100%, 46rem);
+  max-width: 46rem;
+  text-wrap: pretty;
+}
+
+.VPHome .VPHero .actions .VPButton {
+  min-height: 44px;
+  border-radius: 12px;
+  font-weight: 720;
+  box-shadow: 0 8px 22px rgba(37, 58, 112, 0.08);
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.VPHome .VPHero .actions .VPButton.brand {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--vp-c-brand-1), var(--vp-c-brand-2));
+  color: #fff;
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--vp-c-brand-1) 28%, transparent);
+}
+
+.VPHome .VPHero .actions .VPButton.alt {
+  border-color: var(--vp-c-divider);
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 84%, transparent);
+}
+
+.VPHome .VPHero .actions .VPButton:hover {
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--vp-c-brand-1) 20%, transparent);
+  transform: translateY(-2px);
+}
+
+.VPHome .VPHero .actions .VPButton:focus-visible {
+  outline: 3px solid var(--dsh-reading-focus);
+  outline-offset: 4px;
+}
+
+/*
+ * Give the landing page a quiet visual starting point. The decoration is
+ * intentionally CSS-only: it adds hierarchy without adding an image that
+ * could fail to load on GitHub Pages or make the first screen heavier.
+ */
+.VPHome {
+  background:
+    radial-gradient(circle at 84% 7%, color-mix(in srgb, var(--vp-c-brand-soft) 72%, transparent), transparent 25rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--vp-c-bg-soft) 34%, transparent), transparent 30rem);
+}
+
+.VPHome .VPHero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.VPHome .VPHero::before {
+  position: absolute;
+  z-index: -1;
+  top: 2.8rem;
+  right: max(2rem, calc((100vw - 1180px) / 2));
+  width: 18rem;
+  height: 18rem;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 18%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1.7rem color-mix(in srgb, var(--vp-c-brand-1) 5%, transparent),
+    0 0 0 3.4rem color-mix(in srgb, var(--vp-c-brand-1) 3%, transparent);
+  content: '';
+  pointer-events: none;
+}
+
+.VPHome .VPHero::after {
+  position: absolute;
+  z-index: -1;
+  top: 6.9rem;
+  right: max(8rem, calc((100vw - 1180px) / 2 + 6rem));
+  width: 6rem;
+  height: 6rem;
+  background-image: radial-gradient(color-mix(in srgb, var(--vp-c-brand-1) 28%, transparent) 1px, transparent 1px);
+  background-size: 12px 12px;
+  content: '';
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.VPHome .VPHero .main {
+  position: relative;
+  z-index: 1;
+}
+
+.VPHome .VPFeatures {
+  max-width: 1180px;
+  row-gap: 18px;
+}
+
+.VPHome .VPFeature {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 78%, transparent);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.VPHome .VPFeature:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 35%, var(--vp-c-divider));
+  box-shadow: 0 12px 28px rgba(37, 58, 112, 0.09);
+  transform: translateY(-2px);
+}
+
+/*
+ * The home page has three explicit first actions. They are intentionally
+ * ordinary links, not a client-side widget: the same route works on GitHub
+ * Pages, in a local preview, and when JavaScript is unavailable.
+ */
+.VPHome .dsh-route-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 1180px;
+  margin: 1rem auto 2.6rem;
+}
+
+.VPHome .dsh-route-heading {
+  display: grid;
+  gap: 4px;
+  max-width: 1180px;
+  margin: 1.85rem auto 0;
+}
+
+.VPHome .dsh-route-kicker {
+  color: var(--vp-c-brand-1);
+  font-size: 0.75rem;
+  font-weight: 780;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.VPHome .dsh-route-heading strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.18rem;
+  line-height: 1.4;
+}
+
+.VPHome .dsh-route-heading small {
+  color: var(--vp-c-text-2);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.VPHome .dsh-route-card {
+  position: relative;
+  display: flex;
+  min-height: 164px;
+  flex-direction: column;
+  gap: 9px;
+  padding: 20px 20px 22px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 80%, transparent);
+  box-shadow: 0 10px 26px rgba(37, 58, 112, 0.06);
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.VPHome .dsh-route-card,
+.VPHome .dsh-home-learning-card,
+.VPHome .dsh-learning-step {
+  -webkit-tap-highlight-color: color-mix(in srgb, var(--vp-c-brand-1) 18%, transparent);
+}
+
+.VPHome .dsh-route-card:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 42%, var(--vp-c-divider));
+  background: var(--vp-c-bg-soft);
+  box-shadow: 0 16px 34px rgba(37, 58, 112, 0.12);
+  color: var(--vp-c-text-1);
+  transform: translateY(-3px);
+}
+
+.VPHome .dsh-route-card:focus-visible {
+  outline: 3px solid var(--dsh-reading-focus);
+  outline-offset: 4px;
+}
+
+.VPHome .dsh-route-card-primary {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 52%, var(--vp-c-divider));
+  border-left-width: 4px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--vp-c-brand-soft) 88%, var(--vp-c-bg-soft)), var(--vp-c-bg-soft) 72%);
+  box-shadow: var(--dsh-reading-shadow);
+}
+
+.VPHome .dsh-route-card-primary::before {
+  position: absolute;
+  top: 13px;
+  right: 14px;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 30%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vp-c-bg) 72%, transparent);
+  color: var(--vp-c-brand-1);
+  content: '推荐';
+  font-size: 0.7rem;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
+.VPHome .dsh-route-step {
+  color: var(--vp-c-brand-1);
+  font-size: 0.76rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.VPHome .dsh-route-card strong {
+  font-size: 1.14rem;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.VPHome .dsh-route-card > span:nth-of-type(2) {
+  color: var(--vp-c-text-2);
+  font-size: 0.94rem;
+  line-height: 1.62;
+}
+
+.VPHome .dsh-route-card .dsh-route-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  color: var(--vp-c-brand-1);
+  font-size: 0.84rem;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.VPHome .dsh-route-card .dsh-route-link span {
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: transform 160ms ease;
+}
+
+.VPHome .dsh-route-card-primary:hover {
+  box-shadow: var(--dsh-reading-shadow-strong);
+}
+
+.VPHome .dsh-route-card:hover .dsh-route-link span {
+  transform: translateX(3px);
+}
+
+/*
+ * A small recovery lane keeps a first-time reader from treating every
+ * navigation or command failure as a reason to open the whole repository.
+ * It is deliberately ordinary HTML so it also works in the GitHub Markdown
+ * view and remains covered by the built-site contract.
+ */
+.VPHome .dsh-stuck-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.7fr);
+  max-width: 1180px;
+  margin: 0 auto 2.1rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, #d98c3f 34%, var(--vp-c-divider));
+  border-radius: 12px;
+  background: linear-gradient(108deg, color-mix(in srgb, #f4c98f 18%, var(--vp-c-bg-soft)), var(--vp-c-bg-soft) 60%);
+  box-shadow: 0 10px 26px rgba(93, 65, 29, 0.07);
+}
+
+.VPHome .dsh-stuck-lead {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: 20px 23px;
+  border-right: 1px solid color-mix(in srgb, #d98c3f 24%, var(--vp-c-divider));
+}
+
+.VPHome .dsh-stuck-lead .dsh-proof-kicker {
+  color: color-mix(in srgb, #ad641e 80%, var(--vp-c-brand-1));
+}
+
+.VPHome .dsh-stuck-lead strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.08rem;
+  line-height: 1.42;
+}
+
+.VPHome .dsh-stuck-lead small,
+.VPHome .dsh-stuck-steps small {
+  color: var(--vp-c-text-2);
+  line-height: 1.55;
+}
+
+.VPHome .dsh-stuck-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.VPHome .dsh-stuck-steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px;
+  align-content: center;
+  min-width: 0;
+  padding: 20px 17px;
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.VPHome .dsh-stuck-steps li:last-child {
+  border-right: 0;
+}
+
+.VPHome .dsh-stuck-steps span {
+  display: inline-flex;
+  width: 27px;
+  height: 27px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, #d98c3f 42%, var(--vp-c-divider));
+  border-radius: 50%;
+  color: color-mix(in srgb, #ad641e 80%, var(--vp-c-brand-1));
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.VPHome .dsh-stuck-steps strong,
+.VPHome .dsh-stuck-steps small {
+  display: block;
+}
+
+.VPHome .dsh-stuck-steps strong {
+  line-height: 1.35;
+}
+
+.VPHome .dsh-stuck-steps small {
+  margin-top: 4px;
+}
+
+.VPHome .dsh-learning-map {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 1180px;
+  margin: 0 auto 2.6rem;
+}
+
+/*
+ * A compact “you will learn” layer sits between the route cards and the
+ * repository health strip. It borrows the objective-first rhythm used by
+ * mature learning sites while keeping every cell as an ordinary link.
+ */
+.VPHome .dsh-home-learning-results {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.82fr) minmax(0, 1.8fr);
+  max-width: 1180px;
+  margin: 0 auto 2.1rem;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 82%, transparent);
+  box-shadow: 0 12px 30px rgba(37, 58, 112, 0.055);
+}
+
+.VPHome .dsh-home-learning-results-intro {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: 22px 24px;
+  border-right: 1px solid var(--vp-c-divider);
+  background: linear-gradient(145deg, var(--vp-c-brand-soft), transparent 78%);
+}
+
+.VPHome .dsh-home-learning-results-intro strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.08rem;
+  line-height: 1.42;
+}
+
+.VPHome .dsh-home-learning-results-intro small {
+  color: var(--vp-c-text-2);
+  line-height: 1.58;
+}
+
+.VPHome .dsh-home-learning-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.VPHome .dsh-home-learning-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+  align-content: center;
+  min-width: 0;
+  padding: 17px 18px;
+  border-right: 1px solid var(--vp-c-divider);
+  border-bottom: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.VPHome .dsh-home-learning-card:nth-child(2n) {
+  border-right: 0;
+}
+
+.VPHome .dsh-home-learning-card:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.VPHome .dsh-home-learning-card:hover,
+.VPHome .dsh-home-learning-card:focus-visible {
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  box-shadow: inset 0 0 0 2px var(--dsh-reading-focus);
+}
+
+.VPHome .dsh-home-learning-card:focus-visible {
+  outline: 3px solid var(--dsh-reading-focus);
+  outline-offset: -3px;
+}
+
+.VPHome .dsh-home-learning-number {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 28%, transparent);
+  border-radius: 50%;
+  color: var(--vp-c-brand-1);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.VPHome .dsh-home-learning-card strong,
+.VPHome .dsh-home-learning-card small {
+  display: block;
+  grid-column: 2;
+}
+
+.VPHome .dsh-home-learning-card strong {
+  line-height: 1.35;
+}
+
+.VPHome .dsh-home-learning-card small {
+  margin-top: 4px;
+  color: var(--vp-c-text-2);
+  line-height: 1.52;
+}
+
+.VPHome .dsh-home-contract {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.82fr) minmax(0, 1.7fr);
+  max-width: 1180px;
+  margin: 0 auto 2.15rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 24%, var(--vp-c-divider));
+  border-radius: 14px;
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--vp-c-brand-soft) 78%, var(--vp-c-bg-soft)), var(--vp-c-bg-soft) 58%);
+  box-shadow: 0 14px 32px rgba(37, 58, 112, 0.07);
+}
+
+.VPHome .dsh-home-contract,
+.VPHome .dsh-home-learning-results,
+.VPHome .dsh-status-strip,
+.VPHome .dsh-proof-strip {
+  backdrop-filter: blur(8px);
+}
+
+.VPHome .dsh-home-contract-lead {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: 22px 24px;
+  border-right: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 18%, var(--vp-c-divider));
+}
+
+.VPHome .dsh-home-contract-lead strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.16rem;
+  line-height: 1.4;
+}
+
+.VPHome .dsh-home-contract-lead small {
+  color: var(--vp-c-text-2);
+  line-height: 1.58;
+}
+
+.VPHome .dsh-home-contract-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.VPHome .dsh-home-contract-steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 11px;
+  align-content: center;
+  min-width: 0;
+  padding: 22px 19px;
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.VPHome .dsh-home-contract-steps li:last-child {
+  border-right: 0;
+}
+
+.VPHome .dsh-home-contract-number {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 28%, transparent);
+  border-radius: 50%;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-brand-1);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.VPHome .dsh-home-contract-steps strong,
+.VPHome .dsh-home-contract-steps small {
+  display: block;
+}
+
+.VPHome .dsh-home-contract-steps strong {
+  line-height: 1.35;
+}
+
+.VPHome .dsh-home-contract-steps small {
+  margin-top: 4px;
+  color: var(--vp-c-text-2);
+  line-height: 1.5;
+}
+
+.VPHome .dsh-status-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  max-width: 1180px;
+  margin: 0 auto 1.2rem;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+  box-shadow: 0 10px 26px rgba(37, 58, 112, 0.055);
+}
+
+.dsh-status-summary {
+  display: grid;
+  grid-column: span 2;
+  gap: 5px;
+  align-content: center;
+  min-height: 102px;
+  padding: 17px 20px;
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.dsh-status-kicker {
+  color: var(--vp-c-brand-1);
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.dsh-status-summary strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+.dsh-status-summary small {
+  max-width: 28rem;
+  color: var(--vp-c-text-2);
+  line-height: 1.5;
+}
+
+.dsh-status-metric {
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 102px;
+  padding: 17px 16px;
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.dsh-status-metric:last-child {
+  border-right: 0;
+}
+
+.dsh-status-metric strong {
+  color: var(--vp-c-brand-1);
+  font-size: 1.28rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.dsh-status-metric span {
+  color: var(--vp-c-text-2);
+  font-size: 0.83rem;
+  line-height: 1.45;
+}
+
+.dsh-status-metric-good strong {
+  color: #2f9e72;
+}
+
+.dsh-status-boundary {
+  max-width: 1180px;
+  margin: 0 auto 2rem;
+  color: var(--vp-c-text-2);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.dsh-status-boundary strong {
+  color: var(--vp-c-text-1);
+}
+
+.VPHome .dsh-feedback-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 18px;
+  align-items: center;
+  max-width: 1180px;
+  margin: 0 auto 2rem;
+  padding: 18px 20px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--dsh-reading-radius);
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 44%, var(--vp-c-bg-soft));
+  box-shadow: 0 10px 26px rgba(37, 58, 112, 0.055);
+}
+
+.dsh-feedback-copy {
+  display: grid;
+  gap: 5px;
+}
+
+.dsh-feedback-copy strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.04rem;
+  line-height: 1.4;
+}
+
+.dsh-feedback-copy small {
+  color: var(--vp-c-text-2);
+  line-height: 1.55;
+}
+
+.dsh-feedback-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dsh-feedback-links a {
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 24%, var(--vp-c-divider));
+  border-radius: var(--dsh-reading-radius);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-brand-1);
+  font-size: 0.9rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.dsh-feedback-links a:hover,
+.dsh-feedback-links a:focus-visible {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 8px 18px rgba(37, 58, 112, 0.1);
+  color: var(--vp-c-brand-1);
+  transform: translateY(-1px);
+}
+
+.dsh-feedback-links a:focus-visible {
+  outline: 3px solid var(--dsh-reading-focus);
+  outline-offset: 2px;
+}
+
+.VPHome .dsh-learning-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-height: 94px;
+  padding: 15px 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.VPHome .dsh-learning-step:nth-child(1) {
+  border-top: 3px solid color-mix(in srgb, var(--vp-c-brand-1) 70%, var(--vp-c-divider));
+}
+
+.VPHome .dsh-learning-step:nth-child(2) {
+  border-top: 3px solid color-mix(in srgb, #7d8fe0 70%, var(--vp-c-divider));
+}
+
+.VPHome .dsh-learning-step:nth-child(3) {
+  border-top: 3px solid color-mix(in srgb, #b58bce 70%, var(--vp-c-divider));
+}
+
+.VPHome .dsh-learning-step:nth-child(4) {
+  border-top: 3px solid color-mix(in srgb, #d49b62 70%, var(--vp-c-divider));
+}
+
+.VPHome .dsh-learning-step:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 38%, var(--vp-c-divider));
+  box-shadow: 0 10px 24px rgba(37, 58, 112, 0.08);
+  color: var(--vp-c-text-1);
+  transform: translateY(-2px);
+}
+
+.VPHome .dsh-learning-step:focus-visible {
+  outline: 3px solid var(--dsh-reading-focus);
+  outline-offset: 4px;
+}
+
+.VPHome .dsh-learning-step > span:first-child {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.VPHome .dsh-learning-step strong,
+.VPHome .dsh-learning-step small {
+  display: block;
+}
+
+.VPHome .dsh-learning-step strong {
+  line-height: 1.35;
+}
+
+.VPHome .dsh-learning-step small {
+  margin-top: 4px;
+  color: var(--vp-c-text-2);
+  line-height: 1.5;
+}
+
+/*
+ * Learning contracts: these small panels turn a long Markdown page into a
+ * readable sequence of actions and evidence. They deliberately use ordinary
+ * links and text so the same material remains useful on GitHub and without
+ * client-side JavaScript.
+ */
+.dsh-proof-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 1180px;
+  margin: 1.55rem auto 2.15rem;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 74%, transparent);
+  box-shadow: 0 12px 30px rgba(37, 58, 112, 0.06);
+}
+
+.dsh-proof-item {
+  display: flex;
+  min-height: 118px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 19px 20px;
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.dsh-proof-item:last-child {
+  border-right: 0;
+}
+
+.dsh-proof-kicker {
+  color: var(--vp-c-brand-1);
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.dsh-proof-item strong,
+.dsh-command-card strong,
+.dsh-task-card strong,
+.dsh-proof-card strong,
+.dsh-action-link strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.03rem;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+.dsh-proof-item small,
+.dsh-command-card small,
+.dsh-task-card small,
+.dsh-proof-card small,
+.dsh-action-link small {
+  color: var(--vp-c-text-2);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.dsh-command-card,
+.dsh-task-card {
+  display: grid;
+  gap: 8px;
+  margin: 1.45rem 0;
+  padding: 19px 21px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 28%, var(--vp-c-divider));
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+  box-shadow: 0 9px 24px rgba(37, 58, 112, 0.055);
+}
+
+.dsh-lesson-contract {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 1.25rem 0 2rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 22%, var(--vp-c-divider));
+  border-radius: var(--dsh-reading-radius-lg);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--vp-c-brand-soft) 58%, var(--vp-c-bg)), var(--vp-c-bg-soft));
+  box-shadow: var(--dsh-reading-shadow);
+}
+
+.dsh-lesson-contract-item {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 128px;
+  padding: 18px 18px 20px;
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.dsh-lesson-contract-item:last-child {
+  border-right: 0;
+}
+
+.dsh-lesson-contract-item > span {
+  color: var(--vp-c-brand-1);
+  font-size: 0.73rem;
+  font-weight: 780;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+}
+
+.dsh-lesson-contract-item > strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.01rem;
+  line-height: 1.4;
+}
+
+.dsh-lesson-contract-item > small {
+  color: var(--vp-c-text-2);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.vp-doc .dsh-overview-summary {
+  display: grid;
+  gap: 8px;
+  margin: 1.35rem 0 2rem;
+  padding: 20px 22px 21px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 32%, var(--vp-c-divider));
+  border-left: 5px solid var(--vp-c-brand-1);
+  border-radius: var(--dsh-reading-radius-lg);
+  background:
+    radial-gradient(circle at 94% 8%, color-mix(in srgb, var(--vp-c-brand-soft) 78%, transparent), transparent 12rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--vp-c-brand-soft) 72%, var(--vp-c-bg)), var(--vp-c-bg-soft));
+  box-shadow: var(--dsh-reading-shadow);
+}
+
+.vp-doc .dsh-overview-kicker {
+  color: var(--vp-c-brand-1);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+}
+
+.vp-doc .dsh-overview-summary strong {
+  color: var(--vp-c-text-1);
+  font-size: 1.22rem;
+  line-height: 1.4;
+}
+
+.vp-doc .dsh-overview-summary p,
+.vp-doc .dsh-overview-summary small {
+  margin: 0;
+  color: var(--vp-c-text-2);
+  line-height: 1.65;
+}
+
+.vp-doc .dsh-overview-summary p {
+  color: var(--vp-c-text-1);
+  font-size: 1.02rem;
+}
+
+.vp-doc .dsh-overview-summary small {
+  font-size: 0.9rem;
+}
+
+.dsh-command-card {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.dsh-command-card .dsh-proof-kicker {
+  grid-row: span 2;
+  padding: 5px 13px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 34%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vp-c-bg) 52%, transparent);
+  white-space: nowrap;
+}
+
+.dsh-task-card {
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 88%, transparent);
+}
+
+.dsh-check-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 4px;
+}
+
+.dsh-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dsh-check-item > span {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: fit-content;
+  min-width: 26px;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.dsh-check-item > small {
+  align-self: center;
+}
+
+.dsh-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 1.35rem 0 1.5rem;
+}
+
+.dsh-proof-card {
+  display: grid;
+  gap: 6px;
+  min-height: 126px;
+  padding: 17px 18px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+}
+
+.dsh-proof-card-positive {
+  border-color: color-mix(in srgb, #2f9e72 42%, var(--vp-c-divider));
+}
+
+.dsh-proof-card-caution {
+  border-color: color-mix(in srgb, #d98c3f 44%, var(--vp-c-divider));
+}
+
+.dsh-next-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 1.45rem 0 1.8rem;
+}
+
+.dsh-action-link {
+  display: grid;
+  gap: 5px;
+  padding: 16px 18px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.dsh-action-link:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 42%, var(--vp-c-divider));
+  box-shadow: 0 10px 22px rgba(37, 58, 112, 0.09);
+  color: var(--vp-c-text-1);
+  transform: translateY(-2px);
+}
+
+.dsh-action-link-primary {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 38%, var(--vp-c-divider));
+  background: var(--vp-c-bg-soft);
+}
+
+/* Make a lesson's opening read like a small teaching card, not a wall of text. */
+.VPDoc .vp-doc > h1:first-child {
+  max-width: 46rem;
+  margin-bottom: 0.9rem;
+  letter-spacing: -0.015em;
+}
+
+.VPDoc .vp-doc > h1:first-child + p {
+  max-width: 49rem;
+  color: var(--vp-c-text-2);
+  font-size: 1.06rem;
+  line-height: 1.75;
+}
+
+.VPDoc .vp-doc > :is(h2, h3) {
+  scroll-margin-top: calc(var(--vp-nav-height) + 32px);
+}
+
+.VPDoc .vp-doc > :is(table, blockquote, .custom-block):first-of-type {
+  box-shadow: var(--dsh-reading-shadow);
+}
+
+/* A compact, visual "not yet" list keeps new readers from installing too early. */
+.VPHome .dsh-no-prereq {
+  display: grid;
+  grid-template-columns: auto repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+  max-width: 1180px;
+  margin: 1rem auto 1.8rem;
+  padding: 11px 14px;
+  border: 1px dashed color-mix(in srgb, var(--vp-c-brand-1) 32%, var(--vp-c-divider));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 42%, transparent);
+}
+
+.VPHome .dsh-no-prereq-kicker {
+  color: var(--vp-c-brand-1);
+  font-size: 0.76rem;
+  font-weight: 780;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.VPHome .dsh-no-prereq span:not(.dsh-no-prereq-kicker) {
+  min-width: 0;
+  color: var(--vp-c-text-2);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 959px) and (min-width: 720px) {
+  .vp-doc .dsh-lesson-contract {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dsh-lesson-contract-item:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .dsh-lesson-contract-item:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .dsh-lesson-contract-item:nth-child(n + 3) {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 719px) {
+  .VPHome .VPHero {
+    padding: 56px 20px 32px;
+  }
+
+  .VPHome .VPHero .name {
+    font-size: 1rem;
+  }
+
+  .VPHome .VPHero .text {
+    max-width: 26rem;
+    font-size: 2.25rem;
+    line-height: 1.22;
+  }
+
+  .VPHome .VPHero .tagline {
+    width: 100%;
+    max-width: 100%;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .VPHome .VPHero .actions {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .VPHome .VPHero .actions .VPButton {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .VPHome .VPFeatures {
+    padding-inline: 20px;
+  }
+
+  .VPFooter {
+    padding-inline: 20px;
+  }
+
+  .VPHome .VPFeature {
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .VPHome .dsh-route-grid {
+    grid-template-columns: 1fr;
+    margin: 1.6rem 20px 2.1rem;
+  }
+
+  .VPHome .dsh-no-prereq {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-inline: 20px;
+  }
+
+  .VPHome .dsh-no-prereq-kicker {
+    margin-bottom: 2px;
+  }
+
+  .VPHome .dsh-route-heading {
+    margin: 1.6rem 20px 0;
+  }
+
+  .VPHome .dsh-route-card {
+    min-height: 0;
+  }
+
+  .VPHome .dsh-learning-map {
+    grid-template-columns: 1fr;
+    margin: 0 20px 2.1rem;
+  }
+
+  .VPHome .dsh-home-learning-results {
+    grid-template-columns: 1fr;
+    margin-inline: 20px;
+  }
+
+  .VPHome .dsh-home-learning-results-intro {
+    border-right: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .VPHome .dsh-home-learning-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .VPHome .dsh-home-learning-card,
+  .VPHome .dsh-home-learning-card:nth-child(2n),
+  .VPHome .dsh-home-learning-card:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .VPHome .dsh-home-learning-card:last-child {
+    border-bottom: 0;
+  }
+
+  .VPHome .dsh-home-contract {
+    grid-template-columns: 1fr;
+    margin-inline: 20px;
+  }
+
+  .VPHome .dsh-stuck-card {
+    grid-template-columns: 1fr;
+    margin-inline: 20px;
+  }
+
+  .VPHome .dsh-stuck-lead {
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, #d98c3f 24%, var(--vp-c-divider));
+  }
+
+  .VPHome .dsh-stuck-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .VPHome .dsh-stuck-steps li,
+  .VPHome .dsh-stuck-steps li:last-child {
+    border-right: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .VPHome .dsh-stuck-steps li:last-child {
+    border-bottom: 0;
+  }
+
+  .VPHome .dsh-home-contract-lead {
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 18%, var(--vp-c-divider));
+  }
+
+  .VPHome .dsh-home-contract-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .VPHome .dsh-home-contract-steps li,
+  .VPHome .dsh-home-contract-steps li:last-child {
+    border-right: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .VPHome .dsh-home-contract-steps li:last-child {
+    border-bottom: 0;
+  }
+
+  .VPHome .dsh-status-boundary {
+    margin-inline: 20px;
+  }
+
+  .VPHome .dsh-feedback-section {
+    grid-template-columns: 1fr;
+    margin-inline: 20px;
+  }
+
+  .VPHome .dsh-proof-strip,
+  .VPHome .dsh-proof-grid,
+  .VPHome .dsh-next-actions {
+    grid-template-columns: 1fr;
+    margin-inline: 20px;
+  }
+
+  .vp-doc .dsh-proof-grid,
+  .vp-doc .dsh-next-actions {
+    grid-template-columns: 1fr;
+    margin-inline: 0;
+  }
+
+  .dsh-proof-item {
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .VPHome .dsh-status-strip {
+    grid-template-columns: 1fr;
+    margin-inline: 20px;
+  }
+
+  .dsh-status-summary {
+    grid-column: auto;
+    border-right: 0;
+  }
+
+  .dsh-status-metric,
+  .dsh-status-metric:nth-last-child(2) {
+    min-height: 0;
+    border-right: 0;
+    border-top: 1px solid var(--vp-c-divider);
+  }
+
+  .VPHome .dsh-status-boundary {
+    margin-inline: 20px;
+  }
+
+  .VPHome .VPHero::before,
+  .VPHome .VPHero::after {
+    display: none;
+  }
+
+  .dsh-proof-item:last-child {
+    border-bottom: 0;
+  }
+
+  .vp-doc .dsh-lesson-contract {
+    grid-template-columns: 1fr;
+  }
+
+  .dsh-lesson-contract-item,
+  .dsh-lesson-contract-item:nth-child(2n) {
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .dsh-lesson-contract-item:last-child {
+    border-bottom: 0;
+  }
+
+  .dsh-command-card {
+    grid-template-columns: 1fr;
+  }
+
+  .dsh-command-card .dsh-proof-kicker {
+    grid-row: auto;
+    justify-self: start;
+  }
+
+  .dsh-task-card,
+  .dsh-command-card {
+    margin-inline: 0;
+  }
+
+  .dsh-check-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dsh-feedback-links {
+    grid-template-columns: 1fr;
+  }
+
+  .vp-doc {
+    padding-inline: 20px;
+  }
+
+  .vp-doc h1 {
+    font-size: 2rem;
+  }
+
+  .vp-doc h2 {
+    font-size: 1.45rem;
+    padding-top: 0.85rem;
+  }
+
+  .vp-doc table {
+    font-size: 0.9rem;
+  }
+
+  .vp-doc :is(pre, div[class*='language-']) {
+    margin-inline: -4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .VPSidebarItem .item,
+  .VPHome .VPFeature,
+  .VPHome .dsh-route-card,
+  .VPHome .VPHero .actions .VPButton,
+  .dsh-action-link {
+    transition: none;
+  }
+
+  .VPHome .VPFeature:hover {
+    transform: none;
+  }
+
+  .VPHome .dsh-route-card:hover {
+    transform: none;
+  }
+
+  .VPHome .VPHero .actions .VPButton:hover {
+    transform: none;
+  }
+
+  .VPHome .dsh-home-learning-card:hover,
+  .VPHome .dsh-learning-step:hover {
+    transform: none;
+  }
+
+  .VPHome .dsh-learning-step:hover {
+    transform: none;
+  }
+
+  .VPHome .dsh-home-learning-card {
+    transition: none;
+  }
+
+  .dsh-action-link:hover {
+    transform: none;
+  }
+
+  body::before {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .VPHome .dsh-route-card,
+  .VPHome .dsh-home-learning-results,
+  .VPHome .dsh-home-contract,
+  .VPHome .dsh-stuck-card,
+  .VPHome .dsh-status-strip,
+  .VPHome .dsh-proof-strip,
+  .dsh-action-link {
+    border-color: var(--vp-c-text-2);
+  }
+
+  .VPHome .dsh-route-card:hover,
+  .VPHome .dsh-home-learning-card:hover,
+  .VPHome .dsh-learning-step:hover,
+  .dsh-action-link:hover {
+    box-shadow: inset 0 0 0 2px var(--vp-c-brand-1);
+  }
+}
+
+@media print {
+  body::before,
+  .VPNav,
+  .VPSidebar,
+  .VPDocAside,
+  .VPFooter {
+    display: none !important;
+  }
+
+  .VPContent,
+  .VPDoc,
+  .vp-doc {
+    margin: 0;
+    max-width: none;
+  }
+
+  .vp-doc a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}

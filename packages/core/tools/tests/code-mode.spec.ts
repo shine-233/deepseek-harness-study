@@ -1665,6 +1665,13 @@ describe('per-agent presentation', () => {
     const native = await systemPrompt.assemble()
     expect(native.tools.map(tool => tool.name)).toEqual(['echo'])
     expect(native.sections.some(section => section.name === 'tools:sdk')).toBe(false)
+
+    const snapshot = ctx.tools.debugSnapshot(agent)
+    expect(snapshot.presentationMode).toBe('code')
+    expect(snapshot.known).toEqual(['echo'])
+    expect(snapshot.visible).toEqual(['echo', RUN_CODE_NAME])
+    expect(snapshot.visibleSchemas.map(schema => schema.name)).toEqual([RUN_CODE_NAME])
+    expect(snapshot.visibleSchemaUtf8Bytes).toBe(snapshot.visibleSchemas[0]?.utf8Bytes)
   })
 
   it('inherits a STANDING preset scope\'s mode down the chain, agents beside it unaffected', async () => {

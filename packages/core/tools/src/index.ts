@@ -26,6 +26,7 @@ import type { CodeSdkLanguage } from './code-mode.ts'
 import { renderToolsSdk } from './ts-types.ts'
 import type { ToolSdkSchema } from './ts-types.ts'
 import { renderToolsSdkPy } from './py-types.ts'
+import type { ToolPresentationMode, ToolRuntimeDebugSnapshot, ToolRuntimeDebugVisibleSchema } from './types.ts'
 
 /**
  * Language → SDK-section renderer. The registry looks up the loaded
@@ -61,6 +62,8 @@ const SDK_RENDERERS: Record<string, (schemas: ToolSdkSchema[]) => string> = {
   typescript: renderToolsSdk,
   python: renderToolsSdkPy,
 } satisfies Record<CodeSdkLanguage, (schemas: ToolSdkSchema[]) => string>
+
+const utf8Encoder = new TextEncoder()
 
 export {
   defineTool,
@@ -99,7 +102,13 @@ export {
 } from './json-schema.ts'
 
 export type { JsonValue } from '@deepseek-ai/dsh-session'
-export type { CodeDispatchEventData, CodeDispatchStartEventData } from './types.ts'
+export type {
+  CodeDispatchEventData,
+  CodeDispatchStartEventData,
+  ToolPresentationMode,
+  ToolRuntimeDebugSnapshot,
+  ToolRuntimeDebugVisibleSchema,
+} from './types.ts'
 
 export { CodeRunFailedError, RUN_CODE_NAME } from './code-mode.ts'
 export { jsonSchemaToTs, renderToolsSdk } from './ts-types.ts'
@@ -647,9 +656,6 @@ function errorInfo(error: unknown): ToolErrorInfo | undefined {
   }
 }
 
-/** How the registry presents its tools to the model (see {@link Config.mode}). */
-export type ToolPresentationMode = 'native' | 'code' | 'both'
-
 /** Plugin config: how the registered tools are presented to the model. */
 export interface Config {
   /**
@@ -696,6 +702,8 @@ interface ToolView {
   readonly visible: ReadonlyMap<string, ToolDefinition>
   /** Pre-restriction capability names used by prompt-order validation. */
   readonly knownNames: ReadonlySet<string>
+  /** Inherited names removed by the scope-chain restrictions. */
+  readonly hiddenByRestriction: ReadonlySet<string>
   /** Current global names that a scoped restriction may name. */
   readonly restrictableNames: ReadonlySet<string>
 }
@@ -1165,6 +1173,7 @@ export class ToolRuntime extends Service {
     }
     const visible = new Map<string, ToolDefinition>()
     const knownNames = new Set<string>()
+    const hiddenByRestriction = new Set<string>()
     const restrictableNames = new Set<string>()
     for (const [name, definition] of inherited) {
       knownNames.add(name)
@@ -1172,6 +1181,7 @@ export class ToolRuntime extends Service {
       // Restrictions intersect across the whole chain: any scope on it may
       // mask an inherited name for everything nested inside it.
       if (layers.every(layer => layer.admits(name))) visible.set(name, definition)
+      else hiddenByRestriction.add(name)
     }
     // The scope's own registrations last, shadowing an inherited name and
     // outside the filter above.
@@ -1179,6 +1189,10 @@ export class ToolRuntime extends Service {
       for (const [name, definition] of own.tools.entries()) {
         knownNames.add(name)
         visible.set(name, definition)
+        // A scope-local shadow is outside its own restriction, so the
+        // inherited definition with the same name is not hidden in the
+        // effective scope view.
+        hiddenByRestriction.delete(name)
       }
     }
     // Presentation infrastructure is resolved last and outside capability
@@ -1189,7 +1203,7 @@ export class ToolRuntime extends Service {
     if (this.modeFor(scope) !== 'native') {
       visible.set(RUN_CODE_NAME, this.requireCodeTransport())
     }
-    return { visible, knownNames, restrictableNames }
+    return { visible, knownNames, hiddenByRestriction, restrictableNames }
   }
 
   /**
@@ -1233,6 +1247,40 @@ export class ToolRuntime extends Service {
    */
   schemas(scope?: ScopeKey): ToolSchema[] {
     return [...this.view(scope).visible.values()].map(definition => this.schemaOf(definition, true))
+  }
+
+  /**
+   * Return a frozen, JSON-serializable observation of one registry view.
+   *
+   * `registered` names belong to the exact addressed layer; `known` retains
+   * pre-restriction inherited names; `visible` is the effective runtime lookup
+   * set, including `run_code` when the mode presents it. `visibleSchemas` is
+   * the separate model-facing wire projection, so Code Mode can intentionally
+   * report a small direct schema set while its SDK still reaches the other
+   * visible runtime tools. Only names, mode, and UTF-8 byte counts are exposed.
+   *
+   * @param scope - the scope to inspect; omitted addresses the global layer.
+   * @returns a deeply frozen snapshot containing no callbacks or call data.
+   */
+  debugSnapshot(scope?: ScopeKey): ToolRuntimeDebugSnapshot {
+    const view = this.view(scope)
+    const layer = scope === undefined ? this.layers.global : this.layers.peek(scope)
+    const wireSchemas = this.wireSchemas(scope).schemas
+    const visibleSchemas: ToolRuntimeDebugVisibleSchema[] = wireSchemas.map(schema => ({
+      name: schema.name,
+      utf8Bytes: utf8Encoder.encode(JSON.stringify(schema)).byteLength,
+    }))
+    const snapshot: ToolRuntimeDebugSnapshot = {
+      scope: scope === undefined ? 'global' : 'scoped',
+      presentationMode: this.modeFor(scope),
+      registered: layer === undefined ? [] : [...layer.tools.keys()],
+      known: [...view.knownNames],
+      visible: [...view.visible.keys()],
+      hiddenByRestriction: [...view.hiddenByRestriction],
+      visibleSchemas,
+      visibleSchemaUtf8Bytes: visibleSchemas.reduce((total, schema) => total + schema.utf8Bytes, 0),
+    }
+    return deepFreeze(snapshot)
   }
 
   /** Project visible callable tools onto the generated Code Mode SDK contract. */

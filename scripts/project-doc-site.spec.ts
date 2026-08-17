@@ -3,9 +3,9 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, globSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { basename, join, resolve } from 'node:path'
+import { basename, join, relative, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { docsPages, landingLink, routeLink, sectionSpec, type DocsPage } from '../website/docs.ts'
+import { docsPages, landingLink, routeLink, sectionSpec, studyIndexRouteFilename, type DocsPage } from '../website/docs.ts'
 import {
   addProjectionFrontmatter, projectedPageContent, publishableImage, rewriteMarkdown,
 } from './project-doc-site.ts'
@@ -15,6 +15,22 @@ const repositoryRoot = resolve(import.meta.dirname, '..')
 
 function unexpectedWebsiteMarkdown(files: readonly string[]): string[] {
   return files.filter(file => file.endsWith('.md') && file !== 'website/AGENTS.md').sort()
+}
+
+function canonicalStudyMarkdownSources(): string[] {
+  const sources: string[] = ['START-HERE.md']
+  const walk = (directory: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+      const absolute = join(directory, entry.name)
+      if (entry.isDirectory()) {
+        walk(absolute)
+      } else if (entry.isFile() && entry.name.endsWith('.md')) {
+        sources.push(relative(repositoryRoot, absolute).replaceAll('\\', '/'))
+      }
+    }
+  }
+  walk(join(repositoryRoot, 'study'))
+  return sources.sort()
 }
 
 afterEach(() => {
@@ -248,6 +264,21 @@ describe('rewriteMarkdown', () => {
       repositoryRef: 'abc123',
     })).toThrow('links to missing path "missing.md"')
   })
+
+  it('keeps study examples on Pages and unpublished review files on GitHub', () => {
+    const source = '[example](../study-examples/README.zh.md) [review](../.github/AGENT_REVIEW.md)\n'
+    expect(rewriteMarkdown(source, {
+      locale: 'root',
+      sourcePath: 'study/28-最小插件示例与学习检查.md',
+      route: 'study/lessons/28-minimal.md',
+      pages: docsPages,
+      repoRoot: repositoryRoot,
+      repositoryRef: 'abc123',
+    })).toBe(
+      '[example](../examples/index.md) '
+      + '[review](https://github.com/shine-233/deepseek-harness-study/blob/abc123/.github/AGENT_REVIEW.md)\n',
+    )
+  })
 })
 
 describe('docsPages locale routes', () => {
@@ -257,7 +288,7 @@ describe('docsPages locale routes', () => {
     const studyHome = homes.find(page => page.route === 'index.md')
     expect(studyHome?.source).toBe('SITE-HOME.md')
     expect(projectedPageContent(readFileSync(resolve(repositoryRoot, 'SITE-HOME.md'), 'utf8'), studyHome!))
-      .toContain('text: 从“我不知道点哪里”开始')
+      .toContain('text: 从不知道点哪里，到能追一个源文件')
 
     const englishHome = homes.find(page => page.route === 'en/index.md')
     expect(englishHome?.source).toBe('docs/user/index.md')
@@ -314,6 +345,46 @@ describe('docsPages locale routes', () => {
     expect(study.some(page => page.route === 'study/files/dot-github.md' && page.source === 'study/文件索引/.github.md')).toBe(true)
     expect(publishedIndexSources).toEqual(indexSources)
     expect(study.filter(page => page.section === '逐文件索引').every(page => page.route.startsWith('study/files/'))).toBe(true)
+  })
+
+  it('publishes every canonical study Markdown source exactly once', () => {
+    const study = docsPages.filter(page => page.sidebar === 'zh-study' && (
+      page.source === 'START-HERE.md' || page.source.startsWith('study/')
+    ))
+    const sources = study.map(page => page.source).sort()
+    const routes = study.map(page => page.route).sort()
+    expect(sources).toEqual(canonicalStudyMarkdownSources())
+    expect(new Set(sources).size).toBe(sources.length)
+    expect(new Set(routes).size).toBe(routes.length)
+  })
+
+  it('publishes the runnable study README pages with their GitHub source aliases', () => {
+    const examples = docsPages.filter(page => page.source.startsWith('study-examples/'))
+    expect(examples.map(page => page.route).sort()).toEqual([
+      'study/examples/index.md',
+      'study/examples/minimal-observer.md',
+    ])
+    expect(examples.map(page => page.source).sort()).toEqual([
+      'study-examples/README.zh.md',
+      'study-examples/minimal-observer-plugin/README.zh.md',
+    ])
+    expect(examples.every(page => page.sidebar === 'zh-study' && page.contentLocale === 'zh-CN')).toBe(true)
+    expect(examples.flatMap(page => page.sourceAliases ?? []).sort()).toEqual([
+      'study-examples/README.md',
+      'study-examples/minimal-observer-plugin/README.md',
+    ])
+  })
+
+  it('does not publish two pages at one route', () => {
+    const routes = docsPages.map(page => page.route)
+    expect(new Set(routes).size, routes.join('\n')).toBe(routes.length)
+  })
+
+  it('keeps dotted source-index routes inside a GitHub Pages base path', () => {
+    expect(studyIndexRouteFilename('study/文件索引/.agents.md')).toBe('dot-agents.md')
+    expect(studyIndexRouteFilename('study/文件索引/tsdown.config.ts.md')).toBe('tsdown-dot-config-dot-ts.md')
+    expect(studyIndexRouteFilename('study/文件索引/vitest.web.perf.config.ts.md')).toBe('vitest-dot-web-dot-perf-dot-config-dot-ts.md')
+    expect(docsPages.some(page => page.route === 'study/files/tsdown-dot-config-dot-ts.md')).toBe(true)
   })
 
   it('indexes every subsystem page in both sides of the folder README', () => {
@@ -426,6 +497,23 @@ describe('sidebar ordering', () => {
     for (const [locale, collection] of collections) {
       expect(published, `${locale}/${collection}`).toContain(landingLink(locale, collection))
     }
+  })
+
+  it('stages the Chinese learning route without changing its published URLs', () => {
+    const stages = [
+      '01 认识 DSH',
+      '02 追一条主链路',
+      '03 扩展与工具',
+      '04 实验与证据',
+      '05 工具预算与生态',
+      '06 示例、质量与维护',
+    ]
+    const study = docsPages.filter(page => page.locale === 'root' && page.sidebar === 'zh-study')
+    expect(study.filter(page => page.section !== '逐文件索引' && page.section !== '学习示例').every(page => stages.includes(page.section))).toBe(true)
+    expect(study.find(page => page.source === 'study/00-开始这里.md')?.section).toBe('01 认识 DSH')
+    expect(study.find(page => page.source === 'study/22-工具可见性与非侵入扩展.md')?.section).toBe('05 工具预算与生态')
+    expect(study.find(page => page.source === 'study/28-最小插件示例与学习检查.md')?.section).toBe('06 示例、质量与维护')
+    expect(study.find(page => page.source === 'study/文件索引/README.md')?.route).toBe('study/files/README.md')
   })
 
   it('collapses the subsystem groups and leaves the smaller ones open', () => {

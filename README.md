@@ -1,22 +1,28 @@
 # DSH 源码学习仓库
 
-> **第一次来？先点这一个链接：** [打开傻瓜式入口：START-HERE.md](START-HERE.md)
+> **第一次来？先点这一个链接：** [打开开始学习入口：START-HERE.md](START-HERE.md)
 >
 > 只看 GitHub 网页就能开始：不需要下载源码、不需要 API key、不需要安装 pnpm，也不需要先会 TypeScript。进入后按“第一课 → 仓库地图 → 选择一条路线”走；暂时不要点 `Code`，也不要从 2,756 个逐文件索引条目开始。
 >
-> **想看真正的首页分流：** [打开 GitHub Pages 学习首页](https://shine-233.github.io/deepseek-harness-study/)。第一屏会按“从零、查文件、工具上下文、写插件、研究 Hook、运行实验”告诉你下一步点哪里。
+> **想看真正的首页分流：** [打开 GitHub Pages 学习首页](https://shine-233.github.io/deepseek-harness-study/)。第一屏先给“第一次来、照着做、想动手”三条起步路线；进入后再按工具上下文、查文件、研究 Hook 或运行实验选择专题。
+
+> **项目身份先说清楚：** 这是面向 DSH 社区的非官方源码学习与生态研究仓库，不是 DeepSeek AI 的官方教程、官方中文版、官方发布镜像或兼容性承诺。它的任务是帮助社区读源码、写插件、审查扩展、记录证据，并把有代表性的需求整理成可以提交给上游的建议。
 
 > **只想先判断工具和插件边界：** [打开一页决策卡](study/27-工具预算与插件责任决策卡.md)。它先解释工具预算，再告诉你什么时候是普通插件、Bundle、Hook bridge、patch、fork 或注入器。
 
+> **已经在 Codespaces？** 在仓库根目录运行 `pnpm run study:quick-check`，可以一次检查学习入口、离线快照和固定源码链接；加 `-- --example` 会再检查最小示例的 test/lint；Pages 构建后还可以加 `-- --site` 检查每个学习页的 HTML 外壳和站内链接。它不启动 DSH、provider 或模型。这条入口还会检查关键页面的学习体验契约：页面必须保留“现在做什么、应该看到什么或没有证明什么”的提示；它仍不启动 DSH、provider 或模型。
+
+发现文档事实错误、链接问题、教程无法复现或社区扩展风险时，请使用[按类型填写的 Issue 表单](https://github.com/shine-233/deepseek-harness-study/issues/new/choose)；不要提交密钥、Cookie 或私有运行日志。
+
 中文镜像：[README.zh.md](README.zh.md)
 
-这是基于 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的非官方学习型 fork。它不属于 DeepSeek AI，不由 DeepSeek AI 维护，也不代表 DeepSeek AI 的官方立场。
+这是基于 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork。它不属于 DeepSeek AI，不由 DeepSeek AI 维护，也不代表 DeepSeek AI 的官方立场；“官方”在本文中只表示上游来源或上游文档，不表示本仓库获得授权。
 
 本仓库把官方 DSH（DeepSeek Harness）固定在提交 `47f943859bef60e4160492346772ded9b24f765a`，并增加中文源码导读。目标是让第一次接触大型 TypeScript 项目的人，也能知道每一层、每个关键文件和每个源文件索引条目分别解决什么问题。
 
 ## 不知道从哪里开始？只做三步
 
-1. 打开[傻瓜式入口：START-HERE.md](START-HERE.md)，它会根据你的目标告诉你下一步点哪一篇。
+1. 打开[开始学习入口：START-HERE.md](START-HERE.md)，它会根据你的目标告诉你下一步点哪一篇。
 2. 第一次只读[00-开始这里](study/00-开始这里.md)、[01-仓库地图](study/01-仓库地图.md)和[02-Cordis与插件树](study/02-Cordis与插件树.md)，不需要下载、不需要 API key、不需要先会 TypeScript。
 3. 想查文件、写笔记或运行实验时，再分别看[逐文件索引导航](study/文件索引/README.md)和[GitHub 网页、github.dev 与 Codespaces 学习路线](study/21-GitHub网页与Codespaces学习路线.md)。
 
@@ -24,7 +30,7 @@
 
 ## 先从这里开始
 
-- [傻瓜式入口](START-HERE.md)：只回答“我现在点哪里、第一轮读什么、什么时候需要下载或开云端”。
+- [开始学习入口](START-HERE.md)：只回答“我现在点哪里、第一轮读什么、什么时候需要下载或开云端”。
 - [从零开始的学习路线](study/00-开始这里.md)：先建立“插件、服务、事件、轮次、会话”的整体认识。
 - [仓库地图](study/01-仓库地图.md)：解释 `apps`、`packages`、`vendor`、`examples`、`scripts` 等目录的分工。
 - [Cordis、Profile 与 Bundle](study/02-Cordis与插件树.md)：解释 DSH 为什么采用“一切皆插件”。
@@ -36,11 +42,15 @@
 - [逐文件索引的读法](study/08-逐文件索引怎么读.md)：解释自动索引的字段、证据等级和局限。
 - [业界案例与写法](study/09-业界案例与写法.md)：说明这种做法叫什么、为什么合理，以及参考了哪些公开项目。
 - [社区生态与扩展边界](study/10-社区生态与扩展边界.md)：区分 hook、插件、Bundle、配置 patch、源码 fork、注入、注册表修改和冒用官方身份，并拆解 `dsh-super-injector` 与 GitHub `dsh-plugin` 主题页/发现标签。
+- [给官方 DSH 的下一步更新建议](study/33-给官方DSH的更新建议.md)：以 `dsh-webpage` 和社区插件生态为案例，区分社区需求、公共契约和不应进入官方核心的方案。
 - [如何写一个合规插件](study/11-如何写一个合规插件.md)：从最小观察插件开始，讲公开 API、Bundle 安装、生命周期、测试、卸载和发布信任。
+- [最小插件示例与学习检查](study/28-最小插件示例与学习检查.md)：打开可运行的学习用第三方 Bundle，先做 Node 单元测试和 lint，再把“已经证明”和“还没有运行验证”分开写。
+- [学习仓库的质量检查与审阅](study/29-学习仓库的质量检查与审阅.md)：解释示例单元测试、lint、文档构建、A/B 结构预检、PR 审阅和 Agent 审阅各自证明什么，避免把任何一项写成完整 DSH 运行验证。
+- [学习工具箱](study/31-学习工具箱.md)：把入口、快照、A/B、索引、手写路径和 Pages 发布检查整理成可以从仓库根目录复制的命令。
 - [GitHub 生态检索与插件实战核验](study/12-GitHub生态检索与插件实战核验.md)：重新核对每个源文件的学习入口，解释 topic、目录、registry、普通 Bundle、管理器和运行时注入器的区别，并给出安装前审计和写插件的完整路线。
 - [官方工具插件完整契约](study/13-官方工具插件完整契约.md)：从工具流水线、呈现模式、权限可见性、并发、取消到结果事件，按官方扩展点解释怎样写工具插件。
 - [工具可见性与非侵入扩展](study/22-工具可见性与非侵入扩展.md)：解释“已注册、模型可见、执行允许”三层，工具 schema 的上下文成本，以及普通插件作者和 patch/fork 维护者的责任边界。
-- [工具可见集合观测与性能实验](study/23-工具可见集合观测与性能实验.md)：给出脱敏快照格式、离线检查器、A/B 变量和结果表，把“工具太多”变成可复核的实验问题。
+- [工具可见集合观测与性能实验](study/23-工具可见集合观测与性能实验.md)：给出脱敏快照格式、A/B 结构预检器、变量和结果表，把“工具太多”变成可复核的实验问题。
 - [工具预算与插件责任决策卡](study/27-工具预算与插件责任决策卡.md)：用三层直译和五问决策卡，把工具可见性、插件责任、社区生态分层和后续研究串成一条新手路线。
 - [高风险索引人工抽查](study/24-高风险索引人工抽查.md)：抽查工具入口、提示词组装、Profile 启动和 Hook codec，说明自动索引能证明什么、还不能证明什么。
 - [官方 Hook Bridge 与兼容层](study/14-官方HookBridge与兼容层.md)：区分 Hook 协议桥接、普通 Cordis 插件、源码 patch 和运行时注入，说明协议映射与生命周期边界。
@@ -51,7 +61,7 @@
 - [插件测试、卸载与版本证据](study/19-插件测试卸载与版本证据.md)：建立从单元测试到 Loader、构建产物、E2E、真实 API 和卸载检查的证据层级。
 - [学习仓库实际使用手册](study/20-学习仓库实际使用手册.md)：按“第一次阅读、逐文件追踪、写插件、审核社区项目、下载固定源码和运行文档门禁”给出可执行路线。
 - [GitHub 网页、github.dev 与 Codespaces 学习路线](study/21-GitHub网页与Codespaces学习路线.md)：说明不下载源码如何阅读、如何在浏览器中搜索和记笔记，以及什么时候需要云端终端和计算环境。
-- [15 分钟傻瓜式任务单](study/25-首页到第一次产出的傻瓜式任务单.md)：不想选择路线时，照着点击并写下第一条有源码证据的学习记录。
+- [15 分钟动手任务单](study/25-从首页到第一次产出的动手任务单.md)：不想选择路线时，照着点击并写下第一条有源码证据的学习记录。
 - [后续研究路线](study/26-后续研究路线.md)：把工具可见性实验、宿主观测、人工抽查、社区审核、网页体验和仓库治理按优先级排好，并写清每项需要的证据。
 
 ## 每个源文件在哪里
@@ -72,11 +82,17 @@
 - `vendor/` 是 Cordis、Schemastery 等第三方项目的固定副本，但官方 DSH 对它们做了重命名、构建配置和部分行为修改。索引会列出它们；精读时先看固定版本的 [`vendor/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/README.md) 的 Manifest 和 Local modifications，不能把每项实现都直接归因于上游，也不能把它们全部当成 DSH 原创代码。
 - 本仓库新增的导读、索引和生成器不代表官方 API，也不承诺跟随 DSH 的未来兼容性。
 
-## 为什么这个 fork 只保留一条 Actions 工作流
+## 为什么这个 fork 只保留两条 Actions 工作流
 
-这是学习仓库，不是官方 DSH 的发布镜像。因此 `.github/workflows/` 只保留 `docs-pages.yml`：它负责把中文导读和官方文档构建成 GitHub Pages。上游带来的完整 CI、真实 API E2E、E2B 沙箱、跨平台 Sandbox、npm/PyPI 发布和官方 issue 自动化工作流都已从本 fork 移除，避免误跑外部服务、消耗凭据或把学习仓库误当成官方发布源。
+这是学习仓库，不是官方 DSH 的发布镜像。因此 `.github/workflows/` 只保留两条有明确边界的工作流：`docs-pages.yml` 负责把中文导读和官方文档构建成 GitHub Pages，`study-quality.yml` 负责固定源码和网页编译、最小示例的单元测试与 lint、A/B 教学快照结构检查、手写路径、学习入口产物接线、逐文件索引、文档门禁和提交空白检查。上游带来的完整 CI、真实 API E2E、E2B 沙箱、跨平台 Sandbox、npm/PyPI 发布和官方 issue 自动化工作流都已从本 fork 移除，避免误跑外部服务、消耗凭据或把学习仓库误当成官方发布源。
 
-GitHub Actions 的绿色运行只证明“这次文档构建和 Pages 部署通过”；它不证明 DSH 运行时、真实模型调用、插件安装卸载或社区项目安全。要研究这些内容，请回到固定 commit 的源码，按[插件测试、卸载与版本证据](study/19-插件测试卸载与版本证据.md)记录实际命令、输入、输出和清理结果。
+两条工作流的绿色运行分别只证明各自列出的构建或确定性检查通过；它们都不证明 DSH 运行时、真实模型调用、插件安装卸载或社区项目安全。要研究这些内容，请回到固定 commit 的源码，按[插件测试、卸载与版本证据](study/19-插件测试卸载与版本证据.md)记录实际命令、输入、输出和清理结果。
+
+## 这个网站的“前端”和“后端”边界
+
+这个仓库没有独立的 Web API、数据库或运行中的后端服务。网站的前端是 `SITE-HOME.md`、`START-HERE.md`、`study/` 和 `website/public/reading.css`；所谓“后端式接缝”还包括 `study-tools/verify-study-learning-contract.mjs` 与 `study-tools/verify-study-home-metrics.mjs`：前者在构建前检查关键入口是否仍同时写了动作、预期和证据边界，后者重新计算首页状态条中的页面、索引、测试和结构错误数字。`website/docs.ts` 和 `scripts/project-doc-site.ts` 再把这些源材料投影成 VitePress 路由，由 GitHub Actions 构建到 Pages。这样做的好处是页面内容、导航清单和发布产物都能在同一个 PR 中检查；代价是它不能证明真实 DSH 已启动，也不能在页面上直接替读者运行插件。
+
+发布门禁会进一步检查首页三条按钮、第一轮目标卡、START-HERE 第一课、最小示例页、学习工具箱和 `reading.css` 是否真的出现在 `website/.dist`，再枚举整套 104 个中文学习页面，并核对构建后的站内学习链接。当前这组构建证据检查了 12,339 条学习路线链接；它只证明“教材被完整投影并且链接能解析”，不冒充浏览器点击、真实 Loader、模型调用或安全审计。首页状态条会把这组静态证据压缩成新手能读懂的四个数字，并由首页状态数字门禁和入口门禁共同核对它是否仍然与当前清单一致。
 
 <a id="run"></a><a id="run-from-source"></a>
 

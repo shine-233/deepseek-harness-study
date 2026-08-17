@@ -10,7 +10,7 @@ The Chinese source-learning route needs to be readable from GitHub Pages, includ
 
 ## Decision
 
-The website projects every Markdown page under `study/文件索引/` and gives dot-prefixed sources such as `.agents.md` a `dot-` public route while preserving the canonical source path and sidebar label. Only generated index prose is escaped for Vue template safety. The study materials add a neutral JSON snapshot example and an offline Node checker that reports set differences, schema byte counts, and execution decisions without importing DSH, connecting to a model, or modifying runtime state. Lessons 23 and 24 document the observation method, A/B experiment limits, and a five-file manual audit.
+The website projects every Markdown page under `study/文件索引/` and gives source filenames a VitePress-safe public route: dot-prefixed names use `dot-`, and every remaining dot uses `-dot-`, while the canonical source path and sidebar label stay unchanged. Only generated index prose is escaped for Vue template safety. The study materials add a neutral JSON snapshot example, an offline Node checker, and an A/B structure preflight that reports set differences, schema byte counts, and execution decisions without importing DSH, connecting to a model, or modifying runtime state. Lessons 23 and 24 document the observation method, A/B experiment limits, and a five-file manual audit.
 
 ## Alternatives considered
 
@@ -22,4 +22,4 @@ The website projects every Markdown page under `study/文件索引/` and gives d
 
 ## Consequences
 
-Pages now carries all 66 generated index pages, including large client and script references, so builds take longer and the sidebar keeps them collapsed. Dot-prefixed indexes use `dot-agents` and `dot-github` URLs only on the site. The offline checker is useful for teaching and comparing exported snapshots, but it cannot prove the actual prompt, provider token count, model latency, model quality, or tool execution. A future host or patched fork must own any private observation seam and publish its permissions, version range, and rollback procedure.
+Pages now carries all 66 generated index pages, including large client and script references, so builds take longer and the sidebar keeps them collapsed. Dotted index routes remain inside a configured GitHub Pages base path, including names such as `vitest-dot-web-dot-config-dot-ts`. The offline checker and A/B preflight are useful for teaching and comparing exported snapshots, but they cannot prove the actual prompt, provider token count, model latency, model quality, or tool execution. A future host or patched fork must own any private observation seam and publish its permissions, version range, and rollback procedure.

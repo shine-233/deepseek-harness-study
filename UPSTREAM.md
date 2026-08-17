@@ -1,6 +1,6 @@
 # 上游固定版本说明
 
-本仓库是 `shine-233/deepseek-harness-study`，源头是 [DeepSeek AI 的官方 DeepSeek Harness 仓库](https://github.com/deepseek-ai/deepseek-harness)。它是非官方学习型 fork，不是官方中文版，也不是官方教材或官方镜像。
+本仓库是 `shine-233/deepseek-harness-study`，源头是 [DeepSeek AI 的官方 DeepSeek Harness 仓库](https://github.com/deepseek-ai/deepseek-harness)。它是面向社区的非官方学习型 fork，不是官方中文版，也不是官方教程或官方镜像。
 
 ## 固定来源
 

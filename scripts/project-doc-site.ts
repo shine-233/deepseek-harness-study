@@ -210,11 +210,27 @@ function githubTarget(
   image: boolean,
 ): string {
   const path = repoPath(absPath, repoRoot)
-  const repository = path === 'START-HERE.md' || path.startsWith('study/') ? STUDY_REPOSITORY_URL : REPOSITORY_URL
+  const repository = isStudyRepositoryPath(path) ? STUDY_REPOSITORY_URL : REPOSITORY_URL
   if (image) return `${repository.replace('github.com', 'raw.githubusercontent.com')}/${repositoryRef}/${path}${suffix}`
   const kind = lstatSync(absPath).isDirectory() ? 'tree' : 'blob'
   const lineSuffix = line === undefined ? suffix : `#L${line}`
   return `${repository}/${kind}/${repositoryRef}/${path}${lineSuffix}`
+}
+
+function isStudyRepositoryPath(path: string): boolean {
+  return path === 'START-HERE.md'
+    || path === 'README.md'
+    || path === 'README.zh.md'
+    || path === 'README.i18n.yaml'
+    || path === 'SITE-HOME.md'
+    || path === 'UPSTREAM.md'
+    || path === 'LICENSE'
+    || path === 'THIRD_PARTY_NOTICES.md'
+    || path.startsWith('.agents/')
+    || path.startsWith('.github/')
+    || path.startsWith('study/')
+    || path.startsWith('study-examples/')
+    || path.startsWith('study-tools/')
 }
 
 /**

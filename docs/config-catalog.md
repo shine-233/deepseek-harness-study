@@ -2790,11 +2790,11 @@ export interface Config {
   maxParallelSubCalls?: number
 }
 
-/** How the registry presents its tools to the model (see {@link Config.mode}). */
+/** How the runtime presents tools to a model-facing host. */
 export type ToolPresentationMode = 'native' | 'code' | 'both'
 ```
 
-Source: [`packages/core/tools/src/index.ts:654`](../packages/core/tools/src/index.ts)
+Source: [`packages/core/tools/src/index.ts:660`](../packages/core/tools/src/index.ts)
 
 <a id="deepseek-aidsh-typert-loader"></a>
 

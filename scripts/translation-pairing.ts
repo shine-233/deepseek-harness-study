@@ -293,7 +293,7 @@ export interface TranslationStructureSignature {
   tables: string[]
   /** Kind, ordered-list start, and direct item count of each list, in order. */
   lists: string[]
-  /** Every link target in order; the language switcher is excluded. */
+  /** Every link target in order; the language switcher is excluded and localised .zh.md targets are canonicalised. */
   links: string[]
 }
 
@@ -343,6 +343,18 @@ export function requiresSourceLanguageSwitcher(source: string): boolean {
   ].includes(source)
 }
 
+/**
+ * Compare links to the same document across the English and Chinese pair.
+ *
+ * A translated document may intentionally point at the translated README or
+ * lesson counterpart. The pairing gate still needs to catch a genuinely
+ * different destination, so only the locale suffix is canonicalised; anchors,
+ * queries, and every other part of the target remain part of the comparison.
+ */
+function comparableTranslationLinkTarget(target: string): string {
+  return target.replace(/\.zh\.md(?=($|[?#]))/, '.md')
+}
+
 /** Collect the ordered structural signature, skipping accepted switcher targets. */
 export function translationStructureSignature(
   tree: Nodes,
@@ -369,7 +381,7 @@ export function translationStructureSignature(
           : `bullet:items=${node.children.length}`)
         break
       case 'link':
-        if (!acceptedSwitchers.has(node.url)) sig.links.push(node.url)
+        if (!acceptedSwitchers.has(node.url)) sig.links.push(comparableTranslationLinkTarget(node.url))
         break
       default:
         // Every other node kind is prose or a container, not part of the signature.

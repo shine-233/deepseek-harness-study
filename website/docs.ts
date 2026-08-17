@@ -128,17 +128,39 @@ function studyPageLabel(source: string): string {
 }
 
 /**
- * Give dot-prefixed generated index files a VitePress-safe route.
+ * Keep the beginner sidebar staged like a course outline instead of one flat
+ * list. The numeric lesson prefix is already the canonical reading order, so
+ * this grouping adds navigation context without introducing a second route
+ * manifest or changing any published URL.
+ */
+function studySection(source: string): string {
+  if (source.startsWith('study/文件索引/')) return '逐文件索引'
+  const lessonNumber = source.match(/(?:^|\/)\d{2}-/)?.[0].match(/\d{2}/)?.[0]
+  const number = lessonNumber === undefined ? 0 : Number(lessonNumber)
+  if (number <= 2) return '01 认识 DSH'
+  if (number <= 8) return '02 追一条主链路'
+  if (number <= 15) return '03 扩展与工具'
+  if (number <= 21) return '04 实验与证据'
+  if (number <= 27) return '05 工具预算与生态'
+  return '06 示例、质量与维护'
+}
+
+/**
+ * Give generated index files a VitePress-safe route filename.
  *
  * GitHub can link to `.agents.md` and `.github.md` directly, but VitePress
  * normalises a relative link to those hidden pages as `./.agents` and
  * `./.github`, which its dead-link checker does not resolve reliably. The
  * canonical source and sidebar label keep the real filename; only the public
- * site URL uses a visible `dot-` prefix.
+ * site URL uses visible `dot-` and `-dot-` segments.
  */
 export function studyIndexRouteFilename(source: string): string {
   const filename = basename(source, '.md')
-  return filename.startsWith('.') ? `dot-${filename.slice(1)}.md` : `${filename}.md`
+  const visibleFilename = filename.startsWith('.') ? `dot-${filename.slice(1)}` : filename
+  // VitePress treats a dot in an absolute sidebar link as a file URL. That
+  // bypasses the configured GitHub Pages base path, so encode dots in the
+  // public route while keeping the original filename in the page label.
+  return `${visibleFilename.replaceAll('.', '-dot-')}.md`
 }
 
 /**
@@ -164,10 +186,42 @@ const studyPages: DocsPage[] = [
       : index ? `study/files/${studyIndexRouteFilename(source)}` : `study/lessons/${filename}.md`,
     label: studyPageLabel(source),
     sidebar: 'zh-study',
-    section: index ? '逐文件索引' : '学习路线',
+    section: studySection(source),
     order,
   }
 })
+
+/**
+ * Small runnable study artifacts that belong beside the learning route.
+ *
+ * The Chinese README is the canonical page for the root study site. English
+ * README aliases keep links authored for GitHub from escaping to an external
+ * page when the same artifact is available in the Pages projection.
+ */
+const studyExamplePages: DocsPage[] = [
+  {
+    locale: 'root',
+    contentLocale: 'zh-CN',
+    source: 'study-examples/README.zh.md',
+    sourceAliases: ['study-examples/README.md'],
+    route: 'study/examples/index.md',
+    label: '学习示例',
+    sidebar: 'zh-study',
+    section: '学习示例',
+    order: 0,
+  },
+  {
+    locale: 'root',
+    contentLocale: 'zh-CN',
+    source: 'study-examples/minimal-observer-plugin/README.zh.md',
+    sourceAliases: ['study-examples/minimal-observer-plugin/README.md'],
+    route: 'study/examples/minimal-observer.md',
+    label: '最小观察插件',
+    sidebar: 'zh-study',
+    section: '学习示例',
+    order: 1,
+  },
+]
 
 const homePages = mirroredPages([{
   source: { root: 'SITE-HOME.md', en: 'docs/user/index.md' },
@@ -494,7 +548,9 @@ export interface DocsSection {
  */
 const sections: Record<DocsLocale, readonly DocsSection[]> = {
   root: [
-    { label: '学习路线' }, { label: '逐文件索引', collapsed: true },
+    { label: '01 认识 DSH' }, { label: '02 追一条主链路' }, { label: '03 扩展与工具' },
+    { label: '04 实验与证据' }, { label: '05 工具预算与生态' }, { label: '06 示例、质量与维护' },
+    { label: '学习示例' }, { label: '逐文件索引', collapsed: true },
     { label: '入门' }, { label: 'SDK' },
     { label: '基础' }, { label: '框架能力' }, { label: '实战' }, { label: 'Cordis 框架教程' },
     { label: '概念' }, { label: '生成参考' }, { label: 'Cordis API' }, { label: '开发手册' },
@@ -540,6 +596,7 @@ export function sectionSpec(locale: DocsLocale, label: string): DocsSection & { 
 /** Every canonical page published by the documentation website. */
 export const docsPages: DocsPage[] = [
   ...studyPages,
+  ...studyExamplePages,
   ...homePages,
   ...homeAndGuide,
   ...develop,

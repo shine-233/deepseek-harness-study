@@ -97,6 +97,44 @@ describe('scoped tool registration', () => {
     expect(ctx.tools.schemas(key).filter(t => t.name === 'bash')).toHaveLength(1)
   })
 
+  it('exports a frozen, redacted snapshot for registration, resolution, and schema cost', async () => {
+    const ctx = await mount()
+    const { scope, key } = await mintAgentScope(ctx, 'a')
+    ctx.tools.register(tool('shared'))
+    ctx.tools.register(tool('hidden'))
+    scope.ctx.tools.register(tool('local'))
+    scope.ctx.tools.restrict({ deny: ['hidden'] })
+
+    const globalSnapshot = ctx.tools.debugSnapshot()
+    expect(globalSnapshot.scope).toBe('global')
+    expect(globalSnapshot.registered).toEqual(['shared', 'hidden'])
+    expect(globalSnapshot.hiddenByRestriction).toEqual([])
+
+    const snapshot = ctx.tools.debugSnapshot(key)
+    expect(snapshot).toMatchObject({
+      scope: 'scoped',
+      presentationMode: 'native',
+      registered: ['local'],
+      known: ['shared', 'hidden', 'local'],
+      visible: ['shared', 'local'],
+      hiddenByRestriction: ['hidden'],
+      visibleSchemas: [
+        { name: 'shared', utf8Bytes: expect.any(Number) },
+        { name: 'local', utf8Bytes: expect.any(Number) },
+      ],
+    })
+    expect(snapshot.visibleSchemaUtf8Bytes)
+      .toBe(snapshot.visibleSchemas.reduce((total, schema) => total + schema.utf8Bytes, 0))
+    expect(snapshot.visibleSchemas[0]?.utf8Bytes)
+      .toBe(new TextEncoder().encode(JSON.stringify(ctx.tools.schemas(key)[0])).byteLength)
+    expect(Object.isFrozen(snapshot)).toBe(true)
+    expect(Object.isFrozen(snapshot.visible)).toBe(true)
+    expect(JSON.parse(JSON.stringify(snapshot))).toEqual(snapshot)
+    expect(JSON.stringify(snapshot)).not.toContain('execute')
+    expect(JSON.stringify(snapshot)).not.toContain('presentCall')
+    expect(JSON.stringify(snapshot)).not.toContain('presentResult')
+  })
+
   it('rejects a duplicate name within one layer, naming agent.ctx for the global case', async () => {
     const ctx = await mount()
     const { scope } = await mintAgentScope(ctx, 'a')

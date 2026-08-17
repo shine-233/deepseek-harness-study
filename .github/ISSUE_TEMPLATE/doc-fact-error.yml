@@ -1,0 +1,38 @@
+name: 文档事实错误
+description: 报告源码路径、固定版本、扩展边界或证据等级写错。
+title: "[事实错误] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请尽量给出固定提交、页面标题和源码路径；不要粘贴 API key、Cookie、完整日志中的隐私或真实 provider 凭据。
+  - type: input
+    id: page
+    attributes:
+      label: 出问题的页面
+      description: 请填写 Pages URL 或仓库内的 Markdown 路径。
+      placeholder: study/00-开始这里.md 或 https://shine-233.github.io/...
+    validations:
+      required: true
+  - type: textarea
+    id: incorrect_claim
+    attributes:
+      label: 哪一句不准确
+      description: 粘贴原文或概括它声称了什么，并说明你认为哪里不对。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 依据或建议改法
+      description: 给出固定版本源码、测试、官方文档或可复现链接；如果只是怀疑，请明确写“待核验”。
+    validations:
+      required: true
+  - type: input
+    id: upstream_commit
+    attributes:
+      label: 关联版本
+      description: 如果涉及 DSH 源码，请填写页面提到的 commit、tag 或“未知”。
+      placeholder: 47f943859bef60e4160492346772ded9b24f765a
+    validations:
+      required: true

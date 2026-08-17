@@ -7,6 +7,41 @@
 import type { CallId } from '@deepseek-ai/dsh-llm/brand'
 import type { ContentBlock } from '@deepseek-ai/dsh-llm/types'
 
+/** How the runtime presents tools to a model-facing host. */
+export type ToolPresentationMode = 'native' | 'code' | 'both'
+
+/** One model-facing schema's serialized UTF-8 cost in a runtime debug snapshot. */
+export interface ToolRuntimeDebugVisibleSchema {
+  /** Tool name only; the schema body is deliberately not included. */
+  readonly name: string
+  /** Byte length of compact `JSON.stringify({ name, description, parameters })`. */
+  readonly utf8Bytes: number
+}
+
+/**
+ * Lossless, read-only registry facts for one scope. The snapshot contains
+ * names, presentation mode, and schema byte counts only; it never contains
+ * tool callbacks, arguments, credentials, or user content.
+ */
+export interface ToolRuntimeDebugSnapshot {
+  /** Whether this view addresses the context-global layer or an exact scope. */
+  readonly scope: 'global' | 'scoped'
+  /** Effective model presentation selected by the deployment and scope chain. */
+  readonly presentationMode: ToolPresentationMode
+  /** Names owned by the exact layer addressed by `scope` (global when omitted). */
+  readonly registered: readonly string[]
+  /** Effective names known before restrictions, after scope shadowing. */
+  readonly known: readonly string[]
+  /** Effective runtime lookup names after restrictions and presentation transport insertion. */
+  readonly visible: readonly string[]
+  /** Inherited names removed by allow/deny restrictions; local registrations are excluded. */
+  readonly hiddenByRestriction: readonly string[]
+  /** The schemas actually projected to the model-facing host for this presentation mode. */
+  readonly visibleSchemas: readonly ToolRuntimeDebugVisibleSchema[]
+  /** Sum of {@link ToolRuntimeDebugVisibleSchema.utf8Bytes} for `visibleSchemas`. */
+  readonly visibleSchemaUtf8Bytes: number
+}
+
 /** Payload recorded when one nested Code Mode Tool dispatch starts. */
 export interface CodeDispatchStartEventData {
   rootCallId: CallId

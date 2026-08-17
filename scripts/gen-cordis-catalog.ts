@@ -435,6 +435,8 @@ export const LINK_MAP: Readonly<Record<string, string>> = {
   ToolExecutionToken: 'tools.md',
   ToolGuard: 'tools.md',
   ToolPresentationMode: 'tools.md',
+  ToolRuntimeDebugSnapshot: 'tools.md',
+  ToolRuntimeDebugVisibleSchema: 'tools.md',
   ToolRuntime: 'tools.md',
   ToolRestriction: 'tools.md',
   ToolSchema: 'tools.md',

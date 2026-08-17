@@ -10,7 +10,7 @@ Status: implemented
 
 ## Decision
 
-网站现在会投影 `study/文件索引/` 下的全部 Markdown 页面；`.agents.md` 这类点号开头的文件在网站上使用 `dot-` 路由，同时保留真实源文件路径和侧栏标签。只有生成索引正文会为 Vue 模板安全做转义。学习材料新增中立 JSON 快照示例和离线 Node 检查器，用于报告集合差异、schema 字节数和执行决策；它不导入 DSH、不连接模型，也不修改运行时状态。第 23 篇和第 24 篇课程记录观测方法、A/B 实验边界和五个高风险文件的人工抽查。
+网站现在会投影 `study/文件索引/` 下的全部 Markdown 页面；点号开头的文件在网站上使用 `dot-` 路由，其余文件名中的每个点号使用 `-dot-` 编码，同时保留真实源文件路径和侧栏标签。只有生成索引正文会为 Vue 模板安全做转义。学习材料新增中立 JSON 快照示例、离线 Node 检查器和 A/B 结构预检器，用于报告集合差异、schema 字节数和执行决策；它们不导入 DSH、不连接模型，也不修改运行时状态。第 23 篇和第 24 篇课程记录观测方法、A/B 实验边界和五个高风险文件的人工抽查。
 
 ## Alternatives considered
 
@@ -22,4 +22,4 @@ Status: implemented
 
 ## Consequences
 
-Pages 现在包含全部 66 个生成索引页，包括较大的 client 和 scripts 参考页，因此构建时间更长，侧栏会把它们折叠起来。点号开头的索引只在网站使用 `dot-agents` 和 `dot-github` URL。离线检查器适合教学和比较导出的快照，但不能证明真实 prompt、provider token 数、模型延迟、模型质量或工具执行结果。以后如果宿主或 patched fork 维护私有观测接入点，必须由它公开权限、版本范围和回滚步骤。
+Pages 现在包含全部 66 个生成索引页，包括较大的 client 和 scripts 参考页，因此构建时间更长，侧栏会把它们折叠起来。带点号的索引路由会留在 GitHub Pages 的基路径内，例如 `vitest-dot-web-dot-config-dot-ts`。离线检查器和 A/B 预检器适合教学和比较导出的快照，但不能证明真实 prompt、provider token 数、模型延迟、模型质量或工具执行结果。以后如果宿主或 patched fork 维护私有观测接入点，必须由它公开权限、版本范围和回滚步骤。
