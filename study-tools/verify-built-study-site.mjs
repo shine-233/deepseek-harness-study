@@ -26,7 +26,7 @@ export const REQUIRED_PUBLISHED_PAGES = [
       'dsh-proof-strip',
       'dsh-proof-item',
       'dsh-status-strip',
-      'data-study-pages="104"',
+      'data-study-pages="105"',
       'data-index-files="2756"',
       'data-learning-tests="27"',
       'data-example-tests="8"',
