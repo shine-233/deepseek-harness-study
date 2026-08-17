@@ -1,0 +1,12 @@
+{
+  "name": "dsh-study-minimal-plugin-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An offline study workbench for building, loading, and unloading one real Cordis plugin.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "run": "node scripts/run.mjs",
+    "verify": "node scripts/run.mjs"
+  }
+}
