@@ -1,6 +1,6 @@
 # Cordis 与插件树
 
-如果把 DSH 看成一台可以换零件的机器，那么 Cordis 就是它的插座、线路和拆装规则。DSH 的模型、Session、工具、Agent Loop、Web Server 甚至测试替身，都不是写死在一个“大主程序”里的特殊模块，而是可以挂载、替换和卸载的插件。
+如果把 DSH 看成一台可以换零件的机器，那么 Cordis 就是它的插座、线路和拆装规则。DSH 的模型、Session、工具、Agent Loop、Web Server 甚至测试替身，都是插件，可以挂载、替换和卸载。
 
 这篇先解释四个最重要的词：`Context`、`Fiber`、`Service`、`Event`。再把它们和 DSH 的 `Profile`、`Bundle` 接起来。读懂这棵树后，再看逐文件索引中的 `ctx.sessions`、`ctx.llm`、`ctx.tools`，就不会只把它们当成神秘的全局变量。
 
@@ -30,7 +30,7 @@ Profile 和 Bundle 都不是一个巨大的类。它们主要是配置和组合�
 
 官方起点是 [`vendor/cordis/src/context.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/context.ts)。可以把 `Context` 想成一个带作用范围的工作台：插件从这里取得服务、监听事件、创建子作用域，也把自己提供的能力放回这里。
 
-例如下面这些名字不是随便放在一个全局对象上的属性，而是各个包向 Context 提供的服务入口：
+例如下面这些名字是各个包向 Context 提供的服务入口：
 
 | Context 能力 | 负责什么 | 适合先读的官方包 |
 |---|---|---|
@@ -90,11 +90,11 @@ Consumer            使用接口，不关心具体实现
 - Agent scoped 服务只对某个 Agent 的子树可见。
 - 测试可以在隔离 Context 中安装 fake provider，不影响另一个测试。
 
-这就是“能力扩展边界（seam）”的直观版本：接口和实现之间留一个插座，插件通过这个预留边界协作；它不是一条具体函数调用，而是让实现可以替换的连接位置。
+这就是“能力扩展边界（seam）”的直观版本：接口和实现之间留一个插座，插件通过这个预留边界协作；它标记的是位置而非某一次调用：实现可以整体换掉，调用点跟着换。
 
 ## Event：插件之间的通知和拦截点
 
-[`vendor/cordis/src/events.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/events.ts) 提供事件系统。事件不是用来替代所有函数调用，而是用在多个插件可能观察、修改或阻止同一流程的位置。
+[`vendor/cordis/src/events.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/events.ts) 提供事件系统。事件用在多个插件可能观察、修改或阻止同一流程的位置。
 
 DSH 中要区分两种事实：
 
