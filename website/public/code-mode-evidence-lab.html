@@ -128,6 +128,33 @@
       </article>
     </section>
 
+    <section class="derived-grid" aria-label="从同一份事件流导出的两个视图">
+      <article class="matrix-card card" aria-labelledby="matrix-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">PHASE COVERAGE</p>
+            <h2 id="matrix-title">哪个阶段真的发生过</h2>
+          </div>
+          <span class="schema-pill">call × phase</span>
+        </div>
+        <p class="section-intro">行是四个子调用，列是调度器实际执行的阶段顺序，格子里是该阶段的 tick。被拒绝的调用在 <code>body start</code> 和 <code>body end</code> 两列是空的——区分 allow 与 deny 靠的是这个空缺，不是颜色。</p>
+        <div class="matrix-scroll" id="phase-matrix"></div>
+      </article>
+
+      <article class="concurrency-card card" aria-labelledby="concurrency-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">CONCURRENCY BOUND</p>
+            <h2 id="concurrency-heading">并发有没有越过上限</h2>
+          </div>
+          <span class="schema-pill">tick × bodies</span>
+        </div>
+        <p class="section-intro">纵轴是同时处在执行区间的工具主体数量，虚线是本次请求的上限。阶梯而不是曲线：并发只在 tick 边界改变，在两个 tick 之间插值等于编造中间值。</p>
+        <div class="concurrency-scroll" id="concurrency-plot"></div>
+        <p class="chart-note">这条线证明的是教学模型遵守了所选上限，不是真实部署的调度器行为。同一组数字在下方事件表里逐行可读。</p>
+      </article>
+    </section>
+
     <section class="evidence-grid" aria-label="Oracle 与证明边界">
       <article class="oracle-card card">
         <div class="section-heading">

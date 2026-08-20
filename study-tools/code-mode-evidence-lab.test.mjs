@@ -2,9 +2,12 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import {
+  CHILD_PHASE_ORDER,
   CODE_MODE_POLICIES,
+  concurrencySeries,
   evaluateCodeModeOracle,
   frameAt,
+  phaseMatrix,
   simulateCodeMode,
 } from '../website/public/code-mode-evidence-lab.js'
 
@@ -141,4 +144,97 @@ test('the static lab uses no network, storage, random, HTML interpolation, Canva
   assert.match(html, /id="timeline-seek"/)
   assert.match(html, /id="event-table-body"/)
   assert.match(css, /prefers-reduced-motion:\s*reduce/)
+})
+
+test('the phase matrix drops only the body columns of a denied call', () => {
+  const bodyPhases = ['body-start', 'body-end']
+  for (const policy of CODE_MODE_POLICIES.map(candidate => candidate.id)) {
+    const simulation = simulateCodeMode({ seed: 17, policy, parallelism: 2 })
+    const rows = phaseMatrix(simulation)
+    assert.equal(rows.length, simulation.calls.length)
+
+    const absent = rows.flatMap(row => row.cells.filter(cell => cell.tick === null).map(cell => cell.phase))
+    const deniedCount = simulation.calls.filter(call => call.decision === 'deny').length
+
+    // Every gap in the matrix is a missing body, and every denied call has
+    // exactly one: no other phase may go missing under any policy.
+    assert.deepEqual([...new Set(absent)].sort(), deniedCount === 0 ? [] : [...bodyPhases].sort())
+    assert.equal(absent.length, deniedCount * bodyPhases.length)
+
+    for (const row of rows) {
+      const present = row.cells.filter(cell => cell.tick !== null)
+      const ticks = present.map(cell => cell.tick)
+      assert.deepEqual(ticks, [...ticks].sort((left, right) => left - right),
+        'phase ticks must not go backwards for ' + row.name)
+      if (row.decision === 'deny') {
+        assert.equal(present.some(cell => bodyPhases.includes(cell.phase)), false)
+        // A denial still settles: post-execute and result stay in the row.
+        for (const phase of ['post-execute', 'result']) {
+          assert.equal(present.some(cell => cell.phase === phase), true,
+            row.name + ' must keep ' + phase)
+        }
+      }
+    }
+  }
+})
+
+test('the phase matrix columns follow the scheduler order and cover every child phase', () => {
+  const simulation = simulateCodeMode({ seed: 3, policy: 'allow-all', parallelism: 3 })
+  const rows = phaseMatrix(simulation)
+  for (const row of rows) {
+    assert.deepEqual(row.cells.map(cell => cell.phase), [...CHILD_PHASE_ORDER])
+  }
+  const childPhases = new Set(
+    simulation.events.filter(event => event.scope === 'child').map(event => event.phase),
+  )
+  for (const phase of childPhases) {
+    assert.ok(CHILD_PHASE_ORDER.includes(phase), 'matrix is missing column ' + phase)
+  }
+})
+
+test('the concurrency series never reports more running bodies than the requested cap', () => {
+  for (const parallelism of [1, 2, 3]) {
+    for (const policy of CODE_MODE_POLICIES.map(candidate => candidate.id)) {
+      const simulation = simulateCodeMode({ seed: 9, policy, parallelism })
+      const series = concurrencySeries(simulation)
+      assert.equal(series.cap, parallelism)
+      assert.equal(series.points.length, simulation.frames.length)
+      assert.deepEqual(
+        series.points.map(point => point.tick),
+        simulation.frames.map(frame => frame.tick),
+      )
+      const peak = Math.max(...series.points.map(point => point.count))
+      assert.ok(peak <= parallelism,
+        'peak ' + String(peak) + ' exceeded cap ' + String(parallelism))
+      assert.equal(series.observedMax, peak)
+      if (policy === 'deny-all') assert.equal(peak, 0)
+    }
+  }
+})
+
+test('a tampered body-start makes the matrix show a body the oracle rejects', () => {
+  const simulation = simulateCodeMode({ seed: 17, policy: 'deny-write', parallelism: 2 })
+  const denied = simulation.calls.find(call => call.decision === 'deny')
+  assert.ok(denied !== undefined)
+
+  const forged = {
+    ...simulation.events.find(event => event.callId === denied.callId && event.phase === 'policy-decision'),
+    id: 'forged-body-start',
+    phase: 'body-start',
+    bodyExecutionDelta: 1,
+  }
+  const tampered = { ...simulation, events: [...simulation.events, forged] }
+
+  // The view now shows a body cell for a denied call, and the oracle reading the
+  // same stream fails: the matrix and the verdict come from one source, so a
+  // forged frame cannot look correct and pass at the same time.
+  const row = phaseMatrix(tampered).find(candidate => candidate.callId === denied.callId)
+  assert.equal(row.cells.find(cell => cell.phase === 'body-start').tick !== null, true)
+  const verdict = evaluateCodeModeOracle({
+    events: tampered.events,
+    policy: tampered.input.policy,
+    parallelism: tampered.input.parallelism,
+  })
+  assert.equal(verdict.pass, false)
+  assert.equal(verdict.checks.find(check => check.id === 'DENIED_BODY_ZERO').pass, false)
 })

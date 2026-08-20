@@ -813,6 +813,203 @@ function renderEventTable(simulation, tableBody) {
   }
 }
 
+/**
+ * Phase columns in the order the scheduler runs them, so a row reads left to
+ * right as one child call's progress. `body-start` and `body-end` sit in the
+ * middle because that is where a denial removes them.
+ */
+export const CHILD_PHASE_ORDER = Object.freeze([
+  'dispatch-start',
+  'pre-execute',
+  'policy-check',
+  'policy-decision',
+  'body-start',
+  'body-end',
+  'post-execute',
+  'result',
+])
+
+/**
+ * Which phase ticks each child call actually reached.
+ *
+ * Both dimensions carry meaning and neither is decorative: rows are the child
+ * calls, columns are the ordered pipeline phases. A missing cell is the point of
+ * the view — a denied call has no `body-start` or `body-end`, so its row shows a
+ * gap instead of a differently coloured cell, which keeps the allow/deny
+ * distinction off hue alone.
+ *
+ * @param simulation - Return value of {@link simulateCodeMode}.
+ * @returns One row per child call, each with a tick or null per phase.
+ */
+export function phaseMatrix(simulation) {
+  return simulation.calls.map((call) => {
+    const own = simulation.events.filter(event => event.callId === call.callId)
+    return {
+      callId: call.callId,
+      name: call.name,
+      access: call.access,
+      decision: call.decision,
+      cells: CHILD_PHASE_ORDER.map((phase) => {
+        const event = own.find(candidate => candidate.phase === phase)
+        return { phase, tick: event === undefined ? null : event.tick }
+      }),
+    }
+  })
+}
+
+function renderPhaseMatrix(simulation, target) {
+  const rows = phaseMatrix(simulation)
+  target.replaceChildren()
+
+  const table = document.createElement('table')
+  table.className = 'matrix-table'
+  const caption = document.createElement('caption')
+  writeText(caption, '每个子调用实际到达的阶段与 tick；空格表示该阶段没有发生。')
+  table.append(caption)
+
+  const head = document.createElement('thead')
+  const headRow = document.createElement('tr')
+  const corner = document.createElement('th')
+  corner.scope = 'col'
+  writeText(corner, '子调用')
+  headRow.append(corner)
+  for (const phase of CHILD_PHASE_ORDER) {
+    const cell = document.createElement('th')
+    cell.scope = 'col'
+    writeText(cell, phaseLabel(phase))
+    headRow.append(cell)
+  }
+  head.append(headRow)
+
+  const body = document.createElement('tbody')
+  for (const row of rows) {
+    const tr = document.createElement('tr')
+    tr.dataset.decision = row.decision
+    const label = document.createElement('th')
+    label.scope = 'row'
+    writeText(label, row.name + ' · ' + row.access)
+    tr.append(label)
+    for (const cell of row.cells) {
+      const td = document.createElement('td')
+      td.dataset.phase = cell.phase
+      if (cell.tick === null) {
+        td.dataset.state = 'absent'
+        writeText(td, '—')
+        td.setAttribute('aria-label', phaseLabel(cell.phase) + ' 未发生')
+      } else {
+        td.dataset.state = 'present'
+        td.dataset.tick = String(cell.tick)
+        writeText(td, String(cell.tick))
+      }
+      tr.append(td)
+    }
+    body.append(tr)
+  }
+
+  table.append(head, body)
+  target.append(table)
+}
+
+/**
+ * Body concurrency per tick, next to the requested cap.
+ *
+ * One ordered dimension (tick) against one magnitude (how many tool bodies are
+ * inside their execution window). The cap is drawn as a reference line, so
+ * "concurrency never exceeds the cap" becomes something a reader checks by
+ * looking rather than by trusting the oracle's PASS.
+ *
+ * @param simulation - Return value of {@link simulateCodeMode}.
+ * @returns Per-tick concurrency plus the cap and the observed maximum.
+ */
+export function concurrencySeries(simulation) {
+  return {
+    cap: simulation.input.parallelism,
+    observedMax: simulation.observations.maxObservedBodyConcurrency,
+    points: simulation.frames.map(frame => ({ tick: frame.tick, count: frame.activeBodyCount })),
+  }
+}
+
+function renderConcurrencyChart(simulation, target) {
+  const series = concurrencySeries(simulation)
+  const width = 1120
+  const left = 170
+  const right = 32
+  const top = 26
+  const plotHeight = 132
+  const height = top + plotHeight + 38
+  const maxTick = series.points.at(-1).tick
+  const ceiling = Math.max(series.cap, series.observedMax, 1)
+  const xFor = tick => left + (tick / maxTick) * (width - left - right)
+  const yFor = count => top + plotHeight - (count / ceiling) * plotHeight
+
+  target.replaceChildren()
+  const svg = svgElement('svg', {
+    viewBox: '0 0 ' + String(width) + ' ' + String(height),
+    role: 'img',
+    'aria-labelledby': 'concurrency-title concurrency-description',
+  })
+  svg.append(
+    svgElement('title', { id: 'concurrency-title' }, '每个 tick 的工具主体并发数'),
+    svgElement('desc', { id: 'concurrency-description' },
+      '横轴是离散 tick，纵轴是同时处于执行区间的工具主体数量；虚线是本次请求的并发上限 '
+      + String(series.cap) + '。同一份数字也在下方事件表和观测读数中给出。'),
+  )
+
+  for (let count = 0; count <= ceiling; count += 1) {
+    const y = yFor(count)
+    svg.append(
+      svgElement('line', { x1: left, y1: y, x2: width - right, y2: y, class: 'conc-grid' }),
+      svgElement('text', { x: left - 14, y: y + 4, class: 'conc-axis', 'text-anchor': 'end' }, String(count)),
+    )
+  }
+
+  const capY = yFor(series.cap)
+  svg.append(
+    svgElement('line', { x1: left, y1: capY, x2: width - right, y2: capY, class: 'conc-cap' }),
+    svgElement('text', { x: width - right, y: capY - 8, class: 'conc-cap-label', 'text-anchor': 'end' },
+      'parallelism 上限 ' + String(series.cap)),
+  )
+
+  // A step path, not a smoothed line: concurrency changes at a tick boundary and
+  // holds until the next one, so interpolating between ticks would invent values.
+  const commands = []
+  for (const [index, point] of series.points.entries()) {
+    const x = xFor(point.tick)
+    const y = yFor(point.count)
+    if (index === 0) {
+      commands.push('M ' + String(x) + ' ' + String(y))
+      continue
+    }
+    commands.push('L ' + String(x) + ' ' + String(yFor(series.points[index - 1].count)))
+    commands.push('L ' + String(x) + ' ' + String(y))
+  }
+  svg.append(svgElement('path', { d: commands.join(' '), class: 'conc-step' }))
+
+  for (const point of series.points) {
+    const marker = svgElement('circle', {
+      cx: xFor(point.tick),
+      cy: yFor(point.count),
+      r: 5,
+      class: 'conc-point',
+      'data-tick': String(point.tick),
+    })
+    marker.append(svgElement('title', {},
+      'tick ' + String(point.tick) + '：' + String(point.count) + ' 个主体在执行'))
+    svg.append(marker)
+  }
+
+  svg.append(svgElement('line', {
+    id: 'concurrency-current-guide',
+    x1: left,
+    y1: top - 10,
+    x2: left,
+    y2: top + plotHeight + 10,
+    class: 'conc-guide',
+  }))
+
+  target.append(svg)
+}
+
 function initializePage() {
   const form = document.querySelector('#lab-config-form')
   const seedInput = document.querySelector('#seed')
@@ -825,6 +1022,8 @@ function initializePage() {
   const resetButton = document.querySelector('#frame-reset')
   const seek = document.querySelector('#timeline-seek')
   const timeline = document.querySelector('#timeline-plot')
+  const phaseMatrixTarget = document.querySelector('#phase-matrix')
+  const concurrencyTarget = document.querySelector('#concurrency-plot')
   const frameTick = document.querySelector('#frame-tick')
   const framePosition = document.querySelector('#frame-position')
   const frameSummaryTarget = document.querySelector('#frame-summary')
@@ -846,6 +1045,7 @@ function initializePage() {
   const required = [
     form, seedInput, policyInput, parallelismInput, parallelismOutput,
     previousButton, playButton, nextButton, resetButton, seek, timeline,
+    phaseMatrixTarget, concurrencyTarget,
     frameTick, framePosition, frameSummaryTarget, currentEvents, currentStates,
     tableBody, oracleList, canProveList, cannotProveList, feedback, motionStatus,
     ...Object.values(metrics),
@@ -912,6 +1112,24 @@ function initializePage() {
       marker.classList.toggle('is-current', tick === frame.tick)
       marker.classList.toggle('is-future', tick > frame.tick)
     }
+    const concurrencyGuide = concurrencyTarget.querySelector('#concurrency-current-guide')
+    if (concurrencyGuide instanceof SVGElement) {
+      const x = 170 + (frame.tick / maxTick) * (1120 - 170 - 32)
+      concurrencyGuide.setAttribute('x1', String(x))
+      concurrencyGuide.setAttribute('x2', String(x))
+    }
+    for (const marker of concurrencyTarget.querySelectorAll('[data-tick]')) {
+      const tick = Number(marker.getAttribute('data-tick'))
+      marker.classList.toggle('is-past', tick < frame.tick)
+      marker.classList.toggle('is-current', tick === frame.tick)
+      marker.classList.toggle('is-future', tick > frame.tick)
+    }
+    for (const cell of phaseMatrixTarget.querySelectorAll('td[data-tick]')) {
+      const tick = Number(cell.getAttribute('data-tick'))
+      cell.classList.toggle('is-past', tick < frame.tick)
+      cell.classList.toggle('is-current', tick === frame.tick)
+      cell.classList.toggle('is-future', tick > frame.tick)
+    }
     for (const row of tableBody.querySelectorAll('tr')) {
       const tick = Number(row.dataset.tick)
       row.classList.toggle('is-current', tick === frame.tick)
@@ -923,6 +1141,8 @@ function initializePage() {
     if (simulation === null) return
     seek.max = String(simulation.frames.length - 1)
     renderTimeline(simulation, timeline)
+    renderPhaseMatrix(simulation, phaseMatrixTarget)
+    renderConcurrencyChart(simulation, concurrencyTarget)
     renderEventTable(simulation, tableBody)
     writeText(metrics.checks, String(simulation.observations.policyChecks))
     writeText(metrics.bodies, String(simulation.observations.bodyExecutions))
