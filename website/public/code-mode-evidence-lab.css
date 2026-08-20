@@ -1,38 +1,43 @@
 /*
- * Data colours below are validated, not chosen by eye. Measured with the
- * data-viz six-checks validator against this page's own card surfaces
- * (#ffffff light, #1b2a38 dark), OKLab ΔE ×100:
+ * 数据色是验证出来的，不是挑出来的，而且和站点同一个品牌色相族。
  *
- *   categorical --brand / --signal   both modes: every check passes.
- *     light  CVD ΔE 20.0 (protan), normal-vision ΔE 30.8, all >= 3:1
- *     dark   CVD ΔE 20.7 (protan), normal-vision ΔE 26.6, all >= 3:1
+ * 站点的 --vp-c-brand-1 是 #3157c8（浅）/ #91aaff（暗），色相 266°/271°。本页曾用
+ * 自己的一套蓝（#175c91 / #3489cf，色相 247°），暗色那一对与站点相差 OKLab ΔE 15.1
+ * ——正好过了“全色觉读者能分辨两个颜色”的门槛，于是嵌进课程页的组件看起来像另一个
+ * 产品。现在浅色直接用站点那个色，暗色用同色相重新选步。
  *
- *   status --allow / --warning / --deny   lightness band, chroma floor,
- *   normal-vision floor and contrast all pass in both modes. The green-red
- *   pair still measures CVD ΔE 3.6 (deutan), which no re-stepping fixes while
- *   the hues stay green and red. State therefore never rides on hue alone:
- *   every decision carries a glyph and a text label, and a denied call has no
- *   body bar at all, so the timeline separates allow from deny by shape.
+ * 用 data-viz 六项检查验证，对本页自己的卡片表面（浅 #ffffff，暗 #1b1b1f）：
+ *   分类色 --brand / --signal
+ *     浅  #3157c8 + #d46b3e   五项全过，CVD ΔE 26.4（protan），常视力 33.7
+ *     暗  #6b8ae8 + #d1793f   五项全过，CVD ΔE 24.3（protan），常视力 26.3
+ *   暗色的 #6b8ae8 在色相 268°，落在站点 266° 和 271° 之间；站点自己的 #91aaff
+ *   亮度 0.75，超出暗色数据带（0.48–0.67），所以它留给链接和 chrome，不做数据标记。
  *
- *   The previous steps failed three checks: --allow #19765b and --warning
- *   #8d661d sat under the chroma floor and read as grey, and --warning against
- *   --deny measured normal-vision ΔE 12.9, below the 15 floor, so full-colour
- *   readers could confuse "warning" with "denied" in a permission pipeline.
- *   Re-stepping moved that pair to ΔE 20.9.
+ *   状态色 --allow / --warning / --deny 在两种模式下亮度带、色度下限、常视力下限和
+ *   对比度全过。绿红这一对的 CVD ΔE 是 3.6（deutan），只要色相还是绿和红，任何选步
+ *   都改不了。所以状态从不靠色相承载：每个判定都带字形和文字标签，而被拒调用根本
+ *   没有 body 横条，时间轴用形状区分 allow 和 deny。
+ *
+ *   更早的一版还失败过三项：--allow #19765b 和 --warning #8d661d 低于色度下限、读起来
+ *   发灰，且 --warning 与 --deny 的常视力 ΔE 只有 12.9，低于 15 底线——在一个权限管线
+ *   里，全色觉读者会把“警告”和“拒绝”看混。重新选步后这一对是 20.9。
+ *
+ * 表面色也对齐了站点：浅 #f6f6f7/#ffffff，暗 #161618/#1b1b1f，都取自构建产物里
+ * VitePress 的实际取值。新表面上十项文字对比度全部达到 4.5:1 正文标准。
  */
 :root {
   color-scheme: light dark;
-  --page: #eef3f8;
+  --page: #f6f6f7;
   --surface: rgba(255, 255, 255, 0.9);
   --surface-strong: #ffffff;
-  --surface-soft: #e4edf5;
-  --ink: #172330;
-  --muted: #5d6b78;
-  --line: rgba(27, 53, 75, 0.15);
-  --line-strong: rgba(27, 53, 75, 0.3);
-  --brand: #175c91;
-  --brand-bright: #2d8fc7;
-  --brand-soft: #d8eaf7;
+  --surface-soft: #ececed;
+  --ink: #1f2228;
+  --muted: #5b5b66;
+  --line: rgba(60, 60, 67, 0.14);
+  --line-strong: rgba(60, 60, 67, 0.28);
+  --brand: #3157c8;
+  --brand-bright: #466fe0;
+  --brand-soft: #dfe7ff;
   --signal: #d46b3e;
   --signal-soft: #f5dfd3;
   --allow: #0f7a52;
@@ -41,7 +46,7 @@
   --deny-soft: #f4dcdf;
   --warning: #b8892a;
   --warning-soft: #f6ecd6;
-  --shadow: 0 22px 70px rgba(39, 73, 103, 0.13);
+  --shadow: 0 22px 70px rgba(31, 34, 40, 0.11);
   --radius-xl: 30px;
   --radius-lg: 22px;
   --radius-md: 14px;
@@ -51,18 +56,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --page: #0f1821;
-    --surface: rgba(24, 36, 48, 0.94);
-    --surface-strong: #1b2a38;
-    --surface-soft: #22384a;
-    --ink: #edf5fb;
-    --muted: #a9bac8;
-    --line: rgba(219, 237, 249, 0.15);
-    --line-strong: rgba(219, 237, 249, 0.3);
-    --brand: #3489cf;
-    --brand-bright: #50a7d7;
-    --brand-soft: #1f4058;
-    --signal: #cf7040;
+    --page: #161618;
+    --surface: rgba(32, 33, 39, 0.94);
+    --surface-strong: #1b1b1f;
+    --surface-soft: #202127;
+    --ink: #dfdfd6;
+    --muted: #9b9ba4;
+    --line: rgba(223, 223, 214, 0.14);
+    --line-strong: rgba(223, 223, 214, 0.28);
+    --brand: #6b8ae8;
+    --brand-bright: #91aaff;
+    --brand-soft: #202b55;
+    --signal: #d1793f;
     --signal-soft: #4c3027;
     --allow: #2b9a70;
     --allow-soft: #1e493c;
