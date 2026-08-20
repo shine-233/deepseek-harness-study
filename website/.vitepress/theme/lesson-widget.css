@@ -1,0 +1,149 @@
+/*
+ * Lesson widget host styling.
+ *
+ * Written against VitePress's own semantic variables so the component follows the
+ * site's brand and the appearance switch without declaring a second palette. The
+ * brand steps this leans on were measured rather than picked: #3157c8 on white
+ * reaches 6.31:1 and #91aaff on the dark surface reaches 7.68:1, both clear of
+ * the 4.5:1 body-text floor.
+ */
+
+.lesson-widget {
+  margin: 32px 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--dsh-reading-radius-lg, 16px);
+  background: var(--vp-c-bg-soft);
+  overflow: hidden;
+}
+
+.lesson-widget__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+}
+
+.lesson-widget__label {
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lesson-widget__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--vp-c-text-1);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lesson-widget__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lesson-widget__button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-bg);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 140ms ease, color 140ms ease;
+}
+
+.lesson-widget__button:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+.lesson-widget__stage {
+  position: relative;
+  width: 100%;
+}
+
+.lesson-widget__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.lesson-widget__status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.lesson-widget__failure,
+.lesson-widget__errors {
+  margin: 0;
+  padding: 12px 16px;
+  border-top: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}
+
+.lesson-widget__errors {
+  padding-left: 34px;
+}
+
+.lesson-widget__fallback {
+  padding: 12px 16px;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.lesson-widget__fallback summary {
+  color: var(--vp-c-brand-1);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lesson-widget__fallback > :not(summary) {
+  margin-top: 10px;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}
+
+/* The stage is tall enough to be usable on a phone without the frame's own
+ * layout being squeezed; the widget stays responsive inside it. */
+@media (max-width: 719px) {
+  .lesson-widget__stage {
+    height: 560px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-widget__button {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .lesson-widget,
+  .lesson-widget__bar,
+  .lesson-widget__button {
+    border: 1px solid CanvasText;
+  }
+}

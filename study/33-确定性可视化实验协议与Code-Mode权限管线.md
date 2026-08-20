@@ -4,6 +4,18 @@
 
 这不是生产 trace 查看器。页面不连接 DSH Host，不读取 Session，不调用模型或工具，也不写文件；它运行一个固定 seed 的教学函数，并用另一个函数重新检查事件流。
 
+<LessonWidget
+  id="code-mode-evidence-lab"
+  url="/code-mode-evidence-lab.html"
+  title="Code Mode 权限管线证据实验"
+  :height="880"
+  fallback-href="#读懂二维时间轴"
+>
+
+组件里的每一个数字，本页正文都写了它从哪里来：默认输入下 `policy checks=4`、`body executions=3`、`denied bodies=0`；被拒调用没有 `body-start`，但仍有 `post-execute` 和 `result`。阶段矩阵的空格就是这个缺失，并发阶梯图的虚线是所选上限。不打开组件也能按“读懂二维时间轴”和“`simulateCodeMode` 返回什么”两节读完同样的结论。
+
+</LessonWidget>
+
 ## 先锁定问题
 
 实验只回答一个窄问题：
