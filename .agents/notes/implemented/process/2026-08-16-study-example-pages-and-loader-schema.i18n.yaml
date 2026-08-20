@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/process/2026-08-16-study-example-pages-and-loader-schema.md
-2026-08-16-study-example-pages-and-loader-schema.md: f354ca18294846d7fdeed3959c1c38206574bd9c
-2026-08-16-study-example-pages-and-loader-schema.zh.md: 48ef1cf8e026a03f501af245ce16e596ea050d08
+2026-08-16-study-example-pages-and-loader-schema.md: cd09569a442db765ad795ce7d40dfa1cce7b2647
+2026-08-16-study-example-pages-and-loader-schema.zh.md: 383a69a3a1302c9800127bfcd2a33581a50d2b11

@@ -56,6 +56,18 @@ jobs:
       - name: Install (immutable)
         run: pnpm install --frozen-lockfile
 
+      # The study gates read file trees out of the pinned upstream commit in
+      # study/source-index-manifest.json. That commit belongs to the upstream
+      # repository rather than this fork's branch history, so neither the
+      # default shallow checkout nor fetch-depth: 0 brings it in. Fetch it by
+      # SHA, which the fork network serves, and fail here rather than inside a
+      # gate if the object is unreachable.
+      - name: Fetch the pinned upstream commit the study gates read
+        run: |
+          commit="$(node -p "require('./study/source-index-manifest.json').commit")"
+          git fetch --no-tags --depth 1 origin "$commit"
+          git cat-file -e "$commit^{tree}"
+
       - name: Configure Pages
         id: pages
         uses: actions/configure-pages@v6
