@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="DSH 研究课程与 Debug 工具之间的离线 JSON request/result 桥接页">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>研究 ↔ Debug：离线证据桥接</title>
+  <link rel="stylesheet" href="./research-debug-bridge.css">
+</head>
+<body>
+  <main class="bridge-shell">
+    <header class="hero-panel">
+      <div class="eyebrow">DSH STUDY · OFFLINE HANDOFF</div>
+      <div class="hero-grid">
+        <div>
+          <p class="kicker">研究上下文 × 脱敏诊断</p>
+          <h1>让课程提出问题，让 Debug 回答“证据到哪了”。</h1>
+          <p class="hero-copy">这是一个静态文件工作台：生成 request、下载 JSON、在本机显式运行 Debug、再手动导入 result。页面不会连接本机，不会扫描文件，不会启动程序，也不会上传任何内容。</p>
+          <div class="hero-actions" aria-label="页面导航">
+            <a class="button button-secondary" href="./study/lessons/29-研究与-Debug-协作.html">回到课程章节</a>
+            <a class="button button-quiet" href="https://github.com/shine-233/dsh-plugin-debug" rel="noreferrer">查看 Debug 源码</a>
+          </div>
+        </div>
+        <div class="trust-stamp" aria-label="安全边界摘要">
+          <span class="stamp-mark" aria-hidden="true">↔</span>
+          <span class="stamp-title">文件协作</span>
+          <span class="stamp-copy">explicit-file-only<br>no network · no scan</span>
+        </div>
+      </div>
+
+      <ol class="protocol-rail" aria-label="三步协作流程">
+        <li class="protocol-node">
+          <span class="node-index">01</span>
+          <strong>课程生成 request</strong>
+          <span>只描述问题和所需证据</span>
+        </li>
+        <li class="protocol-link" aria-hidden="true"><span></span></li>
+        <li class="protocol-node">
+          <span class="node-index">02</span>
+          <strong>Debug 检查 repro</strong>
+          <span>只读用户明确指定的脱敏文件</span>
+        </li>
+        <li class="protocol-link" aria-hidden="true"><span></span></li>
+        <li class="protocol-node">
+          <span class="node-index">03</span>
+          <strong>课程导入 result</strong>
+          <span>按 coverage 和 trust 继续学习</span>
+        </li>
+      </ol>
+    </header>
+
+    <section class="workspace-grid" aria-label="离线桥接工作台">
+      <article class="card request-card">
+        <div class="card-heading">
+          <div>
+            <p class="section-label">A · COURSE CONTEXT</p>
+            <h2>生成诊断 request</h2>
+          </div>
+          <span class="schema-pill">v1</span>
+        </div>
+        <p class="card-intro">这些字段只写入下载的 request JSON。它们不是本机连接参数，也不会被发送到服务器。</p>
+
+        <form id="bridge-request-form" novalidate>
+          <label class="wide-field preset-field">
+            <span>研究节点预设</span>
+            <select id="preset-id" name="preset-id">
+              <option value="research-debug-bridge" selected>研究 ↔ Debug 桥接自身</option>
+              <option value="session-log-recovery">Session 日志与恢复</option>
+              <option value="tool-execution-failure">工具执行与失败分类</option>
+              <option value="permission-guard">Guard 与权限边界</option>
+              <option value="context-compaction">Context Compaction</option>
+              <option value="scheduler-concurrency">Scheduler 与并发</option>
+              <option value="subagent-handoff">子 Agent 与 Ralph 交接</option>
+              <option value="plugin-provenance">插件溯源与 Provenance</option>
+              <option value="custom">自定义字段</option>
+            </select>
+          </label>
+          <div class="preset-boundary" aria-live="polite">
+            <div><strong>这个节点能证明</strong><ul id="preset-can-prove"><li>三项协议检查是否逐项产生结果</li></ul></div>
+            <div><strong>仍然不能证明</strong><ul id="preset-cannot-prove"><li>原始 DSH 是否运行过</li></ul></div>
+          </div>
+          <div class="field-grid">
+            <label>
+              <span>request ID</span>
+              <input id="request-id" name="request-id" value="course-context-001" required maxlength="120" autocomplete="off">
+            </label>
+            <label>
+              <span>site ID</span>
+              <input id="site-id" name="site-id" value="dsh-study" required maxlength="120" autocomplete="off">
+            </label>
+            <label>
+              <span>course ID</span>
+              <input id="course-id" name="course-id" value="deepseek-harness" required maxlength="120" autocomplete="off">
+            </label>
+            <label>
+              <span>lesson ID</span>
+              <input id="lesson-id" name="lesson-id" value="debug-bridge-v1" required maxlength="120" autocomplete="off">
+            </label>
+            <label>
+              <span>question ID</span>
+              <input id="question-id" name="question-id" value="evidence-coverage" required maxlength="120" autocomplete="off">
+            </label>
+          </div>
+          <label class="wide-field">
+            <span>问题标题</span>
+            <input id="question-title" name="question-title" value="检查上下文诊断证据是否完整" required maxlength="240">
+          </label>
+
+          <fieldset>
+            <legend>要求的 source kind</legend>
+            <div class="check-grid">
+              <label class="check-option"><input type="checkbox" name="source-kind" value="diagnostics" checked><span>diagnostics</span></label>
+              <label class="check-option"><input type="checkbox" name="source-kind" value="trace" checked><span>trace</span></label>
+              <label class="check-option"><input type="checkbox" name="source-kind" value="incident"><span>incident</span></label>
+              <label class="check-option"><input type="checkbox" name="source-kind" value="pointer"><span>pointer</span></label>
+              <label class="check-option"><input type="checkbox" name="source-kind" value="receipt"><span>receipt</span></label>
+              <label class="check-option"><input type="checkbox" name="source-kind" value="unknown"><span>unknown</span></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>请求检查</legend>
+            <div class="check-grid check-grid-small">
+              <label class="check-option"><input type="checkbox" name="requested-check" value="coverage" checked><span>coverage</span></label>
+              <label class="check-option"><input type="checkbox" name="requested-check" value="privacy" checked><span>privacy</span></label>
+              <label class="check-option"><input type="checkbox" name="requested-check" value="integrity"><span>integrity</span></label>
+            </div>
+          </fieldset>
+
+          <div class="button-row">
+            <button class="button button-primary" type="submit">生成 request</button>
+            <button class="button button-secondary" id="download-request" type="button" disabled>下载 JSON</button>
+          </div>
+          <div class="import-row request-import-row">
+            <label class="file-picker">
+              <span>恢复已下载的 request JSON</span>
+              <input id="request-file" type="file" accept="application/json,.json">
+            </label>
+          </div>
+          <p class="feedback" id="request-feedback" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="code-block">
+          <div class="code-heading"><span>request preview</span><span>download only</span></div>
+          <pre id="request-preview" tabindex="0" aria-label="生成的 request JSON"></pre>
+        </div>
+
+        <div class="handoff-block" aria-labelledby="debug-command-title">
+          <div class="code-heading"><span id="debug-command-title">Debug command template</span><span>replace paths locally</span></div>
+          <p class="handoff-copy">把 request 下载后，在你自己的 PowerShell 中替换路径并运行。页面不会自动启动程序、读取本机文件或执行这段命令。</p>
+          <pre id="debug-command-preview" tabindex="0" aria-label="Debug 命令模板"></pre>
+          <div class="button-row handoff-actions">
+            <button class="button button-secondary" id="copy-debug-command" type="button">复制命令模板</button>
+          </div>
+          <p class="feedback" id="command-feedback" role="status" aria-live="polite"></p>
+        </div>
+      </article>
+
+      <article class="card result-card" id="result-card" data-status="complete">
+        <div class="card-heading">
+          <div>
+            <p class="section-label">B · DEBUG RESULT</p>
+            <h2>导入诊断 result</h2>
+          </div>
+          <div class="status-orb" aria-hidden="true"><span></span></div>
+        </div>
+        <p class="card-intro">选择 Debug 输出的 result JSON。页面只按 v1 schema 读取字段；新 result 会显示逐项 checks，旧 result 仍会标记为 legacy。</p>
+
+        <div class="import-row">
+          <label class="file-picker">
+            <span>选择 result JSON</span>
+            <input id="result-file" type="file" accept="application/json,.json">
+          </label>
+          <div class="example-buttons" aria-label="载入示例结果">
+            <button class="text-button" type="button" data-example-status="COMPLETE">示例 COMPLETE</button>
+            <button class="text-button" type="button" data-example-status="PARTIAL">示例 PARTIAL</button>
+            <button class="text-button" type="button" data-example-status="UNAVAILABLE">示例 UNAVAILABLE</button>
+            <button class="text-button" type="button" data-example-status="FAIL">示例 FAIL</button>
+          </div>
+        </div>
+        <p class="feedback" id="result-feedback" role="status" aria-live="polite"></p>
+
+        <div class="result-summary" aria-live="polite">
+          <div class="summary-main">
+            <span class="summary-label">当前状态</span>
+            <strong id="result-status">COMPLETE</strong>
+          </div>
+          <dl class="summary-grid">
+            <div><dt>request</dt><dd id="result-request-id">course-context-001</dd></div>
+            <div><dt>integrity</dt><dd id="result-integrity">verified</dd></div>
+            <div><dt>trust</dt><dd id="result-trust">declared-metadata-only</dd></div>
+            <div><dt>next action</dt><dd id="result-next-action">return-to-course</dd></div>
+          </dl>
+        </div>
+
+        <div class="evidence-grid">
+          <div class="evidence-block"><h3>source kinds</h3><ul id="source-kinds-list"><li>diagnostics</li><li>trace</li></ul></div>
+          <div class="evidence-block"><h3>missing kinds</h3><ul id="missing-kinds-list"><li class="empty-item">无缺失 kind</li></ul></div>
+          <div class="evidence-block evidence-wide"><h3>requested checks</h3><ul id="check-results-list"><li><strong>coverage</strong><span>PASS · REQUIRED_EVIDENCE_PRESENT</span></li><li><strong>privacy</strong><span>PASS · EVIDENCE_PRIVACY_DECLARATION_VALID</span></li></ul></div>
+          <div class="evidence-block evidence-wide"><h3>findings</h3><ul id="findings-list"><li><strong>REQUIRED_EVIDENCE_PRESENT</strong><span>All requested evidence kinds are present.</span></li></ul></div>
+          <div class="evidence-block evidence-wide"><h3>privacy declaration</h3><ul class="privacy-list" id="privacy-list"><li>inputMode: explicit-file-only</li><li>networkAccessed: false</li><li>rawPayloadStored: false</li></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="boundary-panel" aria-labelledby="boundary-title">
+      <div>
+        <p class="section-label">TRUST BOUNDARY</p>
+        <h2 id="boundary-title">它能回答什么，不能回答什么？</h2>
+      </div>
+      <div class="boundary-columns">
+        <div class="boundary-column boundary-yes"><h3>能回答</h3><p>request 要求的 kind 是否出现在用户提供的脱敏 repro 中；manifest 哈希是否可核对；当前结果需要回到课程、补证据还是人工复核。</p></div>
+        <div class="boundary-column boundary-no"><h3>不能回答</h3><p>原始 DSH 是否真的运行过、课程里的简化模型是否等于真实 trace、故障是否已经修复，或某个运行时声明是否天然可信。</p></div>
+      </div>
+      <p class="boundary-footnote"><code>trust=declared-metadata-only</code> 是刻意保守的协议值。证据覆盖不是运行时真相，文件存在也不是生产验证。</p>
+    </section>
+
+    <footer class="page-footer">
+      <span>v1 · request/result JSON · explicit checks · no default connection</span>
+      <a href="./study/lessons/29-研究与-Debug-协作.html">阅读完整课程说明 →</a>
+    </footer>
+  </main>
+  <script type="module" src="./research-debug-bridge.js"></script>
+</body>
+</html>

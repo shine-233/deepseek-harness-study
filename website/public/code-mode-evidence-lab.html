@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="固定 seed 的 Code Mode 权限管线教学实验，含时间轴、独立 oracle 与证据边界">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Code Mode 权限管线证据实验</title>
+  <link rel="stylesheet" href="./code-mode-evidence-lab.css">
+</head>
+<body>
+  <a class="skip-link" href="#lab-main">跳到实验</a>
+  <main class="lab-shell" id="lab-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH STUDY · DETERMINISTIC LAB 01</p>
+        <h1>内部工具调用，不能从权限管线旁边溜过去。</h1>
+        <p class="hero-lead">改变策略、seed 和并发上限，然后逐帧检查四个子调用。默认场景会拒绝一次写入；切到“全部放行”后，写入仍先经过 policy lane，才进入工具主体。</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./research-debug-bridge.html">打开离线 Debug 桥</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 01</span>
+        <strong>这是教学模型，不是真实 DSH trace。</strong>
+        <p>页面不连接 Host，不读取 Session，不调用工具，也不把离散 tick 冒充耗时。</p>
+      </aside>
+
+      <ol class="pipeline-strip" aria-label="教学管线阶段">
+        <li><span>01</span><strong>dispatch</strong><small>建立 parent/child</small></li>
+        <li><span>02</span><strong>pre-execute</strong><small>进入有序前置阶段</small></li>
+        <li><span>03</span><strong>policy</strong><small>allow 或 deny</small></li>
+        <li><span>04</span><strong>body</strong><small>只有 allow 才执行</small></li>
+        <li><span>05</span><strong>post + result</strong><small>按提交顺序结算</small></li>
+      </ol>
+    </header>
+
+    <section class="experiment-grid" aria-label="Code Mode 证据实验">
+      <aside class="control-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">INPUT</p>
+            <h2>先改输入，再看结果</h2>
+          </div>
+          <span class="schema-pill">pure model</span>
+        </div>
+        <form id="lab-config-form">
+          <label>
+            <span>固定 seed</span>
+            <input id="seed" name="seed" type="number" min="0" max="4294967295" step="1" value="17" inputmode="numeric">
+            <small>只改变 token 与主体持续 tick；不会随机改写策略。</small>
+          </label>
+          <label>
+            <span>教学策略</span>
+            <select id="policy" name="policy">
+              <option value="deny-write" selected>只读放行，写入拒绝</option>
+              <option value="allow-all">全部放行</option>
+              <option value="deny-all">全部拒绝</option>
+            </select>
+            <small>用 deny 和 allow 对照“是否经过策略”与“主体是否执行”。</small>
+          </label>
+          <label>
+            <span>parallel 主体上限：<output id="parallelism-output" for="parallelism">2</output></span>
+            <input id="parallelism" name="parallelism" type="range" min="1" max="3" step="1" value="2">
+            <small>只有工具主体可以重叠；前置、后置和 result 仍按模型顺序推进。</small>
+          </label>
+          <button class="button button-primary button-wide" type="submit">重建实验</button>
+        </form>
+        <p class="feedback" id="lab-feedback" role="status" aria-live="polite"></p>
+
+        <div class="metric-grid" aria-label="实验观测值">
+          <div><span>policy checks</span><strong id="metric-policy-checks">4</strong></div>
+          <div><span>body executions</span><strong id="metric-body-executions">3</strong></div>
+          <div><span>denied bodies</span><strong id="metric-denied-bodies">0</strong></div>
+          <div><span>body concurrency</span><strong id="metric-concurrency">2 / 2</strong></div>
+          <div class="metric-oracle"><span>oracle</span><strong id="metric-oracle" data-pass="true">PASS</strong></div>
+        </div>
+      </aside>
+
+      <article class="timeline-card card">
+        <div class="section-heading timeline-heading">
+          <div>
+            <p class="section-label">SEEKABLE TIMELINE</p>
+            <h2>横轴是 tick，纵轴是执行 lane</h2>
+          </div>
+          <p id="motion-status" class="motion-status">正在读取动态效果偏好。</p>
+        </div>
+        <p class="section-intro">圆点是教学事件，横条是工具主体的活动区间。第三维没有额外语义，所以本实验只用二维图；完整内容始终保留在下方事件表。</p>
+
+        <div class="transport" aria-label="时间轴播放控件">
+          <button class="icon-button" id="frame-reset" type="button" aria-label="回到首帧" aria-keyshortcuts="Home">重置</button>
+          <button class="icon-button" id="frame-previous" type="button" aria-label="上一帧" aria-keyshortcuts="ArrowLeft">上一步</button>
+          <button class="icon-button play-button" id="frame-play" type="button" aria-pressed="false" aria-keyshortcuts="Space">播放</button>
+          <button class="icon-button" id="frame-next" type="button" aria-label="下一帧" aria-keyshortcuts="ArrowRight">下一步</button>
+          <label class="seek-field">
+            <span class="sr-only">时间轴位置</span>
+            <input id="timeline-seek" type="range" min="0" max="1" step="1" value="0">
+          </label>
+          <div class="tick-readout" aria-live="polite">
+            <span>tick <strong id="frame-tick">0</strong></span>
+            <span id="frame-position">1 / 1</span>
+          </div>
+        </div>
+        <p class="keyboard-hint">键盘：焦点不在表单控件时，← / → 逐帧，Home / End 跳到首末帧，空格播放或暂停。</p>
+
+        <div class="timeline-scroll">
+          <div id="timeline-plot" class="timeline-plot" aria-live="off"></div>
+        </div>
+
+        <div class="frame-inspector">
+          <div class="frame-summary">
+            <span class="summary-label">CURRENT FRAME</span>
+            <strong id="frame-summary">首帧：外层 run_code 已分发，尚无内部工具主体执行。</strong>
+          </div>
+          <div class="inspector-columns">
+            <div>
+              <h3>本 tick 的事件</h3>
+              <ul id="current-events"><li>run_code · outer dispatch</li></ul>
+            </div>
+            <div>
+              <h3>四个子调用的状态</h3>
+              <ul id="current-states"><li>等待模型初始化</li></ul>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">INDEPENDENT ORACLE</p>
+            <h2>动画不负责给自己判分</h2>
+          </div>
+          <span class="schema-pill schema-oracle">event audit</span>
+        </div>
+        <p class="section-intro">oracle 重新读取事件流，独立核对 parent、阶段顺序、策略结果、主体执行次数、并发上限和外层结算顺序。测试还会篡改一条 deny 事件，确认 oracle 能报错。</p>
+        <ul class="oracle-list" id="oracle-list">
+          <li data-pass="true"><strong>PASS · 等待模型运行</strong><span>页面载入后会显示逐项 expected / actual。</span></li>
+        </ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">EVIDENCE BOUNDARY</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes">
+            <h3>canProve</h3>
+            <ul id="can-prove-list"><li>等待模型运行。</li></ul>
+          </div>
+          <div class="boundary-no">
+            <h3>cannotProve</h3>
+            <ul id="cannot-prove-list"><li>等待模型运行。</li></ul>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="event-card card" aria-labelledby="event-table-title">
+      <div class="section-heading event-heading">
+        <div>
+          <p class="section-label">TEXT FALLBACK</p>
+          <h2 id="event-table-title">每个事件都能按文字读取</h2>
+        </div>
+        <p>表格不随动画隐藏；未来事件只降低对比度。</p>
+      </div>
+      <div class="table-scroll" tabindex="0" aria-label="完整教学事件表，可横向滚动">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">tick</th>
+              <th scope="col">lane</th>
+              <th scope="col">call</th>
+              <th scope="col">phase</th>
+              <th scope="col">decision</th>
+              <th scope="col">说明</th>
+            </tr>
+          </thead>
+          <tbody id="event-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="source-card card" aria-labelledby="source-title">
+      <p class="section-label">SOURCE LAYERS</p>
+      <h2 id="source-title">页面依据什么，又没有运行什么</h2>
+      <div class="source-columns">
+        <div>
+          <h3>固定源码事实</h3>
+          <p>Code Mode Consumer 把内部调用交给 registry 的 staged scheduler；前置与后置阶段有序推进，只有主体阶段并发，独占调用形成屏障。</p>
+          <a href="https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/core/tools/src/code-mode.ts#L342-L357" rel="noreferrer">查看固定源码位置</a>
+        </div>
+        <div>
+          <h3>教学模型推导</h3>
+          <p>四个虚构工具名、离散 tick、固定 seed 生成的持续时间、三套简化策略和二维布局由本页定义，不是 DSH 生产配置。</p>
+          <a href="./study/lessons/31-Shubham五个模式与rc6源码对照.html">查看文章命题与源码对照</a>
+        </div>
+        <div>
+          <h3>本页没有做</h3>
+          <p>没有模型调用、审批弹窗、文件写入、网络请求、浏览器持久化、Debug 自动连接或真实 Session 回放。</p>
+          <a href="./study/lessons/29-研究与-Debug-协作.html">查看手动文件协作边界</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>fixed seed · pure function · seekable frames · text fallback · no default connection</span>
+      <a href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">继续读配套章节</a>
+    </footer>
+  </main>
+  <script type="module" src="./code-mode-evidence-lab.js"></script>
+</body>
+</html>
