@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="从固定上游提交读出的 DSH 包依赖图：体量、被依赖次数与组结构，含文字表格与独立 oracle">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>包依赖图证据实验</title>
+  <link rel="stylesheet" href="./package-graph-lab.css">
+</head>
+<body>
+  <a class="skip-link" href="#graph-main">跳到实验</a>
+  <main class="lab-shell" id="graph-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH STUDY · SOURCE-GROUNDED GRAPH 01</p>
+        <h1>最被依赖的包，是最小的那个。</h1>
+        <p class="hero-lead">横轴是一个包 <code>src</code> 目录的行数，纵轴是同仓库里有多少个包在 <code>peerDependencies</code> 里指向它。两者可以完全脱钩——先看散点右下角和左上角，再按组筛选。</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="./study/lessons/02-cordis与插件树.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./code-mode-evidence-lab.html">打开 Code Mode 实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">SOURCE / 01</span>
+        <strong>这是固定提交的清单读数，不是运行态测量。</strong>
+        <p>行数和 peerDependencies 来自固定提交；运行时调用次数、打包体积和导入频率都没有测量。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="视图输入">
+      <form id="graph-form">
+        <label>
+          <span>按组筛选</span>
+          <select id="group" name="group"></select>
+          <small>组的大小很不均匀；筛到一个组以后，柱视图才诚实可读。</small>
+        </label>
+        <label>
+          <span>排序</span>
+          <select id="sort" name="sort">
+            <option value="lines" selected>按 src 行数</option>
+            <option value="degree">按被依赖次数</option>
+          </select>
+          <small>换排序不改变任何数字，只改变阅读顺序。</small>
+        </label>
+        <button class="button button-primary" type="submit">重建视图</button>
+      </form>
+      <p class="feedback" id="graph-feedback" role="status" aria-live="polite"></p>
+      <dl class="metric-grid" aria-label="当前视图观测值">
+        <div><dt>包</dt><dd id="metric-packages">—</dd></div>
+        <div><dt>视图内边</dt><dd id="metric-edges">—</dd></div>
+        <div><dt>src 行</dt><dd id="metric-lines">—</dd></div>
+        <div><dt>零入度包</dt><dd id="metric-leaves">—</dd></div>
+        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="scatter-card card" aria-labelledby="scatter-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">SIZE × IN-DEGREE</p>
+          <h2 id="scatter-title">体量和被依赖程度是两件事</h2>
+        </div>
+        <span class="schema-pill">lines × degree</span>
+      </div>
+      <p class="section-intro">一个点是一个包。只用一种颜色：49 个组无法用色相安全区分，所以组是筛选条件，不是颜色。只给落在角上的包直接标名字。</p>
+      <div class="scatter-scroll" id="scatter-plot"></div>
+      <p class="chart-note" id="scatter-note"></p>
+    </section>
+
+    <section class="bar-card card" aria-labelledby="bar-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">GROUP DETAIL</p>
+          <h2 id="bar-title">组内的柱与依赖边</h2>
+        </div>
+        <span class="schema-pill">height=lines · width=degree</span>
+      </div>
+      <p class="section-intro">柱高是 src 行数，柱的边框粗细是被依赖次数，横向位置只是排序后的次序，不承载数值。节点超过 24 个时这个视图不显示——密到看不清的图不如表格。</p>
+      <div class="bar-scroll" id="bar-plot"></div>
+      <p class="chart-note" id="bar-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">INDEPENDENT ORACLE</p>
+            <h2>图不给自己判分</h2>
+          </div>
+          <span class="schema-pill schema-oracle">fixture audit</span>
+        </div>
+        <p class="section-intro">oracle 不读页面上任何已渲染的值。它从 nodes 和 edges 重算包数、边数、入度、行数和组数，再和 fixture 自己记录的总数比对；fixture 被改过就会失败。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">EVIDENCE BOUNDARY</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes">
+            <h3>canProve</h3>
+            <ul id="can-prove-list"></ul>
+          </div>
+          <div class="boundary-no">
+            <h3>cannotProve</h3>
+            <ul id="cannot-prove-list"></ul>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">FULL TEXT ALTERNATIVE</p>
+          <h2 id="table-title">同一份数据的完整表格</h2>
+        </div>
+        <span class="schema-pill">no script needed to read</span>
+      </div>
+      <p class="section-intro">上面两张图能表达的每一个数字，这张表都逐行给出。没有脚本、没有图形支持或开启减少动态效果时，从这里读。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="table-caption">当前视图的全部包</caption>
+          <thead>
+            <tr>
+              <th scope="col">包目录</th>
+              <th scope="col">组</th>
+              <th scope="col">npm 名</th>
+              <th scope="col">src 行</th>
+              <th scope="col">src 文件</th>
+              <th scope="col">被依赖（全仓库）</th>
+              <th scope="col">被依赖（视图内）</th>
+            </tr>
+          </thead>
+          <tbody id="graph-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span id="footer-provenance">固定提交读数 · 纯函数模型 · 独立 oracle · 完整表格替代</span>
+      <a href="./study/lessons/02-cordis与插件树.html">继续读配套章节</a>
+    </footer>
+  </main>
+  <script type="module" src="./package-graph-lab.js"></script>
+</body>
+</html>

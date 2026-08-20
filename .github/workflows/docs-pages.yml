@@ -78,6 +78,12 @@ jobs:
       - name: Verify deterministic study lab
         run: pnpm run study-lab:test
 
+      - name: Verify the package graph fixture still matches the pinned commit
+        run: pnpm run study-graph:check
+
+      - name: Verify the package graph model
+        run: pnpm run study-graph:test
+
       - name: Verify and build documentation
         env:
           DOCS_BASE: ${{ steps.pages.outputs.base_path }}/

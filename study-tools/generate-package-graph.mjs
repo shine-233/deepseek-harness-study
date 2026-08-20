@@ -8,7 +8,7 @@
  *   边       = 该包 `package.json` 的 peerDependencies 中指向仓库内其他包的项
  *   边的粗细 = 被依赖次数
  *
- * 输出写入 study/fixtures/package-graph.json，带固定提交、生成口径和内容哈希，
+ * 输出写入 website/public/package-graph.json，带固定提交、生成口径和内容哈希，
  * 这样渲染页只做渲染，不在浏览器里推导数字。
  *
  * 用法：
@@ -24,7 +24,8 @@ import { dirname, join } from 'node:path'
 const root = process.cwd()
 const manifest = JSON.parse(readFileSync(join(root, 'study', 'source-index-manifest.json'), 'utf8'))
 const commit = manifest.commit
-const outputPath = join(root, 'study', 'fixtures', 'package-graph.json')
+// 生成物只有一个家：实验页要同源 fetch 它，复制第二份就会漂移。
+const outputPath = join(root, 'website', 'public', 'package-graph.json')
 
 function git(args, options = {}) {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, ...options })

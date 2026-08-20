@@ -143,7 +143,7 @@ hero:
   </div>
 </section>
 
-<div class="dsh-status-strip" aria-label="当前学习仓库门禁状态" data-study-pages="110" data-index-files="2756" data-learning-tests="52" data-example-tests="8" data-structural-errors="0">
+<div class="dsh-status-strip" aria-label="当前学习仓库门禁状态" data-study-pages="110" data-index-files="2756" data-learning-tests="63" data-example-tests="8" data-structural-errors="0">
   <div class="dsh-status-summary">
     <span class="dsh-status-kicker">本地最近一轮</span>
     <strong>入口和教材结构已通过</strong>
