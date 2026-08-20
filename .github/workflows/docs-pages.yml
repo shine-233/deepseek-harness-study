@@ -84,7 +84,9 @@ jobs:
         run: pnpm run doc-sync
 
       - name: Verify the published study shell before upload
-        run: pnpm run study:quick-check -- --site
+        # pnpm 11 forwards `--` to the script, and quick-check.mjs rejects it as
+        # an unknown option, so the separator has to go.
+        run: pnpm run study:quick-check --site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
