@@ -1,0 +1,6633 @@
+{
+  "generatedBy": "study-tools/generate-package-graph.mjs",
+  "commit": "47f943859bef60e4160492346772ded9b24f765a",
+  "meaning": {
+    "node": "一个 packages/<group>/<pkg> 目录",
+    "size": "该包 src/**/*.ts 的总行数",
+    "edge": "package.json 的 peerDependencies 指向仓库内另一个包",
+    "thickness": "被依赖次数（入度）",
+    "notMeasured": "运行时调用次数、打包体积、导入频率都没有测量；本图只读固定提交的清单和源码行数。"
+  },
+  "totals": {
+    "packages": 219,
+    "groups": 49,
+    "edges": 1089,
+    "srcFiles": 1177,
+    "srcLines": 197968,
+    "externalPeerNames": [
+      "@deepseek-ai/cordis",
+      "@deepseek-ai/cordis-plugin-group",
+      "@deepseek-ai/cordis-plugin-hmr",
+      "@deepseek-ai/cordis-plugin-include",
+      "@deepseek-ai/cordis-plugin-loader",
+      "@deepseek-ai/cordis-plugin-timer",
+      "@deepseek-ai/schemastery",
+      "clsx",
+      "react",
+      "react-dom"
+    ]
+  },
+  "groups": [
+    "acp",
+    "api",
+    "attachment",
+    "boot",
+    "bundle",
+    "client",
+    "code-runtime",
+    "compaction",
+    "context",
+    "core",
+    "credentials",
+    "e2b",
+    "examples",
+    "extensions",
+    "feedback",
+    "fs",
+    "goal",
+    "guard",
+    "hooks",
+    "host",
+    "identity",
+    "interaction",
+    "jobs",
+    "llm",
+    "lsp",
+    "mcp",
+    "plan",
+    "preset",
+    "runtime-diagnostics",
+    "sandbox",
+    "schedule",
+    "sdk",
+    "session",
+    "session-query",
+    "settings",
+    "shell",
+    "skill",
+    "spill",
+    "storage",
+    "subagent",
+    "subprocess",
+    "terminal",
+    "test-support",
+    "todo",
+    "typert",
+    "util",
+    "web",
+    "workflow",
+    "workspace"
+  ],
+  "nodes": [
+    {
+      "id": "acp/acp",
+      "group": "acp",
+      "directory": "acp",
+      "npmName": "@deepseek-ai/dsh-acp",
+      "srcLines": 532,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "api/gateway",
+      "group": "api",
+      "directory": "gateway",
+      "npmName": "@deepseek-ai/dsh-api-gateway",
+      "srcLines": 1358,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "api/remotes",
+      "group": "api",
+      "directory": "remotes",
+      "npmName": "@deepseek-ai/dsh-api-remotes",
+      "srcLines": 449,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 21
+    },
+    {
+      "id": "attachment/attachment",
+      "group": "attachment",
+      "directory": "attachment",
+      "npmName": "@deepseek-ai/dsh-attachment",
+      "srcLines": 171,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 5
+    },
+    {
+      "id": "attachment/attachment-local",
+      "group": "attachment",
+      "directory": "attachment-local",
+      "npmName": "@deepseek-ai/dsh-attachment-local",
+      "srcLines": 393,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "boot/app-boot",
+      "group": "boot",
+      "directory": "app-boot",
+      "npmName": "@deepseek-ai/dsh-app-boot",
+      "srcLines": 1279,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "boot/cmdline",
+      "group": "boot",
+      "directory": "cmdline",
+      "npmName": "@deepseek-ai/dsh-cmdline",
+      "srcLines": 202,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "bundle/base",
+      "group": "bundle",
+      "directory": "base",
+      "npmName": "@deepseek-ai/dsh-base",
+      "srcLines": 37,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "bundle/headless",
+      "group": "bundle",
+      "directory": "headless",
+      "npmName": "@deepseek-ai/dsh-headless",
+      "srcLines": 237,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "bundle/web-app",
+      "group": "bundle",
+      "directory": "web-app",
+      "npmName": "@deepseek-ai/dsh-web-app",
+      "srcLines": 297,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/connection",
+      "group": "client",
+      "directory": "connection",
+      "npmName": "@deepseek-ai/dsh-client-connection",
+      "srcLines": 4693,
+      "srcFiles": 16,
+      "private": false,
+      "dependedOnBy": 16
+    },
+    {
+      "id": "client/hmr",
+      "group": "client",
+      "directory": "hmr",
+      "npmName": "@deepseek-ai/dsh-client-hmr",
+      "srcLines": 447,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/locale",
+      "group": "client",
+      "directory": "locale",
+      "npmName": "@deepseek-ai/dsh-client-locale",
+      "srcLines": 607,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 26
+    },
+    {
+      "id": "client/modules",
+      "group": "client",
+      "directory": "modules",
+      "npmName": "@deepseek-ai/dsh-client-modules",
+      "srcLines": 972,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "client/runtime",
+      "group": "client",
+      "directory": "runtime",
+      "npmName": "@deepseek-ai/dsh-client-runtime",
+      "srcLines": 8989,
+      "srcFiles": 44,
+      "private": false,
+      "dependedOnBy": 32
+    },
+    {
+      "id": "client/schema-form",
+      "group": "client",
+      "directory": "schema-form",
+      "npmName": "@deepseek-ai/dsh-client-schema-form",
+      "srcLines": 195,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "client/ui-agent-preset",
+      "group": "client",
+      "directory": "ui-agent-preset",
+      "npmName": "@deepseek-ai/dsh-client-ui-agent-preset",
+      "srcLines": 1239,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-attachment",
+      "group": "client",
+      "directory": "ui-attachment",
+      "npmName": "@deepseek-ai/dsh-client-ui-attachment",
+      "srcLines": 53,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "client/ui-commands",
+      "group": "client",
+      "directory": "ui-commands",
+      "npmName": "@deepseek-ai/dsh-client-ui-commands",
+      "srcLines": 1153,
+      "srcFiles": 9,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "client/ui-conversation",
+      "group": "client",
+      "directory": "ui-conversation",
+      "npmName": "@deepseek-ai/dsh-client-ui-conversation",
+      "srcLines": 6670,
+      "srcFiles": 44,
+      "private": false,
+      "dependedOnBy": 12
+    },
+    {
+      "id": "client/ui-deliverables",
+      "group": "client",
+      "directory": "ui-deliverables",
+      "npmName": "@deepseek-ai/dsh-client-ui-deliverables",
+      "srcLines": 337,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-directory-picker-browse",
+      "group": "client",
+      "directory": "ui-directory-picker-browse",
+      "npmName": "@deepseek-ai/dsh-client-ui-directory-picker-browse",
+      "srcLines": 182,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "client/ui-directory-picker-native",
+      "group": "client",
+      "directory": "ui-directory-picker-native",
+      "npmName": "@deepseek-ai/dsh-client-ui-directory-picker-native",
+      "srcLines": 146,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "client/ui-goal",
+      "group": "client",
+      "directory": "ui-goal",
+      "npmName": "@deepseek-ai/dsh-client-ui-goal",
+      "srcLines": 284,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-input-trigger",
+      "group": "client",
+      "directory": "ui-input-trigger",
+      "npmName": "@deepseek-ai/dsh-client-ui-input-trigger",
+      "srcLines": 1240,
+      "srcFiles": 13,
+      "private": false,
+      "dependedOnBy": 7
+    },
+    {
+      "id": "client/ui-jobs",
+      "group": "client",
+      "directory": "ui-jobs",
+      "npmName": "@deepseek-ai/dsh-client-ui-jobs",
+      "srcLines": 132,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-layout",
+      "group": "client",
+      "directory": "ui-layout",
+      "npmName": "@deepseek-ai/dsh-client-ui-layout",
+      "srcLines": 477,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-message-feedback",
+      "group": "client",
+      "directory": "ui-message-feedback",
+      "npmName": "@deepseek-ai/dsh-client-ui-message-feedback",
+      "srcLines": 616,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-model-selection",
+      "group": "client",
+      "directory": "ui-model-selection",
+      "npmName": "@deepseek-ai/dsh-client-ui-model-selection",
+      "srcLines": 565,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-permission-presets",
+      "group": "client",
+      "directory": "ui-permission-presets",
+      "npmName": "@deepseek-ai/dsh-client-ui-permission-presets",
+      "srcLines": 478,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-plan",
+      "group": "client",
+      "directory": "ui-plan",
+      "npmName": "@deepseek-ai/dsh-client-ui-plan",
+      "srcLines": 131,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-primitives",
+      "group": "client",
+      "directory": "ui-primitives",
+      "npmName": "@deepseek-ai/dsh-client-ui-primitives",
+      "srcLines": 1787,
+      "srcFiles": 16,
+      "private": false,
+      "dependedOnBy": 26
+    },
+    {
+      "id": "client/ui-settings",
+      "group": "client",
+      "directory": "ui-settings",
+      "npmName": "@deepseek-ai/dsh-client-ui-settings",
+      "srcLines": 482,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 8
+    },
+    {
+      "id": "client/ui-settings-general",
+      "group": "client",
+      "directory": "ui-settings-general",
+      "npmName": "@deepseek-ai/dsh-client-ui-settings-general",
+      "srcLines": 422,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-settings-models",
+      "group": "client",
+      "directory": "ui-settings-models",
+      "npmName": "@deepseek-ai/dsh-client-ui-settings-models",
+      "srcLines": 864,
+      "srcFiles": 9,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-settings-plugin-inventory",
+      "group": "client",
+      "directory": "ui-settings-plugin-inventory",
+      "npmName": "@deepseek-ai/dsh-client-ui-settings-plugin-inventory",
+      "srcLines": 125,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-settings-plugins",
+      "group": "client",
+      "directory": "ui-settings-plugins",
+      "npmName": "@deepseek-ai/dsh-client-ui-settings-plugins",
+      "srcLines": 986,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-sidebar",
+      "group": "client",
+      "directory": "ui-sidebar",
+      "npmName": "@deepseek-ai/dsh-client-ui-sidebar",
+      "srcLines": 207,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "client/ui-skill",
+      "group": "client",
+      "directory": "ui-skill",
+      "npmName": "@deepseek-ai/dsh-client-ui-skill",
+      "srcLines": 263,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-slots",
+      "group": "client",
+      "directory": "ui-slots",
+      "npmName": "@deepseek-ai/dsh-client-ui-slots",
+      "srcLines": 1563,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 31
+    },
+    {
+      "id": "client/ui-subagent",
+      "group": "client",
+      "directory": "ui-subagent",
+      "npmName": "@deepseek-ai/dsh-client-ui-subagent",
+      "srcLines": 256,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-theme",
+      "group": "client",
+      "directory": "ui-theme",
+      "npmName": "@deepseek-ai/dsh-client-ui-theme",
+      "srcLines": 630,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "client/ui-tool",
+      "group": "client",
+      "directory": "ui-tool",
+      "npmName": "@deepseek-ai/dsh-client-ui-tool",
+      "srcLines": 1065,
+      "srcFiles": 14,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "client/ui-trajectory",
+      "group": "client",
+      "directory": "ui-trajectory",
+      "npmName": "@deepseek-ai/dsh-client-ui-trajectory",
+      "srcLines": 3287,
+      "srcFiles": 20,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-user-questions",
+      "group": "client",
+      "directory": "ui-user-questions",
+      "npmName": "@deepseek-ai/dsh-client-ui-user-questions",
+      "srcLines": 290,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-workflow-run",
+      "group": "client",
+      "directory": "ui-workflow-run",
+      "npmName": "@deepseek-ai/dsh-client-ui-workflow-run",
+      "srcLines": 310,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-workspace",
+      "group": "client",
+      "directory": "ui-workspace",
+      "npmName": "@deepseek-ai/dsh-client-ui-workspace",
+      "srcLines": 985,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "client/web",
+      "group": "client",
+      "directory": "web",
+      "npmName": "@deepseek-ai/dsh-client-web",
+      "srcLines": 278,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/web-react",
+      "group": "client",
+      "directory": "web-react",
+      "npmName": "@deepseek-ai/dsh-client-web-react",
+      "srcLines": 155,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 5
+    },
+    {
+      "id": "code-runtime/code-runtime",
+      "group": "code-runtime",
+      "directory": "code-runtime",
+      "npmName": "@deepseek-ai/dsh-code-runtime",
+      "srcLines": 294,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "code-runtime/code-runtime-worker-thread",
+      "group": "code-runtime",
+      "directory": "code-runtime-worker-thread",
+      "npmName": "@deepseek-ai/dsh-code-runtime-worker-thread",
+      "srcLines": 1696,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "compaction/command-compact",
+      "group": "compaction",
+      "directory": "command-compact",
+      "npmName": "@deepseek-ai/dsh-command-compact",
+      "srcLines": 136,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "compaction/compaction",
+      "group": "compaction",
+      "directory": "compaction",
+      "npmName": "@deepseek-ai/dsh-compaction",
+      "srcLines": 792,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 8
+    },
+    {
+      "id": "compaction/compaction-basic",
+      "group": "compaction",
+      "directory": "compaction-basic",
+      "npmName": "@deepseek-ai/dsh-compaction-basic",
+      "srcLines": 1621,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "compaction/compaction-tool-result-pruner",
+      "group": "compaction",
+      "directory": "compaction-tool-result-pruner",
+      "npmName": "@deepseek-ai/dsh-compaction-tool-result-pruner",
+      "srcLines": 331,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "context/agent-instructions",
+      "group": "context",
+      "directory": "agent-instructions",
+      "npmName": "@deepseek-ai/dsh-agent-instructions",
+      "srcLines": 1863,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "context/session-reference",
+      "group": "context",
+      "directory": "session-reference",
+      "npmName": "@deepseek-ai/dsh-session-reference",
+      "srcLines": 726,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "context/time-context",
+      "group": "context",
+      "directory": "time-context",
+      "npmName": "@deepseek-ai/dsh-time-context",
+      "srcLines": 520,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "context/tmux-context",
+      "group": "context",
+      "directory": "tmux-context",
+      "npmName": "@deepseek-ai/dsh-tmux-context",
+      "srcLines": 277,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "core/agent",
+      "group": "core",
+      "directory": "agent",
+      "npmName": "@deepseek-ai/dsh-agent",
+      "srcLines": 1636,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 58
+    },
+    {
+      "id": "core/agent-default-model",
+      "group": "core",
+      "directory": "agent-default-model",
+      "npmName": "@deepseek-ai/dsh-agent-default-model",
+      "srcLines": 137,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "core/agent-loop",
+      "group": "core",
+      "directory": "agent-loop",
+      "npmName": "@deepseek-ai/dsh-agent-loop",
+      "srcLines": 1643,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "core/agent-tool-presentation",
+      "group": "core",
+      "directory": "agent-tool-presentation",
+      "npmName": "@deepseek-ai/dsh-agent-tool-presentation",
+      "srcLines": 104,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "core/scope",
+      "group": "core",
+      "directory": "scope",
+      "npmName": "@deepseek-ai/dsh-scope",
+      "srcLines": 561,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 16
+    },
+    {
+      "id": "core/session",
+      "group": "core",
+      "directory": "session",
+      "npmName": "@deepseek-ai/dsh-session",
+      "srcLines": 3156,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 80
+    },
+    {
+      "id": "core/system-prompt",
+      "group": "core",
+      "directory": "system-prompt",
+      "npmName": "@deepseek-ai/dsh-system-prompt",
+      "srcLines": 605,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 29
+    },
+    {
+      "id": "core/tools",
+      "group": "core",
+      "directory": "tools",
+      "npmName": "@deepseek-ai/dsh-tools",
+      "srcLines": 5620,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 43
+    },
+    {
+      "id": "credentials/credentials",
+      "group": "credentials",
+      "directory": "credentials",
+      "npmName": "@deepseek-ai/dsh-credentials",
+      "srcLines": 214,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 5
+    },
+    {
+      "id": "credentials/credentials-local",
+      "group": "credentials",
+      "directory": "credentials-local",
+      "npmName": "@deepseek-ai/dsh-credentials-local",
+      "srcLines": 527,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "e2b/e2b",
+      "group": "e2b",
+      "directory": "e2b",
+      "npmName": "@deepseek-ai/dsh-e2b",
+      "srcLines": 212,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "e2b/fs-e2b",
+      "group": "e2b",
+      "directory": "fs-e2b",
+      "npmName": "@deepseek-ai/dsh-fs-e2b",
+      "srcLines": 612,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "e2b/subprocess-e2b",
+      "group": "e2b",
+      "directory": "subprocess-e2b",
+      "npmName": "@deepseek-ai/dsh-subprocess-e2b",
+      "srcLines": 1835,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "examples/acp-demo",
+      "group": "examples",
+      "directory": "acp-demo",
+      "npmName": "@deepseek-ai/dsh-acp-demo",
+      "srcLines": 206,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "examples/agent-spine-demo",
+      "group": "examples",
+      "directory": "agent-spine-demo",
+      "npmName": "@deepseek-ai/dsh-agent-spine-demo",
+      "srcLines": 295,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "examples/jsonrpc-demo",
+      "group": "examples",
+      "directory": "jsonrpc-demo",
+      "npmName": "@deepseek-ai/dsh-sdk-jsonrpc-demo",
+      "srcLines": 118,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "extensions/cordis-client-runner",
+      "group": "extensions",
+      "directory": "cordis-client-runner",
+      "npmName": "@deepseek-ai/dsh-cordis-client-runner",
+      "srcLines": 5080,
+      "srcFiles": 12,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "extensions/cordis-host-runner",
+      "group": "extensions",
+      "directory": "cordis-host-runner",
+      "npmName": "@deepseek-ai/dsh-cordis-host-runner",
+      "srcLines": 3360,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "extensions/tool-cordis",
+      "group": "extensions",
+      "directory": "tool-cordis",
+      "npmName": "@deepseek-ai/dsh-tool-cordis",
+      "srcLines": 5984,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "extensions/ui-cordis",
+      "group": "extensions",
+      "directory": "ui-cordis",
+      "npmName": "@deepseek-ai/dsh-client-ui-cordis",
+      "srcLines": 846,
+      "srcFiles": 12,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "feedback/command-feedback",
+      "group": "feedback",
+      "directory": "command-feedback",
+      "npmName": "@deepseek-ai/dsh-command-feedback",
+      "srcLines": 138,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "feedback/message-feedback",
+      "group": "feedback",
+      "directory": "message-feedback",
+      "npmName": "@deepseek-ai/dsh-message-feedback",
+      "srcLines": 647,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "fs/fs",
+      "group": "fs",
+      "directory": "fs",
+      "npmName": "@deepseek-ai/dsh-fs",
+      "srcLines": 503,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 9
+    },
+    {
+      "id": "fs/fs-local",
+      "group": "fs",
+      "directory": "fs-local",
+      "npmName": "@deepseek-ai/dsh-fs-local",
+      "srcLines": 1210,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "fs/fs-observation-policy",
+      "group": "fs",
+      "directory": "fs-observation-policy",
+      "npmName": "@deepseek-ai/dsh-fs-observation-policy",
+      "srcLines": 189,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "fs/fs-sandbox",
+      "group": "fs",
+      "directory": "fs-sandbox",
+      "npmName": "@deepseek-ai/dsh-fs-sandbox",
+      "srcLines": 254,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "fs/tool-fs",
+      "group": "fs",
+      "directory": "tool-fs",
+      "npmName": "@deepseek-ai/dsh-tool-fs",
+      "srcLines": 1463,
+      "srcFiles": 12,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "fs/tool-fs-search",
+      "group": "fs",
+      "directory": "tool-fs-search",
+      "npmName": "@deepseek-ai/dsh-tool-fs-search",
+      "srcLines": 1574,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "fs/tool-str-replace-editor",
+      "group": "fs",
+      "directory": "tool-str-replace-editor",
+      "npmName": "@deepseek-ai/dsh-tool-str-replace-editor",
+      "srcLines": 553,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "goal/command-goal",
+      "group": "goal",
+      "directory": "command-goal",
+      "npmName": "@deepseek-ai/dsh-command-goal",
+      "srcLines": 200,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "goal/goal",
+      "group": "goal",
+      "directory": "goal",
+      "npmName": "@deepseek-ai/dsh-goal",
+      "srcLines": 1288,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 6
+    },
+    {
+      "id": "goal/goal-round-driver",
+      "group": "goal",
+      "directory": "goal-round-driver",
+      "npmName": "@deepseek-ai/dsh-goal-round-driver",
+      "srcLines": 555,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "goal/tool-goal",
+      "group": "goal",
+      "directory": "tool-goal",
+      "npmName": "@deepseek-ai/dsh-tool-goal",
+      "srcLines": 517,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "guard/repeat-tool-reminder",
+      "group": "guard",
+      "directory": "repeat-tool-reminder",
+      "npmName": "@deepseek-ai/dsh-repeat-tool-reminder",
+      "srcLines": 263,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "guard/timeout-policy",
+      "group": "guard",
+      "directory": "timeout-policy",
+      "npmName": "@deepseek-ai/dsh-tool-call-timeout-policy",
+      "srcLines": 111,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "hooks/hook-protocol",
+      "group": "hooks",
+      "directory": "hook-protocol",
+      "npmName": "@deepseek-ai/dsh-hook-protocol",
+      "srcLines": 854,
+      "srcFiles": 9,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "hooks/hooks-claude-code",
+      "group": "hooks",
+      "directory": "hooks-claude-code",
+      "npmName": "@deepseek-ai/dsh-hooks-claude-code",
+      "srcLines": 514,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "hooks/hooks-codex",
+      "group": "hooks",
+      "directory": "hooks-codex",
+      "npmName": "@deepseek-ai/dsh-hooks-codex",
+      "srcLines": 445,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "host/apiproxy",
+      "group": "host",
+      "directory": "apiproxy",
+      "npmName": "@deepseek-ai/dsh-host-apiproxy",
+      "srcLines": 8571,
+      "srcFiles": 42,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "host/directory-picker",
+      "group": "host",
+      "directory": "directory-picker",
+      "npmName": "@deepseek-ai/dsh-host-directory-picker",
+      "srcLines": 168,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "host/directory-picker-auto",
+      "group": "host",
+      "directory": "directory-picker-auto",
+      "npmName": "@deepseek-ai/dsh-host-directory-picker-auto",
+      "srcLines": 220,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "host/directory-picker-browse",
+      "group": "host",
+      "directory": "directory-picker-browse",
+      "npmName": "@deepseek-ai/dsh-host-directory-picker-browse",
+      "srcLines": 349,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "host/directory-picker-native",
+      "group": "host",
+      "directory": "directory-picker-native",
+      "npmName": "@deepseek-ai/dsh-host-directory-picker-native",
+      "srcLines": 737,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "host/frontend-static",
+      "group": "host",
+      "directory": "frontend-static",
+      "npmName": "@deepseek-ai/dsh-host-frontend-static",
+      "srcLines": 144,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "host/plugin-inventory",
+      "group": "host",
+      "directory": "plugin-inventory",
+      "npmName": "@deepseek-ai/dsh-host-plugin-inventory",
+      "srcLines": 120,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "host/webserver",
+      "group": "host",
+      "directory": "webserver",
+      "npmName": "@deepseek-ai/dsh-host-webserver",
+      "srcLines": 325,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 5
+    },
+    {
+      "id": "identity/anonymous-user-id",
+      "group": "identity",
+      "directory": "anonymous-user-id",
+      "npmName": "@deepseek-ai/dsh-anonymous-user-id",
+      "srcLines": 131,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "interaction/commands",
+      "group": "interaction",
+      "directory": "commands",
+      "npmName": "@deepseek-ai/dsh-commands",
+      "srcLines": 583,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 12
+    },
+    {
+      "id": "interaction/permission-presets",
+      "group": "interaction",
+      "directory": "permission-presets",
+      "npmName": "@deepseek-ai/dsh-permission-presets",
+      "srcLines": 526,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "interaction/tool-ask-user",
+      "group": "interaction",
+      "directory": "tool-ask-user",
+      "npmName": "@deepseek-ai/dsh-tool-ask-user",
+      "srcLines": 131,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "interaction/user-approval",
+      "group": "interaction",
+      "directory": "user-approval",
+      "npmName": "@deepseek-ai/dsh-user-approval",
+      "srcLines": 487,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 7
+    },
+    {
+      "id": "interaction/user-questions",
+      "group": "interaction",
+      "directory": "user-questions",
+      "npmName": "@deepseek-ai/dsh-user-questions",
+      "srcLines": 239,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "jobs/jobs",
+      "group": "jobs",
+      "directory": "jobs",
+      "npmName": "@deepseek-ai/dsh-jobs",
+      "srcLines": 424,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 7
+    },
+    {
+      "id": "jobs/jobs-local",
+      "group": "jobs",
+      "directory": "jobs-local",
+      "npmName": "@deepseek-ai/dsh-jobs-local",
+      "srcLines": 567,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "jobs/tool-jobs",
+      "group": "jobs",
+      "directory": "tool-jobs",
+      "npmName": "@deepseek-ai/dsh-tool-jobs",
+      "srcLines": 432,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "llm/llm",
+      "group": "llm",
+      "directory": "llm",
+      "npmName": "@deepseek-ai/dsh-llm",
+      "srcLines": 2625,
+      "srcFiles": 14,
+      "private": false,
+      "dependedOnBy": 78
+    },
+    {
+      "id": "llm/llm-deepseek",
+      "group": "llm",
+      "directory": "llm-deepseek",
+      "npmName": "@deepseek-ai/dsh-llm-deepseek",
+      "srcLines": 1216,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "llm/llm-pi-ai",
+      "group": "llm",
+      "directory": "llm-pi-ai",
+      "npmName": "@deepseek-ai/dsh-llm-pi-ai",
+      "srcLines": 2706,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "llm/llm-retry",
+      "group": "llm",
+      "directory": "llm-retry",
+      "npmName": "@deepseek-ai/dsh-llm-retry",
+      "srcLines": 494,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "llm/token-meter",
+      "group": "llm",
+      "directory": "token-meter",
+      "npmName": "@deepseek-ai/dsh-token-meter",
+      "srcLines": 999,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "lsp/lsp",
+      "group": "lsp",
+      "directory": "lsp",
+      "npmName": "@deepseek-ai/dsh-lsp",
+      "srcLines": 339,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "lsp/lsp-stdio",
+      "group": "lsp",
+      "directory": "lsp-stdio",
+      "npmName": "@deepseek-ai/dsh-lsp-stdio",
+      "srcLines": 1664,
+      "srcFiles": 9,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "lsp/tool-lsp",
+      "group": "lsp",
+      "directory": "tool-lsp",
+      "npmName": "@deepseek-ai/dsh-tool-lsp",
+      "srcLines": 483,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "mcp/mcp-client",
+      "group": "mcp",
+      "directory": "mcp-client",
+      "npmName": "@deepseek-ai/dsh-mcp-client",
+      "srcLines": 929,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "plan/plan-mode",
+      "group": "plan",
+      "directory": "plan-mode",
+      "npmName": "@deepseek-ai/dsh-plan-mode",
+      "srcLines": 563,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "preset/agent-presets",
+      "group": "preset",
+      "directory": "agent-presets",
+      "npmName": "@deepseek-ai/dsh-agent-presets",
+      "srcLines": 1684,
+      "srcFiles": 9,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "preset/persona",
+      "group": "preset",
+      "directory": "persona",
+      "npmName": "@deepseek-ai/dsh-persona",
+      "srcLines": 99,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "runtime-diagnostics/invariants",
+      "group": "runtime-diagnostics",
+      "directory": "invariants",
+      "npmName": "@deepseek-ai/dsh-invariants",
+      "srcLines": 230,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 218
+    },
+    {
+      "id": "sandbox/sandbox",
+      "group": "sandbox",
+      "directory": "sandbox",
+      "npmName": "@deepseek-ai/dsh-sandbox",
+      "srcLines": 452,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 14
+    },
+    {
+      "id": "sandbox/sandbox-local",
+      "group": "sandbox",
+      "directory": "sandbox-local",
+      "npmName": "@deepseek-ai/dsh-sandbox-local",
+      "srcLines": 655,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "sandbox/sandbox-policy",
+      "group": "sandbox",
+      "directory": "sandbox-policy",
+      "npmName": "@deepseek-ai/dsh-sandbox-policy",
+      "srcLines": 267,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 10
+    },
+    {
+      "id": "sandbox/sandbox-windows-acl",
+      "group": "sandbox",
+      "directory": "sandbox-windows-acl",
+      "npmName": "@deepseek-ai/dsh-sandbox-windows-acl",
+      "srcLines": 2530,
+      "srcFiles": 12,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "schedule/schedule",
+      "group": "schedule",
+      "directory": "schedule",
+      "npmName": "@deepseek-ai/dsh-schedule",
+      "srcLines": 2003,
+      "srcFiles": 8,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "sdk/client",
+      "group": "sdk",
+      "directory": "client",
+      "npmName": "@deepseek-ai/dsh-sdk-client",
+      "srcLines": 952,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "sdk/protocol",
+      "group": "sdk",
+      "directory": "protocol",
+      "npmName": "@deepseek-ai/dsh-sdk-protocol",
+      "srcLines": 440,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "sdk/server",
+      "group": "sdk",
+      "directory": "server",
+      "npmName": "@deepseek-ai/dsh-sdk-jsonrpc-server",
+      "srcLines": 362,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "session-query/session-log-export",
+      "group": "session-query",
+      "directory": "session-log-export",
+      "npmName": "@deepseek-ai/dsh-session-log-export",
+      "srcLines": 270,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "session-query/session-query",
+      "group": "session-query",
+      "directory": "session-query",
+      "npmName": "@deepseek-ai/dsh-session-query",
+      "srcLines": 1718,
+      "srcFiles": 11,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "session-query/session-query-sqlite",
+      "group": "session-query",
+      "directory": "session-query-sqlite",
+      "npmName": "@deepseek-ai/dsh-session-query-sqlite",
+      "srcLines": 1783,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "session-query/tool-session-query",
+      "group": "session-query",
+      "directory": "tool-session-query",
+      "npmName": "@deepseek-ai/dsh-tool-session-query",
+      "srcLines": 1444,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "session/session-checkpoint-policy",
+      "group": "session",
+      "directory": "session-checkpoint-policy",
+      "npmName": "@deepseek-ai/dsh-session-checkpoint-policy",
+      "srcLines": 113,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "session/session-persistence",
+      "group": "session",
+      "directory": "session-persistence",
+      "npmName": "@deepseek-ai/dsh-session-persistence",
+      "srcLines": 2159,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 15
+    },
+    {
+      "id": "session/session-persistence-jsonl",
+      "group": "session",
+      "directory": "session-persistence-jsonl",
+      "npmName": "@deepseek-ai/dsh-session-persistence-jsonl",
+      "srcLines": 1939,
+      "srcFiles": 7,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "session/session-persistence-sqlite",
+      "group": "session",
+      "directory": "session-persistence-sqlite",
+      "npmName": "@deepseek-ai/dsh-session-persistence-sqlite",
+      "srcLines": 714,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "session/session-projection",
+      "group": "session",
+      "directory": "session-projection",
+      "npmName": "@deepseek-ai/dsh-session-projection",
+      "srcLines": 483,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 9
+    },
+    {
+      "id": "session/session-projection-cache",
+      "group": "session",
+      "directory": "session-projection-cache",
+      "npmName": "@deepseek-ai/dsh-session-projection-cache",
+      "srcLines": 405,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "session/session-stats",
+      "group": "session",
+      "directory": "session-stats",
+      "npmName": "@deepseek-ai/dsh-session-stats",
+      "srcLines": 303,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "session/session-telemetry",
+      "group": "session",
+      "directory": "session-telemetry",
+      "npmName": "@deepseek-ai/dsh-session-telemetry",
+      "srcLines": 529,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "session/session-telemetry-otel",
+      "group": "session",
+      "directory": "session-telemetry-otel",
+      "npmName": "@deepseek-ai/dsh-session-telemetry-otel",
+      "srcLines": 332,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "session/session-title",
+      "group": "session",
+      "directory": "session-title",
+      "npmName": "@deepseek-ai/dsh-session-title",
+      "srcLines": 948,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 5
+    },
+    {
+      "id": "session/session-title-all-prompts-llm",
+      "group": "session",
+      "directory": "session-title-all-prompts-llm",
+      "npmName": "@deepseek-ai/dsh-session-title-all-prompts-llm",
+      "srcLines": 66,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "session/session-title-first-prompt-llm",
+      "group": "session",
+      "directory": "session-title-first-prompt-llm",
+      "npmName": "@deepseek-ai/dsh-session-title-first-prompt-llm",
+      "srcLines": 70,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "session/session-title-llm",
+      "group": "session",
+      "directory": "session-title-llm",
+      "npmName": "@deepseek-ai/dsh-session-title-llm",
+      "srcLines": 324,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "settings/settings",
+      "group": "settings",
+      "directory": "settings",
+      "npmName": "@deepseek-ai/dsh-settings",
+      "srcLines": 1106,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 13
+    },
+    {
+      "id": "settings/settings-file",
+      "group": "settings",
+      "directory": "settings-file",
+      "npmName": "@deepseek-ai/dsh-settings-file",
+      "srcLines": 401,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "shell/bash-local",
+      "group": "shell",
+      "directory": "bash-local",
+      "npmName": "@deepseek-ai/dsh-bash-local",
+      "srcLines": 363,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "shell/bash-sandbox",
+      "group": "shell",
+      "directory": "bash-sandbox",
+      "npmName": "@deepseek-ai/dsh-bash-sandbox",
+      "srcLines": 328,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "shell/pwsh-local",
+      "group": "shell",
+      "directory": "pwsh-local",
+      "npmName": "@deepseek-ai/dsh-pwsh-local",
+      "srcLines": 472,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "shell/pwsh-sandbox",
+      "group": "shell",
+      "directory": "pwsh-sandbox",
+      "npmName": "@deepseek-ai/dsh-pwsh-sandbox",
+      "srcLines": 339,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "shell/shell",
+      "group": "shell",
+      "directory": "shell",
+      "npmName": "@deepseek-ai/dsh-shell",
+      "srcLines": 350,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 10
+    },
+    {
+      "id": "shell/shell-env",
+      "group": "shell",
+      "directory": "shell-env",
+      "npmName": "@deepseek-ai/dsh-shell-env",
+      "srcLines": 247,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "shell/tool-bash",
+      "group": "shell",
+      "directory": "tool-bash",
+      "npmName": "@deepseek-ai/dsh-tool-bash",
+      "srcLines": 554,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "shell/tool-bash-persistent",
+      "group": "shell",
+      "directory": "tool-bash-persistent",
+      "npmName": "@deepseek-ai/dsh-tool-bash-persistent",
+      "srcLines": 476,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "shell/tool-pwsh",
+      "group": "shell",
+      "directory": "tool-pwsh",
+      "npmName": "@deepseek-ai/dsh-tool-pwsh",
+      "srcLines": 620,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "skill/skill",
+      "group": "skill",
+      "directory": "skill",
+      "npmName": "@deepseek-ai/dsh-skill",
+      "srcLines": 898,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "skill/skill-badge",
+      "group": "skill",
+      "directory": "skill-badge",
+      "npmName": "@deepseek-ai/dsh-skill-badge",
+      "srcLines": 90,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "skill/skill-filesystem",
+      "group": "skill",
+      "directory": "skill-filesystem",
+      "npmName": "@deepseek-ai/dsh-skill-filesystem",
+      "srcLines": 1071,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "skill/tool-skill",
+      "group": "skill",
+      "directory": "tool-skill",
+      "npmName": "@deepseek-ai/dsh-tool-skill",
+      "srcLines": 461,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "spill/spill",
+      "group": "spill",
+      "directory": "spill",
+      "npmName": "@deepseek-ai/dsh-spill",
+      "srcLines": 161,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "spill/spill-local",
+      "group": "spill",
+      "directory": "spill-local",
+      "npmName": "@deepseek-ai/dsh-spill-local",
+      "srcLines": 215,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "spill/spill-policy",
+      "group": "spill",
+      "directory": "spill-policy",
+      "npmName": "@deepseek-ai/dsh-spill-policy",
+      "srcLines": 288,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "storage/storage",
+      "group": "storage",
+      "directory": "storage",
+      "npmName": "@deepseek-ai/dsh-storage",
+      "srcLines": 331,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "storage/storage-domain",
+      "group": "storage",
+      "directory": "storage-domain",
+      "npmName": "@deepseek-ai/dsh-storage-domain",
+      "srcLines": 857,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "storage/storage-json",
+      "group": "storage",
+      "directory": "storage-json",
+      "npmName": "@deepseek-ai/dsh-storage-json",
+      "srcLines": 424,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "storage/storage-sqlite",
+      "group": "storage",
+      "directory": "storage-sqlite",
+      "npmName": "@deepseek-ai/dsh-storage-sqlite",
+      "srcLines": 476,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/subagent",
+      "group": "subagent",
+      "directory": "subagent",
+      "npmName": "@deepseek-ai/dsh-subagent",
+      "srcLines": 4531,
+      "srcFiles": 18,
+      "private": false,
+      "dependedOnBy": 16
+    },
+    {
+      "id": "subagent/subagent-acp",
+      "group": "subagent",
+      "directory": "subagent-acp",
+      "npmName": "@deepseek-ai/dsh-subagent-acp",
+      "srcLines": 587,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/subagent-claude-code",
+      "group": "subagent",
+      "directory": "subagent-claude-code",
+      "npmName": "@deepseek-ai/dsh-subagent-claude-code",
+      "srcLines": 604,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/subagent-codex",
+      "group": "subagent",
+      "directory": "subagent-codex",
+      "npmName": "@deepseek-ai/dsh-subagent-codex",
+      "srcLines": 705,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/subagent-dsh-sdk",
+      "group": "subagent",
+      "directory": "subagent-dsh-sdk",
+      "npmName": "@deepseek-ai/dsh-subagent-dsh-sdk",
+      "srcLines": 375,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/subagent-fork-in-process",
+      "group": "subagent",
+      "directory": "subagent-fork-in-process",
+      "npmName": "@deepseek-ai/dsh-subagent-fork-in-process",
+      "srcLines": 124,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/subagent-in-process-driver",
+      "group": "subagent",
+      "directory": "subagent-in-process-driver",
+      "npmName": "@deepseek-ai/dsh-subagent-in-process-driver",
+      "srcLines": 405,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 2
+    },
+    {
+      "id": "subagent/subagent-spawn-in-process",
+      "group": "subagent",
+      "directory": "subagent-spawn-in-process",
+      "npmName": "@deepseek-ai/dsh-subagent-spawn-in-process",
+      "srcLines": 94,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/tool-subagent",
+      "group": "subagent",
+      "directory": "tool-subagent",
+      "npmName": "@deepseek-ai/dsh-tool-subagent",
+      "srcLines": 497,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/tool-subagent-control",
+      "group": "subagent",
+      "directory": "tool-subagent-control",
+      "npmName": "@deepseek-ai/dsh-tool-subagent-control",
+      "srcLines": 342,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subagent/tool-subagent-report",
+      "group": "subagent",
+      "directory": "tool-subagent-report",
+      "npmName": "@deepseek-ai/dsh-tool-subagent-report",
+      "srcLines": 172,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "subprocess/subprocess",
+      "group": "subprocess",
+      "directory": "subprocess",
+      "npmName": "@deepseek-ai/dsh-subprocess",
+      "srcLines": 428,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 13
+    },
+    {
+      "id": "subprocess/subprocess-local",
+      "group": "subprocess",
+      "directory": "subprocess-local",
+      "npmName": "@deepseek-ai/dsh-subprocess-local",
+      "srcLines": 1391,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "terminal/terminal",
+      "group": "terminal",
+      "directory": "terminal",
+      "npmName": "@deepseek-ai/dsh-terminal",
+      "srcLines": 683,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "terminal/terminal-bash",
+      "group": "terminal",
+      "directory": "terminal-bash",
+      "npmName": "@deepseek-ai/dsh-terminal-bash",
+      "srcLines": 1017,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "terminal/tool-terminal",
+      "group": "terminal",
+      "directory": "tool-terminal",
+      "npmName": "@deepseek-ai/dsh-tool-terminal",
+      "srcLines": 606,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "test-support/acp-snapshot",
+      "group": "test-support",
+      "directory": "acp-snapshot",
+      "npmName": "@deepseek-ai/dsh-acp-snapshot",
+      "srcLines": 3162,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "test-support/agent-loop-testkit",
+      "group": "test-support",
+      "directory": "agent-loop-testkit",
+      "npmName": "@deepseek-ai/dsh-agent-loop-testkit",
+      "srcLines": 76,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "test-support/client-runtime",
+      "group": "test-support",
+      "directory": "client-runtime",
+      "npmName": "@deepseek-ai/dsh-client-test-runtime",
+      "srcLines": 1517,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "test-support/llm-mock-server",
+      "group": "test-support",
+      "directory": "llm-mock-server",
+      "npmName": "@deepseek-ai/dsh-llm-mock-server",
+      "srcLines": 1031,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "test-support/llm-replay",
+      "group": "test-support",
+      "directory": "llm-replay",
+      "npmName": "@deepseek-ai/dsh-llm-replay",
+      "srcLines": 856,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "test-support/loader-smoke",
+      "group": "test-support",
+      "directory": "loader-smoke",
+      "npmName": "@deepseek-ai/dsh-loader-smoke",
+      "srcLines": 342,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "todo/tool-todo",
+      "group": "todo",
+      "directory": "tool-todo",
+      "npmName": "@deepseek-ai/dsh-tool-todo",
+      "srcLines": 326,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "typert/generator",
+      "group": "typert",
+      "directory": "generator",
+      "npmName": "@deepseek-ai/dsh-typert-generator",
+      "srcLines": 6245,
+      "srcFiles": 9,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "typert/loader",
+      "group": "typert",
+      "directory": "loader",
+      "npmName": "@deepseek-ai/dsh-typert-loader",
+      "srcLines": 472,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "typert/protocol",
+      "group": "typert",
+      "directory": "protocol",
+      "npmName": "@deepseek-ai/dsh-typert-protocol",
+      "srcLines": 801,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 9
+    },
+    {
+      "id": "typert/registry",
+      "group": "typert",
+      "directory": "registry",
+      "npmName": "@deepseek-ai/dsh-typert-registry",
+      "srcLines": 909,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "util/atomic-write",
+      "group": "util",
+      "directory": "atomic-write",
+      "npmName": "@deepseek-ai/dsh-atomic-write",
+      "srcLines": 148,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 3
+    },
+    {
+      "id": "util/brand",
+      "group": "util",
+      "directory": "brand",
+      "npmName": "@deepseek-ai/dsh-brand",
+      "srcLines": 57,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 29
+    },
+    {
+      "id": "util/home-paths",
+      "group": "util",
+      "directory": "home-paths",
+      "npmName": "@deepseek-ai/dsh-home-paths",
+      "srcLines": 142,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 10
+    },
+    {
+      "id": "util/launch-environment",
+      "group": "util",
+      "directory": "launch-environment",
+      "npmName": "@deepseek-ai/dsh-launch-environment",
+      "srcLines": 154,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 7
+    },
+    {
+      "id": "util/native-command",
+      "group": "util",
+      "directory": "native-command",
+      "npmName": "@deepseek-ai/dsh-native-command",
+      "srcLines": 75,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "util/output-retention",
+      "group": "util",
+      "directory": "output-retention",
+      "npmName": "@deepseek-ai/dsh-output-retention",
+      "srcLines": 473,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 5
+    },
+    {
+      "id": "util/timeout",
+      "group": "util",
+      "directory": "timeout",
+      "npmName": "@deepseek-ai/dsh-timeout",
+      "srcLines": 220,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 23
+    },
+    {
+      "id": "web/tool-web",
+      "group": "web",
+      "directory": "tool-web",
+      "npmName": "@deepseek-ai/dsh-tool-web",
+      "srcLines": 902,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "web/web",
+      "group": "web",
+      "directory": "web",
+      "npmName": "@deepseek-ai/dsh-web",
+      "srcLines": 361,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 5
+    },
+    {
+      "id": "web/web-fetch-http",
+      "group": "web",
+      "directory": "web-fetch-http",
+      "npmName": "@deepseek-ai/dsh-web-fetch-http",
+      "srcLines": 476,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "web/web-search-deepseek",
+      "group": "web",
+      "directory": "web-search-deepseek",
+      "npmName": "@deepseek-ai/dsh-web-search-deepseek",
+      "srcLines": 565,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "web/web-search-exa",
+      "group": "web",
+      "directory": "web-search-exa",
+      "npmName": "@deepseek-ai/dsh-web-search-exa",
+      "srcLines": 303,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "web/web-search-perplexity",
+      "group": "web",
+      "directory": "web-search-perplexity",
+      "npmName": "@deepseek-ai/dsh-web-search-perplexity",
+      "srcLines": 296,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "workflow/tool-ralph",
+      "group": "workflow",
+      "directory": "tool-ralph",
+      "npmName": "@deepseek-ai/dsh-tool-ralph",
+      "srcLines": 509,
+      "srcFiles": 2,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "workflow/tool-workflow",
+      "group": "workflow",
+      "directory": "tool-workflow",
+      "npmName": "@deepseek-ai/dsh-tool-workflow",
+      "srcLines": 566,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "workflow/workflow",
+      "group": "workflow",
+      "directory": "workflow",
+      "npmName": "@deepseek-ai/dsh-workflow",
+      "srcLines": 519,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "workflow/workflow-worker-thread",
+      "group": "workflow",
+      "directory": "workflow-worker-thread",
+      "npmName": "@deepseek-ai/dsh-workflow-worker-thread",
+      "srcLines": 1987,
+      "srcFiles": 10,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "workspace/workspace",
+      "group": "workspace",
+      "directory": "workspace",
+      "npmName": "@deepseek-ai/dsh-workspace",
+      "srcLines": 1142,
+      "srcFiles": 6,
+      "private": false,
+      "dependedOnBy": 0
+    }
+  ],
+  "edges": [
+    {
+      "from": "acp/acp",
+      "to": "core/agent"
+    },
+    {
+      "from": "acp/acp",
+      "to": "core/session"
+    },
+    {
+      "from": "acp/acp",
+      "to": "interaction/user-approval"
+    },
+    {
+      "from": "acp/acp",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "api/gateway",
+      "to": "client/connection"
+    },
+    {
+      "from": "api/gateway",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "api/gateway",
+      "to": "typert/registry"
+    },
+    {
+      "from": "api/remotes",
+      "to": "api/gateway"
+    },
+    {
+      "from": "api/remotes",
+      "to": "core/agent"
+    },
+    {
+      "from": "api/remotes",
+      "to": "core/session"
+    },
+    {
+      "from": "api/remotes",
+      "to": "credentials/credentials"
+    },
+    {
+      "from": "api/remotes",
+      "to": "extensions/cordis-host-runner"
+    },
+    {
+      "from": "api/remotes",
+      "to": "feedback/message-feedback"
+    },
+    {
+      "from": "api/remotes",
+      "to": "goal/goal"
+    },
+    {
+      "from": "api/remotes",
+      "to": "host/plugin-inventory"
+    },
+    {
+      "from": "api/remotes",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "api/remotes",
+      "to": "llm/llm"
+    },
+    {
+      "from": "api/remotes",
+      "to": "preset/agent-presets"
+    },
+    {
+      "from": "api/remotes",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "api/remotes",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "api/remotes",
+      "to": "settings/settings"
+    },
+    {
+      "from": "api/remotes",
+      "to": "typert/registry"
+    },
+    {
+      "from": "attachment/attachment",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "attachment/attachment",
+      "to": "util/brand"
+    },
+    {
+      "from": "attachment/attachment-local",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "attachment/attachment-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "attachment/attachment-local",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "boot/app-boot",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "boot/app-boot",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "boot/app-boot",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "boot/app-boot",
+      "to": "util/launch-environment"
+    },
+    {
+      "from": "boot/cmdline",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "bundle/base",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "bundle/headless",
+      "to": "core/agent"
+    },
+    {
+      "from": "bundle/headless",
+      "to": "core/agent-default-model"
+    },
+    {
+      "from": "bundle/headless",
+      "to": "core/session"
+    },
+    {
+      "from": "bundle/headless",
+      "to": "llm/llm"
+    },
+    {
+      "from": "bundle/headless",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "bundle/web-app",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "bundle/web-app",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "bundle/web-app",
+      "to": "shell/shell-env"
+    },
+    {
+      "from": "client/connection",
+      "to": "host/webserver"
+    },
+    {
+      "from": "client/connection",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/hmr",
+      "to": "client/modules"
+    },
+    {
+      "from": "client/hmr",
+      "to": "host/webserver"
+    },
+    {
+      "from": "client/hmr",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/locale",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/locale",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/locale",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/locale",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/locale",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/locale",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/locale",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/modules",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/runtime",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/runtime",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/runtime",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "client/runtime",
+      "to": "typert/registry"
+    },
+    {
+      "from": "client/schema-form",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "client/web-react"
+    },
+    {
+      "from": "client/ui-agent-preset",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-attachment",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "client/ui-commands",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/ui-attachment"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "core/agent"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "core/tools"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "llm/llm-retry"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "llm/token-meter"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "session/session-stats"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "util/brand"
+    },
+    {
+      "from": "client/ui-deliverables",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-deliverables",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-deliverables",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-deliverables",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-deliverables",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-deliverables",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "client/ui-deliverables",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-directory-picker-browse",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-directory-picker-browse",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-directory-picker-browse",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-directory-picker-browse",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-directory-picker-browse",
+      "to": "client/ui-workspace"
+    },
+    {
+      "from": "client/ui-directory-picker-browse",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-directory-picker-native",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-directory-picker-native",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-directory-picker-native",
+      "to": "client/ui-workspace"
+    },
+    {
+      "from": "client/ui-directory-picker-native",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "goal/goal"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "client/ui-goal",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-input-trigger",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-input-trigger",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-input-trigger",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-input-trigger",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-input-trigger",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-jobs",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-jobs",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-jobs",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-jobs",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-jobs",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-jobs",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-layout",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-layout",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-layout",
+      "to": "client/ui-theme"
+    },
+    {
+      "from": "client/ui-layout",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "feedback/message-feedback"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-message-feedback",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/ui-commands"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-model-selection",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/schema-form"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/ui-commands"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "interaction/permission-presets"
+    },
+    {
+      "from": "client/ui-permission-presets",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "plan/plan-mode"
+    },
+    {
+      "from": "client/ui-plan",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-primitives",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-settings",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-settings",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-settings",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-settings",
+      "to": "client/schema-form"
+    },
+    {
+      "from": "client/ui-settings",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-settings",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-settings",
+      "to": "settings/settings"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/ui-sidebar"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "client/web-react"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "client/schema-form"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "client/web-react"
+    },
+    {
+      "from": "client/ui-settings-models",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-settings-plugin-inventory",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-settings-plugin-inventory",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-settings-plugin-inventory",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-settings-plugin-inventory",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-settings-plugin-inventory",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/ui-settings-plugin-inventory",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-settings-plugin-inventory",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "client/web-react"
+    },
+    {
+      "from": "client/ui-settings-plugins",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-sidebar",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-sidebar",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-sidebar",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-sidebar",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-sidebar",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "client/ui-tool"
+    },
+    {
+      "from": "client/ui-skill",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-slots",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "llm/token-meter"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-subagent",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "client/ui-settings"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "host/webserver"
+    },
+    {
+      "from": "client/ui-theme",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-trajectory",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-trajectory",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-trajectory",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-trajectory",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "client/ui-trajectory",
+      "to": "core/agent"
+    },
+    {
+      "from": "client/ui-trajectory",
+      "to": "core/tools"
+    },
+    {
+      "from": "client/ui-trajectory",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-user-questions",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-user-questions",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-user-questions",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "core/session"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "workflow/tool-workflow"
+    },
+    {
+      "from": "client/ui-workflow-run",
+      "to": "workflow/workflow"
+    },
+    {
+      "from": "client/ui-workspace",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-workspace",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-workspace",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "client/ui-workspace",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "client/ui-workspace",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/web",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/web-react",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "code-runtime/code-runtime",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "code-runtime/code-runtime-worker-thread",
+      "to": "code-runtime/code-runtime"
+    },
+    {
+      "from": "code-runtime/code-runtime-worker-thread",
+      "to": "core/session"
+    },
+    {
+      "from": "code-runtime/code-runtime-worker-thread",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "code-runtime/code-runtime-worker-thread",
+      "to": "util/timeout"
+    },
+    {
+      "from": "compaction/command-compact",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "compaction/command-compact",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "compaction/command-compact",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "compaction/compaction",
+      "to": "core/session"
+    },
+    {
+      "from": "compaction/compaction",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "compaction/compaction",
+      "to": "llm/llm"
+    },
+    {
+      "from": "compaction/compaction",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "compaction/compaction",
+      "to": "util/brand"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "compaction/compaction-tool-result-pruner"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "core/agent"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "core/session"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "llm/llm"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "llm/token-meter"
+    },
+    {
+      "from": "compaction/compaction-basic",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "compaction/compaction-tool-result-pruner",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "compaction/compaction-tool-result-pruner",
+      "to": "core/session"
+    },
+    {
+      "from": "compaction/compaction-tool-result-pruner",
+      "to": "llm/llm"
+    },
+    {
+      "from": "compaction/compaction-tool-result-pruner",
+      "to": "llm/token-meter"
+    },
+    {
+      "from": "compaction/compaction-tool-result-pruner",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "context/agent-instructions",
+      "to": "core/agent"
+    },
+    {
+      "from": "context/agent-instructions",
+      "to": "core/session"
+    },
+    {
+      "from": "context/agent-instructions",
+      "to": "core/tools"
+    },
+    {
+      "from": "context/agent-instructions",
+      "to": "fs/fs"
+    },
+    {
+      "from": "context/agent-instructions",
+      "to": "llm/llm"
+    },
+    {
+      "from": "context/agent-instructions",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "context/agent-instructions",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "core/agent"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "core/session"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "llm/llm"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "session-query/session-query"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "util/output-retention"
+    },
+    {
+      "from": "context/time-context",
+      "to": "core/agent"
+    },
+    {
+      "from": "context/time-context",
+      "to": "core/session"
+    },
+    {
+      "from": "context/time-context",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "context/tmux-context",
+      "to": "core/agent"
+    },
+    {
+      "from": "context/tmux-context",
+      "to": "core/session"
+    },
+    {
+      "from": "context/tmux-context",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "context/tmux-context",
+      "to": "shell/shell"
+    },
+    {
+      "from": "core/agent",
+      "to": "core/scope"
+    },
+    {
+      "from": "core/agent",
+      "to": "core/session"
+    },
+    {
+      "from": "core/agent",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "core/agent",
+      "to": "llm/llm"
+    },
+    {
+      "from": "core/agent",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "core/agent",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "core/agent-default-model",
+      "to": "core/agent"
+    },
+    {
+      "from": "core/agent-default-model",
+      "to": "llm/llm"
+    },
+    {
+      "from": "core/agent-default-model",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "core/agent-default-model",
+      "to": "settings/settings"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "core/agent"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "core/scope"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "core/session"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "core/tools"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "llm/llm"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "core/agent-loop",
+      "to": "settings/settings"
+    },
+    {
+      "from": "core/agent-tool-presentation",
+      "to": "core/tools"
+    },
+    {
+      "from": "core/agent-tool-presentation",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "core/scope",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "core/session",
+      "to": "core/scope"
+    },
+    {
+      "from": "core/session",
+      "to": "llm/llm"
+    },
+    {
+      "from": "core/session",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "core/session",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "core/session",
+      "to": "util/brand"
+    },
+    {
+      "from": "core/system-prompt",
+      "to": "core/scope"
+    },
+    {
+      "from": "core/system-prompt",
+      "to": "llm/llm"
+    },
+    {
+      "from": "core/system-prompt",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "core/tools",
+      "to": "code-runtime/code-runtime"
+    },
+    {
+      "from": "core/tools",
+      "to": "core/agent"
+    },
+    {
+      "from": "core/tools",
+      "to": "core/scope"
+    },
+    {
+      "from": "core/tools",
+      "to": "core/session"
+    },
+    {
+      "from": "core/tools",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "core/tools",
+      "to": "interaction/user-approval"
+    },
+    {
+      "from": "core/tools",
+      "to": "llm/llm"
+    },
+    {
+      "from": "core/tools",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "credentials/credentials",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "credentials/credentials",
+      "to": "util/brand"
+    },
+    {
+      "from": "credentials/credentials-local",
+      "to": "credentials/credentials"
+    },
+    {
+      "from": "credentials/credentials-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "credentials/credentials-local",
+      "to": "util/atomic-write"
+    },
+    {
+      "from": "credentials/credentials-local",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "credentials/credentials-local",
+      "to": "util/launch-environment"
+    },
+    {
+      "from": "e2b/e2b",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "e2b/fs-e2b",
+      "to": "e2b/e2b"
+    },
+    {
+      "from": "e2b/fs-e2b",
+      "to": "fs/fs"
+    },
+    {
+      "from": "e2b/fs-e2b",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "e2b/subprocess-e2b",
+      "to": "e2b/e2b"
+    },
+    {
+      "from": "e2b/subprocess-e2b",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "e2b/subprocess-e2b",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "e2b/subprocess-e2b",
+      "to": "util/timeout"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "acp/acp"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "boot/app-boot"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "context/agent-instructions"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "core/tools"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "examples/agent-spine-demo"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "session-query/session-query"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "session-query/session-query-sqlite"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "session/session-checkpoint-policy"
+    },
+    {
+      "from": "examples/acp-demo",
+      "to": "session/session-persistence-jsonl"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "context/agent-instructions"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "core/agent"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "core/agent-loop"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "core/scope"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "core/session"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "core/tools"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "goal/goal"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "goal/goal-round-driver"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "goal/tool-goal"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "jobs/jobs-local"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "jobs/tool-jobs"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "llm/llm"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "llm/llm-retry"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "session/session-title"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "shell/shell-env"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "shell/tool-bash"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "skill/skill"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "skill/skill-filesystem"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "skill/tool-skill"
+    },
+    {
+      "from": "examples/agent-spine-demo",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "examples/jsonrpc-demo",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "extensions/cordis-client-runner",
+      "to": "api/remotes"
+    },
+    {
+      "from": "extensions/cordis-client-runner",
+      "to": "client/connection"
+    },
+    {
+      "from": "extensions/cordis-client-runner",
+      "to": "client/modules"
+    },
+    {
+      "from": "extensions/cordis-client-runner",
+      "to": "client/runtime"
+    },
+    {
+      "from": "extensions/cordis-client-runner",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "extensions/cordis-client-runner",
+      "to": "client/ui-theme"
+    },
+    {
+      "from": "extensions/cordis-client-runner",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "core/agent"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "core/scope"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "core/session"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "core/tools"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "llm/llm"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "extensions/cordis-host-runner",
+      "to": "util/brand"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "core/agent"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "core/scope"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "core/session"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "core/tools"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "extensions/cordis-host-runner"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "llm/llm"
+    },
+    {
+      "from": "extensions/tool-cordis",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "api/remotes"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/connection"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/locale"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/runtime"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/ui-sidebar"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "client/ui-tool"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "extensions/cordis-client-runner"
+    },
+    {
+      "from": "extensions/ui-cordis",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "feedback/command-feedback",
+      "to": "core/session"
+    },
+    {
+      "from": "feedback/command-feedback",
+      "to": "identity/anonymous-user-id"
+    },
+    {
+      "from": "feedback/command-feedback",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "feedback/command-feedback",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "feedback/command-feedback",
+      "to": "session/session-telemetry"
+    },
+    {
+      "from": "feedback/message-feedback",
+      "to": "core/session"
+    },
+    {
+      "from": "feedback/message-feedback",
+      "to": "llm/llm"
+    },
+    {
+      "from": "feedback/message-feedback",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "feedback/message-feedback",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "feedback/message-feedback",
+      "to": "storage/storage-domain"
+    },
+    {
+      "from": "feedback/message-feedback",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "feedback/message-feedback",
+      "to": "util/brand"
+    },
+    {
+      "from": "fs/fs",
+      "to": "llm/llm"
+    },
+    {
+      "from": "fs/fs",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "fs/fs",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "fs/fs",
+      "to": "util/brand"
+    },
+    {
+      "from": "fs/fs-local",
+      "to": "fs/fs"
+    },
+    {
+      "from": "fs/fs-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "fs/fs-observation-policy",
+      "to": "fs/fs"
+    },
+    {
+      "from": "fs/fs-observation-policy",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "fs/fs-sandbox",
+      "to": "fs/fs"
+    },
+    {
+      "from": "fs/fs-sandbox",
+      "to": "fs/fs-local"
+    },
+    {
+      "from": "fs/fs-sandbox",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "fs/fs-sandbox",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "fs/fs-sandbox",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "core/session"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "core/tools"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "fs/fs"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "interaction/user-approval"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "llm/llm"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "fs/tool-fs",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "core/session"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "core/tools"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "llm/llm"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "spill/spill"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "util/output-retention"
+    },
+    {
+      "from": "fs/tool-fs-search",
+      "to": "util/timeout"
+    },
+    {
+      "from": "fs/tool-str-replace-editor",
+      "to": "core/tools"
+    },
+    {
+      "from": "fs/tool-str-replace-editor",
+      "to": "fs/fs"
+    },
+    {
+      "from": "fs/tool-str-replace-editor",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "fs/tool-str-replace-editor",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "fs/tool-str-replace-editor",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "goal/command-goal",
+      "to": "goal/goal"
+    },
+    {
+      "from": "goal/command-goal",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "goal/command-goal",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "goal/goal",
+      "to": "core/agent"
+    },
+    {
+      "from": "goal/goal",
+      "to": "core/scope"
+    },
+    {
+      "from": "goal/goal",
+      "to": "core/session"
+    },
+    {
+      "from": "goal/goal",
+      "to": "llm/llm"
+    },
+    {
+      "from": "goal/goal",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "goal/goal",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "goal/goal",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "goal/goal",
+      "to": "util/brand"
+    },
+    {
+      "from": "goal/goal-round-driver",
+      "to": "core/agent"
+    },
+    {
+      "from": "goal/goal-round-driver",
+      "to": "core/session"
+    },
+    {
+      "from": "goal/goal-round-driver",
+      "to": "goal/goal"
+    },
+    {
+      "from": "goal/goal-round-driver",
+      "to": "llm/llm"
+    },
+    {
+      "from": "goal/goal-round-driver",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "goal/tool-goal",
+      "to": "core/agent"
+    },
+    {
+      "from": "goal/tool-goal",
+      "to": "core/session"
+    },
+    {
+      "from": "goal/tool-goal",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "goal/tool-goal",
+      "to": "core/tools"
+    },
+    {
+      "from": "goal/tool-goal",
+      "to": "goal/goal"
+    },
+    {
+      "from": "goal/tool-goal",
+      "to": "llm/llm"
+    },
+    {
+      "from": "goal/tool-goal",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "guard/repeat-tool-reminder",
+      "to": "core/agent"
+    },
+    {
+      "from": "guard/repeat-tool-reminder",
+      "to": "core/tools"
+    },
+    {
+      "from": "guard/repeat-tool-reminder",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "guard/timeout-policy",
+      "to": "core/tools"
+    },
+    {
+      "from": "guard/timeout-policy",
+      "to": "llm/llm"
+    },
+    {
+      "from": "guard/timeout-policy",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "guard/timeout-policy",
+      "to": "util/timeout"
+    },
+    {
+      "from": "hooks/hook-protocol",
+      "to": "core/session"
+    },
+    {
+      "from": "hooks/hook-protocol",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "hooks/hook-protocol",
+      "to": "shell/shell"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "core/agent"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "core/session"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "core/tools"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "hooks/hook-protocol"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "llm/llm"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "hooks/hooks-claude-code",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "hooks/hooks-codex",
+      "to": "core/agent"
+    },
+    {
+      "from": "hooks/hooks-codex",
+      "to": "core/session"
+    },
+    {
+      "from": "hooks/hooks-codex",
+      "to": "core/tools"
+    },
+    {
+      "from": "hooks/hooks-codex",
+      "to": "hooks/hook-protocol"
+    },
+    {
+      "from": "hooks/hooks-codex",
+      "to": "llm/llm"
+    },
+    {
+      "from": "hooks/hooks-codex",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "hooks/hooks-codex",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "host/apiproxy",
+      "to": "extensions/cordis-host-runner"
+    },
+    {
+      "from": "host/apiproxy",
+      "to": "preset/agent-presets"
+    },
+    {
+      "from": "host/apiproxy",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "host/directory-picker",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "host/directory-picker-auto",
+      "to": "client/ui-directory-picker-browse"
+    },
+    {
+      "from": "host/directory-picker-auto",
+      "to": "client/ui-directory-picker-native"
+    },
+    {
+      "from": "host/directory-picker-auto",
+      "to": "host/directory-picker-browse"
+    },
+    {
+      "from": "host/directory-picker-auto",
+      "to": "host/directory-picker-native"
+    },
+    {
+      "from": "host/directory-picker-auto",
+      "to": "host/webserver"
+    },
+    {
+      "from": "host/directory-picker-auto",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "host/directory-picker-browse",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "host/directory-picker-native",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "host/frontend-static",
+      "to": "host/webserver"
+    },
+    {
+      "from": "host/frontend-static",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "host/plugin-inventory",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "host/plugin-inventory",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "host/plugin-inventory",
+      "to": "util/brand"
+    },
+    {
+      "from": "host/webserver",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "identity/anonymous-user-id",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "identity/anonymous-user-id",
+      "to": "util/brand"
+    },
+    {
+      "from": "identity/anonymous-user-id",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "interaction/commands",
+      "to": "core/agent"
+    },
+    {
+      "from": "interaction/commands",
+      "to": "core/scope"
+    },
+    {
+      "from": "interaction/commands",
+      "to": "core/session"
+    },
+    {
+      "from": "interaction/commands",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "interaction/commands",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "interaction/commands",
+      "to": "util/brand"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "core/session"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "interaction/user-approval"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "settings/settings"
+    },
+    {
+      "from": "interaction/permission-presets",
+      "to": "shell/shell"
+    },
+    {
+      "from": "interaction/tool-ask-user",
+      "to": "core/agent"
+    },
+    {
+      "from": "interaction/tool-ask-user",
+      "to": "core/tools"
+    },
+    {
+      "from": "interaction/tool-ask-user",
+      "to": "interaction/user-questions"
+    },
+    {
+      "from": "interaction/tool-ask-user",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "interaction/user-approval",
+      "to": "core/agent"
+    },
+    {
+      "from": "interaction/user-approval",
+      "to": "core/scope"
+    },
+    {
+      "from": "interaction/user-approval",
+      "to": "core/session"
+    },
+    {
+      "from": "interaction/user-approval",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "interaction/user-approval",
+      "to": "llm/llm"
+    },
+    {
+      "from": "interaction/user-approval",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "interaction/user-approval",
+      "to": "util/brand"
+    },
+    {
+      "from": "interaction/user-questions",
+      "to": "core/agent"
+    },
+    {
+      "from": "interaction/user-questions",
+      "to": "llm/llm"
+    },
+    {
+      "from": "interaction/user-questions",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "jobs/jobs",
+      "to": "core/agent"
+    },
+    {
+      "from": "jobs/jobs",
+      "to": "core/session"
+    },
+    {
+      "from": "jobs/jobs",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "jobs/jobs",
+      "to": "util/brand"
+    },
+    {
+      "from": "jobs/jobs-local",
+      "to": "core/agent"
+    },
+    {
+      "from": "jobs/jobs-local",
+      "to": "core/scope"
+    },
+    {
+      "from": "jobs/jobs-local",
+      "to": "jobs/jobs"
+    },
+    {
+      "from": "jobs/jobs-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "jobs/jobs-local",
+      "to": "util/timeout"
+    },
+    {
+      "from": "jobs/tool-jobs",
+      "to": "core/agent"
+    },
+    {
+      "from": "jobs/tool-jobs",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "jobs/tool-jobs",
+      "to": "core/tools"
+    },
+    {
+      "from": "jobs/tool-jobs",
+      "to": "jobs/jobs"
+    },
+    {
+      "from": "jobs/tool-jobs",
+      "to": "llm/llm"
+    },
+    {
+      "from": "jobs/tool-jobs",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "jobs/tool-jobs",
+      "to": "util/output-retention"
+    },
+    {
+      "from": "llm/llm",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "llm/llm",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "llm/llm",
+      "to": "util/brand"
+    },
+    {
+      "from": "llm/llm",
+      "to": "util/timeout"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "credentials/credentials"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "identity/anonymous-user-id"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "llm/llm"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "settings/settings"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "util/launch-environment"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "util/timeout"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "credentials/credentials"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "llm/llm"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "settings/settings"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "util/launch-environment"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "util/timeout"
+    },
+    {
+      "from": "llm/llm-retry",
+      "to": "core/agent"
+    },
+    {
+      "from": "llm/llm-retry",
+      "to": "core/session"
+    },
+    {
+      "from": "llm/llm-retry",
+      "to": "llm/llm"
+    },
+    {
+      "from": "llm/llm-retry",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "llm/llm-retry",
+      "to": "util/brand"
+    },
+    {
+      "from": "llm/llm-retry",
+      "to": "util/timeout"
+    },
+    {
+      "from": "llm/token-meter",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "llm/token-meter",
+      "to": "core/session"
+    },
+    {
+      "from": "llm/token-meter",
+      "to": "llm/llm"
+    },
+    {
+      "from": "llm/token-meter",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "llm/token-meter",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "lsp/lsp",
+      "to": "llm/llm"
+    },
+    {
+      "from": "lsp/lsp",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "lsp/lsp",
+      "to": "util/brand"
+    },
+    {
+      "from": "lsp/lsp-stdio",
+      "to": "fs/fs"
+    },
+    {
+      "from": "lsp/lsp-stdio",
+      "to": "llm/llm"
+    },
+    {
+      "from": "lsp/lsp-stdio",
+      "to": "lsp/lsp"
+    },
+    {
+      "from": "lsp/lsp-stdio",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "lsp/lsp-stdio",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "lsp/lsp-stdio",
+      "to": "util/brand"
+    },
+    {
+      "from": "lsp/lsp-stdio",
+      "to": "util/timeout"
+    },
+    {
+      "from": "lsp/tool-lsp",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "lsp/tool-lsp",
+      "to": "core/tools"
+    },
+    {
+      "from": "lsp/tool-lsp",
+      "to": "llm/llm"
+    },
+    {
+      "from": "lsp/tool-lsp",
+      "to": "lsp/lsp"
+    },
+    {
+      "from": "lsp/tool-lsp",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "lsp/tool-lsp",
+      "to": "util/timeout"
+    },
+    {
+      "from": "mcp/mcp-client",
+      "to": "core/tools"
+    },
+    {
+      "from": "mcp/mcp-client",
+      "to": "llm/llm"
+    },
+    {
+      "from": "mcp/mcp-client",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "mcp/mcp-client",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "mcp/mcp-client",
+      "to": "util/timeout"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "core/agent"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "core/session"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "core/tools"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "interaction/user-questions"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "llm/llm"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "plan/plan-mode",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "core/agent"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "core/scope"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "core/session"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "settings/settings"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "util/atomic-write"
+    },
+    {
+      "from": "preset/agent-presets",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "preset/persona",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "preset/persona",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "sandbox/sandbox",
+      "to": "core/session"
+    },
+    {
+      "from": "sandbox/sandbox",
+      "to": "llm/llm"
+    },
+    {
+      "from": "sandbox/sandbox",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "sandbox/sandbox-local",
+      "to": "core/session"
+    },
+    {
+      "from": "sandbox/sandbox-local",
+      "to": "llm/llm"
+    },
+    {
+      "from": "sandbox/sandbox-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "sandbox/sandbox-local",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "sandbox/sandbox-policy",
+      "to": "core/agent"
+    },
+    {
+      "from": "sandbox/sandbox-policy",
+      "to": "core/session"
+    },
+    {
+      "from": "sandbox/sandbox-policy",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "sandbox/sandbox-policy",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "sandbox/sandbox-policy",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "sandbox/sandbox-windows-acl",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "schedule/schedule",
+      "to": "core/agent"
+    },
+    {
+      "from": "schedule/schedule",
+      "to": "core/session"
+    },
+    {
+      "from": "schedule/schedule",
+      "to": "core/tools"
+    },
+    {
+      "from": "schedule/schedule",
+      "to": "llm/llm"
+    },
+    {
+      "from": "schedule/schedule",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "schedule/schedule",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "schedule/schedule",
+      "to": "util/brand"
+    },
+    {
+      "from": "sdk/client",
+      "to": "core/session"
+    },
+    {
+      "from": "sdk/client",
+      "to": "llm/llm"
+    },
+    {
+      "from": "sdk/client",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "sdk/client",
+      "to": "sdk/protocol"
+    },
+    {
+      "from": "sdk/protocol",
+      "to": "core/session"
+    },
+    {
+      "from": "sdk/protocol",
+      "to": "llm/llm"
+    },
+    {
+      "from": "sdk/protocol",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "sdk/protocol",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "sdk/server",
+      "to": "core/agent"
+    },
+    {
+      "from": "sdk/server",
+      "to": "core/scope"
+    },
+    {
+      "from": "sdk/server",
+      "to": "core/session"
+    },
+    {
+      "from": "sdk/server",
+      "to": "llm/llm"
+    },
+    {
+      "from": "sdk/server",
+      "to": "llm/llm-deepseek"
+    },
+    {
+      "from": "sdk/server",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "sdk/server",
+      "to": "sdk/protocol"
+    },
+    {
+      "from": "sdk/server",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "client/locale"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "client/runtime"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "client/ui-commands"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "client/ui-primitives"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "session-query/session-log-export",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session-query/session-query",
+      "to": "core/session"
+    },
+    {
+      "from": "session-query/session-query",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session-query/session-query",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session-query/session-query",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "session-query/session-query",
+      "to": "session/session-title"
+    },
+    {
+      "from": "session-query/session-query",
+      "to": "util/brand"
+    },
+    {
+      "from": "session-query/session-query-sqlite",
+      "to": "core/session"
+    },
+    {
+      "from": "session-query/session-query-sqlite",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session-query/session-query-sqlite",
+      "to": "session-query/session-query"
+    },
+    {
+      "from": "session-query/session-query-sqlite",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "session-query/tool-session-query",
+      "to": "core/session"
+    },
+    {
+      "from": "session-query/tool-session-query",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "session-query/tool-session-query",
+      "to": "core/tools"
+    },
+    {
+      "from": "session-query/tool-session-query",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session-query/tool-session-query",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session-query/tool-session-query",
+      "to": "session-query/session-query"
+    },
+    {
+      "from": "session-query/tool-session-query",
+      "to": "util/timeout"
+    },
+    {
+      "from": "session/session-checkpoint-policy",
+      "to": "core/agent"
+    },
+    {
+      "from": "session/session-checkpoint-policy",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-checkpoint-policy",
+      "to": "core/tools"
+    },
+    {
+      "from": "session/session-checkpoint-policy",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session/session-checkpoint-policy",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-checkpoint-policy",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "session/session-persistence",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-persistence",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-persistence",
+      "to": "util/brand"
+    },
+    {
+      "from": "session/session-persistence",
+      "to": "util/timeout"
+    },
+    {
+      "from": "session/session-persistence-jsonl",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-persistence-jsonl",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-persistence-jsonl",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "session/session-persistence-sqlite",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-persistence-sqlite",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-persistence-sqlite",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "session/session-projection",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-projection",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-projection-cache",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-projection-cache",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-projection-cache",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "session/session-projection-cache",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "session/session-projection-cache",
+      "to": "storage/storage-domain"
+    },
+    {
+      "from": "session/session-stats",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-stats",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session/session-stats",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-stats",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "session/session-telemetry",
+      "to": "core/agent"
+    },
+    {
+      "from": "session/session-telemetry",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-telemetry",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-telemetry-otel",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-telemetry-otel",
+      "to": "feedback/command-feedback"
+    },
+    {
+      "from": "session/session-telemetry-otel",
+      "to": "identity/anonymous-user-id"
+    },
+    {
+      "from": "session/session-telemetry-otel",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session/session-telemetry-otel",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-telemetry-otel",
+      "to": "session/session-telemetry"
+    },
+    {
+      "from": "session/session-title",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-title",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session/session-title",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-title",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "session/session-title",
+      "to": "util/brand"
+    },
+    {
+      "from": "session/session-title-all-prompts-llm",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-title-all-prompts-llm",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session/session-title-all-prompts-llm",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-title-all-prompts-llm",
+      "to": "session/session-title"
+    },
+    {
+      "from": "session/session-title-all-prompts-llm",
+      "to": "session/session-title-llm"
+    },
+    {
+      "from": "session/session-title-first-prompt-llm",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-title-first-prompt-llm",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session/session-title-first-prompt-llm",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-title-first-prompt-llm",
+      "to": "session/session-title"
+    },
+    {
+      "from": "session/session-title-first-prompt-llm",
+      "to": "session/session-title-llm"
+    },
+    {
+      "from": "session/session-title-llm",
+      "to": "core/session"
+    },
+    {
+      "from": "session/session-title-llm",
+      "to": "llm/llm"
+    },
+    {
+      "from": "session/session-title-llm",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "session/session-title-llm",
+      "to": "session/session-title"
+    },
+    {
+      "from": "session/session-title-llm",
+      "to": "util/timeout"
+    },
+    {
+      "from": "settings/settings",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "settings/settings",
+      "to": "util/brand"
+    },
+    {
+      "from": "settings/settings-file",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "settings/settings-file",
+      "to": "settings/settings"
+    },
+    {
+      "from": "settings/settings-file",
+      "to": "util/atomic-write"
+    },
+    {
+      "from": "settings/settings-file",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "shell/bash-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/bash-local",
+      "to": "settings/settings"
+    },
+    {
+      "from": "shell/bash-local",
+      "to": "shell/shell"
+    },
+    {
+      "from": "shell/bash-local",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "shell/bash-local",
+      "to": "util/timeout"
+    },
+    {
+      "from": "shell/bash-sandbox",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/bash-sandbox",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "shell/bash-sandbox",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "shell/bash-sandbox",
+      "to": "shell/bash-local"
+    },
+    {
+      "from": "shell/bash-sandbox",
+      "to": "shell/shell"
+    },
+    {
+      "from": "shell/pwsh-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/pwsh-local",
+      "to": "settings/settings"
+    },
+    {
+      "from": "shell/pwsh-local",
+      "to": "shell/shell"
+    },
+    {
+      "from": "shell/pwsh-local",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "shell/pwsh-local",
+      "to": "util/timeout"
+    },
+    {
+      "from": "shell/pwsh-sandbox",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/pwsh-sandbox",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "shell/pwsh-sandbox",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "shell/pwsh-sandbox",
+      "to": "shell/pwsh-local"
+    },
+    {
+      "from": "shell/pwsh-sandbox",
+      "to": "shell/shell"
+    },
+    {
+      "from": "shell/shell",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/shell",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "shell/shell",
+      "to": "settings/settings"
+    },
+    {
+      "from": "shell/shell",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "shell/shell-env",
+      "to": "core/tools"
+    },
+    {
+      "from": "shell/shell-env",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/shell-env",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "shell/shell-env",
+      "to": "shell/shell"
+    },
+    {
+      "from": "shell/shell-env",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "core/agent"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "core/tools"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "interaction/user-approval"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "jobs/jobs"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "llm/llm"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "shell/shell"
+    },
+    {
+      "from": "shell/tool-bash",
+      "to": "shell/shell-env"
+    },
+    {
+      "from": "shell/tool-bash-persistent",
+      "to": "core/agent"
+    },
+    {
+      "from": "shell/tool-bash-persistent",
+      "to": "core/tools"
+    },
+    {
+      "from": "shell/tool-bash-persistent",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/tool-bash-persistent",
+      "to": "terminal/terminal"
+    },
+    {
+      "from": "shell/tool-bash-persistent",
+      "to": "util/timeout"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "core/agent"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "core/tools"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "interaction/user-approval"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "jobs/jobs"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "llm/llm"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "shell/shell"
+    },
+    {
+      "from": "shell/tool-pwsh",
+      "to": "shell/shell-env"
+    },
+    {
+      "from": "skill/skill",
+      "to": "core/scope"
+    },
+    {
+      "from": "skill/skill",
+      "to": "llm/llm"
+    },
+    {
+      "from": "skill/skill",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "skill/skill-badge",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "skill/skill-badge",
+      "to": "skill/skill"
+    },
+    {
+      "from": "skill/skill-filesystem",
+      "to": "fs/fs"
+    },
+    {
+      "from": "skill/skill-filesystem",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "skill/skill-filesystem",
+      "to": "skill/skill"
+    },
+    {
+      "from": "skill/skill-filesystem",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "skill/tool-skill",
+      "to": "core/agent"
+    },
+    {
+      "from": "skill/tool-skill",
+      "to": "core/tools"
+    },
+    {
+      "from": "skill/tool-skill",
+      "to": "llm/llm"
+    },
+    {
+      "from": "skill/tool-skill",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "skill/tool-skill",
+      "to": "skill/skill"
+    },
+    {
+      "from": "spill/spill",
+      "to": "core/session"
+    },
+    {
+      "from": "spill/spill",
+      "to": "llm/llm"
+    },
+    {
+      "from": "spill/spill",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "spill/spill",
+      "to": "util/brand"
+    },
+    {
+      "from": "spill/spill-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "spill/spill-local",
+      "to": "spill/spill"
+    },
+    {
+      "from": "spill/spill-policy",
+      "to": "core/session"
+    },
+    {
+      "from": "spill/spill-policy",
+      "to": "core/tools"
+    },
+    {
+      "from": "spill/spill-policy",
+      "to": "llm/llm"
+    },
+    {
+      "from": "spill/spill-policy",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "spill/spill-policy",
+      "to": "spill/spill"
+    },
+    {
+      "from": "spill/spill-policy",
+      "to": "util/output-retention"
+    },
+    {
+      "from": "storage/storage",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "storage/storage-domain",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "storage/storage-domain",
+      "to": "storage/storage"
+    },
+    {
+      "from": "storage/storage-json",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "storage/storage-json",
+      "to": "storage/storage"
+    },
+    {
+      "from": "storage/storage-sqlite",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "storage/storage-sqlite",
+      "to": "storage/storage"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "core/agent"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "core/scope"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "core/tools"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "interaction/user-approval"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "jobs/jobs"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "preset/agent-presets"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "session/session-projection-cache"
+    },
+    {
+      "from": "subagent/subagent",
+      "to": "util/brand"
+    },
+    {
+      "from": "subagent/subagent-acp",
+      "to": "core/agent"
+    },
+    {
+      "from": "subagent/subagent-acp",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/subagent-acp",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/subagent-acp",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent-acp",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/subagent-acp",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "subagent/subagent-acp",
+      "to": "util/timeout"
+    },
+    {
+      "from": "subagent/subagent-claude-code",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/subagent-claude-code",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/subagent-claude-code",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent-claude-code",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/subagent-claude-code",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "subagent/subagent-claude-code",
+      "to": "util/timeout"
+    },
+    {
+      "from": "subagent/subagent-codex",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/subagent-codex",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/subagent-codex",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent-codex",
+      "to": "sdk/protocol"
+    },
+    {
+      "from": "subagent/subagent-codex",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/subagent-codex",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "subagent/subagent-codex",
+      "to": "util/timeout"
+    },
+    {
+      "from": "subagent/subagent-dsh-sdk",
+      "to": "core/agent"
+    },
+    {
+      "from": "subagent/subagent-dsh-sdk",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/subagent-dsh-sdk",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/subagent-dsh-sdk",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent-dsh-sdk",
+      "to": "sdk/client"
+    },
+    {
+      "from": "subagent/subagent-dsh-sdk",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/subagent-dsh-sdk",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "subagent/subagent-fork-in-process",
+      "to": "core/agent"
+    },
+    {
+      "from": "subagent/subagent-fork-in-process",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/subagent-fork-in-process",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent-fork-in-process",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/subagent-fork-in-process",
+      "to": "subagent/subagent-in-process-driver"
+    },
+    {
+      "from": "subagent/subagent-in-process-driver",
+      "to": "core/agent"
+    },
+    {
+      "from": "subagent/subagent-in-process-driver",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/subagent-in-process-driver",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "subagent/subagent-in-process-driver",
+      "to": "core/tools"
+    },
+    {
+      "from": "subagent/subagent-in-process-driver",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/subagent-in-process-driver",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent-in-process-driver",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/subagent-spawn-in-process",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/subagent-spawn-in-process",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/subagent-spawn-in-process",
+      "to": "subagent/subagent-in-process-driver"
+    },
+    {
+      "from": "subagent/tool-subagent",
+      "to": "core/agent"
+    },
+    {
+      "from": "subagent/tool-subagent",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "subagent/tool-subagent",
+      "to": "core/tools"
+    },
+    {
+      "from": "subagent/tool-subagent",
+      "to": "jobs/jobs"
+    },
+    {
+      "from": "subagent/tool-subagent",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/tool-subagent",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/tool-subagent",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/tool-subagent-control",
+      "to": "core/session"
+    },
+    {
+      "from": "subagent/tool-subagent-control",
+      "to": "core/tools"
+    },
+    {
+      "from": "subagent/tool-subagent-control",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/tool-subagent-control",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/tool-subagent-control",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subagent/tool-subagent-report",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "subagent/tool-subagent-report",
+      "to": "core/tools"
+    },
+    {
+      "from": "subagent/tool-subagent-report",
+      "to": "llm/llm"
+    },
+    {
+      "from": "subagent/tool-subagent-report",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subagent/tool-subagent-report",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "subprocess/subprocess",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subprocess/subprocess-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "subprocess/subprocess-local",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "subprocess/subprocess-local",
+      "to": "util/timeout"
+    },
+    {
+      "from": "terminal/terminal",
+      "to": "core/agent"
+    },
+    {
+      "from": "terminal/terminal",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "terminal/terminal",
+      "to": "util/brand"
+    },
+    {
+      "from": "terminal/terminal-bash",
+      "to": "core/agent"
+    },
+    {
+      "from": "terminal/terminal-bash",
+      "to": "core/session"
+    },
+    {
+      "from": "terminal/terminal-bash",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "terminal/terminal-bash",
+      "to": "sandbox/sandbox"
+    },
+    {
+      "from": "terminal/terminal-bash",
+      "to": "sandbox/sandbox-policy"
+    },
+    {
+      "from": "terminal/terminal-bash",
+      "to": "subprocess/subprocess"
+    },
+    {
+      "from": "terminal/terminal-bash",
+      "to": "terminal/terminal"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "core/agent"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "core/tools"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "jobs/jobs"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "llm/llm"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "terminal/terminal"
+    },
+    {
+      "from": "terminal/tool-terminal",
+      "to": "util/output-retention"
+    },
+    {
+      "from": "test-support/acp-snapshot",
+      "to": "core/session"
+    },
+    {
+      "from": "test-support/acp-snapshot",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "test-support/agent-loop-testkit",
+      "to": "core/agent"
+    },
+    {
+      "from": "test-support/agent-loop-testkit",
+      "to": "core/session"
+    },
+    {
+      "from": "test-support/agent-loop-testkit",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "test-support/agent-loop-testkit",
+      "to": "core/tools"
+    },
+    {
+      "from": "test-support/agent-loop-testkit",
+      "to": "llm/llm"
+    },
+    {
+      "from": "test-support/agent-loop-testkit",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "test-support/client-runtime",
+      "to": "client/runtime"
+    },
+    {
+      "from": "test-support/client-runtime",
+      "to": "client/ui-slots"
+    },
+    {
+      "from": "test-support/client-runtime",
+      "to": "client/web-react"
+    },
+    {
+      "from": "test-support/client-runtime",
+      "to": "host/apiproxy"
+    },
+    {
+      "from": "test-support/client-runtime",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "test-support/llm-mock-server",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "test-support/llm-replay",
+      "to": "compaction/compaction"
+    },
+    {
+      "from": "test-support/llm-replay",
+      "to": "core/session"
+    },
+    {
+      "from": "test-support/llm-replay",
+      "to": "llm/llm"
+    },
+    {
+      "from": "test-support/llm-replay",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "test-support/loader-smoke",
+      "to": "core/agent"
+    },
+    {
+      "from": "test-support/loader-smoke",
+      "to": "core/session"
+    },
+    {
+      "from": "test-support/loader-smoke",
+      "to": "llm/llm"
+    },
+    {
+      "from": "test-support/loader-smoke",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "todo/tool-todo",
+      "to": "core/agent"
+    },
+    {
+      "from": "todo/tool-todo",
+      "to": "core/session"
+    },
+    {
+      "from": "todo/tool-todo",
+      "to": "core/tools"
+    },
+    {
+      "from": "todo/tool-todo",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "todo/tool-todo",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "typert/generator",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "typert/loader",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "typert/loader",
+      "to": "typert/registry"
+    },
+    {
+      "from": "typert/protocol",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "typert/registry",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "util/atomic-write",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "util/brand",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "util/home-paths",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "util/launch-environment",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "util/native-command",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "util/output-retention",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "util/timeout",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "web/tool-web",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "web/tool-web",
+      "to": "core/tools"
+    },
+    {
+      "from": "web/tool-web",
+      "to": "llm/llm"
+    },
+    {
+      "from": "web/tool-web",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "web/tool-web",
+      "to": "web/web"
+    },
+    {
+      "from": "web/web",
+      "to": "llm/llm"
+    },
+    {
+      "from": "web/web",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "web/web-fetch-http",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "web/web-fetch-http",
+      "to": "util/timeout"
+    },
+    {
+      "from": "web/web-fetch-http",
+      "to": "web/web"
+    },
+    {
+      "from": "web/web-search-deepseek",
+      "to": "core/agent"
+    },
+    {
+      "from": "web/web-search-deepseek",
+      "to": "core/session"
+    },
+    {
+      "from": "web/web-search-deepseek",
+      "to": "credentials/credentials"
+    },
+    {
+      "from": "web/web-search-deepseek",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "web/web-search-deepseek",
+      "to": "settings/settings"
+    },
+    {
+      "from": "web/web-search-deepseek",
+      "to": "util/launch-environment"
+    },
+    {
+      "from": "web/web-search-deepseek",
+      "to": "web/web"
+    },
+    {
+      "from": "web/web-search-exa",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "web/web-search-exa",
+      "to": "util/launch-environment"
+    },
+    {
+      "from": "web/web-search-exa",
+      "to": "web/web"
+    },
+    {
+      "from": "web/web-search-perplexity",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "web/web-search-perplexity",
+      "to": "util/launch-environment"
+    },
+    {
+      "from": "web/web-search-perplexity",
+      "to": "web/web"
+    },
+    {
+      "from": "workflow/tool-ralph",
+      "to": "core/agent"
+    },
+    {
+      "from": "workflow/tool-ralph",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "workflow/tool-ralph",
+      "to": "core/tools"
+    },
+    {
+      "from": "workflow/tool-ralph",
+      "to": "llm/llm"
+    },
+    {
+      "from": "workflow/tool-ralph",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "workflow/tool-ralph",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "workflow/tool-ralph",
+      "to": "workflow/workflow"
+    },
+    {
+      "from": "workflow/tool-workflow",
+      "to": "core/agent"
+    },
+    {
+      "from": "workflow/tool-workflow",
+      "to": "core/session"
+    },
+    {
+      "from": "workflow/tool-workflow",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "workflow/tool-workflow",
+      "to": "core/tools"
+    },
+    {
+      "from": "workflow/tool-workflow",
+      "to": "llm/llm"
+    },
+    {
+      "from": "workflow/tool-workflow",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "workflow/tool-workflow",
+      "to": "workflow/workflow"
+    },
+    {
+      "from": "workflow/workflow",
+      "to": "core/agent"
+    },
+    {
+      "from": "workflow/workflow",
+      "to": "core/session"
+    },
+    {
+      "from": "workflow/workflow",
+      "to": "llm/llm"
+    },
+    {
+      "from": "workflow/workflow",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "workflow/workflow",
+      "to": "util/brand"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "core/agent"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "core/session"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "core/tools"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "llm/llm"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "util/brand"
+    },
+    {
+      "from": "workflow/workflow-worker-thread",
+      "to": "workflow/workflow"
+    },
+    {
+      "from": "workspace/workspace",
+      "to": "core/session"
+    },
+    {
+      "from": "workspace/workspace",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "workspace/workspace",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "workspace/workspace",
+      "to": "storage/storage"
+    },
+    {
+      "from": "workspace/workspace",
+      "to": "storage/storage-domain"
+    },
+    {
+      "from": "workspace/workspace",
+      "to": "util/brand"
+    }
+  ],
+  "skipped": [],
+  "contentHash": "7254A6A5F253E4E7EA7F13191118D34E9179C3ABE146368FE338FFFC9315BC8D"
+}
