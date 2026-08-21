@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/process/2026-08-21-fork-workflow-spec-pins-own-workflows.md
+2026-08-21-fork-workflow-spec-pins-own-workflows.md: 7dc454fc7ac7e7801c80f525a63d5072f5624b08
+2026-08-21-fork-workflow-spec-pins-own-workflows.zh.md: 96c0fd8eb6ef34583073ab23f7fdd96613f419aa

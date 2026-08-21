@@ -111,6 +111,8 @@ describe('scoped tool registration', () => {
     expect(globalSnapshot.hiddenByRestriction).toEqual([])
 
     const snapshot = ctx.tools.debugSnapshot(key)
+    // expect.any 返回 any；显式收窄成 number，避免 lint 的 no-unsafe-assignment。
+    const anyUtf8Bytes = expect.any(Number) as unknown as number
     expect(snapshot).toMatchObject({
       scope: 'scoped',
       presentationMode: 'native',
@@ -119,8 +121,8 @@ describe('scoped tool registration', () => {
       visible: ['shared', 'local'],
       hiddenByRestriction: ['hidden'],
       visibleSchemas: [
-        { name: 'shared', utf8Bytes: expect.any(Number) },
-        { name: 'local', utf8Bytes: expect.any(Number) },
+        { name: 'shared', utf8Bytes: anyUtf8Bytes },
+        { name: 'local', utf8Bytes: anyUtf8Bytes },
       ],
     })
     expect(snapshot.visibleSchemaUtf8Bytes)
