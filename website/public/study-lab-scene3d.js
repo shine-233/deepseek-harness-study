@@ -7,7 +7,7 @@
  * CDN 也不是选项。
  *
  * 这一幕的目标不是读数值。读数值看二维散点和表格，那两个都在同一页上，而且不需要
- * 先点开。3D 负责的是另一件事：一眼看到 49 个组的相对体量，并且记住这张图。
+ * 先点开。3D 负责的是另一件事：一眼看到 50 个组的相对体量，并且记住这张图。
  * 遮挡和透视让 3D 读不准精确值，所以精确值永远由表格给。
  *
  * 三个维度的含义写在页面上，不写在这里就等于没有：
@@ -148,7 +148,7 @@ export function createPackageScene(canvas, model, options = {}) {
   }
 
   function drawEdges(width, height, palette) {
-    // 1089 条边一起画是视觉泥浆，所以只画最重的那些，并把条数报给调用方。
+    // 1124 条边一起画是视觉泥浆，所以只画最重的那些，并把条数报给调用方。
     const ranked = [...(model.edges ?? [])]
       .map(edge => ({ edge, weight: positions.has(edge.to) ? (positions.get(edge.to).node.dependedOnBy ?? 0) : 0 }))
       .sort((left, right) => right.weight - left.weight)

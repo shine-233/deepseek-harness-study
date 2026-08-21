@@ -34,17 +34,17 @@
 
 ## 固定版本的证据入口
 
-本篇使用的上游固定提交是 47f943859bef60e4160492346772ded9b24f765a。
-优先阅读[官方架构说明](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/architecture.zh.md)。
+本篇使用的上游固定提交是 aa6c361a972c8369148dea7380bb5c21c24e07ec。
+优先阅读[官方架构说明](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/architecture.zh.md)。
 
-再读[app-boot README](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/boot/app-boot/README.zh.md)。
-[Profile 实现](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/boot/app-boot/src/profile.ts)。
+再读[app-boot README](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/app-boot/README.zh.md)。
+[Profile 实现](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/app-boot/src/profile.ts)。
 
-再读[CLI Profile 启动编排](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/cli/src/profile-boot.ts)。
+再读[CLI Profile 启动编排](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/src/profile-boot.ts)。
 
-配置语义还应对照[Cordis primer](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/cordis-primer.zh.md)。
+配置语义还应对照[Cordis primer](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/cordis-primer.zh.md)。
 
-再读[官方发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/user/develop/basic/publish.zh.md)。
+再读[官方发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/user/develop/basic/publish.zh.md)。
 这些链接固定到同一提交，不能用社区 README 或滚动的 master 代替。
 
 ## 一条 Bundle 到运行时的链
@@ -68,12 +68,12 @@ Bundle package.json
 ## Bundle manifest 怎样被识别
 
 一个可被 DSH 识别的组合包通常在 package.json 中声明 dsh.bundle.patch，它指向本包中的 patch 文件。
-固定提交中的[基础 Bundle manifest](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/bundle/base/package.json)。
+固定提交中的[基础 Bundle manifest](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/bundle/base/package.json)。
 
-再读[基础 patch](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/bundle/base/cordis.patch.yml)。
-[headless Bundle](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/bundle/headless/cordis.patch.yml)。
+再读[基础 patch](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/bundle/base/cordis.patch.yml)。
+[headless Bundle](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/bundle/headless/cordis.patch.yml)。
 
-再读[Web Bundle](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/bundle/web-app/cordis.patch.yml)，它们都是格式学习样本。
+再读[Web Bundle](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/bundle/web-app/cordis.patch.yml)，它们都是格式学习样本。
 
 dsh.bundle.patch 是可识别的装配元数据，不是官方认证字段。社区包也可以使用同一个字段；判断官方身份仍然要看仓库归属、发布组织、上游源码、许可证和官方文档。
 
@@ -142,9 +142,9 @@ installFailLoud 把无法处理的 Loader 拒绝转换成带标签的错误并�
 
 ## 固定版本参考
 
-- [官方架构](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/architecture.zh.md)
-- [Cordis primer](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/cordis-primer.zh.md)
-- [app-boot README](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/boot/app-boot/README.zh.md)
-- [Profile 实现](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/boot/app-boot/src/profile.ts)
-- [CLI Profile 启动](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/apps/cli/src/profile-boot.ts)
-- [Bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/user/develop/basic/publish.zh.md)
+- [官方架构](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/architecture.zh.md)
+- [Cordis primer](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/cordis-primer.zh.md)
+- [app-boot README](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/app-boot/README.zh.md)
+- [Profile 实现](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/app-boot/src/profile.ts)
+- [CLI Profile 启动](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/src/profile-boot.ts)
+- [Bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/user/develop/basic/publish.zh.md)

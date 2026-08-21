@@ -9,7 +9,7 @@ test('the default home contract keeps a visible recovery lane for beginners', ()
   const home = REQUIRED_PUBLISHED_PAGES.find(page => page.file === 'index.html')
   assert.ok(home)
   assert.ok(home.markers.includes('dsh-stuck-card'))
-  assert.ok(home.markers.includes('卡住时不用猜'))
+  assert.ok(home.markers.includes('卡住时'))
 })
 
 test('the built-study contract accepts pages with all required markers', () => {

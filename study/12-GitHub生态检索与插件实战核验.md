@@ -2,13 +2,13 @@
 
 这一章补上两个容易混在一起的问题：**当前索引是否真的覆盖了每一个纳入的源文件**，以及**GitHub 上看起来像 DSH 插件的仓库到底属于哪一类**。
 
-先给结论：固定 DSH 提交中被本仓库纳入的 2,756 个代码或界面源文件，确实都有一条对应的中文索引条目；每条条目都有用途、设计理由、文件级证据、协作者、测试关系、阅读顺序和固定版本链接。但这不等于 2,756 个文件都被人工逐行精读，也不等于所有 JSON、YAML、Markdown、快照和资源文件都被遗漏。它们是另一类重要材料，当前不计入“逐源码文件”数字。
+先给结论：固定 DSH 提交中被本仓库纳入的 2,973 个代码或界面源文件，确实都有一条对应的中文索引条目；每条条目都有用途、设计理由、文件级证据、协作者、测试关系、阅读顺序和固定版本链接。但这不等于 2,973 个文件都被人工逐行精读，也不等于所有 JSON、YAML、Markdown、快照和资源文件都被遗漏。它们是另一类重要材料，当前不计入“逐源码文件”数字。
 
 本章还把 GitHub 的生态搜索结果当作**候选发现数据**，不当作官方注册表。目录、市场、扫描器、管理器、普通插件、桌面封装和运行时注入器解决的是不同问题；安装前必须分别核对身份、装配方式、权限、版本、测试和卸载行为。
 
 ## 一、怎样证明“每个源文件都有对应材料”
 
-本仓库固定的上游提交是 [`47f943859bef60e4160492346772ded9b24f765a`](https://github.com/deepseek-ai/deepseek-harness/tree/47f943859bef60e4160492346772ded9b24f765a)。这个提交的 Git tree 有 7,412 个文件，生成器按照源码扩展名白名单识别出 2,756 个代码或界面源文件，分到 `study/文件索引/` 的 66 个索引页中。
+本仓库固定的上游提交是 [`aa6c361a972c8369148dea7380bb5c21c24e07ec`](https://github.com/deepseek-ai/deepseek-harness/tree/aa6c361a972c8369148dea7380bb5c21c24e07ec)。这个提交的 Git tree 有 7,412 个文件，生成器按照源码扩展名白名单识别出 2,973 个代码或界面源文件，分到 `study/文件索引/` 的 66 个索引页中。
 
 每一条索引不是只有一个文件名，而是包含下面这些字段：
 
@@ -40,7 +40,7 @@ node study-tools/audit-source-index-quality.mjs
 node study-tools/verify-study-links.mjs
 ```
 
-当前固定提交的检查结果是：清单源文件 2,756、索引条目 2,756、结构错误 0、文件级设计证据 2,756/2,756、手写导读路径错误 0。质量审计仍会提示一些角色采用相同的共性模板；这是为了提醒维护者人工抽查，不是隐藏的缺条目。实际条目仍保留自己的路径、声明、注释、测试主题和 import 关系。
+当前固定提交的检查结果是：清单源文件 2,973、索引条目 2,973、结构错误 0、文件级设计证据 2,973/2,973、手写导读路径错误 0。质量审计仍会提示一些角色采用相同的共性模板；这是为了提醒维护者人工抽查，不是隐藏的缺条目。实际条目仍保留自己的路径、声明、注释、测试主题和 import 关系。
 
 ## 二、这次 GitHub 搜索查到了什么
 
@@ -66,7 +66,7 @@ per_page=30
 
 | 层次 | 代表样本 | 固定核验点 | 应该怎样理解 |
 | --- | --- | --- | --- |
-| 官方上游 | [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness/tree/47f943859bef60e4160492346772ded9b24f765a) | `47f943859bef60e4160492346772ded9b24f765a`，根包为 `0.1.0-rc.5` | 官方源码、官方文档和公开扩展契约的首要证据 |
+| 官方上游 | [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness/tree/aa6c361a972c8369148dea7380bb5c21c24e07ec) | `aa6c361a972c8369148dea7380bb5c21c24e07ec`，根包为 `0.1.1-rc.2` | 官方源码、官方文档和公开扩展契约的首要证据 |
 | 目录与精选列表 | [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/tree/b23d58c72d8ea267a230ec848f5d96a0821c84ce)、[awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness/tree/57eaea3dc32b3b5bf64d0f24a09f1cf16e76524a) | 各自的 README 和收录规则 | 方便发现项目，不是安全认证；前者明确提醒第三方代码会在本机权限下运行 |
 | 第三方 registry | [awesome-dsh-plugins](https://github.com/dshworks/awesome-dsh-plugins/tree/e60ca29e9521a52ac641d534dd3528f8dac4b4e0) | README 自述有 `verifiedAgainst`、`lastVerified`、分类和过滤；固定 commit `e60ca29...` | 比 topic 多了一层过滤和版本字段，但 registry 的“已验证”仍是该项目自己的声明，不能替代独立 Loader、平台和安全验证 |
 | 普通 Bundle | [dsh-annotation](https://github.com/omdsh-dev/dsh-annotation/tree/40216642260821da1c16d6d219150c3e4f31a222)、[dsh-navbar](https://github.com/vlln/dsh-navbar/tree/10e9d1546db28c499687d66a369e548cd3f52237) | `package.json`、`cordis.patch.yml`、client 声明和 README | 典型的第三方 UI Bundle；采用官方装配格式不等于 DeepSeek 官方维护 |
@@ -200,7 +200,7 @@ tools/pre-execute
 
 ## 六、为什么当前社区特别容易出现版本错位
 
-本学习仓库固定的是 DSH `0.1.0-rc.5`，而本次核验到的多个社区 README 或 registry 条目自述测试的是 `0.1.0-rc.6`。这两个版本之间可能有破坏性变化；“在 rc.6 验证过”不能自动证明“在本仓库固定的 rc.5 可用”。
+本学习仓库固定的是 DSH `0.1.1-rc.2`，而本次核验到的多个社区 README 或 registry 条目自述测试的是 `0.1.0-rc.6`。两个版本之间可能有破坏性变化；“在 rc.6 验证过”不能自动证明“在本仓库固定的 0.1.1-rc.2 可用”。
 
 另外，社区项目的 README、`package.json`、`cordis.patch.yml`、npm 包、Release 和安装文档可能来自不同时间。例如某些仓库的包名已经换过 namespace，而安装文档仍保留旧名称。这不是只看一段 README 就能发现的问题，所以核验必须同时看：
 
@@ -217,7 +217,7 @@ tools/pre-execute
 
 ## 七、这份学习材料仍然没有声称什么
 
-- 2,756 条索引是静态源码证据驱动的逐文件入口，不是 2,756 条人工逐行代码审查。
+- 2,973 条索引是静态源码证据驱动的逐文件入口，不是 2,973 条人工逐行代码审查。
 - GitHub topic 的 4,136 是一次公开 API 检索快照，不是插件数量、安装数量或安全名单。
 - 社区 registry 的 `verifiedAgainst` 是 registry 自己维护的字段，不等于官方认证。
 - `dsh-super-injector` 的低层注入能力是边界案例，不等于官方公开热插拔 API。
@@ -228,12 +228,12 @@ tools/pre-execute
 
 ## 固定核验链接
 
-- [官方第一个插件教程](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/cordis-tutorial/01-first-plugin.zh.md)
-- [官方生命周期与 effect](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/cordis-tutorial/02-lifecycle-and-effects.zh.md)
-- [官方进入 harness 的工具教程](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/cordis-tutorial/07-into-the-harness.zh.md)
-- [官方扩展插件手册](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/cookbook/extension-cookbook.zh.md)
-- [官方工具流水线说明](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/core/tools/README.zh.md)
-- [官方测试策略](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/testing.zh.md)
-- [官方插件打包与安装](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/user/develop/basic/publish.zh.md)
+- [官方第一个插件教程](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/cordis-tutorial/01-first-plugin.zh.md)
+- [官方生命周期与 effect](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/cordis-tutorial/02-lifecycle-and-effects.zh.md)
+- [官方进入 harness 的工具教程](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/cordis-tutorial/07-into-the-harness.zh.md)
+- [官方扩展插件手册](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/cookbook/extension-cookbook.zh.md)
+- [官方工具流水线说明](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/README.zh.md)
+- [官方测试策略](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/testing.zh.md)
+- [官方插件打包与安装](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/user/develop/basic/publish.zh.md)
 - [GitHub `dsh-plugin` topic](https://github.com/topics/dsh-plugin)
 - [本次公开 topic 查询](https://api.github.com/search/repositories?q=topic%3Adsh-plugin&per_page=30)

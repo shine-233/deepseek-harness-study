@@ -1,6 +1,6 @@
 # Agent 与 Turn 流程
 
-这一页只讲一件事：用户发出一句话后，DSH 怎样把它变成模型请求、工具执行和最终结果。官方架构里的 `Turn` 是一轮工作，`Step` 是这一轮中的一次模型请求加上它发出的工具调用。
+这一页讲用户发出一句话后，DSH 怎样把它变成模型请求、工具执行和最终结果。官方架构里的 `Turn` 是一轮工作，`Step` 是这一轮中的一次模型请求加上它发出的工具调用。
 
 ## 亲手看一次 Turn 展开
 
@@ -62,7 +62,7 @@ turn/end
 
 ## 输入不是直接塞进 prompt
 
-Agent 有 inbox。直接用户消息、注入的运行时上下文和 goal continuation 都要经过领取和事件记录。`next-turn` 的消息会唤醒下一轮，`next-step` 的消息要等当前工作继续时被领取。队列的修改会进入 `agent/inbox/spliced`，所以恢复和调试时不会只看到一个神秘的内存数组。
+Agent 有 inbox。直接用户消息、注入的运行时上下文和 goal continuation 都要经过领取和事件记录。`next-turn` 的消息会唤醒下一轮，`next-step` 的消息要等当前工作继续时被领取。队列的修改会进入 `agent/inbox/spliced`，恢复和调试时能据此从日志还原每次改动。
 
 ## `agent/pre-step` 为什么重要
 
@@ -78,7 +78,7 @@ Agent 有 inbox。直接用户消息、注入的运行时上下文和 goal conti
 
 ## 推荐阅读和验证
 
-先读[核心文件精读](03-核心文件精读.md)里的 `packages/core/agent-loop/src/agent.ts`、`packages/core/agent-loop/src/tool-calls.ts` 和 `packages/core/agent-loop/src/runtime-context.ts`，再读官方[架构中的 Turn flow](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/docs/architecture.md#turn-flow)。测试从这些开始：
+先读[核心文件精读](03-核心文件精读.md)里的 `packages/core/agent-loop/src/agent.ts`、`packages/core/agent-loop/src/tool-calls.ts` 和 `packages/core/agent-loop/src/runtime-context.ts`，再读官方[架构中的 Turn flow](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/architecture.md#turn-flow)。测试从这些开始：
 
 - `packages/core/agent-loop/tests/loop.spec.ts`
 - `packages/core/agent-loop/tests/tool-order.spec.ts`

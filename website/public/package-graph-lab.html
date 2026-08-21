@@ -101,7 +101,7 @@
         </div>
         <span class="schema-pill">行数 × 被依赖次数</span>
       </div>
-      <p class="section-intro">一个点是一个包。把鼠标停在任意一点上会显示它的行数和被依赖次数；换上面的「按组筛选」会重画这张图，只留那一组的包。只用一种颜色：49 个组无法用色相安全区分，所以组是筛选条件，不是颜色。只给落在角上的包直接标名字。</p>
+      <p class="section-intro">一个点是一个包。把鼠标停在任意一点上会显示它的行数和被依赖次数；换上面的「按组筛选」会重画这张图，只留那一组的包。只用一种颜色：50 个组无法用色相安全区分，所以组是筛选条件，不是颜色。只给落在角上的包直接标名字。</p>
       <div class="scatter-scroll" id="scatter-plot"></div>
         <p class="chart-note" id="scatter-size-legend">
           点的面积编码第三个量：这个包在当前视图里依赖了多少个别的包。三个量在固定 fixture 上两两近似不相关（相关系数 +0.15、+0.18、−0.11），所以面积不是把横纵轴换个说法重复一遍。面积按平方根映射，因为人眼比较面积而不是半径。这一列在下面的表格里逐行给出，不依赖看图。
@@ -126,16 +126,16 @@
       <div class="section-heading">
         <div>
           <p class="section-label" data-icon="cube">全局定位</p>
-          <h2 id="scene-title">49 个组的相对体量</h2>
+          <h2 id="scene-title">50 个组的相对体量</h2>
         </div>
         <span class="schema-pill">高=行数 · 环=组 · 线=依赖</span>
       </div>
-      <p class="section-intro">这一幕不是用来读数值的。要读某个包有多少行、被谁依赖，看上面的散点图和本页最后的表格——那两个都不用先点开。这里回答另一个问题：49 个组的体量差多大，排在一起是什么样子。前 14 个组占了 73% 的行数却只占 29% 的组数，这件事在表格里要逐行加，在这里一眼就看得到。</p>
+      <p class="section-intro">这一幕不是用来读数值的。要读某个包有多少行、被谁依赖，看上面的散点图和本页最后的表格——那两个都不用先点开。这里回答另一个问题：50 个组的体量差多大，排在一起是什么样子。前 14 个组占了 72% 的行数却只占 28% 的组数，这件事在表格里要逐行加，在这里一眼就看得到。</p>
       <dl class="scene-legend">
         <div><dt>柱高</dt><dd>src 行数，对数刻度（行数跨 37 到 8989，线性会把大半柱子压平）</dd></div>
         <div><dt>环上位置</dt><dd>所属组。内环是行数最多的 12 组，外环是其余 37 组</dd></div>
-        <div><dt>连线</dt><dd>peerDependencies，线宽是被依赖次数。默认不画：1089 条边叠在 219 根柱子上看不出结构</dd></div>
-        <div><dt>颜色</dt><dd>只区分内外环。49 个组无法用色相安全区分，所以组由位置承载，不由颜色承载</dd></div>
+        <div><dt>连线</dt><dd>peerDependencies，线宽是被依赖次数。默认不画：1124 条边叠在 227 根柱子上看不出结构</dd></div>
+        <div><dt>颜色</dt><dd>只区分内外环。50 个组无法用色相安全区分，所以组由位置承载，不由颜色承载</dd></div>
       </dl>
       <div class="scene-launch">
         <button class="button button-primary" id="scene-launch" type="button">启动 3D 场景</button>
@@ -143,7 +143,7 @@
       </div>
       <div class="scene-stage" id="scene-stage" hidden>
         <canvas id="scene-canvas" tabindex="0" role="img"
-          aria-label="49 个组的包体量 3D 场景：柱高是 src 行数，环上位置是所属组。精确数值在本页最后的表格里。"></canvas>
+          aria-label="50 个组的包体量 3D 场景：柱高是 src 行数，环上位置是所属组。精确数值在本页最后的表格里。"></canvas>
         <div class="scene-controls">
           <label class="scene-toggle">
             <input type="checkbox" id="scene-edges">

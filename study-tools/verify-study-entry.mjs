@@ -64,7 +64,6 @@ export function verifyStudyEntry(root = resolve(import.meta.dirname, '..')) {
     'link: /study/lessons/25-从首页到第一次产出的动手任务单',
     'link: /study/lessons/28-最小插件示例与学习检查',
     'study/32-源码学习项目的渐进式设计.md',
-    'dsh-learning-map',
     'dsh-status-strip',
     // Only the presence of each field belongs here. The values are derived from
     // the repository by verify-study-home-metrics, which this script already

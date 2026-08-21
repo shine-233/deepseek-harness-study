@@ -1,6 +1,6 @@
 {
   "generatedBy": "study-tools/generate-package-graph.mjs",
-  "commit": "47f943859bef60e4160492346772ded9b24f765a",
+  "commit": "aa6c361a972c8369148dea7380bb5c21c24e07ec",
   "meaning": {
     "node": "一个 packages/<group>/<pkg> 目录",
     "size": "该包 src/**/*.ts 的总行数",
@@ -9,11 +9,11 @@
     "notMeasured": "运行时调用次数、打包体积、导入频率都没有测量；本图只读固定提交的清单和源码行数。"
   },
   "totals": {
-    "packages": 219,
-    "groups": 49,
-    "edges": 1089,
-    "srcFiles": 1177,
-    "srcLines": 197968,
+    "packages": 227,
+    "groups": 50,
+    "edges": 1124,
+    "srcFiles": 1240,
+    "srcLines": 214713,
     "externalPeerNames": [
       "@deepseek-ai/cordis",
       "@deepseek-ai/cordis-plugin-group",
@@ -22,7 +22,6 @@
       "@deepseek-ai/cordis-plugin-loader",
       "@deepseek-ai/cordis-plugin-timer",
       "@deepseek-ai/schemastery",
-      "clsx",
       "react",
       "react-dom"
     ]
@@ -41,6 +40,7 @@
     "credentials",
     "e2b",
     "examples",
+    "experimental",
     "extensions",
     "feedback",
     "fs",
@@ -84,8 +84,8 @@
       "group": "acp",
       "directory": "acp",
       "npmName": "@deepseek-ai/dsh-acp",
-      "srcLines": 532,
-      "srcFiles": 3,
+      "srcLines": 847,
+      "srcFiles": 4,
       "private": false,
       "dependedOnBy": 1
     },
@@ -94,7 +94,7 @@
       "group": "api",
       "directory": "gateway",
       "npmName": "@deepseek-ai/dsh-api-gateway",
-      "srcLines": 1358,
+      "srcLines": 1403,
       "srcFiles": 4,
       "private": false,
       "dependedOnBy": 1
@@ -104,28 +104,28 @@
       "group": "api",
       "directory": "remotes",
       "npmName": "@deepseek-ai/dsh-api-remotes",
-      "srcLines": 449,
+      "srcLines": 458,
       "srcFiles": 6,
       "private": false,
-      "dependedOnBy": 21
+      "dependedOnBy": 22
     },
     {
       "id": "attachment/attachment",
       "group": "attachment",
       "directory": "attachment",
       "npmName": "@deepseek-ai/dsh-attachment",
-      "srcLines": 171,
-      "srcFiles": 5,
+      "srcLines": 385,
+      "srcFiles": 6,
       "private": false,
-      "dependedOnBy": 5
+      "dependedOnBy": 12
     },
     {
       "id": "attachment/attachment-local",
       "group": "attachment",
       "directory": "attachment-local",
       "npmName": "@deepseek-ai/dsh-attachment-local",
-      "srcLines": 393,
-      "srcFiles": 4,
+      "srcLines": 1270,
+      "srcFiles": 8,
       "private": false,
       "dependedOnBy": 0
     },
@@ -174,7 +174,7 @@
       "group": "bundle",
       "directory": "web-app",
       "npmName": "@deepseek-ai/dsh-web-app",
-      "srcLines": 297,
+      "srcLines": 409,
       "srcFiles": 3,
       "private": false,
       "dependedOnBy": 0
@@ -184,10 +184,10 @@
       "group": "client",
       "directory": "connection",
       "npmName": "@deepseek-ai/dsh-client-connection",
-      "srcLines": 4693,
+      "srcLines": 4822,
       "srcFiles": 16,
       "private": false,
-      "dependedOnBy": 16
+      "dependedOnBy": 19
     },
     {
       "id": "client/hmr",
@@ -204,17 +204,17 @@
       "group": "client",
       "directory": "locale",
       "npmName": "@deepseek-ai/dsh-client-locale",
-      "srcLines": 607,
+      "srcLines": 649,
       "srcFiles": 10,
       "private": false,
-      "dependedOnBy": 26
+      "dependedOnBy": 28
     },
     {
       "id": "client/modules",
       "group": "client",
       "directory": "modules",
       "npmName": "@deepseek-ai/dsh-client-modules",
-      "srcLines": 972,
+      "srcLines": 1201,
       "srcFiles": 5,
       "private": false,
       "dependedOnBy": 2
@@ -224,27 +224,17 @@
       "group": "client",
       "directory": "runtime",
       "npmName": "@deepseek-ai/dsh-client-runtime",
-      "srcLines": 8989,
-      "srcFiles": 44,
+      "srcLines": 9032,
+      "srcFiles": 43,
       "private": false,
-      "dependedOnBy": 32
-    },
-    {
-      "id": "client/schema-form",
-      "group": "client",
-      "directory": "schema-form",
-      "npmName": "@deepseek-ai/dsh-client-schema-form",
-      "srcLines": 195,
-      "srcFiles": 3,
-      "private": false,
-      "dependedOnBy": 3
+      "dependedOnBy": 37
     },
     {
       "id": "client/ui-agent-preset",
       "group": "client",
       "directory": "ui-agent-preset",
       "npmName": "@deepseek-ai/dsh-client-ui-agent-preset",
-      "srcLines": 1239,
+      "srcLines": 1243,
       "srcFiles": 8,
       "private": false,
       "dependedOnBy": 0
@@ -254,17 +244,27 @@
       "group": "client",
       "directory": "ui-attachment",
       "npmName": "@deepseek-ai/dsh-client-ui-attachment",
-      "srcLines": 53,
+      "srcLines": 123,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-brand-official",
+      "group": "client",
+      "directory": "ui-brand-official",
+      "npmName": "@deepseek-ai/dsh-client-ui-brand-official",
+      "srcLines": 60,
       "srcFiles": 3,
       "private": false,
-      "dependedOnBy": 1
+      "dependedOnBy": 0
     },
     {
       "id": "client/ui-commands",
       "group": "client",
       "directory": "ui-commands",
       "npmName": "@deepseek-ai/dsh-client-ui-commands",
-      "srcLines": 1153,
+      "srcLines": 1190,
       "srcFiles": 9,
       "private": false,
       "dependedOnBy": 3
@@ -274,10 +274,10 @@
       "group": "client",
       "directory": "ui-conversation",
       "npmName": "@deepseek-ai/dsh-client-ui-conversation",
-      "srcLines": 6670,
-      "srcFiles": 44,
+      "srcLines": 7036,
+      "srcFiles": 45,
       "private": false,
-      "dependedOnBy": 12
+      "dependedOnBy": 17
     },
     {
       "id": "client/ui-deliverables",
@@ -324,10 +324,10 @@
       "group": "client",
       "directory": "ui-input-trigger",
       "npmName": "@deepseek-ai/dsh-client-ui-input-trigger",
-      "srcLines": 1240,
+      "srcLines": 1332,
       "srcFiles": 13,
       "private": false,
-      "dependedOnBy": 7
+      "dependedOnBy": 8
     },
     {
       "id": "client/ui-jobs",
@@ -347,14 +347,14 @@
       "srcLines": 477,
       "srcFiles": 8,
       "private": false,
-      "dependedOnBy": 0
+      "dependedOnBy": 2
     },
     {
       "id": "client/ui-message-feedback",
       "group": "client",
       "directory": "ui-message-feedback",
       "npmName": "@deepseek-ai/dsh-client-ui-message-feedback",
-      "srcLines": 616,
+      "srcLines": 618,
       "srcFiles": 7,
       "private": false,
       "dependedOnBy": 0
@@ -374,7 +374,7 @@
       "group": "client",
       "directory": "ui-permission-presets",
       "npmName": "@deepseek-ai/dsh-client-ui-permission-presets",
-      "srcLines": 478,
+      "srcLines": 494,
       "srcFiles": 7,
       "private": false,
       "dependedOnBy": 0
@@ -394,27 +394,47 @@
       "group": "client",
       "directory": "ui-primitives",
       "npmName": "@deepseek-ai/dsh-client-ui-primitives",
-      "srcLines": 1787,
-      "srcFiles": 16,
+      "srcLines": 1901,
+      "srcFiles": 18,
       "private": false,
-      "dependedOnBy": 26
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-reference",
+      "group": "client",
+      "directory": "ui-reference",
+      "npmName": "@deepseek-ai/dsh-client-ui-reference",
+      "srcLines": 212,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "client/ui-renderer",
+      "group": "client",
+      "directory": "ui-renderer",
+      "npmName": "@deepseek-ai/dsh-client-ui-renderer",
+      "srcLines": 158,
+      "srcFiles": 5,
+      "private": false,
+      "dependedOnBy": 1
     },
     {
       "id": "client/ui-settings",
       "group": "client",
       "directory": "ui-settings",
       "npmName": "@deepseek-ai/dsh-client-ui-settings",
-      "srcLines": 482,
-      "srcFiles": 6,
+      "srcLines": 910,
+      "srcFiles": 8,
       "private": false,
-      "dependedOnBy": 8
+      "dependedOnBy": 9
     },
     {
       "id": "client/ui-settings-general",
       "group": "client",
       "directory": "ui-settings-general",
       "npmName": "@deepseek-ai/dsh-client-ui-settings-general",
-      "srcLines": 422,
+      "srcLines": 425,
       "srcFiles": 7,
       "private": false,
       "dependedOnBy": 0
@@ -424,8 +444,8 @@
       "group": "client",
       "directory": "ui-settings-models",
       "npmName": "@deepseek-ai/dsh-client-ui-settings-models",
-      "srcLines": 864,
-      "srcFiles": 9,
+      "srcLines": 930,
+      "srcFiles": 10,
       "private": false,
       "dependedOnBy": 0
     },
@@ -444,8 +464,8 @@
       "group": "client",
       "directory": "ui-settings-plugins",
       "npmName": "@deepseek-ai/dsh-client-ui-settings-plugins",
-      "srcLines": 986,
-      "srcFiles": 10,
+      "srcLines": 1099,
+      "srcFiles": 11,
       "private": false,
       "dependedOnBy": 0
     },
@@ -454,10 +474,10 @@
       "group": "client",
       "directory": "ui-sidebar",
       "npmName": "@deepseek-ai/dsh-client-ui-sidebar",
-      "srcLines": 207,
+      "srcLines": 238,
       "srcFiles": 6,
       "private": false,
-      "dependedOnBy": 2
+      "dependedOnBy": 4
     },
     {
       "id": "client/ui-skill",
@@ -477,14 +497,14 @@
       "srcLines": 1563,
       "srcFiles": 4,
       "private": false,
-      "dependedOnBy": 31
+      "dependedOnBy": 1
     },
     {
       "id": "client/ui-subagent",
       "group": "client",
       "directory": "ui-subagent",
       "npmName": "@deepseek-ai/dsh-client-ui-subagent",
-      "srcLines": 256,
+      "srcLines": 206,
       "srcFiles": 5,
       "private": false,
       "dependedOnBy": 0
@@ -494,8 +514,8 @@
       "group": "client",
       "directory": "ui-theme",
       "npmName": "@deepseek-ai/dsh-client-ui-theme",
-      "srcLines": 630,
-      "srcFiles": 8,
+      "srcLines": 663,
+      "srcFiles": 9,
       "private": false,
       "dependedOnBy": 2
     },
@@ -504,7 +524,7 @@
       "group": "client",
       "directory": "ui-tool",
       "npmName": "@deepseek-ai/dsh-client-ui-tool",
-      "srcLines": 1065,
+      "srcLines": 1096,
       "srcFiles": 14,
       "private": false,
       "dependedOnBy": 2
@@ -514,7 +534,7 @@
       "group": "client",
       "directory": "ui-trajectory",
       "npmName": "@deepseek-ai/dsh-client-ui-trajectory",
-      "srcLines": 3287,
+      "srcLines": 3288,
       "srcFiles": 20,
       "private": false,
       "dependedOnBy": 0
@@ -524,7 +544,7 @@
       "group": "client",
       "directory": "ui-user-questions",
       "npmName": "@deepseek-ai/dsh-client-ui-user-questions",
-      "srcLines": 290,
+      "srcLines": 294,
       "srcFiles": 6,
       "private": false,
       "dependedOnBy": 0
@@ -544,7 +564,7 @@
       "group": "client",
       "directory": "ui-workspace",
       "npmName": "@deepseek-ai/dsh-client-ui-workspace",
-      "srcLines": 985,
+      "srcLines": 990,
       "srcFiles": 8,
       "private": false,
       "dependedOnBy": 2
@@ -554,20 +574,10 @@
       "group": "client",
       "directory": "web",
       "npmName": "@deepseek-ai/dsh-client-web",
-      "srcLines": 278,
-      "srcFiles": 7,
+      "srcLines": 401,
+      "srcFiles": 8,
       "private": false,
       "dependedOnBy": 0
-    },
-    {
-      "id": "client/web-react",
-      "group": "client",
-      "directory": "web-react",
-      "npmName": "@deepseek-ai/dsh-client-web-react",
-      "srcLines": 155,
-      "srcFiles": 5,
-      "private": false,
-      "dependedOnBy": 5
     },
     {
       "id": "code-runtime/code-runtime",
@@ -578,6 +588,16 @@
       "srcFiles": 3,
       "private": false,
       "dependedOnBy": 2
+    },
+    {
+      "id": "code-runtime/code-runtime-python",
+      "group": "code-runtime",
+      "directory": "code-runtime-python",
+      "npmName": "@deepseek-ai/dsh-code-runtime-python",
+      "srcLines": 706,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
     },
     {
       "id": "code-runtime/code-runtime-worker-thread",
@@ -640,14 +660,34 @@
       "dependedOnBy": 2
     },
     {
+      "id": "context/file-reference",
+      "group": "context",
+      "directory": "file-reference",
+      "npmName": "@deepseek-ai/dsh-file-reference",
+      "srcLines": 161,
+      "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 4
+    },
+    {
+      "id": "context/file-reference-local",
+      "group": "context",
+      "directory": "file-reference-local",
+      "npmName": "@deepseek-ai/dsh-file-reference-local",
+      "srcLines": 464,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
       "id": "context/session-reference",
       "group": "context",
       "directory": "session-reference",
       "npmName": "@deepseek-ai/dsh-session-reference",
-      "srcLines": 726,
+      "srcLines": 807,
       "srcFiles": 7,
       "private": false,
-      "dependedOnBy": 0
+      "dependedOnBy": 2
     },
     {
       "id": "context/time-context",
@@ -677,7 +717,7 @@
       "srcLines": 1636,
       "srcFiles": 8,
       "private": false,
-      "dependedOnBy": 58
+      "dependedOnBy": 64
     },
     {
       "id": "core/agent-default-model",
@@ -694,7 +734,7 @@
       "group": "core",
       "directory": "agent-loop",
       "npmName": "@deepseek-ai/dsh-agent-loop",
-      "srcLines": 1643,
+      "srcLines": 1662,
       "srcFiles": 6,
       "private": false,
       "dependedOnBy": 1
@@ -724,10 +764,10 @@
       "group": "core",
       "directory": "session",
       "npmName": "@deepseek-ai/dsh-session",
-      "srcLines": 3156,
+      "srcLines": 3164,
       "srcFiles": 10,
       "private": false,
-      "dependedOnBy": 80
+      "dependedOnBy": 85
     },
     {
       "id": "core/system-prompt",
@@ -737,34 +777,44 @@
       "srcLines": 605,
       "srcFiles": 2,
       "private": false,
-      "dependedOnBy": 29
+      "dependedOnBy": 31
     },
     {
       "id": "core/tools",
       "group": "core",
       "directory": "tools",
       "npmName": "@deepseek-ai/dsh-tools",
-      "srcLines": 5620,
+      "srcLines": 5628,
       "srcFiles": 10,
       "private": false,
-      "dependedOnBy": 43
+      "dependedOnBy": 48
+    },
+    {
+      "id": "credentials/authorization",
+      "group": "credentials",
+      "directory": "authorization",
+      "npmName": "@deepseek-ai/dsh-authorization",
+      "srcLines": 573,
+      "srcFiles": 3,
+      "private": false,
+      "dependedOnBy": 1
     },
     {
       "id": "credentials/credentials",
       "group": "credentials",
       "directory": "credentials",
       "npmName": "@deepseek-ai/dsh-credentials",
-      "srcLines": 214,
+      "srcLines": 450,
       "srcFiles": 3,
       "private": false,
-      "dependedOnBy": 5
+      "dependedOnBy": 6
     },
     {
       "id": "credentials/credentials-local",
       "group": "credentials",
       "directory": "credentials-local",
       "npmName": "@deepseek-ai/dsh-credentials-local",
-      "srcLines": 527,
+      "srcLines": 966,
       "srcFiles": 2,
       "private": false,
       "dependedOnBy": 0
@@ -830,11 +880,31 @@
       "dependedOnBy": 0
     },
     {
+      "id": "experimental/agent-team",
+      "group": "experimental",
+      "directory": "agent-team",
+      "npmName": "@deepseek-ai/dsh-experimental-agent-team",
+      "srcLines": 2327,
+      "srcFiles": 14,
+      "private": true,
+      "dependedOnBy": 1
+    },
+    {
+      "id": "experimental/tool-agent-team",
+      "group": "experimental",
+      "directory": "tool-agent-team",
+      "npmName": "@deepseek-ai/dsh-experimental-tool-agent-team",
+      "srcLines": 436,
+      "srcFiles": 2,
+      "private": true,
+      "dependedOnBy": 0
+    },
+    {
       "id": "extensions/cordis-client-runner",
       "group": "extensions",
       "directory": "cordis-client-runner",
       "npmName": "@deepseek-ai/dsh-cordis-client-runner",
-      "srcLines": 5080,
+      "srcLines": 5246,
       "srcFiles": 12,
       "private": false,
       "dependedOnBy": 1
@@ -844,7 +914,7 @@
       "group": "extensions",
       "directory": "cordis-host-runner",
       "npmName": "@deepseek-ai/dsh-cordis-host-runner",
-      "srcLines": 3360,
+      "srcLines": 3387,
       "srcFiles": 8,
       "private": false,
       "dependedOnBy": 3
@@ -854,7 +924,7 @@
       "group": "extensions",
       "directory": "tool-cordis",
       "npmName": "@deepseek-ai/dsh-tool-cordis",
-      "srcLines": 5984,
+      "srcLines": 6392,
       "srcFiles": 8,
       "private": false,
       "dependedOnBy": 0
@@ -934,7 +1004,7 @@
       "group": "fs",
       "directory": "tool-fs",
       "npmName": "@deepseek-ai/dsh-tool-fs",
-      "srcLines": 1463,
+      "srcLines": 1517,
       "srcFiles": 12,
       "private": false,
       "dependedOnBy": 0
@@ -944,7 +1014,7 @@
       "group": "fs",
       "directory": "tool-fs-search",
       "npmName": "@deepseek-ai/dsh-tool-fs-search",
-      "srcLines": 1574,
+      "srcLines": 1578,
       "srcFiles": 8,
       "private": false,
       "dependedOnBy": 0
@@ -964,7 +1034,7 @@
       "group": "goal",
       "directory": "command-goal",
       "npmName": "@deepseek-ai/dsh-command-goal",
-      "srcLines": 200,
+      "srcLines": 226,
       "srcFiles": 2,
       "private": false,
       "dependedOnBy": 0
@@ -974,10 +1044,10 @@
       "group": "goal",
       "directory": "goal",
       "npmName": "@deepseek-ai/dsh-goal",
-      "srcLines": 1288,
+      "srcLines": 1291,
       "srcFiles": 7,
       "private": false,
-      "dependedOnBy": 6
+      "dependedOnBy": 7
     },
     {
       "id": "goal/goal-round-driver",
@@ -1054,10 +1124,10 @@
       "group": "host",
       "directory": "apiproxy",
       "npmName": "@deepseek-ai/dsh-host-apiproxy",
-      "srcLines": 8571,
+      "srcLines": 8470,
       "srcFiles": 42,
       "private": false,
-      "dependedOnBy": 1
+      "dependedOnBy": 3
     },
     {
       "id": "host/directory-picker",
@@ -1104,7 +1174,7 @@
       "group": "host",
       "directory": "frontend-static",
       "npmName": "@deepseek-ai/dsh-host-frontend-static",
-      "srcLines": 144,
+      "srcLines": 155,
       "srcFiles": 2,
       "private": false,
       "dependedOnBy": 0
@@ -1124,10 +1194,10 @@
       "group": "host",
       "directory": "webserver",
       "npmName": "@deepseek-ai/dsh-host-webserver",
-      "srcLines": 325,
-      "srcFiles": 2,
+      "srcLines": 466,
+      "srcFiles": 3,
       "private": false,
-      "dependedOnBy": 5
+      "dependedOnBy": 6
     },
     {
       "id": "identity/anonymous-user-id",
@@ -1144,20 +1214,20 @@
       "group": "interaction",
       "directory": "commands",
       "npmName": "@deepseek-ai/dsh-commands",
-      "srcLines": 583,
+      "srcLines": 661,
       "srcFiles": 4,
       "private": false,
-      "dependedOnBy": 12
+      "dependedOnBy": 14
     },
     {
       "id": "interaction/permission-presets",
       "group": "interaction",
       "directory": "permission-presets",
       "npmName": "@deepseek-ai/dsh-permission-presets",
-      "srcLines": 526,
+      "srcLines": 542,
       "srcFiles": 4,
       "private": false,
-      "dependedOnBy": 1
+      "dependedOnBy": 2
     },
     {
       "id": "interaction/tool-ask-user",
@@ -1224,18 +1294,18 @@
       "group": "llm",
       "directory": "llm",
       "npmName": "@deepseek-ai/dsh-llm",
-      "srcLines": 2625,
+      "srcLines": 2958,
       "srcFiles": 14,
       "private": false,
-      "dependedOnBy": 78
+      "dependedOnBy": 86
     },
     {
       "id": "llm/llm-deepseek",
       "group": "llm",
       "directory": "llm-deepseek",
       "npmName": "@deepseek-ai/dsh-llm-deepseek",
-      "srcLines": 1216,
-      "srcFiles": 7,
+      "srcLines": 2831,
+      "srcFiles": 11,
       "private": false,
       "dependedOnBy": 1
     },
@@ -1244,8 +1314,8 @@
       "group": "llm",
       "directory": "llm-pi-ai",
       "npmName": "@deepseek-ai/dsh-llm-pi-ai",
-      "srcLines": 2706,
-      "srcFiles": 10,
+      "srcLines": 3710,
+      "srcFiles": 12,
       "private": false,
       "dependedOnBy": 0
     },
@@ -1257,14 +1327,14 @@
       "srcLines": 494,
       "srcFiles": 5,
       "private": false,
-      "dependedOnBy": 2
+      "dependedOnBy": 3
     },
     {
       "id": "llm/token-meter",
       "group": "llm",
       "directory": "token-meter",
       "npmName": "@deepseek-ai/dsh-token-meter",
-      "srcLines": 999,
+      "srcLines": 1027,
       "srcFiles": 10,
       "private": false,
       "dependedOnBy": 4
@@ -1304,7 +1374,7 @@
       "group": "mcp",
       "directory": "mcp-client",
       "npmName": "@deepseek-ai/dsh-mcp-client",
-      "srcLines": 929,
+      "srcLines": 1171,
       "srcFiles": 5,
       "private": false,
       "dependedOnBy": 0
@@ -1314,10 +1384,10 @@
       "group": "plan",
       "directory": "plan-mode",
       "npmName": "@deepseek-ai/dsh-plan-mode",
-      "srcLines": 563,
+      "srcLines": 601,
       "srcFiles": 4,
       "private": false,
-      "dependedOnBy": 1
+      "dependedOnBy": 2
     },
     {
       "id": "preset/agent-presets",
@@ -1347,7 +1417,7 @@
       "srcLines": 230,
       "srcFiles": 2,
       "private": false,
-      "dependedOnBy": 218
+      "dependedOnBy": 226
     },
     {
       "id": "sandbox/sandbox",
@@ -1417,14 +1487,14 @@
       "srcLines": 440,
       "srcFiles": 4,
       "private": false,
-      "dependedOnBy": 3
+      "dependedOnBy": 2
     },
     {
       "id": "sdk/server",
       "group": "sdk",
       "directory": "server",
       "npmName": "@deepseek-ai/dsh-sdk-jsonrpc-server",
-      "srcLines": 362,
+      "srcLines": 368,
       "srcFiles": 3,
       "private": false,
       "dependedOnBy": 0
@@ -1484,10 +1554,10 @@
       "group": "session",
       "directory": "session-persistence",
       "npmName": "@deepseek-ai/dsh-session-persistence",
-      "srcLines": 2159,
+      "srcLines": 2160,
       "srcFiles": 6,
       "private": false,
-      "dependedOnBy": 15
+      "dependedOnBy": 16
     },
     {
       "id": "session/session-persistence-jsonl",
@@ -1504,8 +1574,8 @@
       "group": "session",
       "directory": "session-persistence-sqlite",
       "npmName": "@deepseek-ai/dsh-session-persistence-sqlite",
-      "srcLines": 714,
-      "srcFiles": 3,
+      "srcLines": 1742,
+      "srcFiles": 7,
       "private": false,
       "dependedOnBy": 0
     },
@@ -1514,17 +1584,17 @@
       "group": "session",
       "directory": "session-projection",
       "npmName": "@deepseek-ai/dsh-session-projection",
-      "srcLines": 483,
+      "srcLines": 559,
       "srcFiles": 3,
       "private": false,
-      "dependedOnBy": 9
+      "dependedOnBy": 10
     },
     {
       "id": "session/session-projection-cache",
       "group": "session",
       "directory": "session-projection-cache",
       "npmName": "@deepseek-ai/dsh-session-projection-cache",
-      "srcLines": 405,
+      "srcLines": 404,
       "srcFiles": 3,
       "private": false,
       "dependedOnBy": 1
@@ -1534,7 +1604,7 @@
       "group": "session",
       "directory": "session-stats",
       "npmName": "@deepseek-ai/dsh-session-stats",
-      "srcLines": 303,
+      "srcLines": 329,
       "srcFiles": 5,
       "private": false,
       "dependedOnBy": 1
@@ -1564,10 +1634,10 @@
       "group": "session",
       "directory": "session-title",
       "npmName": "@deepseek-ai/dsh-session-title",
-      "srcLines": 948,
+      "srcLines": 952,
       "srcFiles": 5,
       "private": false,
-      "dependedOnBy": 5
+      "dependedOnBy": 6
     },
     {
       "id": "session/session-title-all-prompts-llm",
@@ -1607,7 +1677,7 @@
       "srcLines": 1106,
       "srcFiles": 4,
       "private": false,
-      "dependedOnBy": 13
+      "dependedOnBy": 17
     },
     {
       "id": "settings/settings-file",
@@ -1694,7 +1764,7 @@
       "group": "shell",
       "directory": "tool-bash-persistent",
       "npmName": "@deepseek-ai/dsh-tool-bash-persistent",
-      "srcLines": 476,
+      "srcLines": 503,
       "srcFiles": 2,
       "private": false,
       "dependedOnBy": 0
@@ -1706,6 +1776,16 @@
       "npmName": "@deepseek-ai/dsh-tool-pwsh",
       "srcLines": 620,
       "srcFiles": 4,
+      "private": false,
+      "dependedOnBy": 0
+    },
+    {
+      "id": "shell/tool-pwsh-persistent",
+      "group": "shell",
+      "directory": "tool-pwsh-persistent",
+      "npmName": "@deepseek-ai/dsh-tool-pwsh-persistent",
+      "srcLines": 545,
+      "srcFiles": 2,
       "private": false,
       "dependedOnBy": 0
     },
@@ -1824,10 +1904,10 @@
       "group": "subagent",
       "directory": "subagent",
       "npmName": "@deepseek-ai/dsh-subagent",
-      "srcLines": 4531,
+      "srcLines": 4684,
       "srcFiles": 18,
       "private": false,
-      "dependedOnBy": 16
+      "dependedOnBy": 17
     },
     {
       "id": "subagent/subagent-acp",
@@ -1844,7 +1924,7 @@
       "group": "subagent",
       "directory": "subagent-claude-code",
       "npmName": "@deepseek-ai/dsh-subagent-claude-code",
-      "srcLines": 604,
+      "srcLines": 936,
       "srcFiles": 4,
       "private": false,
       "dependedOnBy": 0
@@ -1854,7 +1934,7 @@
       "group": "subagent",
       "directory": "subagent-codex",
       "npmName": "@deepseek-ai/dsh-subagent-codex",
-      "srcLines": 705,
+      "srcLines": 1348,
       "srcFiles": 4,
       "private": false,
       "dependedOnBy": 0
@@ -1904,7 +1984,7 @@
       "group": "subagent",
       "directory": "tool-subagent",
       "npmName": "@deepseek-ai/dsh-tool-subagent",
-      "srcLines": 497,
+      "srcLines": 506,
       "srcFiles": 2,
       "private": false,
       "dependedOnBy": 0
@@ -1944,8 +2024,8 @@
       "group": "subprocess",
       "directory": "subprocess-local",
       "npmName": "@deepseek-ai/dsh-subprocess-local",
-      "srcLines": 1391,
-      "srcFiles": 5,
+      "srcLines": 1792,
+      "srcFiles": 6,
       "private": false,
       "dependedOnBy": 0
     },
@@ -1957,14 +2037,14 @@
       "srcLines": 683,
       "srcFiles": 3,
       "private": false,
-      "dependedOnBy": 3
+      "dependedOnBy": 4
     },
     {
       "id": "terminal/terminal-bash",
       "group": "terminal",
       "directory": "terminal-bash",
       "npmName": "@deepseek-ai/dsh-terminal-bash",
-      "srcLines": 1017,
+      "srcLines": 1116,
       "srcFiles": 5,
       "private": false,
       "dependedOnBy": 0
@@ -1984,7 +2064,7 @@
       "group": "test-support",
       "directory": "acp-snapshot",
       "npmName": "@deepseek-ai/dsh-acp-snapshot",
-      "srcLines": 3162,
+      "srcLines": 3218,
       "srcFiles": 6,
       "private": false,
       "dependedOnBy": 0
@@ -2004,7 +2084,7 @@
       "group": "test-support",
       "directory": "client-runtime",
       "npmName": "@deepseek-ai/dsh-client-test-runtime",
-      "srcLines": 1517,
+      "srcLines": 1537,
       "srcFiles": 10,
       "private": false,
       "dependedOnBy": 0
@@ -2024,7 +2104,7 @@
       "group": "test-support",
       "directory": "llm-replay",
       "npmName": "@deepseek-ai/dsh-llm-replay",
-      "srcLines": 856,
+      "srcLines": 889,
       "srcFiles": 2,
       "private": false,
       "dependedOnBy": 0
@@ -2044,17 +2124,17 @@
       "group": "todo",
       "directory": "tool-todo",
       "npmName": "@deepseek-ai/dsh-tool-todo",
-      "srcLines": 326,
+      "srcLines": 329,
       "srcFiles": 4,
       "private": false,
-      "dependedOnBy": 0
+      "dependedOnBy": 1
     },
     {
       "id": "typert/generator",
       "group": "typert",
       "directory": "generator",
       "npmName": "@deepseek-ai/dsh-typert-generator",
-      "srcLines": 6245,
+      "srcLines": 6251,
       "srcFiles": 9,
       "private": false,
       "dependedOnBy": 0
@@ -2077,7 +2157,7 @@
       "srcLines": 801,
       "srcFiles": 3,
       "private": false,
-      "dependedOnBy": 9
+      "dependedOnBy": 13
     },
     {
       "id": "typert/registry",
@@ -2094,10 +2174,10 @@
       "group": "util",
       "directory": "atomic-write",
       "npmName": "@deepseek-ai/dsh-atomic-write",
-      "srcLines": 148,
+      "srcLines": 184,
       "srcFiles": 2,
       "private": false,
-      "dependedOnBy": 3
+      "dependedOnBy": 4
     },
     {
       "id": "util/brand",
@@ -2107,7 +2187,7 @@
       "srcLines": 57,
       "srcFiles": 2,
       "private": false,
-      "dependedOnBy": 29
+      "dependedOnBy": 31
     },
     {
       "id": "util/home-paths",
@@ -2117,7 +2197,7 @@
       "srcLines": 142,
       "srcFiles": 2,
       "private": false,
-      "dependedOnBy": 10
+      "dependedOnBy": 11
     },
     {
       "id": "util/launch-environment",
@@ -2157,14 +2237,14 @@
       "srcLines": 220,
       "srcFiles": 2,
       "private": false,
-      "dependedOnBy": 23
+      "dependedOnBy": 24
     },
     {
       "id": "web/tool-web",
       "group": "web",
       "directory": "tool-web",
       "npmName": "@deepseek-ai/dsh-tool-web",
-      "srcLines": 902,
+      "srcLines": 1008,
       "srcFiles": 5,
       "private": false,
       "dependedOnBy": 0
@@ -2174,7 +2254,7 @@
       "group": "web",
       "directory": "web",
       "npmName": "@deepseek-ai/dsh-web",
-      "srcLines": 361,
+      "srcLines": 362,
       "srcFiles": 3,
       "private": false,
       "dependedOnBy": 5
@@ -2273,6 +2353,10 @@
   "edges": [
     {
       "from": "acp/acp",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "acp/acp",
       "to": "core/agent"
     },
     {
@@ -2282,6 +2366,10 @@
     {
       "from": "acp/acp",
       "to": "interaction/user-approval"
+    },
+    {
+      "from": "acp/acp",
+      "to": "llm/llm"
     },
     {
       "from": "acp/acp",
@@ -2302,6 +2390,14 @@
     {
       "from": "api/remotes",
       "to": "api/gateway"
+    },
+    {
+      "from": "api/remotes",
+      "to": "context/file-reference"
+    },
+    {
+      "from": "api/remotes",
+      "to": "context/session-reference"
     },
     {
       "from": "api/remotes",
@@ -2437,7 +2533,31 @@
     },
     {
       "from": "client/connection",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "client/connection",
+      "to": "core/session"
+    },
+    {
+      "from": "client/connection",
+      "to": "core/tools"
+    },
+    {
+      "from": "client/connection",
+      "to": "host/apiproxy"
+    },
+    {
+      "from": "client/connection",
       "to": "host/webserver"
+    },
+    {
+      "from": "client/connection",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "client/connection",
+      "to": "llm/llm"
     },
     {
       "from": "client/connection",
@@ -2469,19 +2589,19 @@
     },
     {
       "from": "client/locale",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/locale",
       "to": "client/ui-settings"
     },
     {
       "from": "client/locale",
-      "to": "client/ui-slots"
+      "to": "runtime-diagnostics/invariants"
     },
     {
       "from": "client/locale",
-      "to": "runtime-diagnostics/invariants"
+      "to": "settings/settings"
+    },
+    {
+      "from": "client/modules",
+      "to": "host/webserver"
     },
     {
       "from": "client/modules",
@@ -2493,7 +2613,51 @@
     },
     {
       "from": "client/runtime",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "client/runtime",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/runtime",
+      "to": "core/agent"
+    },
+    {
+      "from": "client/runtime",
+      "to": "core/session"
+    },
+    {
+      "from": "client/runtime",
+      "to": "core/tools"
+    },
+    {
+      "from": "client/runtime",
+      "to": "host/apiproxy"
+    },
+    {
+      "from": "client/runtime",
+      "to": "interaction/commands"
+    },
+    {
+      "from": "client/runtime",
+      "to": "llm/llm"
+    },
+    {
+      "from": "client/runtime",
+      "to": "llm/llm-retry"
+    },
+    {
+      "from": "client/runtime",
       "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/runtime",
+      "to": "session/session-projection"
+    },
+    {
+      "from": "client/runtime",
+      "to": "session/session-title"
     },
     {
       "from": "client/runtime",
@@ -2502,10 +2666,6 @@
     {
       "from": "client/runtime",
       "to": "typert/registry"
-    },
-    {
-      "from": "client/schema-form",
-      "to": "runtime-diagnostics/invariants"
     },
     {
       "from": "client/ui-agent-preset",
@@ -2529,19 +2689,7 @@
     },
     {
       "from": "client/ui-agent-preset",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-agent-preset",
       "to": "client/ui-settings"
-    },
-    {
-      "from": "client/ui-agent-preset",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-agent-preset",
-      "to": "client/web-react"
     },
     {
       "from": "client/ui-agent-preset",
@@ -2549,6 +2697,34 @@
     },
     {
       "from": "client/ui-attachment",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "client/ui-attachment",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-attachment",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-attachment",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-brand-official",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-brand-official",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-brand-official",
+      "to": "client/ui-sidebar"
+    },
+    {
+      "from": "client/ui-brand-official",
       "to": "runtime-diagnostics/invariants"
     },
     {
@@ -2570,14 +2746,6 @@
     {
       "from": "client/ui-commands",
       "to": "client/ui-input-trigger"
-    },
-    {
-      "from": "client/ui-commands",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-commands",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-commands",
@@ -2609,23 +2777,15 @@
     },
     {
       "from": "client/ui-conversation",
-      "to": "client/ui-attachment"
-    },
-    {
-      "from": "client/ui-conversation",
       "to": "client/ui-input-trigger"
     },
     {
       "from": "client/ui-conversation",
-      "to": "client/ui-primitives"
+      "to": "client/ui-layout"
     },
     {
       "from": "client/ui-conversation",
       "to": "client/ui-settings"
-    },
-    {
-      "from": "client/ui-conversation",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-conversation",
@@ -2641,7 +2801,15 @@
     },
     {
       "from": "client/ui-conversation",
+      "to": "goal/goal"
+    },
+    {
+      "from": "client/ui-conversation",
       "to": "interaction/commands"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "interaction/permission-presets"
     },
     {
       "from": "client/ui-conversation",
@@ -2653,11 +2821,23 @@
     },
     {
       "from": "client/ui-conversation",
+      "to": "plan/plan-mode"
+    },
+    {
+      "from": "client/ui-conversation",
       "to": "runtime-diagnostics/invariants"
     },
     {
       "from": "client/ui-conversation",
       "to": "session/session-stats"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "settings/settings"
+    },
+    {
+      "from": "client/ui-conversation",
+      "to": "todo/tool-todo"
     },
     {
       "from": "client/ui-conversation",
@@ -2681,10 +2861,6 @@
     },
     {
       "from": "client/ui-deliverables",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-deliverables",
       "to": "core/system-prompt"
     },
     {
@@ -2701,14 +2877,6 @@
     },
     {
       "from": "client/ui-directory-picker-browse",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-directory-picker-browse",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-directory-picker-browse",
       "to": "client/ui-workspace"
     },
     {
@@ -2718,10 +2886,6 @@
     {
       "from": "client/ui-directory-picker-native",
       "to": "client/runtime"
-    },
-    {
-      "from": "client/ui-directory-picker-native",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-directory-picker-native",
@@ -2749,11 +2913,7 @@
     },
     {
       "from": "client/ui-goal",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-goal",
-      "to": "client/ui-slots"
+      "to": "core/session"
     },
     {
       "from": "client/ui-goal",
@@ -2768,6 +2928,10 @@
       "to": "runtime-diagnostics/invariants"
     },
     {
+      "from": "client/ui-goal",
+      "to": "typert/protocol"
+    },
+    {
       "from": "client/ui-input-trigger",
       "to": "client/locale"
     },
@@ -2777,11 +2941,7 @@
     },
     {
       "from": "client/ui-input-trigger",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-input-trigger",
-      "to": "client/ui-slots"
+      "to": "context/file-reference"
     },
     {
       "from": "client/ui-input-trigger",
@@ -2801,23 +2961,11 @@
     },
     {
       "from": "client/ui-jobs",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-jobs",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-jobs",
       "to": "runtime-diagnostics/invariants"
     },
     {
       "from": "client/ui-layout",
       "to": "client/runtime"
-    },
-    {
-      "from": "client/ui-layout",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-layout",
@@ -2846,14 +2994,6 @@
     {
       "from": "client/ui-message-feedback",
       "to": "client/ui-conversation"
-    },
-    {
-      "from": "client/ui-message-feedback",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-message-feedback",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-message-feedback",
@@ -2897,14 +3037,6 @@
     },
     {
       "from": "client/ui-model-selection",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-model-selection",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-model-selection",
       "to": "runtime-diagnostics/invariants"
     },
     {
@@ -2925,10 +3057,6 @@
     },
     {
       "from": "client/ui-permission-presets",
-      "to": "client/schema-form"
-    },
-    {
-      "from": "client/ui-permission-presets",
       "to": "client/ui-commands"
     },
     {
@@ -2937,15 +3065,7 @@
     },
     {
       "from": "client/ui-permission-presets",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-permission-presets",
       "to": "client/ui-settings"
-    },
-    {
-      "from": "client/ui-permission-presets",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-permission-presets",
@@ -2973,14 +3093,6 @@
     },
     {
       "from": "client/ui-plan",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-plan",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-plan",
       "to": "plan/plan-mode"
     },
     {
@@ -2989,6 +3101,46 @@
     },
     {
       "from": "client/ui-primitives",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "client/ui-input-trigger"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "context/file-reference"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "context/session-reference"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-reference",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "client/ui-renderer",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-renderer",
       "to": "runtime-diagnostics/invariants"
     },
     {
@@ -3002,14 +3154,6 @@
     {
       "from": "client/ui-settings",
       "to": "client/runtime"
-    },
-    {
-      "from": "client/ui-settings",
-      "to": "client/schema-form"
-    },
-    {
-      "from": "client/ui-settings",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-settings",
@@ -3037,10 +3181,6 @@
     },
     {
       "from": "client/ui-settings-general",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-settings-general",
       "to": "client/ui-settings"
     },
     {
@@ -3049,15 +3189,11 @@
     },
     {
       "from": "client/ui-settings-general",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-settings-general",
-      "to": "client/web-react"
-    },
-    {
-      "from": "client/ui-settings-general",
       "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "client/ui-settings-general",
+      "to": "settings/settings"
     },
     {
       "from": "client/ui-settings-models",
@@ -3069,23 +3205,15 @@
     },
     {
       "from": "client/ui-settings-models",
+      "to": "client/locale"
+    },
+    {
+      "from": "client/ui-settings-models",
       "to": "client/runtime"
     },
     {
       "from": "client/ui-settings-models",
-      "to": "client/schema-form"
-    },
-    {
-      "from": "client/ui-settings-models",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-settings-models",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-settings-models",
-      "to": "client/web-react"
+      "to": "client/ui-settings"
     },
     {
       "from": "client/ui-settings-models",
@@ -3105,15 +3233,7 @@
     },
     {
       "from": "client/ui-settings-plugin-inventory",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-settings-plugin-inventory",
       "to": "client/ui-settings"
-    },
-    {
-      "from": "client/ui-settings-plugin-inventory",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-settings-plugin-inventory",
@@ -3137,19 +3257,7 @@
     },
     {
       "from": "client/ui-settings-plugins",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-settings-plugins",
       "to": "client/ui-settings"
-    },
-    {
-      "from": "client/ui-settings-plugins",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-settings-plugins",
-      "to": "client/web-react"
     },
     {
       "from": "client/ui-settings-plugins",
@@ -3165,11 +3273,7 @@
     },
     {
       "from": "client/ui-sidebar",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-sidebar",
-      "to": "client/ui-slots"
+      "to": "client/ui-layout"
     },
     {
       "from": "client/ui-sidebar",
@@ -3194,14 +3298,6 @@
     {
       "from": "client/ui-skill",
       "to": "client/ui-input-trigger"
-    },
-    {
-      "from": "client/ui-skill",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-skill",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-skill",
@@ -3233,14 +3329,6 @@
     },
     {
       "from": "client/ui-subagent",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-subagent",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-subagent",
       "to": "llm/token-meter"
     },
     {
@@ -3269,15 +3357,7 @@
     },
     {
       "from": "client/ui-theme",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-theme",
       "to": "client/ui-settings"
-    },
-    {
-      "from": "client/ui-theme",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-theme",
@@ -3288,8 +3368,16 @@
       "to": "runtime-diagnostics/invariants"
     },
     {
+      "from": "client/ui-theme",
+      "to": "settings/settings"
+    },
+    {
       "from": "client/ui-tool",
       "to": "api/remotes"
+    },
+    {
+      "from": "client/ui-tool",
+      "to": "client/connection"
     },
     {
       "from": "client/ui-tool",
@@ -3305,14 +3393,6 @@
     },
     {
       "from": "client/ui-tool",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-tool",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "client/ui-tool",
       "to": "runtime-diagnostics/invariants"
     },
     {
@@ -3325,7 +3405,7 @@
     },
     {
       "from": "client/ui-trajectory",
-      "to": "client/ui-primitives"
+      "to": "client/ui-conversation"
     },
     {
       "from": "client/ui-trajectory",
@@ -3353,6 +3433,14 @@
     },
     {
       "from": "client/ui-user-questions",
+      "to": "client/runtime"
+    },
+    {
+      "from": "client/ui-user-questions",
+      "to": "client/ui-conversation"
+    },
+    {
+      "from": "client/ui-user-questions",
       "to": "runtime-diagnostics/invariants"
     },
     {
@@ -3366,14 +3454,6 @@
     {
       "from": "client/ui-workflow-run",
       "to": "client/ui-conversation"
-    },
-    {
-      "from": "client/ui-workflow-run",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "client/ui-workflow-run",
-      "to": "client/ui-slots"
     },
     {
       "from": "client/ui-workflow-run",
@@ -3393,6 +3473,10 @@
     },
     {
       "from": "client/ui-workspace",
+      "to": "client/connection"
+    },
+    {
+      "from": "client/ui-workspace",
       "to": "client/locale"
     },
     {
@@ -3401,11 +3485,11 @@
     },
     {
       "from": "client/ui-workspace",
-      "to": "client/ui-primitives"
+      "to": "client/ui-conversation"
     },
     {
       "from": "client/ui-workspace",
-      "to": "client/ui-slots"
+      "to": "client/ui-sidebar"
     },
     {
       "from": "client/ui-workspace",
@@ -3416,11 +3500,11 @@
       "to": "runtime-diagnostics/invariants"
     },
     {
-      "from": "client/web-react",
+      "from": "code-runtime/code-runtime",
       "to": "runtime-diagnostics/invariants"
     },
     {
-      "from": "code-runtime/code-runtime",
+      "from": "code-runtime/code-runtime-python",
       "to": "runtime-diagnostics/invariants"
     },
     {
@@ -3552,6 +3636,38 @@
       "to": "util/home-paths"
     },
     {
+      "from": "context/file-reference",
+      "to": "core/agent"
+    },
+    {
+      "from": "context/file-reference",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "context/file-reference",
+      "to": "typert/protocol"
+    },
+    {
+      "from": "context/file-reference-local",
+      "to": "context/file-reference"
+    },
+    {
+      "from": "context/file-reference-local",
+      "to": "core/agent"
+    },
+    {
+      "from": "context/file-reference-local",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "context/file-reference-local",
+      "to": "core/tools"
+    },
+    {
+      "from": "context/file-reference-local",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
       "from": "context/session-reference",
       "to": "compaction/compaction"
     },
@@ -3574,6 +3690,10 @@
     {
       "from": "context/session-reference",
       "to": "session-query/session-query"
+    },
+    {
+      "from": "context/session-reference",
+      "to": "typert/protocol"
     },
     {
       "from": "context/session-reference",
@@ -3757,6 +3877,18 @@
     },
     {
       "from": "core/tools",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "credentials/authorization",
+      "to": "credentials/credentials"
+    },
+    {
+      "from": "credentials/authorization",
+      "to": "llm/llm"
+    },
+    {
+      "from": "credentials/authorization",
       "to": "runtime-diagnostics/invariants"
     },
     {
@@ -3952,6 +4084,58 @@
       "to": "runtime-diagnostics/invariants"
     },
     {
+      "from": "experimental/agent-team",
+      "to": "core/agent"
+    },
+    {
+      "from": "experimental/agent-team",
+      "to": "core/session"
+    },
+    {
+      "from": "experimental/agent-team",
+      "to": "llm/llm"
+    },
+    {
+      "from": "experimental/agent-team",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "experimental/agent-team",
+      "to": "session/session-persistence"
+    },
+    {
+      "from": "experimental/agent-team",
+      "to": "subagent/subagent"
+    },
+    {
+      "from": "experimental/agent-team",
+      "to": "util/brand"
+    },
+    {
+      "from": "experimental/tool-agent-team",
+      "to": "core/agent"
+    },
+    {
+      "from": "experimental/tool-agent-team",
+      "to": "core/session"
+    },
+    {
+      "from": "experimental/tool-agent-team",
+      "to": "core/system-prompt"
+    },
+    {
+      "from": "experimental/tool-agent-team",
+      "to": "core/tools"
+    },
+    {
+      "from": "experimental/tool-agent-team",
+      "to": "experimental/agent-team"
+    },
+    {
+      "from": "experimental/tool-agent-team",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
       "from": "extensions/cordis-client-runner",
       "to": "api/remotes"
     },
@@ -3966,10 +4150,6 @@
     {
       "from": "extensions/cordis-client-runner",
       "to": "client/runtime"
-    },
-    {
-      "from": "extensions/cordis-client-runner",
-      "to": "client/ui-slots"
     },
     {
       "from": "extensions/cordis-client-runner",
@@ -4065,15 +4245,7 @@
     },
     {
       "from": "extensions/ui-cordis",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "extensions/ui-cordis",
       "to": "client/ui-sidebar"
-    },
-    {
-      "from": "extensions/ui-cordis",
-      "to": "client/ui-slots"
     },
     {
       "from": "extensions/ui-cordis",
@@ -4290,6 +4462,10 @@
     {
       "from": "goal/command-goal",
       "to": "interaction/commands"
+    },
+    {
+      "from": "goal/command-goal",
+      "to": "llm/llm"
     },
     {
       "from": "goal/command-goal",
@@ -4561,6 +4737,10 @@
     },
     {
       "from": "interaction/commands",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "interaction/commands",
       "to": "core/agent"
     },
     {
@@ -4570,6 +4750,10 @@
     {
       "from": "interaction/commands",
       "to": "core/session"
+    },
+    {
+      "from": "interaction/commands",
+      "to": "llm/llm"
     },
     {
       "from": "interaction/commands",
@@ -4757,6 +4941,10 @@
     },
     {
       "from": "llm/llm-deepseek",
+      "to": "attachment/attachment"
+    },
+    {
+      "from": "llm/llm-deepseek",
       "to": "credentials/credentials"
     },
     {
@@ -4777,6 +4965,18 @@
     },
     {
       "from": "llm/llm-deepseek",
+      "to": "util/atomic-write"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "util/brand"
+    },
+    {
+      "from": "llm/llm-deepseek",
+      "to": "util/home-paths"
+    },
+    {
+      "from": "llm/llm-deepseek",
       "to": "util/launch-environment"
     },
     {
@@ -4786,6 +4986,10 @@
     {
       "from": "llm/llm-pi-ai",
       "to": "attachment/attachment"
+    },
+    {
+      "from": "llm/llm-pi-ai",
+      "to": "credentials/authorization"
     },
     {
       "from": "llm/llm-pi-ai",
@@ -4918,6 +5122,10 @@
     {
       "from": "lsp/tool-lsp",
       "to": "util/timeout"
+    },
+    {
+      "from": "mcp/mcp-client",
+      "to": "attachment/attachment"
     },
     {
       "from": "mcp/mcp-client",
@@ -5177,14 +5385,6 @@
     },
     {
       "from": "session-query/session-log-export",
-      "to": "client/ui-primitives"
-    },
-    {
-      "from": "session-query/session-log-export",
-      "to": "client/ui-slots"
-    },
-    {
-      "from": "session-query/session-log-export",
       "to": "interaction/commands"
     },
     {
@@ -5314,6 +5514,10 @@
     {
       "from": "session/session-persistence-sqlite",
       "to": "core/session"
+    },
+    {
+      "from": "session/session-persistence-sqlite",
+      "to": "llm/llm"
     },
     {
       "from": "session/session-persistence-sqlite",
@@ -5732,6 +5936,26 @@
       "to": "shell/shell-env"
     },
     {
+      "from": "shell/tool-pwsh-persistent",
+      "to": "core/agent"
+    },
+    {
+      "from": "shell/tool-pwsh-persistent",
+      "to": "core/tools"
+    },
+    {
+      "from": "shell/tool-pwsh-persistent",
+      "to": "runtime-diagnostics/invariants"
+    },
+    {
+      "from": "shell/tool-pwsh-persistent",
+      "to": "terminal/terminal"
+    },
+    {
+      "from": "shell/tool-pwsh-persistent",
+      "to": "util/timeout"
+    },
+    {
       "from": "skill/skill",
       "to": "core/scope"
     },
@@ -5986,10 +6210,6 @@
     {
       "from": "subagent/subagent-codex",
       "to": "runtime-diagnostics/invariants"
-    },
-    {
-      "from": "subagent/subagent-codex",
-      "to": "sdk/protocol"
     },
     {
       "from": "subagent/subagent-codex",
@@ -6285,11 +6505,11 @@
     },
     {
       "from": "test-support/client-runtime",
-      "to": "client/ui-slots"
+      "to": "client/ui-renderer"
     },
     {
       "from": "test-support/client-runtime",
-      "to": "client/web-react"
+      "to": "client/ui-slots"
     },
     {
       "from": "test-support/client-runtime",
@@ -6629,5 +6849,5 @@
     }
   ],
   "skipped": [],
-  "contentHash": "7254A6A5F253E4E7EA7F13191118D34E9179C3ABE146368FE338FFFC9315BC8D"
+  "contentHash": "6ADAFF5350082E0AF378BBE9906FD89F36ED15A5A2342E8D864AF116DC0C3E28"
 }

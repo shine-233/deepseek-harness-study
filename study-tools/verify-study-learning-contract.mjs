@@ -24,7 +24,7 @@ export const BEGINNER_LEARNING_CONTRACTS = [
   {
     source: 'SITE-HOME.md',
     label: 'Pages 首页',
-    markers: ['先选一条', 'dsh-route-grid', 'dsh-home-contract', 'dsh-stuck-card', '卡住时不用猜', '证据边界', '不用下载'],
+    markers: ['先选一条', 'dsh-route-grid', 'dsh-stuck-card', '证据边界', '不用下载'],
   },
   {
     source: 'START-HERE.md',

@@ -1,6 +1,6 @@
 # 14｜官方 HookBridge 与兼容层
 
-> 证据范围：本文只解释 2026-08-16（Asia/Shanghai）复核的上游 `deepseek-ai/deepseek-harness` 固定提交 [`47f943859bef60e4160492346772ded9b24f765a`][fixed-tree] 中的 `hook-protocol`、Claude Code bridge、Codex bridge、对应 README、Agent Note 和测试源码。
+> 证据范围：本文解释上游 `deepseek-ai/deepseek-harness` 固定提交 [`aa6c361a972c8369148dea7380bb5c21c24e07ec`][fixed-tree]（`0.1.1-rc.2`）中的 `hook-protocol`、Claude Code bridge、Codex bridge、对应 README、Agent Note 和测试源码。人工对照完成于 2026-08-16（Asia/Shanghai）的上一个固定基线；迁移到当前基线后只验证了链接路径仍存在，没有逐行复读版本差异。
 
 > 证据状态：下面写“测试证据”时，意思是静态阅读了固定提交中的测试断言和测试名称；本次没有运行上游测试，没有启动 DSH 或任何 `Test-DSH*`，也没有做真实 shell hook、模型、Profile 或 state 验证。
 
@@ -186,7 +186,7 @@ turn-scoped point 在有开放 turn 时为每次命令写一对 log-only session
 
 ### 版本边界
 
-本章固定的是根包 `0.1.0-rc.5`、提交 `47f943859bef60e4160492346772ded9b24f765a` 的源码；
+本章固定的是根包 `0.1.1-rc.2`、提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 的源码；
 本地固定版本说明也提醒该项目仍是 Developer Preview，未来允许破坏性变化[固定版本说明](../UPSTREAM.md)。
 因此“Claude 7/30、Codex 5/10”是该提交 README 对其外部协议快照的支持子集，不是对未来 Claude Code、Codex 或 DSH 的永久承诺。
 协议增加字段、改变 matcher、改变 timeout、改变 config discovery 或新增 typed point 后，都必须重新核对 bridge 源码、README 和测试。
@@ -240,33 +240,33 @@ turn-scoped point 在有开放 turn 时为每次命令写一对 log-only session
 
 本文的结论优先级是：固定提交源码和测试断言高于自动索引，包 README 负责支持子集和已知限制，社区 README 或项目自称不能覆盖上游没有提供的证据。
 
-[fixed-tree]: https://github.com/deepseek-ai/deepseek-harness/tree/47f943859bef60e4160492346772ded9b24f765a
-[protocol-readme]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/README.md#L5-L28
-[protocol-types]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/src/types.ts#L43-L131
-[protocol-codec]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/src/codec.ts#L59-L120
-[protocol-runner]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/src/runner.ts#L13-L99
-[protocol-detached]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/src/detached.ts#L9-L60
-[protocol-matcher]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/src/matcher.ts#L31-L59
-[protocol-merge]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/src/merge.ts#L11-L92
-[protocol-events]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/src/events.ts#L12-L97
-[codec-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/tests/codec.spec.ts#L4-L168
-[runner-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/tests/runner.spec.ts#L57-L141
-[detached-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/tests/detached.spec.ts#L12-L62
-[matcher-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/tests/matcher.spec.ts#L4-L65
-[merge-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/tests/merge.spec.ts#L9-L87
-[events-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hook-protocol/tests/events.spec.ts#L10-L107
-[claude-readme]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-claude-code/README.md#L5-L64
-[claude-config]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-claude-code/src/config.ts#L11-L112
-[claude-index]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-claude-code/src/index.ts#L96-L336
-[claude-bridge-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-claude-code/tests/bridge.spec.ts#L91-L401
-[claude-config-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-claude-code/tests/config.spec.ts#L15-L82
-[codex-readme]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-codex/README.md#L5-L65
-[codex-config]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-codex/src/config.ts#L10-L77
-[codex-index]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-codex/src/index.ts#L81-L302
-[codex-bridge-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-codex/tests/bridge.spec.ts#L68-L214
-[codex-config-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/hooks/hooks-codex/tests/config.spec.ts#L4-L74
-[bridge-note]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/.agents/notes/implemented/feature/2026-06-30-hook-bridges.md#L7-L43
-[interception-note]: https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/.agents/notes/implemented/feature/2026-06-30-interception-extension-points.md#L7-L34
+[fixed-tree]: https://github.com/deepseek-ai/deepseek-harness/tree/aa6c361a972c8369148dea7380bb5c21c24e07ec
+[protocol-readme]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/README.md#L5-L28
+[protocol-types]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/src/types.ts#L43-L131
+[protocol-codec]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/src/codec.ts#L59-L120
+[protocol-runner]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/src/runner.ts#L13-L99
+[protocol-detached]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/src/detached.ts#L9-L60
+[protocol-matcher]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/src/matcher.ts#L31-L59
+[protocol-merge]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/src/merge.ts#L11-L92
+[protocol-events]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/src/events.ts#L12-L97
+[codec-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/tests/codec.spec.ts#L4-L168
+[runner-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/tests/runner.spec.ts#L57-L141
+[detached-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/tests/detached.spec.ts#L12-L62
+[matcher-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/tests/matcher.spec.ts#L4-L65
+[merge-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/tests/merge.spec.ts#L9-L87
+[events-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hook-protocol/tests/events.spec.ts#L10-L107
+[claude-readme]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-claude-code/README.md#L5-L64
+[claude-config]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-claude-code/src/config.ts#L11-L112
+[claude-index]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-claude-code/src/index.ts#L96-L336
+[claude-bridge-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-claude-code/tests/bridge.spec.ts#L91-L401
+[claude-config-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-claude-code/tests/config.spec.ts#L15-L82
+[codex-readme]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-codex/README.md#L5-L65
+[codex-config]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-codex/src/config.ts#L10-L77
+[codex-index]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-codex/src/index.ts#L81-L302
+[codex-bridge-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-codex/tests/bridge.spec.ts#L68-L214
+[codex-config-tests]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/hooks/hooks-codex/tests/config.spec.ts#L4-L74
+[bridge-note]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/.agents/notes/implemented/feature/2026-06-30-hook-bridges.md#L7-L43
+[interception-note]: https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/.agents/notes/implemented/feature/2026-06-30-interception-extension-points.md#L7-L34
 [community-annotation-readme]: https://github.com/omdsh-dev/dsh-annotation/blob/40216642260821da1c16d6d219150c3e4f31a222/README.md
 [community-navbar-readme]: https://github.com/vlln/dsh-navbar/blob/10e9d1546db28c499687d66a369e548cd3f52237/README.md
 [community-rpm-fork]: https://github.com/rpmalouin/deepseek-harness

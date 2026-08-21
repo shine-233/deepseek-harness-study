@@ -8,7 +8,7 @@
 
 ## 这棵树到底有多大，谁在树的中间
 
-“万物皆插件”不是一句口号，它有可以数出来的形状。下面这个组件读的是固定提交 `47f943859b` 的清单和源码行数：219 个包分在 49 个组里，包与包之间有 1089 条 `peerDependencies` 依赖。
+“万物皆插件”是可以数出来的：下面这个组件读取固定提交 `aa6c361a97` 的清单和源码行数——227 个包分在 50 个组里，包与包之间有 1124 条 `peerDependencies` 依赖。
 
 先看散点图右下角和左上角，再回答一个问题：最被依赖的包，是不是最大的那个？
 
@@ -48,7 +48,7 @@ Profile 和 Bundle 都不是一个巨大的类。它们主要是配置和组合�
 
 ## Context：插件共同工作的范围
 
-官方起点是 [`vendor/cordis/src/context.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/context.ts)。可以把 `Context` 想成一个带作用范围的工作台：插件从这里取得服务、监听事件、创建子作用域，也把自己提供的能力放回这里。
+官方起点是 [`vendor/cordis/src/context.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/context.ts)。可以把 `Context` 想成一个带作用范围的工作台：插件从这里取得服务、监听事件、创建子作用域，也把自己提供的能力放回这里。
 
 例如下面这些名字是各个包向 Context 提供的服务入口：
 
@@ -71,7 +71,7 @@ Context 还有三个对初学者很重要的性质：
 
 ## Fiber：一个插件实例的生命周期账本
 
-[`vendor/cordis/src/fiber.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/fiber.ts) 是理解“可卸载插件”的关键。
+[`vendor/cordis/src/fiber.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/fiber.ts) 是理解“可卸载插件”的关键。
 
 一个插件函数被调用，不代表它只做了一次计算。它可能注册事件监听器、创建 Service、启动定时器、加载子插件、等待依赖或打开文件。Fiber 会记录已经通过 Cordis 注册机制登记的可撤销效果，并在插件离开树时按正确顺序清理；它不会自动发现插件私下创建的 timer、文件 watcher、网络连接或子进程。
 
@@ -90,11 +90,11 @@ PENDING -> LOADING -> ACTIVE -> UNLOADING -> DISPOSED
 - 重复 dispose 必须保持幂等，清理过程中不能偷偷注册逃出生命周期的新 Effect。
 - 固定提交的 Loader entry 替换路径会先处理候选状态，并在特定的 dispose/reload 路径失败时尝试恢复仍然有效的旧 entry；不能把这句话泛化成所有插件状态更新都有事务性回滚。
 
-所以 Fiber 不是普通的“插件状态变量”，它是已登记资源的所有权边界。谁创建了一个外部资源，谁就必须把停止、关闭或等待逻辑登记到自己的 Fiber；否则 `fiber.dispose()` 完成并不代表那个资源已经消失。
+Fiber 是已登记资源的所有权边界。谁创建了一个外部资源，谁就必须把停止、关闭或等待逻辑登记到自己的 Fiber；否则 `fiber.dispose()` 完成并不代表那个资源已经消失。
 
 ## Service：把能力放进插座
 
-[`vendor/cordis/src/service.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/service.ts) 提供服务注册的基础规则。一个服务通常包含三部分：
+[`vendor/cordis/src/service.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/service.ts) 提供服务注册的基础规则。一个服务通常包含三部分：
 
 ```text
 Service Definition  定义别人可以调用的接口
@@ -114,14 +114,14 @@ Consumer            使用接口，不关心具体实现
 
 ## Event：插件之间的通知和拦截点
 
-[`vendor/cordis/src/events.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/events.ts) 提供事件系统。事件用在多个插件可能观察、修改或阻止同一流程的位置。
+[`vendor/cordis/src/events.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/events.ts) 提供事件系统。事件用在多个插件可能观察、修改或阻止同一流程的位置。
 
 DSH 中要区分两种事实：
 
 - Session event 是要写入日志的持久事实，例如用户消息、assistant chunk、tool call 和 tool result。
 - Agent 或 capability event 主要是运行中的扩展点，例如 `agent/request`、`tools/pre-execute` 和 `fs/*`。它们可能参与当前流程，但不一定单独写入 Session。
 
-事件还不是只有一种派发方式：
+事件有多种派发方式：
 
 - 普通事件适合通知多个监听者。
 - `parallel` 适合彼此独立的监听器同时工作。
@@ -170,16 +170,16 @@ DSH 中要区分两种事实：
 
 换 provider 后，工具的 schema、审批和 Agent Loop 都可以不变。测试时安装 fake provider，既能控制返回值，也能验证工具是否正确传递路径和权限，而不必真的修改开发者电脑上的文件。
 
-这不是为了增加抽象而抽象。只有当一个能力需要被替换、隔离、测试或按 Agent 作用域控制时，Service/Provider/Consumer 这条边界才有明显价值。
+只有当一个能力需要被替换、隔离、测试或按 Agent 作用域控制时，Service/Provider/Consumer 这条边界才有明显价值。
 
 ## 推荐阅读顺序
 
 1. 先读官方 [`docs/architecture.md`](../docs/architecture.md)，建立 Profile、Bundle、Event、Turn 和 Session 的词汇表。
-2. 再读 [`vendor/cordis/src/context.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/context.ts) 和 [`fiber.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/fiber.ts)，理解作用域和生命周期。
-3. 接着读 [`service.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/service.ts)、[`events.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/vendor/cordis/src/events.ts)，理解能力和扩展点怎样注册。
-4. 再读 [`packages/boot/app-boot/src/profile.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/boot/app-boot/src/profile.ts) 和 [`index.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859bef60e4160492346772ded9b24f765a/packages/boot/app-boot/src/index.ts)，看配置如何变成插件树。
+2. 再读 [`vendor/cordis/src/context.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/context.ts) 和 [`fiber.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/fiber.ts)，理解作用域和生命周期。
+3. 接着读 [`service.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/service.ts)、[`events.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/events.ts)，理解能力和扩展点怎样注册。
+4. 再读 [`packages/boot/app-boot/src/profile.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/app-boot/src/profile.ts) 和 [`index.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/app-boot/src/index.ts)，看配置如何变成插件树。
 5. 最后回到[核心文件精读](03-核心文件精读.md)和[逐文件索引](08-逐文件索引怎么读.md)，沿着 `Session -> Agent Loop -> Tools -> LLM` 主链路阅读。
 
-每读一个 Service，都问自己三个问题：它定义了什么能力？谁提供实现？谁在消费它？每读一个 Event，都问：它是持久事实还是 live extension point？这些问题比背目录名更容易真正掌握 DSH 的设计。
+每读一个 Service，都问自己三个问题：它定义了什么能力？谁提供实现？谁在消费它？每读一个 Event，都问：它是持久事实还是 live extension point？
 
 如果要把自己的功能接入 DSH，继续阅读[社区生态与扩展边界](10-社区生态与扩展边界.md)和[如何写一个合规插件](11-如何写一个合规插件.md)。它们把本页的 Context、Service、Event、Fiber 和 Profile 具体化为插件选择、Bundle manifest、卸载清理和测试证据。

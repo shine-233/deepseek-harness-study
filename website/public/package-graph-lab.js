@@ -340,7 +340,7 @@ async function initializePage() {
   const verdict = evaluatePackageGraphOracle(fixture)
   renderOracle(verdict, oracleList, metrics.oracle)
 
-  // 3D 场景用全量模型，不跟随「按组筛选」：它要回答的是 49 个组的相对体量，
+  // 3D 场景用全量模型，不跟随「按组筛选」：它要回答的是 50 个组的相对体量，
   // 筛到一个组以后这句话就不成立了。数值视图（散点、柱、表格）才跟随筛选。
   installScene(buildPackageGraphModel(fixture, { group: 'all', sort: 'lines' }))
 
