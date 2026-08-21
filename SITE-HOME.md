@@ -232,8 +232,8 @@ hero:
 | 我想知道索引卡片是否真的准确 | [高风险索引人工抽查](study/24-高风险索引人工抽查.md) | 自动索引、源码事实和运行时证据怎样分开 |
 | 我想运行检查或实验 | [网页、github.dev 与 Codespaces](study/21-GitHub网页与Codespaces学习路线.md) | 哪些事只需网页，哪些事才需要云端终端 |
 | 我想照着命令检查教材或工具快照 | [学习工具箱](study/31-学习工具箱.md) | 怎样在不启动 DSH 的前提下运行入口、索引、A/B 和发布检查 |
-| 我想亲手验证 Code Mode 没绕过权限 | [确定性可视化实验协议与 Code Mode 权限管线](study/33-确定性可视化实验协议与Code-Mode权限管线.md) → [证据实验](/code-mode-evidence-lab.html) | deny 为什么不执行工具主体，allow 为什么仍保留 policy lane |
-| 我想让课程和 Debug 协作 | [研究与 Debug 协作](study/29-研究与-Debug-协作.md) → [离线桥接工作台](/research-debug-bridge.html) | request、脱敏 repro、result 和四种状态怎样分开 |
+| 我想亲手验证 Code Mode 没绕过权限 | [确定性可视化实验协议与 Code Mode 权限管线](study/33-确定性可视化实验协议与Code-Mode权限管线.md) | deny 为什么不执行工具主体，allow 为什么仍保留 policy lane |
+| 我想让课程和 Debug 协作 | [研究与 Debug 协作](study/29-研究与-Debug-协作.md) | request、脱敏 repro、result 和四种状态怎样分开 |
 | 我想知道以后还能做什么 | [后续研究路线](study/26-后续研究路线.md) | 哪些工作值得做，哪些工作需要宿主、模型或仓库权限 |
 | 我想处理漏洞、Actions 提示和 Pages 发布 | [安全告警与网页发布维护](study/30-安全告警与网页发布维护.md) | 如何读取 47 条告警、区分已处理与未验证，并确认整套教材确实能从网页读完 |
 

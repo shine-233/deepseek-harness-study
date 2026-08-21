@@ -20,6 +20,7 @@
  */
 
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { withBase } from 'vitepress'
 
 interface Props {
   /** Stable widget id; scopes reported errors so stale ones can be dropped. */
@@ -106,8 +107,18 @@ function reset() {
   loaded.value = false
   const element = frame.value
   if (element === null) return
+  // Reassigning the resolved absolute src reloads the document; props.url is
+  // base-relative and would not resolve here.
   element.src = element.src
 }
+
+/**
+ * The widget lives in `public/`, so it is not a VitePress route and VitePress does
+ * not rewrite a site-absolute path to it. Under a base path — GitHub Pages serves
+ * this site from /deepseek-harness-study/ — a bare `/foo.html` resolves to the
+ * domain root and 404s, so the base has to be applied here.
+ */
+const frameSrc = computed(() => withBase(props.url))
 
 const frameHeight = computed(() => String(props.height) + 'px')
 
@@ -122,7 +133,7 @@ onBeforeUnmount(() => window.removeEventListener('message', onMessage))
       <span class="lesson-widget__title">{{ title }}</span>
       <span class="lesson-widget__actions">
         <button type="button" class="lesson-widget__button" @click="reset">重置组件</button>
-        <a class="lesson-widget__button" :href="url" target="_blank" rel="noreferrer">单独打开</a>
+        <a class="lesson-widget__button" :href="frameSrc" target="_blank" rel="noreferrer">单独打开</a>
       </span>
     </figcaption>
 
@@ -130,7 +141,7 @@ onBeforeUnmount(() => window.removeEventListener('message', onMessage))
       <iframe
         ref="frame"
         class="lesson-widget__frame"
-        :src="url"
+        :src="frameSrc"
         :title="title"
         loading="lazy"
         sandbox="allow-scripts allow-same-origin"

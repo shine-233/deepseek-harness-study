@@ -2,7 +2,19 @@
 
 这一章把两个可以独立使用的东西放在一条可选的学习路径上：研究网站负责解释上下文、提出问题和告诉你“需要什么证据”；`dsh-plugin-debug` 负责检查一份已经脱敏、由你明确指定的本地 evidence artifact。它们不是一个默认互相连接的程序。
 
-如果你只想体验表单，直接打开[静态桥接工作台](/research-debug-bridge.html)。它不需要 API key，不需要启动 DSH，不需要下载 Debug 工具，也不会访问本机。若你想实际检查一份 repro，再下载[Debug 工具源码](https://github.com/shine-233/dsh-plugin-debug)，按下面的命令运行。
+如果你只想体验表单，用本页的互动组件即可。它不需要 API key，不需要启动 DSH，不需要下载 Debug 工具，也不会访问本机。若你想实际检查一份 repro，再下载[Debug 工具源码](https://github.com/shine-233/dsh-plugin-debug)，按下面的命令运行。
+
+<LessonWidget
+  id="research-debug-bridge"
+  url="/research-debug-bridge.html"
+  title="研究 ↔ Debug 离线证据桥接"
+  :height="900"
+  fallback-href="#先记住边界"
+>
+
+组件是一个静态文件工作台：它生成 request、下载 JSON、让你在本机显式运行 Debug，再手动导入 result。它不连接本机、不扫描文件、不启动程序、不上传任何内容——页面自己的 `connect-src 'none'` 就是这条边界的技术凭据。不打开组件也能按本页正文走完整个流程，正文写出了每一步的输入、输出和四种状态。
+
+</LessonWidget>
 
 ## 先记住边界
 
@@ -27,7 +39,7 @@
 
 ## 第一步：在网站生成 request
 
-打开[静态桥接工作台](/research-debug-bridge.html)，填写课程定位、问题标题和所需 source kind，然后点击“生成 request”。页面会把规范化后的 v1 JSON 显示在预览区；点击“下载 JSON”才会创建下载文件。下次打开页面时，可以手动选择之前下载的 request JSON，页面会先做 v1 schema 校验，再恢复表单、预设边界和预览；页面不使用浏览器存储，也不会恢复 schema 之外的字段。request 预览下方还会显示两步 PowerShell 命令模板，帮助你把路径替换成自己审阅过的输入、repro 和 result 路径；页面不会自动执行模板。
+在本页的互动组件里填写课程定位、问题标题和所需 source kind，然后点击“生成 request”。页面会把规范化后的 v1 JSON 显示在预览区；点击“下载 JSON”才会创建下载文件。下次打开页面时，可以手动选择之前下载的 request JSON，页面会先做 v1 schema 校验，再恢复表单、预设边界和预览；页面不使用浏览器存储，也不会恢复 schema 之外的字段。request 预览下方还会显示两步 PowerShell 命令模板，帮助你把路径替换成自己审阅过的输入、repro 和 result 路径；页面不会自动执行模板。
 
 request 的最小形状如下：
 
