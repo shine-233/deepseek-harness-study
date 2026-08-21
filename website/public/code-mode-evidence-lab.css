@@ -39,10 +39,31 @@
   --brand-bright: #466fe0;
   --brand-soft: #dfe7ff;
   --signal: #d46b3e;
+  /*
+   * --signal is a data colour, validated at 3:1 against the surface for a chart
+   * mark. Small text needs 4.5:1, so text takes this darker step of the same
+   * hue instead. Measured: 5.47:1 on the card and 4.54:1 on the warning panel in
+   * light, 5.66:1 and 4.51:1 in dark.
+   */
+  --signal-ink: #aa4d26;
   --signal-soft: #f5dfd3;
   --allow: #0f7a52;
+  /*
+   * The state colours are validated as marks at 3:1. Text needs 4.5:1, so these
+   * darker (light mode) and lighter (dark mode) steps of the same hues carry
+   * text. Measured floor across the soft panel and the card: 4.51:1 allow and
+   * 4.50:1 deny in light, 4.53:1 and 4.51:1 in dark.
+   */
+  --allow-ink: #0f7851;
   --allow-soft: #d9eee5;
   --deny: #b03040;
+  /*
+   * The state colours are validated as marks at 3:1. Text needs 4.5:1, so these
+   * darker (light mode) and lighter (dark mode) steps of the same hues carry
+   * text. Measured floor across the soft panel and the card: 4.51:1 allow and
+   * 4.50:1 deny in light, 4.53:1 and 4.51:1 in dark.
+   */
+  --deny-ink: #b83243;
   --deny-soft: #f4dcdf;
   --warning: #b8892a;
   --warning-soft: #f6ecd6;
@@ -83,10 +104,13 @@
     --brand-bright: #91aaff;
     --brand-soft: #202b55;
     --signal: #d1793f;
+    --signal-ink: #d58651;
     --signal-soft: #4c3027;
     --allow: #2b9a70;
+    --allow-ink: #37c38e;
     --allow-soft: #1e493c;
     --deny: #cd4a5a;
+    --deny-ink: #dc808b;
     --deny-soft: #4c292f;
     --warning: #b8871f;
     --warning-soft: #43351a;
@@ -337,7 +361,7 @@ h3 {
 }
 
 .warning-index {
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 
 .model-warning strong {
@@ -402,7 +426,7 @@ h3 {
 }
 
 .pipeline-strip span {
-  color: var(--signal);
+  color: var(--signal-ink);
   font: 700 0.7rem var(--mono);
 }
 
@@ -463,7 +487,7 @@ h3 {
 }
 
 .schema-oracle {
-  color: var(--allow);
+  color: var(--allow-ink);
   border-color: color-mix(in srgb, var(--allow) 36%, var(--line));
   background: var(--allow-soft);
 }
@@ -526,11 +550,11 @@ output {
 }
 
 .feedback[data-tone="success"] {
-  color: var(--allow);
+  color: var(--allow-ink);
 }
 
 .feedback[data-tone="error"] {
-  color: var(--deny);
+  color: var(--deny-ink);
 }
 
 .feedback[data-tone="notice"] {
@@ -572,7 +596,7 @@ output {
 }
 
 #metric-oracle[data-pass="false"] {
-  color: var(--deny);
+  color: var(--deny-ink);
 }
 
 .timeline-heading {
@@ -857,11 +881,11 @@ li {
 }
 
 .boundary-yes h3 {
-  color: var(--allow);
+  color: var(--allow-ink);
 }
 
 .boundary-no h3 {
-  color: var(--deny);
+  color: var(--deny-ink);
 }
 
 .event-card,
@@ -1231,7 +1255,7 @@ tbody tr:last-child td {
   margin-left: 8px;
   padding: 1px 7px;
   border-radius: 999px;
-  color: var(--deny);
+  color: var(--deny-ink);
   background: var(--deny-soft);
   content: "✕ denied";
   font-family: var(--mono);
@@ -1243,7 +1267,7 @@ tbody tr:last-child td {
   margin-left: 8px;
   padding: 1px 7px;
   border-radius: 999px;
-  color: var(--allow);
+  color: var(--allow-ink);
   background: var(--allow-soft);
   content: "✓ allowed";
   font-family: var(--mono);

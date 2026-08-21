@@ -23,10 +23,31 @@
   --brand-bright: #466fe0;
   --brand-soft: #dfe7ff;
   --signal: #d46b3e;
+  /*
+   * --signal is a data colour, validated at 3:1 against the surface for a chart
+   * mark. Small text needs 4.5:1, so text takes this darker step of the same
+   * hue instead. Measured: 5.47:1 on the card and 4.54:1 on the warning panel in
+   * light, 5.66:1 and 4.51:1 in dark.
+   */
+  --signal-ink: #aa4d26;
   --signal-soft: #f5dfd3;
   --allow: #0f7a52;
+  /*
+   * The state colours are validated as marks at 3:1. Text needs 4.5:1, so these
+   * darker (light mode) and lighter (dark mode) steps of the same hues carry
+   * text. Measured floor across the soft panel and the card: 4.51:1 allow and
+   * 4.50:1 deny in light, 4.53:1 and 4.51:1 in dark.
+   */
+  --allow-ink: #0f7851;
   --allow-soft: #d9eee5;
   --deny: #b03040;
+  /*
+   * The state colours are validated as marks at 3:1. Text needs 4.5:1, so these
+   * darker (light mode) and lighter (dark mode) steps of the same hues carry
+   * text. Measured floor across the soft panel and the card: 4.51:1 allow and
+   * 4.50:1 deny in light, 4.53:1 and 4.51:1 in dark.
+   */
+  --deny-ink: #b83243;
   --deny-soft: #f4dcdf;
   --warning: #b8892a;
   --warning-soft: #f6ecd6;
@@ -67,10 +88,13 @@
     --brand-bright: #91aaff;
     --brand-soft: #202b55;
     --signal: #d1793f;
+    --signal-ink: #d58651;
     --signal-soft: #4c3027;
     --allow: #2b9a70;
+    --allow-ink: #37c38e;
     --allow-soft: #1e493c;
     --deny: #cd4a5a;
+    --deny-ink: #dc808b;
     --deny-soft: #4c292f;
     --warning: #b8871f;
     --warning-soft: #43351a;
@@ -194,7 +218,7 @@ h3 { margin: 0 0 8px; font-size: 0.94rem; }
   background: color-mix(in srgb, var(--signal-soft) 78%, var(--surface));
 }
 
-.warning-index { color: var(--signal); }
+.warning-index { color: var(--signal-ink); }
 .model-warning strong { display: block; margin: 8px 0; }
 .model-warning p { margin: 0; color: var(--muted); font-size: 0.88rem; }
 
@@ -213,8 +237,8 @@ select, input[type="number"] {
 }
 
 .feedback { margin: 16px 0 0; color: var(--muted); font-size: 0.88rem; }
-.feedback[data-tone="success"] { color: var(--allow); }
-.feedback[data-tone="error"] { color: var(--deny); }
+.feedback[data-tone="success"] { color: var(--allow-ink); }
+.feedback[data-tone="error"] { color: var(--deny-ink); }
 
 .metric-grid {
   display: grid;
@@ -232,8 +256,8 @@ select, input[type="number"] {
 
 .metric-grid dt { margin: 0 0 6px; color: var(--muted); }
 .metric-grid dd { margin: 0; font-family: var(--mono); font-size: 1.24rem; font-weight: 750; font-variant-numeric: tabular-nums; }
-.metric-oracle dd[data-pass="true"] { color: var(--allow); }
-.metric-oracle dd[data-pass="false"] { color: var(--deny); }
+.metric-oracle dd[data-pass="true"] { color: var(--allow-ink); }
+.metric-oracle dd[data-pass="false"] { color: var(--deny-ink); }
 
 .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
 .section-label { margin: 0 0 8px; color: var(--brand); }
@@ -302,15 +326,15 @@ select, input[type="number"] {
 
 .oracle-list li:first-child { border-top: 0; }
 .oracle-list strong { font-size: 0.9rem; }
-.oracle-list li[data-pass="true"] strong { color: var(--allow); }
-.oracle-list li[data-pass="false"] strong { color: var(--deny); }
+.oracle-list li[data-pass="true"] strong { color: var(--allow-ink); }
+.oracle-list li[data-pass="false"] strong { color: var(--deny-ink); }
 .oracle-list span { color: var(--muted); font-family: var(--mono); font-size: 0.78rem; }
 
 .boundary-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
 .boundary-columns ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: 0.88rem; }
 .boundary-columns li { margin-bottom: 8px; }
-.boundary-yes h3 { color: var(--allow); }
-.boundary-no h3 { color: var(--deny); }
+.boundary-yes h3 { color: var(--allow-ink); }
+.boundary-no h3 { color: var(--deny-ink); }
 
 table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
 caption { padding: 14px; color: var(--muted); font-size: 0.82rem; text-align: left; }

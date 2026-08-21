@@ -86,8 +86,8 @@
 .funnel-bar.tone-scope { fill: color-mix(in srgb, var(--signal) 62%, transparent); }
 .funnel-bar.tone-bundle { fill: color-mix(in srgb, var(--muted) 46%, transparent); }
 
-tbody tr[data-state="3"] td:first-child { color: var(--allow); font-weight: 700; }
-tbody tr[data-state="2"] td:first-child { color: var(--deny); }
+tbody tr[data-state="3"] td:first-child { color: var(--allow-ink); font-weight: 700; }
+tbody tr[data-state="2"] td:first-child { color: var(--deny-ink); }
 tbody tr[data-state="0"] td { opacity: 0.62; }
 
 @media (forced-colors: active) {

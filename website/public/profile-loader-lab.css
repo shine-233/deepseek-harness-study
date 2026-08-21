@@ -50,7 +50,7 @@
   font-size: 0.78rem;
 }
 
-.bundle-check:has(input:checked) { border-color: var(--deny); color: var(--deny); }
+.bundle-check:has(input:checked) { border-color: var(--deny); color: var(--deny-ink); }
 
 .matrix-scroll {
   overflow-x: auto;
@@ -112,15 +112,15 @@
 .write-matrix td[data-mark="untouched"] { background: none; }
 
 .write-matrix td[data-mark="not-applied"] {
-  color: var(--deny);
+  color: var(--deny-ink);
   background: var(--deny-soft);
 }
 
 .write-matrix tbody tr[data-kind="overlay"] th { color: var(--signal); }
-.write-matrix tbody tr[data-applied="false"] th { color: var(--deny); }
+.write-matrix tbody tr[data-applied="false"] th { color: var(--deny-ink); }
 
 tbody tr[data-state="unset"] td { opacity: 0.62; }
-tbody tr[data-state="failed"] td { color: var(--deny); }
+tbody tr[data-state="failed"] td { color: var(--deny-ink); }
 
 @media (forced-colors: active) {
   .matrix-scroll, .order-chip, .bundle-check { border: 1px solid CanvasText; }

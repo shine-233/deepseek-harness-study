@@ -84,9 +84,9 @@
 .message-list li { margin-bottom: 7px; }
 .message-list li[data-role="assistant"] { color: var(--ink); }
 
-tbody tr[data-state="applied"] td:nth-child(4) { color: var(--allow); }
+tbody tr[data-state="applied"] td:nth-child(4) { color: var(--allow-ink); }
 tbody tr[data-state="skipped"] td:nth-child(4) { color: var(--warning); }
-tbody tr[data-state="refused"] td { color: var(--deny); font-weight: 700; }
+tbody tr[data-state="refused"] td { color: var(--deny-ink); font-weight: 700; }
 tbody tr[data-state="not-reached"] td { opacity: 0.6; }
 
 input[type="range"] { width: 100%; }

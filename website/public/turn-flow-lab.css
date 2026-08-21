@@ -26,9 +26,9 @@
   stroke-width: 2;
 }
 
-tbody tr[data-state="orphan"] td { color: var(--deny); font-weight: 700; }
-tbody tr[data-state="denied"] td:nth-child(3) { color: var(--deny); }
-tbody tr[data-state="failed"] td:nth-child(3) { color: var(--signal); }
+tbody tr[data-state="orphan"] td { color: var(--deny-ink); font-weight: 700; }
+tbody tr[data-state="denied"] td:nth-child(3) { color: var(--deny-ink); }
+tbody tr[data-state="failed"] td:nth-child(3) { color: var(--signal-ink); }
 
 @media (prefers-reduced-motion: reduce) {
   .trace-dot { transition: none; }
