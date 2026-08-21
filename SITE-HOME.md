@@ -143,14 +143,14 @@ hero:
   </div>
 </section>
 
-<div class="dsh-status-strip" aria-label="当前学习仓库门禁状态" data-study-pages="106" data-index-files="2756" data-learning-tests="110" data-example-tests="8" data-structural-errors="0">
+<div class="dsh-status-strip" aria-label="当前学习仓库门禁状态" data-study-pages="107" data-index-files="2756" data-learning-tests="142" data-example-tests="8" data-structural-errors="0">
   <div class="dsh-status-summary">
     <span class="dsh-status-kicker">本地最近一轮</span>
     <strong>入口和教材结构已通过</strong>
     <small>这些是静态构建与确定性检查的结果，不是 DSH、provider 或模型运行证明。</small>
   </div>
   <div class="dsh-status-metric">
-    <strong>105</strong>
+    <strong>107</strong>
     <span>中文学习页面</span>
   </div>
   <div class="dsh-status-metric">
@@ -158,7 +158,7 @@ hero:
     <span>逐文件索引</span>
   </div>
   <div class="dsh-status-metric">
-    <strong>27 + 8</strong>
+    <strong>142 + 8</strong>
     <span>学习工具 / 示例测试</span>
   </div>
   <div class="dsh-status-metric dsh-status-metric-good">

@@ -18,6 +18,15 @@ import { expectedStudySources } from './verify-study-publication.mjs'
 
 const repositoryRoot = resolve(import.meta.dirname, '..')
 
+/**
+ * Count declared test cases in a file.
+ *
+ * This counts `test(` and `it(` calls in the source, so a table-driven file that
+ * generates one case per discovered module contributes one, not one per case.
+ * The homepage number is therefore the number of declared cases, which is stable
+ * against how many files happen to exist; `node --test` reports the larger
+ * executed total.
+ */
 function countTestCalls(text) {
   return [...text.matchAll(/\b(?:test|it)\s*\(/g)].length
 }
@@ -53,6 +62,43 @@ export function parseHomeMetrics(text) {
 }
 
 /**
+ * Read the numbers the strip actually renders, keyed by the label beneath each.
+ *
+ * The `data-*` attributes and the `<strong>` values are two representations of
+ * the same counts, and checking only the attributes let them drift: the strip
+ * shipped `data-study-pages="106"` above a rendered `105`, and
+ * `data-learning-tests="110"` above a rendered `27 + 8`. A reader sees the
+ * rendered value, so it carries the same obligation as the attribute.
+ *
+ * A rendered cell may sum two counts, as the test cell does, so a `a + b` value
+ * parses to the list of its parts.
+ *
+ * @param {string} text - Source homepage Markdown.
+ * @returns {Map<string, number[]>} Label to the numbers rendered above it.
+ */
+export function parseRenderedMetrics(text) {
+  const strip = text.match(/<div class="dsh-status-strip"[\s\S]*?\n<\/div>/)?.[0] ?? ''
+  const rendered = new Map()
+  for (const cell of strip.matchAll(/<strong>([\d,+\s]+)<\/strong>\s*<span>([^<]+)<\/span>/g)) {
+    const parts = cell[1].split('+').map(part => Number(part.trim().replaceAll(',', '')))
+    rendered.set(cell[2].trim(), parts)
+  }
+  return rendered
+}
+
+/**
+ * Labels on the strip, and which derived counts each one renders.
+ *
+ * A label maps to a list because one cell shows two counts added together.
+ */
+const RENDERED_CELLS = Object.freeze({
+  中文学习页面: ['study-pages'],
+  逐文件索引: ['index-files'],
+  '学习工具 / 示例测试': ['learning-tests', 'example-tests'],
+  结构错误: ['structural-errors'],
+})
+
+/**
  * @param {string} [root] - Repository root for tests.
  * @returns {{ expected: Record<string, number>, actual: Record<string, number>, errors: string[] }}
  */
@@ -64,10 +110,23 @@ export function inspectStudyHomeMetrics(root = repositoryRoot) {
     'example-tests': countExampleTests(root),
     'structural-errors': countStructuralErrors(root),
   }
-  const actual = parseHomeMetrics(readFileSync(resolve(root, 'SITE-HOME.md'), 'utf8'))
+  const source = readFileSync(resolve(root, 'SITE-HOME.md'), 'utf8')
+  const actual = parseHomeMetrics(source)
   const errors = Object.keys(expected)
     .filter(name => actual[name] !== expected[name])
     .map(name => `首页 data-${name}=${String(actual[name])}，当前仓库应为 ${expected[name]}`)
+
+  const rendered = parseRenderedMetrics(source)
+  for (const [label, names] of Object.entries(RENDERED_CELLS)) {
+    const shown = rendered.get(label)
+    const want = names.map(name => expected[name])
+    if (shown === undefined) {
+      errors.push(`首页状态条缺少「${label}」这一格`)
+    } else if (shown.length !== want.length || shown.some((value, index) => value !== want[index])) {
+      errors.push(`首页「${label}」显示 ${shown.join(' + ')}，当前仓库应为 ${want.join(' + ')}`)
+    }
+  }
+
   return { expected, actual, errors }
 }
 

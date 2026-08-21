@@ -66,11 +66,15 @@ export function verifyStudyEntry(root = resolve(import.meta.dirname, '..')) {
     'study/32-源码学习项目的渐进式设计.md',
     'dsh-learning-map',
     'dsh-status-strip',
-    'data-study-pages="106"',
-    'data-index-files="2756"',
+    // Only the presence of each field belongs here. The values are derived from
+    // the repository by verify-study-home-metrics, which this script already
+    // runs; asserting a literal count in both places means every new lesson or
+    // test has to be edited into two files, and the copies drift.
+    'data-study-pages="',
+    'data-index-files="',
     'data-learning-tests="',
-    'data-example-tests="8"',
-    'data-structural-errors="0"',
+    'data-example-tests="',
+    'data-structural-errors="',
     'href="./study/lessons/00-开始这里"',
     'href="./study/lessons/01-仓库地图"',
     'href="./study/lessons/25-从首页到第一次产出的动手任务单"',

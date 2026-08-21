@@ -1,7 +1,16 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { inspectStudyHomeMetrics } from './verify-study-home-metrics.mjs'
 
 const repositoryRoot = resolve(import.meta.dirname, '..')
+
+/*
+ * 状态条的五个数字只有一个推导来源：verify-study-home-metrics.mjs 从仓库算出来。
+ * 这里不再抄一份字面值——抄一份的结果就是构建产物发出 107，而这份清单还在要求 106，
+ * 两边各自都自认为正确。
+ */
+const statusMarkers = Object.entries(inspectStudyHomeMetrics(repositoryRoot).expected)
+  .map(([name, value]) => 'data-' + name + '="' + String(value) + '"')
 
 /**
  * The small set of published pages that make up the first-time reader route.
@@ -26,11 +35,7 @@ export const REQUIRED_PUBLISHED_PAGES = [
       'dsh-proof-strip',
       'dsh-proof-item',
       'dsh-status-strip',
-      'data-study-pages="106"',
-      'data-index-files="2756"',
-      'data-learning-tests="110"',
-      'data-example-tests="8"',
-      'data-structural-errors="0"',
+      ...statusMarkers,
       'dsh-learning-map',
       'dsh-reading-progress',
       '我第一次来',
