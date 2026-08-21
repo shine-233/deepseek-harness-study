@@ -1,3 +1,14 @@
+
+// The two earliest labs predate the shared kit and stay self-contained, so they
+// take the icon module directly. It has no other dependency, and an element
+// without `data-icon` keeps its plain text.
+import { prefixIcon } from './study-lab-icons.js'
+
+function installDeclaredIcons(scope = document) {
+  for (const target of scope.querySelectorAll('[data-icon]')) {
+    prefixIcon(target, target.dataset.icon, Number(target.dataset.iconSize ?? 16))
+  }
+}
 const UINT32_MAX = 0xffffffff
 const MAX_PARALLELISM = 3
 const DEFAULT_INPUT = Object.freeze({
@@ -1264,3 +1275,5 @@ function initializePage() {
 }
 
 if (typeof document !== 'undefined') initializePage()
+
+installDeclaredIcons()

@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="./research-debug-bridge.css">
 </head>
 <body>
-  <main class="bridge-shell">
+  <a class="skip-link" href="#bridge-main">跳到工作台</a>
+  <main class="bridge-shell" id="bridge-main">
     <header class="hero-panel">
       <div class="eyebrow">DSH STUDY · OFFLINE HANDOFF</div>
       <div class="hero-grid">
@@ -55,7 +56,7 @@
       <article class="card request-card">
         <div class="card-heading">
           <div>
-            <p class="section-label">A · COURSE CONTEXT</p>
+            <p class="section-label" data-icon="fileDown">A · COURSE CONTEXT</p>
             <h2>生成诊断 request</h2>
           </div>
           <span class="schema-pill">v1</span>
@@ -160,7 +161,7 @@
       <article class="card result-card" id="result-card" data-status="complete">
         <div class="card-heading">
           <div>
-            <p class="section-label">B · DEBUG RESULT</p>
+            <p class="section-label" data-icon="fileUp">B · DEBUG RESULT</p>
             <h2>导入诊断 result</h2>
           </div>
           <div class="status-orb" aria-hidden="true"><span></span></div>
@@ -197,21 +198,21 @@
         <div class="evidence-grid">
           <div class="evidence-block"><h3>source kinds</h3><ul id="source-kinds-list"><li>diagnostics</li><li>trace</li></ul></div>
           <div class="evidence-block"><h3>missing kinds</h3><ul id="missing-kinds-list"><li class="empty-item">无缺失 kind</li></ul></div>
-          <div class="evidence-block evidence-wide"><h3>requested checks</h3><ul id="check-results-list"><li><strong>coverage</strong><span>PASS · REQUIRED_EVIDENCE_PRESENT</span></li><li><strong>privacy</strong><span>PASS · EVIDENCE_PRIVACY_DECLARATION_VALID</span></li></ul></div>
+          <div class="evidence-block evidence-wide"><h3 data-icon="gauge">requested checks</h3><ul id="check-results-list"><li><strong>coverage</strong><span>PASS · REQUIRED_EVIDENCE_PRESENT</span></li><li><strong>privacy</strong><span>PASS · EVIDENCE_PRIVACY_DECLARATION_VALID</span></li></ul></div>
           <div class="evidence-block evidence-wide"><h3>findings</h3><ul id="findings-list"><li><strong>REQUIRED_EVIDENCE_PRESENT</strong><span>All requested evidence kinds are present.</span></li></ul></div>
-          <div class="evidence-block evidence-wide"><h3>privacy declaration</h3><ul class="privacy-list" id="privacy-list"><li>inputMode: explicit-file-only</li><li>networkAccessed: false</li><li>rawPayloadStored: false</li></ul></div>
+          <div class="evidence-block evidence-wide"><h3 data-icon="lock">privacy declaration</h3><ul class="privacy-list" id="privacy-list"><li>inputMode: explicit-file-only</li><li>networkAccessed: false</li><li>rawPayloadStored: false</li></ul></div>
         </div>
       </article>
     </section>
 
     <section class="boundary-panel" aria-labelledby="boundary-title">
       <div>
-        <p class="section-label">TRUST BOUNDARY</p>
+        <p class="section-label" data-icon="shield">TRUST BOUNDARY</p>
         <h2 id="boundary-title">它能回答什么，不能回答什么？</h2>
       </div>
       <div class="boundary-columns">
-        <div class="boundary-column boundary-yes"><h3>能回答</h3><p>request 要求的 kind 是否出现在用户提供的脱敏 repro 中；manifest 哈希是否可核对；当前结果需要回到课程、补证据还是人工复核。</p></div>
-        <div class="boundary-column boundary-no"><h3>不能回答</h3><p>原始 DSH 是否真的运行过、课程里的简化模型是否等于真实 trace、故障是否已经修复，或某个运行时声明是否天然可信。</p></div>
+        <div class="boundary-column boundary-yes"><h3 data-icon="check">能回答</h3><p>request 要求的 kind 是否出现在用户提供的脱敏 repro 中；manifest 哈希是否可核对；当前结果需要回到课程、补证据还是人工复核。</p></div>
+        <div class="boundary-column boundary-no"><h3 data-icon="cross">不能回答</h3><p>原始 DSH 是否真的运行过、课程里的简化模型是否等于真实 trace、故障是否已经修复，或某个运行时声明是否天然可信。</p></div>
       </div>
       <p class="boundary-footnote"><code>trust=declared-metadata-only</code> 是刻意保守的协议值。证据覆盖不是运行时真相，文件存在也不是生产验证。</p>
     </section>
