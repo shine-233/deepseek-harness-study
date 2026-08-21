@@ -2,7 +2,7 @@
 // The two earliest labs predate the shared kit and stay self-contained, so they
 // take the icon module directly. It has no other dependency, and an element
 // without `data-icon` keeps its plain text.
-import { prefixIcon } from './study-lab-icons.js'
+import { icon, prefixIcon } from './study-lab-icons.js'
 
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -1025,7 +1025,6 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
+  // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+  installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 }
-
-// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
-installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

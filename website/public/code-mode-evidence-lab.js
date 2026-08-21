@@ -1,10 +1,11 @@
 // The two earliest labs predate the shared kit and stay self-contained, so they
 // take the icon module directly. It has no other dependency, and an element
 // without `data-icon` keeps its plain text.
-import { prefixIcon } from './study-lab-icons.js'
+import { icon, prefixIcon } from './study-lab-icons.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 
 import { installThemeToggle } from './study-lab-theme.js'
+import { installPredictionGate } from './study-lab-gate.js'
 
 /** Replace the declared markers with inline SVG. Requires a live document. */
 function installDeclaredIcons(scope = document) {
@@ -1282,7 +1283,20 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
-}
+  // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+  installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 
-// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
-installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+  // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  installPredictionGate({
+    form: document.getElementById('prediction-gate'),
+    locked: document.getElementById('gated-controls'),
+    feedback: document.getElementById('gate-feedback'),
+    correct: 'deny',
+    explain: {
+      allow: '默认策略是 deny-write，写入调用会被拒绝。',
+      deny: 'prepareExecution 在拒绝时返回 post-result 而不是 dispatch，所以没有 body-start。',
+      'deny-with-body': '主体只在调度器拿到 dispatch 之后才运行；拒绝时它拿不到。',
+      skipped: '每个调用都有自己的 policy-check，切到全部放行也还是四次。',
+    },
+  })
+}

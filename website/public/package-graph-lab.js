@@ -6,7 +6,7 @@
  * 其他实验页的唯一差别，也是它需要一次 fetch 的原因。
  */
 
-import { prefixIcon } from './study-lab-icons.js'
+import { icon, prefixIcon } from './study-lab-icons.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import {
   BAR_VIEW_MAX_NODES,
@@ -374,7 +374,9 @@ async function initializePage() {
   rebuild()
 }
 
-if (typeof document !== 'undefined') void initializePage()
-
-// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
-installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+if (typeof document !== 'undefined') {
+  void initializePage()
+  installDeclaredIcons()
+  // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+  installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+}

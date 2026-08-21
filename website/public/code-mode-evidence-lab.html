@@ -49,6 +49,38 @@
           </div>
           <span class="schema-pill">pure model</span>
         </div>
+        <form id="prediction-gate" class="prediction-gate">
+          <p class="gate-question" id="gate-question">
+            默认输入是 <code>seed 17</code>、<code>deny-write</code>、<code>parallelism 2</code>。
+            四个内部调用里，<code>write_summary</code> 是唯一的写入调用。
+            在动控件之前先押一个注：它的 <code>policy-decision</code> 会是什么？
+          </p>
+          <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="allow">
+              <span><code>allow</code>，然后主体照常执行</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="deny">
+              <span><code>deny</code>，而且不会出现 <code>body-start</code></span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="deny-with-body">
+              <span><code>deny</code>，但主体仍然跑了一次</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="skipped">
+              <span>根本不经过 <code>policy-check</code></span>
+            </label>
+          </div>
+          <div class="gate-actions">
+            <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+            <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+          </div>
+          <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+        </form>
+
+        <div id="gated-controls">
         <form id="lab-config-form">
           <label>
             <span>固定 seed</span>
@@ -71,6 +103,7 @@
           </label>
           <button class="button button-primary button-wide" type="submit">重建实验</button>
         </form>
+        </div>
         <p class="feedback" id="lab-feedback" role="status" aria-live="polite"></p>
 
         <div class="metric-grid" aria-label="实验观测值">
