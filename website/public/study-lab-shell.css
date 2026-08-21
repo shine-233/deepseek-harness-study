@@ -206,7 +206,12 @@ select, input[type="number"] {
  * 所以给 SVG 设一个接近设计宽度的 min-width：低于它就横向滚动，而不是继续缩小到
  * 读不出来。完整表格始终是这张图的文字替代，滚动不是唯一出路。
  */
-.plot-scroll svg { display: block; width: 100%; min-width: 1100px; }
+/*
+ * 图宽由脚本按容器算出并写进 viewBox，所以缩放恒为 1，SVG 里的字号就是屏幕上的
+ * 字号。这里不再设 min-width：设了只会在窄屏强制出现一条本不需要的横向滚动条。
+ * 宽度下限由脚本负责（760，保证坐标轴标签不互相压住），到不了才滚动。
+ */
+.plot-scroll svg { display: block; width: 100%; }
 
 .grid { stroke: var(--line); stroke-width: 1; }
 .baseline { stroke: var(--line-strong); stroke-width: 1; }

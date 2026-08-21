@@ -7,6 +7,7 @@
  */
 
 import { prefixIcon } from './study-lab-icons.js'
+import { revealOnScroll } from './study-lab-reveal.js'
 import {
   BAR_VIEW_MAX_NODES,
   buildPackageGraphModel,
@@ -41,8 +42,19 @@ function logScale(value) {
   return Math.log10(Math.max(1, value))
 }
 
+/**
+ * 图宽跟随容器，所以 viewBox 宽度等于 CSS 宽度，缩放恒为 1。
+ * 固定 viewBox 只有两种结局：窄屏横向滚动，或者等比缩小到文字读不出来。
+ * 下限 760 是保证坐标轴标签不互相压住的最小宽度；到不了就只能滚动。
+ */
+function plotWidth(target) {
+  const available = Math.floor(target.clientWidth - 28)
+  if (!Number.isFinite(available) || available <= 0) return 1080
+  return Math.max(760, available)
+}
+
 function renderScatter(model, target, note) {
-  const width = 1080
+  const width = plotWidth(target)
   const height = 460
   const left = 76
   const right = 34
@@ -117,20 +129,30 @@ function renderScatter(model, target, note) {
       cx: x, cy: y, r: labelled.has(node.id) ? 7 : 5,
       class: 'point' + (isHub ? ' is-hub' : ''),
       'data-id': node.id,
+      'data-reveal': '',
     })
     point.append(svgElement('title', {},
       node.id + '：' + String(node.srcLines) + ' 行，被 ' + String(node.dependedOnBy) + ' 个包依赖'))
     svg.append(point)
     if (labelled.has(node.id)) {
-      svg.append(svgElement('text', {
-        x: x + 11, y: y + 4, class: 'point-label',
-        'text-anchor': x > width * 0.72 ? 'end' : 'start',
-        ...(x > width * 0.72 ? { x: x - 11 } : {}),
-      }, node.id))
+      const toLeft = x > width * 0.72
+      const anchorX = toLeft ? x - 13 : x + 13
+      const labelX = toLeft ? x - 34 : x + 34
+      // A ring plus a leader line makes the annotated point findable among 219
+      // dots; the label alone reads as one more piece of axis furniture.
+      svg.append(
+        svgElement('circle', { cx: x, cy: y, r: 11, class: 'point-ring' }),
+        svgElement('line', { x1: anchorX, y1: y, x2: labelX, y2: y, class: 'point-leader' }),
+        svgElement('text', {
+          x: labelX + (toLeft ? -4 : 4), y: y + 4, class: 'point-label',
+          'text-anchor': toLeft ? 'end' : 'start',
+        }, node.id),
+      )
     }
   }
 
   target.append(svg)
+  revealOnScroll(target)
 
   const biggest = model.observations.biggest
   const most = model.observations.mostDepended
@@ -151,7 +173,7 @@ function renderBars(model, target, note) {
   }
 
   const nodes = model.nodes
-  const width = Math.max(560, 96 + nodes.length * 96)
+  const width = Math.max(plotWidth(target), 96 + nodes.length * 96)
   const height = 380
   const left = 64
   const bottom = 96
@@ -189,6 +211,7 @@ function renderBars(model, target, note) {
       class: 'bar' + (model.observations.hubs.includes(node.id) ? ' is-hub' : ''),
       'stroke-width': stroke.toFixed(2),
       'data-id': node.id,
+      'data-reveal': '',
     })
     bar.append(svgElement('title', {},
       node.id + '：' + String(node.srcLines) + ' 行，被 ' + String(node.dependedOnBy) + ' 个包依赖'))
@@ -206,6 +229,7 @@ function renderBars(model, target, note) {
   }
 
   target.append(svg)
+  revealOnScroll(target)
   writeText(note, '柱底下的 ←n 是被依赖次数，也就是边框粗细对应的数字；组内边 '
     + String(model.observations.edgesWithinView) + ' 条，其余依赖指向组外。')
 }
@@ -308,7 +332,8 @@ async function initializePage() {
     writeText(option, group + '（' + String(counts.get(group)) + ' 包）')
     groupInput.append(option)
   }
-  groupInput.value = 'core'
+  // 打开页面第一眼就该是全貌；core 只有 2 个可见点，剩下是空白。
+  groupInput.value = 'all'
 
   writeText(provenance, '固定提交 ' + fixture.commit.slice(0, 10) + ' · 纯函数模型 · 独立 oracle · 完整表格替代')
 

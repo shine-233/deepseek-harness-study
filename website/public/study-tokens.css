@@ -189,3 +189,48 @@
     --dur-enter: 0s;
   }
 }
+
+/*
+ * 进场动画的两个状态。study-lab-reveal.js 负责挂 class，这里只定义外观。
+ *
+ * 只动 opacity 和 transform——SVG 的 r、width 等几何属性各浏览器支持不一，
+ * 而这两个属性走合成器，不触发重排。动画结束后与不做动画完全一致。
+ */
+[data-reveal] {
+  transition:
+    opacity var(--dur-enter) var(--ease),
+    transform var(--dur-enter) var(--ease);
+}
+
+[data-reveal].awaits-reveal {
+  opacity: 0;
+  /* 点和柱从各自的基线方向长出来，由 transform-origin 决定，不改坐标。 */
+  transform: scale(0.4);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* 柱子从底部长起，缩放的原点在下沿。 */
+rect[data-reveal].awaits-reveal {
+  transform: scaleY(0.02);
+  transform-origin: bottom;
+}
+
+/*
+ * 减少动态效果时：没有过渡，也没有起始态。这里不依赖 JS 判断，
+ * 所以脚本失效时也不会留下一批 opacity:0 的隐形标记。
+ */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal].awaits-reveal,
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

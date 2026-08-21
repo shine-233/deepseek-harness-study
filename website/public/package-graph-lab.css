@@ -211,7 +211,12 @@ select {
  * 所以给 SVG 设一个接近设计宽度的 min-width：低于它就横向滚动，而不是继续缩小到
  * 读不出来。完整表格始终是这张图的文字替代，滚动不是唯一出路。
  */
-.scatter-scroll svg, .bar-scroll svg { display: block; width: 100%; min-width: 1100px; }
+/*
+ * 图宽由脚本按容器算出并写进 viewBox，所以缩放恒为 1，SVG 里的字号就是屏幕上的
+ * 字号。这里不再设 min-width：设了只会在窄屏强制出现一条本不需要的横向滚动条。
+ * 宽度下限由脚本负责（760，保证坐标轴标签不互相压住），到不了才滚动。
+ */
+.scatter-scroll svg, .bar-scroll svg { display: block; width: 100%; }
 
 .grid { stroke: var(--line); stroke-width: 1; }
 .baseline { stroke: var(--line-strong); stroke-width: 1; }
@@ -322,4 +327,21 @@ tbody tr:hover { background: color-mix(in srgb, var(--brand) 7%, transparent); }
 @media (forced-colors: active) {
   .icon { stroke: CanvasText; }
   [data-pass="true"] .icon, [data-pass="true"].icon { stroke: CanvasText; }
+}
+
+/*
+ * 四个角上的包承载本页结论（最大的包不是最被依赖的包），所以它们比其他 215 个点
+ * 多一个圆环和一条引导线。219 个点里找一个 7px 的点做不到，加了环就做得到。
+ * 环和线都不编码数值，去掉后图仍然完整。
+ */
+.point-ring {
+  fill: none;
+  stroke: var(--signal);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+.point-leader {
+  stroke: var(--signal);
+  stroke-width: 1.25;
 }
