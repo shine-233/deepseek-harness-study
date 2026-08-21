@@ -1020,6 +1020,7 @@ function initializePage() {
   importValue(exampleResult('COMPLETE'))
 }
 
-if (typeof document !== 'undefined') initializePage()
-
-installDeclaredIcons()
+if (typeof document !== 'undefined') {
+  initializePage()
+  installDeclaredIcons()
+}
