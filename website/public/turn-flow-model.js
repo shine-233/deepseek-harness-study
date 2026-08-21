@@ -167,12 +167,13 @@ export function buildTurnModel(input = {}) {
   )
 
   /*
-   * 一份内容可能先写日志、再进模型请求，也可能同一步既进请求又写日志。配对看的是
+   * 一份内容可能同一步既进请求又写日志，也可能先写日志再进请求。配对看的是
    * payloadId 是否在两个集合里都出现过，不看它出现在第几步。
    *
-   * 推进到中途时，一份内容可以「进了请求但这一步还没到写日志那一步」。那是正常的
-   * 中间状态，不是违反可重建性——所以 `status` 分三档，只有 `orphan` 是真的问题。
-   * 把中间态显示成失败会让读者以为不变量本来就不成立。
+   * `status` 区分三档，因为推进到中途时「日志事件还在后面」和「整个 Turn 都没有
+   * 日志事件」不是一回事，前者是正常中间态。不过在当前三个场景里日志总是与请求
+   * 同步或早于请求（见 turn-flow.test.mjs 的顺序断言），所以 `pending` 不会出现；
+   * 它留在这里是为了让新场景一旦打破这个顺序，页面显示的是「还没记」而不是「违反」。
    */
   const pairs = [...new Set(modelVisible.map(entry => entry.payloadId))].map(payloadId => {
     const reconstructable = loggedIds.has(payloadId)
@@ -242,13 +243,25 @@ export function evaluateTurnOracle(model) {
     badLane.map(entry => entry.lane).join('、') || '0 个未知 lane')
 
   /*
-   * 可重建性按 `status` 判，不按「这一步有没有日志」判。
+   * 可重建性从 steps 重算，不读 model.pairs。
    *
-   * 推进到中途时，一份内容进了请求而它的日志事件还在后面，那是 `pending`——正常的
-   * 中间态。只有 `orphan`（整个 Turn 走完都没有对应日志事件）才是违反。
+   * oracle 的作用是独立核对，所以它不能复用被检查对象已经算好的结论——否则篡改
+   * steps 里的一条日志事件时，pairs 仍然是旧的，校验就查不出来。
+   *
+   * 中途停下时，一份内容进了请求而它的日志事件还在后面，那是正常的中间态；
+   * 判断依据是这一份内容在完整 Turn 里到底有没有日志事件，由 pairs 的 status
+   * 提供那个「完整 Turn」视角，但它只用来豁免 pending，不用来决定 orphan。
    */
-  const orphan = model.pairs.filter(pair => pair.status === 'orphan').map(pair => pair.payloadId)
-  const pending = model.pairs.filter(pair => pair.status === 'pending').map(pair => pair.payloadId)
+  const loggedIds = new Set(model.steps.filter(entry => entry.logged && entry.payloadId !== null)
+    .map(entry => entry.payloadId))
+  const visibleIds = [...new Set(model.steps
+    .filter(entry => entry.modelVisible && entry.payloadId !== null)
+    .map(entry => entry.payloadId))]
+  const pendingIds = new Set(model.pairs.filter(pair => pair.status === 'pending').map(pair => pair.payloadId))
+
+  const missing = visibleIds.filter(payloadId => !loggedIds.has(payloadId))
+  const orphan = missing.filter(payloadId => !pendingIds.has(payloadId))
+  const pending = missing.filter(payloadId => pendingIds.has(payloadId))
   const pendingNote = pending.length === 0 ? '' : '，另有 ' + String(pending.length) + ' 份日志事件还在后面'
   add('MODEL_VISIBLE_IS_LOGGED', '进入模型请求的每一份内容都有日志事件',
     orphan.length === 0, '0 份无法重建',
@@ -262,11 +275,18 @@ export function evaluateTurnOracle(model) {
     firstRequest > 0 && inputsBefore > 0,
     '请求前至少 1 份输入', String(inputsBefore) + ' 份输入，请求在第 ' + String(firstRequest) + ' 步')
 
+  /*
+   * 下面两条只有在推进到末尾时才该判定。中途停下时，「调用了但结果还没到」和
+   * 「还没出现 turn-end」都是正常的，判成失败会把读者往错的方向带。
+   */
+  const atEnd = model.observations.steps === model.observations.totalSteps
+
   const results = model.steps.filter(entry => entry.phase === 'tool-result-logged')
   const calls = model.steps.filter(entry => entry.phase === 'tool-call-logged')
   add('EVERY_CALL_HAS_RESULT', '每次被记录的工具调用都有一个结果事件',
-    results.length >= calls.length,
-    '结果数 ≥ 调用数', String(results.length) + ' ≥ ' + String(calls.length))
+    !atEnd || results.length >= calls.length,
+    atEnd ? '结果数 ≥ 调用数' : '推进到末尾后才判定',
+    String(results.length) + ' ≥ ' + String(calls.length) + (atEnd ? '' : '（尚未推进到末尾）'))
 
   const denied = model.steps.filter(entry => entry.denied === true)
   const deniedRan = denied.length > 0 && model.steps.some(entry => entry.phase === 'tool-run'
@@ -277,7 +297,9 @@ export function evaluateTurnOracle(model) {
     denied.length === 0 ? '本场景没有拒绝' : (deniedRan ? '拒绝后仍执行了主体' : '拒绝后无主体'))
 
   add('TURN_ENDS_LAST', 'Turn 以结束事件收尾',
-    model.steps.at(-1)?.phase === 'turn-end', 'turn-end', String(model.steps.at(-1)?.phase))
+    !atEnd || model.steps.at(-1)?.phase === 'turn-end',
+    atEnd ? 'turn-end' : '推进到末尾后才判定',
+    String(model.steps.at(-1)?.phase) + (atEnd ? '' : '（尚未推进到末尾）'))
 
   const counted = model.observations
   add('OBSERVATIONS_MATCH', '观测读数与重算一致',

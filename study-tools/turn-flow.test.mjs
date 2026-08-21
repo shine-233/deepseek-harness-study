@@ -141,3 +141,75 @@ test('the evidence boundary names what a step trace cannot show', () => {
     assert.ok(boundary.includes(absent), 'cannotProve must mention ' + absent)
   }
 })
+
+test('推进到中途只保留前缀，观测读数跟着变', () => {
+  const full = buildTurnModel({ scenario: 'two-tools' })
+  const half = buildTurnModel({ scenario: 'two-tools', upTo: 5 })
+  assert.equal(half.steps.length, 6)
+  assert.equal(half.observations.steps, 6)
+  assert.equal(half.observations.totalSteps, full.totalSteps)
+  assert.ok(half.observations.modelRequests <= full.observations.modelRequests)
+  // 前缀里的每一步都必须来自完整序列的同一位置，不是重新编号。
+  for (const [index, entry] of half.steps.entries()) {
+    assert.deepEqual(entry, full.steps[index])
+  }
+})
+
+test('日志从不落后于模型请求，所以任何前缀下可重建性都成立', () => {
+  for (const scenario of SCENARIOS) {
+    const full = buildTurnModel({ scenario })
+    // 这个教学模型的实际顺序：每份内容写日志的步骤不晚于它进入请求的步骤。
+    for (const pair of full.pairs) {
+      assert.ok(Math.min(...pair.loggedAt) <= Math.min(...pair.visibleAt),
+        scenario + '：' + pair.payloadId + ' 的日志晚于请求')
+    }
+    // 因此逐步推进时，可重建性在每一个前缀上都成立，不会出现中途变红。
+    for (let upTo = 0; upTo < full.totalSteps; upTo += 1) {
+      const partial = buildTurnModel({ scenario, upTo })
+      const check = evaluateTurnOracle(partial).checks.find(c => c.id === 'MODEL_VISIBLE_IS_LOGGED')
+      assert.equal(check.pass, true, scenario + ' 第 ' + upTo + ' 步：' + check.actual)
+      for (const pair of partial.pairs) {
+        assert.equal(pair.status, 'logged', scenario + ' 第 ' + upTo + ' 步：' + pair.payloadId)
+      }
+    }
+  }
+})
+
+test('只有整个 Turn 里都没有日志事件才算 orphan', () => {
+  const model = buildTurnModel({ scenario: 'two-tools' })
+  const target = model.pairs.find(pair => pair.payloadId.startsWith('p-result-'))
+  // 篡改成「这份内容在任何一步都没有日志」，pending 的豁免就不该生效。
+  const tampered = {
+    ...model,
+    steps: model.steps.map(entry => entry.payloadId === target.payloadId && entry.logged
+      ? { ...entry, logged: false }
+      : entry),
+    pairs: model.pairs.map(pair => pair.payloadId === target.payloadId
+      ? { ...pair, reconstructable: false, status: 'orphan' }
+      : pair),
+  }
+  const check = evaluateTurnOracle(tampered).checks.find(c => c.id === 'MODEL_VISIBLE_IS_LOGGED')
+  assert.equal(check.pass, false)
+  assert.ok(check.actual.includes(target.payloadId))
+})
+
+test('收尾类检查只在推进到末尾时判定', () => {
+  const partial = buildTurnModel({ scenario: 'two-tools', upTo: 4 })
+  const partialVerdict = evaluateTurnOracle(partial)
+  for (const id of ['TURN_ENDS_LAST', 'EVERY_CALL_HAS_RESULT']) {
+    const check = partialVerdict.checks.find(candidate => candidate.id === id)
+    assert.equal(check.pass, true, id + ' 在中途不该失败：' + check.actual)
+    assert.match(check.actual, /尚未推进到末尾/)
+  }
+  // 推进到末尾后恢复真正的判定。
+  const endVerdict = evaluateTurnOracle(buildTurnModel({ scenario: 'two-tools' }))
+  assert.equal(endVerdict.checks.find(c => c.id === 'TURN_ENDS_LAST').pass, true)
+  assert.equal(endVerdict.pass, true)
+})
+
+test('upTo 超出范围会被夹到有效区间', () => {
+  const full = buildTurnModel({ scenario: 'two-tools' })
+  assert.equal(buildTurnModel({ scenario: 'two-tools', upTo: 999 }).steps.length, full.steps.length)
+  assert.equal(buildTurnModel({ scenario: 'two-tools', upTo: -5 }).steps.length, 1)
+  assert.throws(() => buildTurnModel({ scenario: 'two-tools', upTo: 'x' }), TypeError)
+})
