@@ -20,6 +20,9 @@ import {
   buildToolVisibilityModel,
   evaluateToolVisibilityOracle,
 } from './tool-visibility-model.js'
+import { revealOnScroll } from './study-lab-reveal.js'
+import { icon } from './study-lab-icons.js'
+import { installThemeToggle } from './study-lab-theme.js'
 
 const LEVEL_LABELS = ['未注册', '已注册', '模型可见', '允许执行']
 
@@ -90,7 +93,7 @@ function renderNest(model, target, note) {
       const y = zone.y + row * 30
       const chip = svgElement('g', { class: 'chip level-' + String(zone.level), 'data-tool': tool.name })
       chip.append(
-        svgElement('rect', { x, y, width: Math.min(168, zone.w / perRow - 8), height: 24, rx: 6, class: 'chip-box' }),
+        svgElement('rect', { x, y, width: Math.min(168, zone.w / perRow - 8), height: 24, rx: 6, class: 'chip-box', 'data-reveal': '' }),
         svgElement('text', { x: x + 9, y: y + 16, class: 'chip-text' },
           (zone.level === 3 ? '✓ ' : '✕ ') + tool.name),
       )
@@ -102,6 +105,7 @@ function renderNest(model, target, note) {
   }
 
   target.append(svg)
+  revealOnScroll(target)
   const gap = model.observations.visibleButNotAllowed
   writeText(note, gap.length === 0
     ? '当前输入下没有“模型可见但不允许执行”的工具：这一档要靠更宽的作用域配更严的策略才造得出来。'
@@ -151,6 +155,7 @@ function renderFunnel(model, target, note) {
   }
 
   target.append(svg)
+  revealOnScroll(target)
   writeText(note, '四段之和 ' + String(rows.reduce((sum, row) => sum + row.count, 0))
     + ' 等于清单里的 ' + String(total) + ' 个工具；作用域是「' + model.scope.label
     + '」，策略是「' + model.policy.label + '」。')
@@ -265,3 +270,6 @@ function initializePage() {
 if (typeof document !== 'undefined') initializePage()
 
 installDeclaredIcons()
+
+// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./turn-flow-lab.css">
+  <script src="./study-theme-boot.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#turn-main">跳到实验</a>
@@ -20,6 +21,7 @@
         <h1>进了模型请求的东西，日志里必须找得到。</h1>
         <p class="hero-lead">一次 Turn 不是一次模型调用。每拿到一个工具结果就要把它带回模型，所以一次 Turn 里有多次请求。而仓库自己的规则是：凡是能到达模型请求的输入，都要能从 Session 日志重建——这条规则可以逐条配对检查。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/04-agent与turn流程.html">阅读配套课程</a>
           <a class="button button-secondary" href="./tool-visibility-lab.html">打开工具可见性实验</a>
         </div>

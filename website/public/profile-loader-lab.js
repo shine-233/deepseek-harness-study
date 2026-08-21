@@ -17,6 +17,8 @@ import {
   buildProfileModel,
   evaluateProfileOracle,
 } from './profile-loader-model.js'
+import { icon } from './study-lab-icons.js'
+import { installThemeToggle } from './study-lab-theme.js'
 
 const DEFAULT_ORDER = ['base', 'web-tools', 'shell-tools', 'observability', 'strict-limits']
 
@@ -222,3 +224,6 @@ function initializePage() {
 if (typeof document !== 'undefined') initializePage()
 
 installDeclaredIcons()
+
+// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

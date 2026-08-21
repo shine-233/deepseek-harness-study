@@ -2,6 +2,9 @@
 // take the icon module directly. It has no other dependency, and an element
 // without `data-icon` keeps its plain text.
 import { prefixIcon } from './study-lab-icons.js'
+import { revealOnScroll } from './study-lab-reveal.js'
+
+import { installThemeToggle } from './study-lab-theme.js'
 
 /** Replace the declared markers with inline SVG. Requires a live document. */
 function installDeclaredIcons(scope = document) {
@@ -1020,6 +1023,7 @@ function renderConcurrencyChart(simulation, target) {
   }))
 
   target.append(svg)
+  revealOnScroll(target)
 }
 
 function initializePage() {
@@ -1279,3 +1283,6 @@ if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
 }
+
+// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

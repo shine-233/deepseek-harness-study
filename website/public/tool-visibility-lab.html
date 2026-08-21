@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./tool-visibility-lab.css">
+  <script src="./study-theme-boot.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#visibility-main">跳到实验</a>
@@ -20,6 +21,7 @@
         <h1>模型看得见，不等于允许执行。</h1>
         <p class="hero-lead">工具要穿过三道收窄才能真的跑起来：Bundle 决定它是否<strong>已注册</strong>，agent 作用域决定它是否<strong>对模型可见</strong>，执行策略决定它是否<strong>允许执行</strong>。三层是嵌套的，收窄各由不同的东西负责。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/22-工具可见性与非侵入扩展.html">阅读配套课程</a>
           <a class="button button-secondary" href="./package-graph-lab.html">打开包依赖图</a>
         </div>

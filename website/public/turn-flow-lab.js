@@ -18,6 +18,9 @@ import {
   buildTurnModel,
   evaluateTurnOracle,
 } from './turn-flow-model.js'
+import { revealOnScroll } from './study-lab-reveal.js'
+import { icon } from './study-lab-icons.js'
+import { installThemeToggle } from './study-lab-theme.js'
 
 const LANE_LABELS = {
   user: '用户',
@@ -83,6 +86,7 @@ function renderTrace(model, target, note) {
     if (entry.denied === true) classes.push('is-denied')
     if (entry.failed === true) classes.push('is-failed')
     const dot = svgElement('circle', {
+      'data-reveal': '',
       cx: x, cy: y, r: 8, class: classes.join(' '), 'data-step': String(entry.index),
     })
     dot.append(svgElement('title', {},
@@ -96,6 +100,7 @@ function renderTrace(model, target, note) {
   }
 
   target.append(svg)
+  revealOnScroll(target)
   const orphan = model.observations.unreconstructable
   writeText(note, orphan.length === 0
     ? '本场景里 ' + String(model.observations.modelVisiblePayloads)
@@ -198,3 +203,6 @@ function initializePage() {
 if (typeof document !== 'undefined') initializePage()
 
 installDeclaredIcons()
+
+// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

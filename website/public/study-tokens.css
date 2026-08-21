@@ -134,8 +134,19 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 }
 
+/*
+ * 深色板有两份：媒体查询那份服务系统偏好，也是关掉脚本时唯一生效的一份；
+ * 属性那份服务用户的显式选择。CSS 没法让媒体查询作用域内外的两个选择器共用
+ * 同一个声明块，所以这里是真的两份副本。
+ *
+ * `:not([data-theme="light"])` 让显式选浅色时媒体查询让位；`[data-theme="dark"]`
+ * 让显式选深色时在浅色系统下也生效。
+ *
+ * 两份会漂移，所以 study-tools/verify-theme-parity.mjs 逐 token 比对它们；
+ * 只改一边会让那道门禁失败。
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --page: #17171a;
     --surface: rgba(32, 33, 39, 0.94);
     --surface-strong: #1b1b1f;
@@ -178,6 +189,50 @@
     --shadow-lg: 0 24px 86px rgba(0, 0, 0, 0.36);
     --shadow: var(--shadow-lg);
   }
+}
+
+:root[data-theme="dark"] {
+  --page: #17171a;
+  --surface: rgba(32, 33, 39, 0.94);
+  --surface-strong: #1b1b1f;
+  --surface-soft: #202127;
+
+  --ink: #dfdfd6;
+  --muted: #9b9ba4;
+  --line: rgba(223, 223, 214, 0.14);
+  --line-strong: rgba(223, 223, 214, 0.28);
+
+  --brand: #6b8ae8;
+  --brand-bright: #91aaff;
+  --brand-soft: #202b55;
+
+  --signal: #d1793f;
+  --signal-ink: #d58651;
+  --signal-soft: #4c3027;
+
+  --allow: #2b9a70;
+  --allow-ink: #37c38e;
+  --allow-soft: #1e493c;
+
+  --deny: #cd4a5a;
+  --deny-ink: #dc808b;
+  --deny-soft: #4c292f;
+
+  --warning: #b8871f;
+  --warning-ink: #d7a63c;
+  --warning-soft: #43351a;
+
+  --series-1: #6b8ae8;
+  --series-2: #d1793f;
+  --series-3: #a98ad4;
+  --series-1-wash: #202b55;
+  --series-2-wash: #4c3027;
+  --series-3-wash: #33294a;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 12px 34px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 24px 86px rgba(0, 0, 0, 0.36);
+  --shadow: var(--shadow-lg);
 }
 
 /* 减少动态效果时把四档时长一起归零，页面不必各自判断。 */
@@ -233,4 +288,42 @@ rect[data-reveal].awaits-reveal {
     transform: none;
     transition: none;
   }
+}
+
+/*
+ * 主题切换按钮。三态（跟随系统／浅色／深色），所以状态由可见文字和 aria-label
+ * 承担，aria-pressed 只报告「是否覆盖了系统偏好」这一个布尔量。
+ */
+.theme-toggle {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface-strong) 65%, transparent);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.theme-toggle:hover {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface-strong));
+}
+
+/* 覆盖了系统偏好时给一个可见标记，不只靠 aria-pressed。 */
+.theme-toggle[aria-pressed="true"] {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.theme-toggle .icon { flex: 0 0 auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle { transition: none; }
 }

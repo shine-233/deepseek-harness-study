@@ -18,6 +18,9 @@ import {
   buildSessionLogModel,
   evaluateSessionLogOracle,
 } from './session-log-model.js'
+import { revealOnScroll } from './study-lab-reveal.js'
+import { icon } from './study-lab-icons.js'
+import { installThemeToggle } from './study-lab-theme.js'
 
 const DISPOSITION_GLYPH = {
   applied: '✓',
@@ -57,7 +60,7 @@ function renderStrip(model, target, note) {
     const x = left + index * cell
     const group = svgElement('g', { class: 'cell disposition-' + entry.disposition })
     group.append(
-      svgElement('rect', { x, y: top, width: cell - 8, height: 54, rx: 6, class: 'cell-box' }),
+      svgElement('rect', { x, y: top, width: cell - 8, height: 54, rx: 6, class: 'cell-box', 'data-reveal': '' }),
       svgElement('text', { x: x + (cell - 8) / 2, y: top + 24, class: 'cell-glyph', 'text-anchor': 'middle' },
         DISPOSITION_GLYPH[entry.disposition] ?? '?'),
       svgElement('text', { x: x + (cell - 8) / 2, y: top + 44, class: 'cell-seq', 'text-anchor': 'middle' },
@@ -77,6 +80,7 @@ function renderStrip(model, target, note) {
   }))
 
   target.append(svg)
+  revealOnScroll(target)
   writeText(note, model.observations.refusedAt === null
     ? '本次重放没有拒绝：' + String(model.observations.applied) + ' 条应用，'
       + String(model.observations.skipped) + ' 条跳过。'
@@ -216,3 +220,6 @@ function initializePage() {
 if (typeof document !== 'undefined') initializePage()
 
 installDeclaredIcons()
+
+// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

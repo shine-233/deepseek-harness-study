@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./session-log-lab.css">
+  <script src="./study-theme-boot.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#session-main">跳到实验</a>
@@ -20,6 +21,7 @@
         <h1>状态是事件的函数，不是页面记住的东西。</h1>
         <p class="hero-lead">拖动重放位置，看状态怎么从日志折叠出来。再换到含未知事件的场景：标了 <code>ignorable</code> 的可以跳过，必需的那条必须让加载停在它之前——悄悄忽略它，后面每条事件都建立在一个没人知道的状态上。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/05-session日志与恢复.html">阅读配套课程</a>
           <a class="button button-secondary" href="./turn-flow-lab.html">打开 Turn 流程实验</a>
         </div>

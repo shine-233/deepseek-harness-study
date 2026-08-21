@@ -9,6 +9,7 @@
   <title>Code Mode 权限管线证据实验</title>
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./code-mode-evidence-lab.css">
+  <script src="./study-theme-boot.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#lab-main">跳到实验</a>
@@ -19,6 +20,7 @@
         <h1>内部工具调用，不能从权限管线旁边溜过去。</h1>
         <p class="hero-lead">改变策略、seed 和并发上限，然后逐帧检查四个子调用。默认场景会拒绝一次写入；切到“全部放行”后，写入仍先经过 policy lane，才进入工具主体。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">阅读配套课程</a>
           <a class="button button-secondary" href="./research-debug-bridge.html">打开离线 Debug 桥</a>
         </div>

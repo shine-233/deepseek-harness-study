@@ -14,6 +14,8 @@ import {
   evaluatePackageGraphOracle,
 } from './package-graph-model.js'
 
+import { installThemeToggle } from './study-lab-theme.js'
+
 const FIXTURE_URL = './package-graph.json'
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
@@ -373,3 +375,6 @@ async function initializePage() {
 }
 
 if (typeof document !== 'undefined') void initializePage()
+
+// 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
