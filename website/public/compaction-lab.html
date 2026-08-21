@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="压缩替换 surface 时，原始日志为什么必须一条不少：可交互的上下文压缩实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>上下文压缩实验</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./compaction-lab.css">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#compaction-main">跳到实验</a>
+  <main class="lab-shell" id="compaction-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · Surface 与历史</p>
+        <h1>压缩换掉的是视图，不是日志。</h1>
+        <p class="hero-lead">上下文太长时，把久远的历史替换成一份摘要，最近几轮原样保留——这是 surface 的变化。原始日志是只追加的事实：被替换的每一条事件都还在，摘要必须逐条引用它们。这个实验让你亲手拉「保留轮数」，看两层折叠怎么算账。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./session-log-lab.html">打开日志重放实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 03</span>
+        <strong>token 是估算，不是分词。</strong>
+        <p>页面不连接 Host，不调用模型；所有数字来自构造的教学数据，token 一栏是启发式估计。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：把「保留轮数」拉到 0，除摘要以外全部历史都被替换。这时原始日志里的事件数会怎么变？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="unchanged">
+            <span>一条不变——日志只追加，压缩动的是 surface</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="fewer">
+            <span>变少——被替换的事件从日志里删掉了</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="depends">
+            <span>看情况——保留得越少，删掉的事件越多</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="compaction-form">
+          <label>
+            <span>会话形状</span>
+            <select id="scenario" name="scenario"></select>
+            <small id="scenario-note"></small>
+          </label>
+          <label>
+            <span>最近保留 <output id="keep-output">0</output> 轮（其余替换为摘要）</span>
+            <input id="keep-recent" type="range" min="0" max="12" step="1" value="2">
+            <small>0 表示全部历史都进摘要；拉到最大等于不压缩。摘要本身也有成本，不是免费的。</small>
+          </label>
+          <button class="button button-primary" type="submit">重新折叠</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
+        </form>
+        <p class="feedback" id="compaction-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="压缩观测值">
+          <div><dt>原始事件</dt><dd id="metric-events">—</dd></div>
+          <div><dt>表面节点</dt><dd id="metric-nodes">—</dd></div>
+          <div><dt>压缩前估算</dt><dd id="metric-before">—</dd></div>
+          <div><dt>压缩后估算</dt><dd id="metric-after">—</dd></div>
+          <div><dt>估算节省</dt><dd id="metric-saved">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="fold-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">两层折叠</p>
+          <h2 id="fold-title">上排是日志事实，下排是进入模型的表面</h2>
+        </div>
+        <span class="schema-pill">事件 × 表面节点</span>
+      </div>
+      <p class="section-intro">上排一格是一条原始事件，位置就是它的序号。下排一个节点横跨它引用的序号范围：chunk 先折成整条消息，久远轮次再换成一份摘要。摘要节点的虚线连回它替换的范围——这条线就是 sourceEventSeqs。矩形长度编码覆盖的事件数，不编码 token。</p>
+      <div class="plot-scroll" id="fold-plot"></div>
+      <p class="chart-note" id="fold-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>三条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">折叠校验</span>
+        </div>
+        <p class="section-intro">独立校验 不读渲染层的中间量：它自己重建一遍折叠、数一遍事件、加一遍 token，再检查摘要引用、最近轮保留和确定性。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="nodes-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="nodes-title">当前表面的全部节点</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">图里的每个节点，这张表都逐行给出：属于哪一轮、引用了哪些事件序号、估算多少 token。没有脚本或图形支持时从这里读。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="nodes-caption">当前表面的全部节点</caption>
+          <thead>
+            <tr>
+              <th scope="col">节点</th>
+              <th scope="col">所属范围</th>
+              <th scope="col">引用的事件序号</th>
+              <th scope="col">估算 token</th>
+            </tr>
+          </thead>
+          <tbody id="nodes-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/05-session日志与恢复.html">继续读 Session 日志与恢复</a>
+    </footer>
+  </main>
+  <script type="module" src="./compaction-lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+/*
+ * 上下文压缩实验页的页内专用样式。共用部分在 study-lab-shell.css。
+ */
+
+/* 事件类别只换填充色相，不编码数值；chunk 用低饱和底加描边表示“还没折叠”。 */
+.ev {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  transition: opacity 120ms ease;
+}
+.ev-user { fill: var(--brand); }
+.ev-call { fill: var(--allow); }
+.ev-result { fill: var(--signal); }
+.ev-assistant { fill: color-mix(in srgb, var(--brand) 72%, var(--surface-strong)); }
+.ev-chunk {
+  fill: color-mix(in srgb, var(--brand) 26%, var(--surface-strong));
+  stroke: color-mix(in srgb, var(--brand) 55%, var(--surface-strong));
+}
+
+/* 表面节点与摘要：摘要是虚线边框加同色相浅底，引用连线是关系不是数值。 */
+.fold-node {
+  fill: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  transition: stroke-width 120ms ease;
+}
+.fold-node:hover { stroke-width: 3; }
+.fold-node.is-summary {
+  fill: color-mix(in srgb, var(--signal-soft) 60%, transparent);
+  stroke: var(--signal);
+  stroke-dasharray: 4 3;
+}
+
+.cite-link {
+  fill: none;
+  stroke: color-mix(in srgb, var(--signal) 62%, transparent);
+  stroke-dasharray: 5 4;
+  stroke-width: 2;
+}
+
+tbody tr[data-state="summary"] td { color: var(--signal-ink); font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ev,
+  .fold-node { transition: none; }
+}

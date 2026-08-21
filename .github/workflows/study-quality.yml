@@ -80,6 +80,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      # 与 docs-pages.yml 相同的前置：学习门禁要从 study/source-index-manifest.json
+      # 固定的上游提交读文件树。那个提交属于上游仓库，不属于本 fork 的分支历史，
+      # fetch-depth: 0 也不会带它进来；按 SHA 从 fork network 拉取，对象不可达时
+      # 在这里失败，而不是把错误藏进某个门禁的输出里。
+      - name: Fetch the pinned upstream commit the study gates read
+        run: |
+          commit="$(node -p "require('./study/source-index-manifest.json').commit")"
+          git fetch --no-tags --depth 1 origin "$commit"
+          git cat-file -e "$commit^{tree}"
+
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v7

@@ -95,7 +95,7 @@ test('the model field names stay English', () => {
 })
 
 test('the ids the scripts bind to are not translated', () => {
-  // Translating a label must never touch the element it labels. The six model
+  // Translating a label must never touch the element it labels. The seven model
   // labs fill their boundary lists from `canProve` / `cannotProve`; the bridge
   // states its own boundary in prose and uses different ids, so it is checked
   // for the ids it actually has rather than forced into the same list.
@@ -112,7 +112,9 @@ test('the ids the scripts bind to are not translated', () => {
     )
     checked.push(file)
   }
-  assert.equal(checked.length, 6, 'the six model labs must each keep all three ids')
+  // 新增模型实验页时这里要同步加一：数字是「有几页必须带齐三个 id」的契约，
+  // 不是页面总数的自动统计，所以漏登记新页面会在这里失败。
+  assert.equal(checked.length, 7, 'the seven model labs must each keep all three ids')
 })
 
 test('a verdict badge carries its state in data-pass, not in its text', () => {

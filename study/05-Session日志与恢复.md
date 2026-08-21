@@ -51,6 +51,21 @@
 
 原始日志可能有很多 assistant chunk，也可能有 compaction replacement。`surface` 是按规则折叠后真正进入模型历史的有序节点；日志仍保留原始事实，surface 只是一个可重算的视图。`sourceEventSeqs` 记录一个节点引用了哪些原始事件，这样替换、回放和调试不会失去来源。
 
+<LessonWidget
+  id="compaction-lab"
+  url="/compaction-lab.html"
+  title="上下文压缩实验"
+  :height="1000"
+  fallback-href="#surface-和历史不是一回事"
+>
+
+不打开组件也能得到三个结论。第一，压缩替换的是 surface，不是日志：把「最近保留轮数」拉到 0，被替换的事件一条也不会从日志里消失。第二，摘要必须逐条引用它替换的事件——少了任何一条序号，独立校验的「摘要恰好引用被替换事件」就会失败。第三，最近几轮永远逐字保留，而且摘要本身有成本（固定底价加被替换内容的一个比例），所以「最近一轮特别大」的会话压不出多少空间。
+
+</LessonWidget>
+
+组件里的 token 一栏是构造教学数据上的启发式估计，不是真实 tokenizer 的计数；页面也不连接 Host，不调用模型。
+
+
 ## 恢复、fork 和修复
 
 - **恢复**：持久化层先取回 header 和 event seed，再由 `packages/core/session/src/index.ts` 的恢复入口和 `packages/session/session-persistence/src/preparations.ts` 协调准备；`packages/core/session/src/preparation.ts` 只持有尚未公开的 Session 并负责 provider 资源释放。
