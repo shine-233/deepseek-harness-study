@@ -1266,7 +1266,7 @@ tbody tr:last-child td {
 .concurrency-scroll svg {
   display: block;
   width: 100%;
-  min-width: 560px;
+  min-width: 1100px;
 }
 
 .conc-grid {
@@ -1290,7 +1290,7 @@ tbody tr:last-child td {
 .conc-cap-label {
   fill: var(--signal);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 750;
 }
 

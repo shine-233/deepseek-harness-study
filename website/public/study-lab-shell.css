@@ -265,7 +265,15 @@ select, input[type="number"] {
 }
 
 .plot-scroll { padding: 14px; }
-.plot-scroll svg { display: block; width: 100%; min-width: 560px; }
+/*
+ * 图表在容器变窄时会等比缩小，SVG 里的字号也跟着缩。按 .lab-shell 到 .plot-scroll
+ * 的盒模型推算：1270 单位宽的图在 1440px 视口下拿到 1296px（缩放 1.02），到 1024px
+ * 视口只剩 895px（缩放 0.70），11px 的文字实际只有 7.7px。
+ *
+ * 所以给 SVG 设一个接近设计宽度的 min-width：低于它就横向滚动，而不是继续缩小到
+ * 读不出来。完整表格始终是这张图的文字替代，滚动不是唯一出路。
+ */
+.plot-scroll svg { display: block; width: 100%; min-width: 1100px; }
 
 .grid { stroke: var(--line); stroke-width: 1; }
 .baseline { stroke: var(--line-strong); stroke-width: 1; }
@@ -273,11 +281,11 @@ select, input[type="number"] {
 .axis, .axis-title, .mark-label, .mark-value {
   fill: var(--muted);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
-.axis-title { font-size: 12px; font-weight: 750; }
+.axis-title { font-size: 14px; font-weight: 750; }
 .mark-value { fill: var(--ink); font-weight: 750; }
 
 .evidence-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }

@@ -8,11 +8,11 @@
   --muted: #626d65;
   --line: rgba(32, 49, 39, 0.14);
   --line-strong: rgba(32, 49, 39, 0.26);
-  --brand: #315d47;
-  --brand-bright: #4c8a69;
-  --brand-soft: #dceadf;
-  --signal: #d9773f;
-  --signal-soft: #f4dfd0;
+  --brand: #3157c8;
+  --brand-bright: #466fe0;
+  --brand-soft: #dfe7ff;
+  --signal: #d46b3e;
+  --signal-soft: #f5dfd3;
   --danger: #a84040;
   --danger-soft: #f4dede;
   --warning: #9c681c;
@@ -21,6 +21,14 @@
   --radius-xl: 30px;
   --radius-lg: 22px;
   --radius-md: 14px;
+  /*
+   * A code block stays dark in both themes, like a terminal, so these three do
+   * not flip with the colour scheme. Measured on this pair: body text reaches
+   * 13.46:1 and the label 6.55:1, both past AA.
+   */
+  --code-surface: #16161a;
+  --code-ink: #dfdfd6;
+  --code-label: #9b9ba4;
   --mono:
     ui-monospace, "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Menlo, Consolas,
     "Liberation Mono", "Sarasa Mono SC", "Noto Sans Mono CJK SC",
@@ -50,11 +58,11 @@
     --muted: #a6b3a9;
     --line: rgba(218, 234, 222, 0.13);
     --line-strong: rgba(218, 234, 222, 0.24);
-    --brand: #8ac6a6;
-    --brand-bright: #67af88;
-    --brand-soft: #263f31;
-    --signal: #f2a26f;
-    --signal-soft: #4b3123;
+    --brand: #6b8ae8;
+    --brand-bright: #91aaff;
+    --brand-soft: #202b55;
+    --signal: #d1793f;
+    --signal-soft: #4c3027;
     --danger: #f08b8b;
     --danger-soft: #492828;
     --warning: #e9b95e;
@@ -240,8 +248,8 @@ h1 {
 
 .button-primary {
   color: #fff;
-  background: #315d47;
-  box-shadow: 0 10px 26px rgba(49, 93, 71, 0.24);
+  background: var(--brand);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--brand) 26%, transparent);
 }
 
 .button-secondary {
@@ -571,7 +579,7 @@ fieldset {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: #121914;
+  background: var(--code-surface);
 }
 
 .handoff-block {
@@ -593,7 +601,7 @@ fieldset {
   margin-top: 12px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  background: #121914;
+  background: var(--code-surface);
 }
 
 .handoff-actions {
@@ -608,8 +616,8 @@ fieldset {
   display: flex;
   justify-content: space-between;
   padding: 9px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: #93a799;
+  border-bottom: 1px solid color-mix(in srgb, var(--code-ink) 12%, transparent);
+  color: var(--code-label);
   font-family: var(--mono);
   font-size: 0.68rem;
   letter-spacing: 0.04em;
@@ -621,7 +629,7 @@ pre {
   margin: 0;
   overflow: auto;
   padding: 18px;
-  color: #dfece3;
+  color: var(--code-ink);
   font-family: var(--mono);
   font-size: 0.76rem;
   line-height: 1.65;
