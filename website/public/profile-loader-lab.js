@@ -11,8 +11,7 @@ import {
   renderOracle,
   renderRows,
   requireElements,
-  writeText,
-} from './study-lab-kit.js'
+  writeText, installDeclaredIcons } from './study-lab-kit.js'
 import {
   OVERLAY_SOURCES,
   buildProfileModel,
@@ -221,3 +220,5 @@ function initializePage() {
 }
 
 if (typeof document !== 'undefined') initializePage()
+
+installDeclaredIcons()

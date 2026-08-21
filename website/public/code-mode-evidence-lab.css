@@ -1353,3 +1353,24 @@ tbody tr:last-child td {
     border: 1px dashed CanvasText;
   }
 }
+
+/*
+ * 内联图标。语义由旁边的文字标签承担，图标只加快扫读；去掉全部图标后信息量不变。
+ * 用 currentColor 描边，所以颜色跟随所在容器，不引入第二套配色。
+ */
+.icon {
+  flex: none;
+  vertical-align: -0.16em;
+  margin-right: 0.42em;
+}
+
+.has-icon {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+/* 图标不参与减少动态效果的判断，它本身不动。 */
+@media (forced-colors: active) {
+  .icon { stroke: CanvasText; }
+  [data-pass="true"] .icon, [data-pass="true"].icon { stroke: CanvasText; }
+}

@@ -6,6 +6,8 @@
  * `*-model.js` 里，是纯函数，可以在 Node 下单独测试。
  */
 
+import { prefixIcon } from './study-lab-icons.js'
+
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
 /** 一律用 textContent 赋值：导入的字符串永远当文本，不当标记。 */
@@ -43,6 +45,7 @@ export function renderOracle(verdict, list, badge) {
     const detail = document.createElement('span')
     writeText(title, (check.pass ? 'PASS · ' : 'FAIL · ') + check.label)
     writeText(detail, 'expected: ' + check.expected + '；actual: ' + check.actual)
+    prefixIcon(title, check.pass ? 'check' : 'cross')
     item.append(title, detail)
     list.append(item)
   }
@@ -51,6 +54,10 @@ export function renderOracle(verdict, list, badge) {
 export function renderBoundary(model, canProveList, cannotProveList) {
   replaceList(canProveList, model.canProve, '没有 canProve 声明。')
   replaceList(cannotProveList, model.cannotProve, '没有 cannotProve 声明。')
+  for (const [list, name] of [[canProveList, 'check'], [cannotProveList, 'cross']]) {
+    const heading = list.closest('div, section')?.querySelector('h3')
+    if (heading !== null && heading !== undefined) prefixIcon(heading, name)
+  }
 }
 
 /** 表格是每个实验的完整文字替代，所以行的顺序必须和图里一致。 */
@@ -89,4 +96,16 @@ export function requireElements(elements) {
 export function prefersReducedMotion() {
   return typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+/**
+ * 给带 `data-icon` 的元素装上图标。
+ *
+ * 由标记声明用哪个图标，而不是由脚本按类名猜；这样加一个小节不用改脚本，
+ * 而且未知的图标名会安静地保持纯文字，不会渲染出一个空框。
+ */
+export function installDeclaredIcons(scope = document) {
+  for (const target of scope.querySelectorAll('[data-icon]')) {
+    prefixIcon(target, target.dataset.icon, Number(target.dataset.iconSize ?? 16))
+  }
 }

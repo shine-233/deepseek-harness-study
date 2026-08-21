@@ -12,8 +12,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText,
-} from './study-lab-kit.js'
+  writeText, installDeclaredIcons } from './study-lab-kit.js'
 import {
   TURN_SCENARIOS,
   buildTurnModel,
@@ -197,3 +196,5 @@ function initializePage() {
 }
 
 if (typeof document !== 'undefined') initializePage()
+
+installDeclaredIcons()

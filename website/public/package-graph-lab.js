@@ -6,6 +6,7 @@
  * 其他实验页的唯一差别，也是它需要一次 fetch 的原因。
  */
 
+import { prefixIcon } from './study-lab-icons.js'
 import {
   BAR_VIEW_MAX_NODES,
   buildPackageGraphModel,
@@ -240,6 +241,7 @@ function renderOracle(verdict, list, badge) {
     const detail = document.createElement('span')
     writeText(title, (check.pass ? 'PASS · ' : 'FAIL · ') + check.label)
     writeText(detail, 'expected: ' + check.expected + '；actual: ' + check.actual)
+    prefixIcon(title, check.pass ? 'check' : 'cross')
     item.append(title, detail)
     list.append(item)
   }
@@ -321,6 +323,10 @@ async function initializePage() {
       renderTable(model, tableBody, tableCaption)
       replaceList(canProveList, model.canProve, '没有 canProve 声明。')
       replaceList(cannotProveList, model.cannotProve, '没有 cannotProve 声明。')
+      for (const [list, iconName] of [[canProveList, 'check'], [cannotProveList, 'cross']]) {
+        const heading = list.closest('div, section')?.querySelector('h3')
+        if (heading !== null && heading !== undefined) prefixIcon(heading, iconName)
+      }
       writeText(metrics.packages, String(model.observations.packages))
       writeText(metrics.edges, String(model.observations.edgesWithinView))
       writeText(metrics.lines, model.observations.srcLines.toLocaleString('en-US'))

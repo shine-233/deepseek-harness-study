@@ -235,8 +235,6 @@ select {
 .metric-grid dd { margin: 0; font-family: var(--mono); font-size: 1.24rem; font-weight: 750; font-variant-numeric: tabular-nums; }
 .metric-oracle dd[data-pass="true"] { color: var(--allow); }
 .metric-oracle dd[data-pass="false"] { color: var(--deny); }
-.metric-oracle dd[data-pass="true"]::before { content: "✓ "; }
-.metric-oracle dd[data-pass="false"]::before { content: "✕ "; }
 
 .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
 .section-label { margin: 0 0 8px; color: var(--brand); }
@@ -319,8 +317,6 @@ select {
 .oracle-list strong { font-size: 0.9rem; }
 .oracle-list li[data-pass="true"] strong { color: var(--allow); }
 .oracle-list li[data-pass="false"] strong { color: var(--deny); }
-.oracle-list li[data-pass="true"] strong::before { content: "✓ "; }
-.oracle-list li[data-pass="false"] strong::before { content: "✕ "; }
 .oracle-list span { color: var(--muted); font-family: var(--mono); font-size: 0.78rem; }
 
 .boundary-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
@@ -328,8 +324,6 @@ select {
 .boundary-columns li { margin-bottom: 8px; }
 .boundary-yes h3 { color: var(--allow); }
 .boundary-no h3 { color: var(--deny); }
-.boundary-yes h3::before { content: "✓ "; }
-.boundary-no h3::before { content: "✕ "; }
 
 table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
 caption { padding: 14px; color: var(--muted); font-size: 0.82rem; text-align: left; }
@@ -362,4 +356,25 @@ tbody tr:hover { background: color-mix(in srgb, var(--brand) 7%, transparent); }
 @media (forced-colors: active) {
   .card, .hero-panel, .scatter-scroll, .bar-scroll, .table-scroll { border: 1px solid CanvasText; }
   .button, select { border: 1px solid ButtonText; }
+}
+
+/*
+ * 内联图标。语义由旁边的文字标签承担，图标只加快扫读；去掉全部图标后信息量不变。
+ * 用 currentColor 描边，所以颜色跟随所在容器，不引入第二套配色。
+ */
+.icon {
+  flex: none;
+  vertical-align: -0.16em;
+  margin-right: 0.42em;
+}
+
+.has-icon {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+/* 图标不参与减少动态效果的判断，它本身不动。 */
+@media (forced-colors: active) {
+  .icon { stroke: CanvasText; }
+  [data-pass="true"] .icon, [data-pass="true"].icon { stroke: CanvasText; }
 }

@@ -12,8 +12,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText,
-} from './study-lab-kit.js'
+  writeText, installDeclaredIcons } from './study-lab-kit.js'
 import {
   LOG_SCENARIOS,
   buildSessionLogModel,
@@ -215,3 +214,5 @@ function initializePage() {
 }
 
 if (typeof document !== 'undefined') initializePage()
+
+installDeclaredIcons()
