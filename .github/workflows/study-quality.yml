@@ -177,7 +177,9 @@ jobs:
         with:
           name: dsh-study-site-${{ github.sha }}
           path: website/.dist
-          # .dist 以点开头；v4 默认排除隐藏文件，不加这一项上传永远为空。
+          # .dist 是点开头目录：v4 默认在遍历时跳过隐藏目录，会报
+          # "No files were found"。这里的产物本来就是要给人下载检查的，
+          # 显式包含隐藏文件。
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 7
