@@ -116,7 +116,7 @@
   background: var(--deny-soft);
 }
 
-.write-matrix tbody tr[data-kind="overlay"] th { color: var(--signal); }
+.write-matrix tbody tr[data-kind="overlay"] th { color: var(--signal-ink); }
 .write-matrix tbody tr[data-applied="false"] th { color: var(--deny-ink); }
 
 tbody tr[data-state="unset"] td { opacity: 0.62; }

@@ -1,83 +1,10 @@
 :root {
-  color-scheme: light dark;
-  --page: #f6f6f7;
-  --surface: rgba(255, 255, 255, 0.9);
-  --surface-strong: #ffffff;
-  --surface-soft: #ececed;
-  --ink: #1f2228;
-  --muted: #5b5b66;
-  --line: rgba(60, 60, 67, 0.14);
-  --line-strong: rgba(60, 60, 67, 0.28);
-  --brand: #3157c8;
-  --brand-bright: #466fe0;
-  --brand-soft: #dfe7ff;
-  --signal: #d46b3e;
-  /*
-   * --signal is a data colour, validated at 3:1 against the surface for a chart
-   * mark. Small text needs 4.5:1, so text takes this darker step of the same
-   * hue instead. Measured: 5.47:1 on the card and 4.54:1 on the warning panel in
-   * light, 5.66:1 and 4.51:1 in dark.
-   */
-  --signal-ink: #aa4d26;
-  --signal-soft: #f5dfd3;
-  --danger: #a84040;
-  --danger-soft: #f4dede;
-  --warning: #9c681c;
-  --warning-soft: #f6e8c7;
-  --shadow: 0 22px 70px rgba(31, 34, 40, 0.11);
-  --radius-xl: 30px;
-  --radius-lg: 22px;
-  --radius-md: 14px;
-  /*
-   * A code block stays dark in both themes, like a terminal, so these three do
-   * not flip with the colour scheme. Measured on this pair: body text reaches
-   * 13.46:1 and the label 6.55:1, both past AA.
-   */
-  --code-surface: #16161a;
+  /* 只有这个页面用到的 token；其余全部来自 study-tokens.css。 */
   --code-ink: #dfdfd6;
   --code-label: #9b9ba4;
-  --mono:
-    ui-monospace, "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Menlo, Consolas,
-    "Liberation Mono", "Sarasa Mono SC", "Noto Sans Mono CJK SC",
-    "Microsoft YaHei UI", "Microsoft YaHei", monospace;
-  /*
-   * Same stack as the site's reading layer and the shared lab shell, so this page
-   * and the lesson embedding it resolve to one typeface. Latin first: a CJK face
-   * also carries Latin glyphs, and they read looser than a dedicated Latin face
-   * beside code. Nothing is downloaded — `default-src 'self'` forbids a font CDN,
-   * and a self-hosted Chinese face costs 17 MB or more.
-   */
-  --sans:
-    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI",
-    "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans SC", "Noto Sans CJK SC",
-    "Microsoft YaHei UI", "Microsoft YaHei", "WenQuanYi Micro Hei",
-    ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --code-surface: #16161a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --page: #161618;
-    --surface: rgba(32, 33, 39, 0.94);
-    --surface-strong: #1b1b1f;
-    --surface-soft: #202127;
-    --ink: #dfdfd6;
-    --muted: #9b9ba4;
-    --line: rgba(223, 223, 214, 0.14);
-    --line-strong: rgba(223, 223, 214, 0.28);
-    --brand: #6b8ae8;
-    --brand-bright: #91aaff;
-    --brand-soft: #202b55;
-    --signal: #d1793f;
-    --signal-ink: #d58651;
-    --signal-soft: #4c3027;
-    --danger: #f08b8b;
-    --danger-soft: #492828;
-    --warning: #e9b95e;
-    --warning-soft: #46371d;
-    --shadow: 0 24px 86px rgba(0, 0, 0, 0.36);
-  }
-}
 
 * {
   box-sizing: border-box;
@@ -294,6 +221,7 @@ h1 {
 }
 
 .stamp-mark {
+  /* large-text: 36px 的装饰印章，WCAG 大字号下限是 3:1，图元色已经够。 */
   color: var(--signal);
   font-size: 2.25rem;
   line-height: 1;
@@ -785,7 +713,7 @@ pre {
 
 .result-card[data-status="partial"] .summary-main strong,
 .result-card[data-status="unavailable"] .summary-main strong {
-  color: var(--warning);
+  color: var(--warning-ink);
 }
 
 .result-card[data-status="fail"] .summary-main,

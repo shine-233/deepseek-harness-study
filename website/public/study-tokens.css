@@ -1,0 +1,191 @@
+/*
+ * 学习实验页与站点阅读层共用的 design token。
+ *
+ * 分成两组。语义组（表面、文字、品牌、状态）原本在四个样式表里各存一份副本，
+ * 现在只有这里一份；分级组（字号、间距、圆角、阴影、时长、缓动）是新加的刻度，
+ * 让每个页面从同一张表里取值，而不是各写各的数字。
+ *
+ * 颜色的验证记录留在原处：分类色 --brand / --signal 在两种模式下过五项检查
+ * （明度带、彩度下限、色盲可分辨、常视力下限、对表面对比度），且与站点
+ * --vp-c-brand-1 同色相族。状态色作为图元验证到 3:1，作为文字另有 *-ink 一档
+ * 验证到 4.5:1——数据色和文字色不能混用。
+ *
+ * 分级刻度只定义值，不规定谁该用哪一档。页面按用途取，取错了是页面的问题，
+ * 不是刻度的问题。
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* 表面：三层暖白。纯白配纯灰长文读起来偏冷偏平，暖调留出层次。 */
+  --page: #faf8f4;
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-strong: #ffffff;
+  --surface-soft: #f4f1ea;
+
+  --ink: #1f2228;
+  --muted: #5b5b66;
+  --line: rgba(60, 60, 67, 0.14);
+  --line-strong: rgba(60, 60, 67, 0.28);
+
+  --brand: #3157c8;
+  --brand-bright: #466fe0;
+  --brand-soft: #dfe7ff;
+
+  --signal: #d46b3e;
+  /* 文字档：图元色验证到 3:1，正文需要 4.5:1，所以文字取同色相的深一档。 */
+  --signal-ink: #aa4d26;
+  --signal-soft: #f5dfd3;
+
+  --allow: #0f7a52;
+  --allow-ink: #0f7851;
+  --allow-soft: #d9eee5;
+
+  --deny: #b03040;
+  --deny-ink: #b83243;
+  --deny-soft: #f4dcdf;
+
+  --warning: #b8892a;
+  --warning-ink: #8a6410;
+  --warning-soft: #f6ecd6;
+
+  /*
+   * 数据序列色：只在一张图需要区分三条以上同类序列时使用。
+   * 组别、分类等高基数维度不靠色相区分——那种情况下颜色不可靠，用筛选或位置。
+   */
+  --series-1: #3157c8;
+  --series-2: #d46b3e;
+  --series-3: #6b4d9e;
+  --series-1-wash: #dfe7ff;
+  --series-2-wash: #f5dfd3;
+  --series-3-wash: #e6dff2;
+
+  /* 字号：10 级。正文取 --text-md，行内 code 取 --text-xs。 */
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.8rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 4.25rem;
+
+  /* 间距：10 级，4px 基准。 */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.375rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 2.75rem;
+  --space-3xl: 3.5rem;
+  --space-4xl: 5rem;
+
+  /* 圆角：9 级。--radius-pill 用于胶囊按钮，不是一个尺寸而是一种形状。 */
+  --radius-2xs: 3px;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --radius-2xl: 38px;
+  --radius-3xl: 48px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 2px 8px rgba(38, 34, 26, 0.05);
+  --shadow-md: 0 12px 32px rgba(38, 34, 26, 0.08);
+  --shadow-lg: 0 22px 70px rgba(38, 34, 26, 0.11);
+
+  /*
+   * 别名，让已有页面不必改规则。--shadow 是四个实验页原来共用的那一档，等于
+   * --shadow-lg；--danger 是 bridge 对 --deny 的叫法，语义相同。
+   */
+  --shadow: var(--shadow-lg);
+  --danger: var(--deny);
+  --danger-soft: var(--deny-soft);
+
+  /*
+   * 四档时长配一条曲线。整站的交互反馈走同一条曲线，手感才一致；
+   * 各处各写一个 transition 是之前手感散的原因。
+   */
+  --dur-fast: 0.15s;
+  --dur: 0.2s;
+  --dur-slow: 0.3s;
+  --dur-enter: 0.35s;
+  --ease: cubic-bezier(0.2, 0.6, 0.3, 1);
+
+  --mono:
+    ui-monospace, "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Menlo, Consolas,
+    "Liberation Mono", "Sarasa Mono SC", "Noto Sans Mono CJK SC",
+    "Microsoft YaHei UI", "Microsoft YaHei", monospace;
+  /*
+   * Latin 放前面：CJK 字体自带的西文字形比专用 Latin 字体松，代码旁边的标识符
+   * 和数字会看出来。一个字节都不下载——实验页的 default-src 'self' 禁止字体 CDN，
+   * 而自托管中文字体要 17 MB 以上。
+   */
+  --sans:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans SC", "Noto Sans CJK SC",
+    "Microsoft YaHei UI", "Microsoft YaHei", "WenQuanYi Micro Hei",
+    ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #17171a;
+    --surface: rgba(32, 33, 39, 0.94);
+    --surface-strong: #1b1b1f;
+    --surface-soft: #202127;
+
+    --ink: #dfdfd6;
+    --muted: #9b9ba4;
+    --line: rgba(223, 223, 214, 0.14);
+    --line-strong: rgba(223, 223, 214, 0.28);
+
+    --brand: #6b8ae8;
+    --brand-bright: #91aaff;
+    --brand-soft: #202b55;
+
+    --signal: #d1793f;
+    --signal-ink: #d58651;
+    --signal-soft: #4c3027;
+
+    --allow: #2b9a70;
+    --allow-ink: #37c38e;
+    --allow-soft: #1e493c;
+
+    --deny: #cd4a5a;
+    --deny-ink: #dc808b;
+    --deny-soft: #4c292f;
+
+    --warning: #b8871f;
+    --warning-ink: #d7a63c;
+    --warning-soft: #43351a;
+
+    --series-1: #6b8ae8;
+    --series-2: #d1793f;
+    --series-3: #a98ad4;
+    --series-1-wash: #202b55;
+    --series-2-wash: #4c3027;
+    --series-3-wash: #33294a;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 12px 34px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 24px 86px rgba(0, 0, 0, 0.36);
+    --shadow: var(--shadow-lg);
+  }
+}
+
+/* 减少动态效果时把四档时长一起归零，页面不必各自判断。 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0s;
+    --dur: 0s;
+    --dur-slow: 0s;
+    --dur-enter: 0s;
+  }
+}

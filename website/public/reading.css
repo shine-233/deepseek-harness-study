@@ -31,7 +31,7 @@
     "Microsoft YaHei UI", "Microsoft YaHei", monospace;
   --vp-font-family-base: var(--dsh-font-sans);
   --vp-font-family-mono: var(--dsh-font-mono);
-  --dsh-reading-line-height: 1.78;
+  --dsh-reading-line-height: 1.85;
   --dsh-reading-radius: 8px;
   --dsh-reading-radius-lg: 16px;
   --dsh-reading-focus: color-mix(in srgb, var(--vp-c-brand-1) 22%, transparent);
@@ -87,6 +87,9 @@ body::before {
 .vp-doc h2 {
   padding-top: 1.1rem;
   border-top: 1px solid var(--vp-c-divider);
+  /* Tightening a heading slightly is what separates it from body tracking. */
+  font-weight: 700;
+  letter-spacing: -0.22px;
 }
 
 .vp-doc :is(p, ul, ol, blockquote) {
@@ -140,9 +143,10 @@ body::before {
 
 .vp-doc :not(pre) > code {
   border: 1px solid var(--vp-c-divider);
-  border-radius: 5px;
+  border-radius: 3px;
   background: var(--vp-c-bg-soft);
-  padding: 0.12em 0.34em;
+  padding: 1px 4px;
+  font-size: 0.8em;
 }
 
 .vp-doc kbd {

@@ -241,7 +241,16 @@ const siteStyle = `
   --vp-c-brand-2: #466fe0;
   --vp-c-brand-3: #dfe7ff;
   --vp-c-brand-soft: rgba(49, 87, 200, 0.14);
-  --dsh-card-shadow: 0 12px 34px rgba(37, 58, 112, 0.08);
+  --dsh-card-shadow: 0 12px 34px rgba(38, 34, 26, 0.08);
+  /*
+   * Three warm surfaces instead of white over neutral grey. The lab pages carry
+   * the same values, so an embedded lab and the lesson around it sit on one
+   * background rather than two slightly different whites.
+   */
+  --vp-c-bg: #faf8f4;
+  --vp-c-bg-alt: #f2efe6;
+  --vp-c-bg-soft: #f4f1ea;
+  --vp-c-bg-elv: #ffffff;
 }
 .dark {
   --vp-c-brand-1: #91aaff;
@@ -249,6 +258,10 @@ const siteStyle = `
   --vp-c-brand-3: #202b55;
   --vp-c-brand-soft: rgba(145, 170, 255, 0.18);
   --dsh-card-shadow: 0 14px 38px rgba(0, 0, 0, 0.22);
+  --vp-c-bg: #17171a;
+  --vp-c-bg-alt: #131316;
+  --vp-c-bg-soft: #202127;
+  --vp-c-bg-elv: #1b1b1f;
 }
 .VPNavBar {
   background: color-mix(in srgb, var(--vp-c-bg) 88%, transparent);
