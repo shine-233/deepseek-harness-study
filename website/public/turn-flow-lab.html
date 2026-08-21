@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="一次 Turn 的有序步骤，以及进入模型请求的内容与 Session 日志的一一对应">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Turn 流程与日志对应实验</title>
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./turn-flow-lab.css">
+</head>
+<body>
+  <a class="skip-link" href="#turn-main">跳到实验</a>
+  <main class="lab-shell" id="turn-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH STUDY · TURN TRACE 01</p>
+        <h1>进了模型请求的东西，日志里必须找得到。</h1>
+        <p class="hero-lead">一次 Turn 不是一次模型调用。每拿到一个工具结果就要把它带回模型，所以一次 Turn 里有多次请求。而仓库自己的规则是：凡是能到达模型请求的输入，都要能从 Session 日志重建——这条规则可以逐条配对检查。</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="./study/lessons/04-agent与turn流程.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./tool-visibility-lab.html">打开工具可见性实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 01</span>
+        <strong>横轴是步骤序号，不是时间。</strong>
+        <p>页面不连接 Host，不调用模型，也不把离散步骤冒充耗时或 token 数。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="场景输入">
+      <form class="lab-form" id="turn-form">
+        <label>
+          <span>场景</span>
+          <select id="scenario" name="scenario"></select>
+          <small id="scenario-note"></small>
+        </label>
+        <button class="button button-primary" type="submit">重建 Turn</button>
+      </form>
+      <p class="feedback" id="turn-feedback" role="status" aria-live="polite"></p>
+      <dl class="metric-grid" aria-label="Turn 观测值">
+        <div><dt>步骤</dt><dd id="metric-steps">—</dd></div>
+        <div><dt>模型请求</dt><dd id="metric-requests">—</dd></div>
+        <div><dt>工具执行</dt><dd id="metric-runs">—</dd></div>
+        <div><dt>日志事件</dt><dd id="metric-logged">—</dd></div>
+        <div><dt>不可重建</dt><dd id="metric-orphan">—</dd></div>
+        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="trace-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">ORDERED TRACE</p>
+          <h2 id="trace-title">五条 lane 上的有序步骤</h2>
+        </div>
+        <span class="schema-pill">step × lane</span>
+      </div>
+      <p class="section-intro">横轴是步骤序号，纵轴是参与方。虚线把同一份内容的“写入日志”和“进入模型请求”连起来——这条线就是可重建性本身。没有连线的日志事件是只入库不回传给模型的内容。</p>
+      <div class="plot-scroll" id="trace-plot"></div>
+      <p class="chart-note" id="trace-note"></p>
+    </section>
+
+    <section class="pair-card card" aria-labelledby="pair-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">RECONSTRUCTABILITY</p>
+          <h2 id="pair-title">每一份模型可见内容的日志出处</h2>
+        </div>
+        <span class="schema-pill">payload pairing</span>
+      </div>
+      <p class="section-intro">一行一份内容。左边是它进入模型请求的步骤，右边是它写入日志的步骤。任何一行右边为空，就说明有内容进了模型却无法从日志重建——oracle 会因此失败。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="pair-caption">当前场景的载荷配对</caption>
+          <thead>
+            <tr>
+              <th scope="col">载荷</th>
+              <th scope="col">进入模型请求（步）</th>
+              <th scope="col">写入日志（步）</th>
+              <th scope="col">可从日志重建</th>
+            </tr>
+          </thead>
+          <tbody id="pair-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">INDEPENDENT ORACLE</p>
+            <h2>那条规则由 oracle 逐条配对</h2>
+          </div>
+          <span class="schema-pill schema-oracle">trace audit</span>
+        </div>
+        <p class="section-intro">oracle 只读步骤数组，自己重算“模型可见”和“已记录”两个集合再配对。它还检查步骤序号连续、输入先于第一次请求、每次被记录的调用都有结果、被拒绝的调用没有主体执行。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">EVIDENCE BOUNDARY</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>canProve</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>cannotProve</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="steps-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">FULL TEXT ALTERNATIVE</p>
+          <h2 id="steps-title">完整步骤表</h2>
+        </div>
+        <span class="schema-pill">no script needed to read</span>
+      </div>
+      <p class="section-intro">图里的每一步，这张表都逐行给出，包括它是否进入模型请求、是否写入日志。没有脚本或图形支持时从这里读。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="steps-caption">当前场景的全部步骤</caption>
+          <thead>
+            <tr>
+              <th scope="col">步</th>
+              <th scope="col">lane</th>
+              <th scope="col">阶段</th>
+              <th scope="col">说明</th>
+              <th scope="col">进模型请求</th>
+              <th scope="col">写入日志</th>
+              <th scope="col">载荷</th>
+            </tr>
+          </thead>
+          <tbody id="steps-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立 oracle · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/05-session日志与恢复.html">继续读 Session 日志与恢复</a>
+    </footer>
+  </main>
+  <script type="module" src="./turn-flow-lab.js"></script>
+</body>
+</html>

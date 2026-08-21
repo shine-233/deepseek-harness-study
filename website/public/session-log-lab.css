@@ -1,0 +1,92 @@
+/*
+ * Session 日志重放实验页的页内专用样式。共用部分在 study-lab-shell.css。
+ */
+
+.cell-box {
+  fill: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.cell-glyph {
+  fill: var(--muted);
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.cell-seq, .cell-type {
+  fill: var(--muted);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+.cell-type { fill: var(--ink); }
+
+/* 四种去向各有独立字形（✓ ⤼ ✕ ·）加文字标签，颜色只是第二线索。 */
+.disposition-applied .cell-box { fill: var(--allow-soft); stroke: var(--allow); }
+.disposition-applied .cell-glyph { fill: var(--allow); }
+.disposition-skipped .cell-box { fill: var(--warning-soft); stroke: var(--warning); stroke-dasharray: 4 3; }
+.disposition-skipped .cell-glyph { fill: var(--warning); }
+.disposition-refused .cell-box { fill: var(--deny-soft); stroke: var(--deny); stroke-width: 2; }
+.disposition-refused .cell-glyph { fill: var(--deny); }
+.disposition-not-reached .cell-box { stroke-dasharray: 2 3; }
+.disposition-not-reached .cell-glyph,
+.disposition-not-reached .cell-seq,
+.disposition-not-reached .cell-type { opacity: 0.5; }
+
+.replay-marker {
+  stroke: var(--brand);
+  stroke-width: 2;
+}
+
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 18px 0 0;
+}
+
+.state-grid > div {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-strong) 62%, transparent);
+}
+
+.state-grid dt {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.state-grid dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.message-list-wrap { margin-top: 22px; }
+
+.message-list {
+  margin: 12px 0 0;
+  padding-left: 22px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.message-list li { margin-bottom: 7px; }
+.message-list li[data-role="assistant"] { color: var(--ink); }
+
+tbody tr[data-state="applied"] td:nth-child(4) { color: var(--allow); }
+tbody tr[data-state="skipped"] td:nth-child(4) { color: var(--warning); }
+tbody tr[data-state="refused"] td { color: var(--deny); font-weight: 700; }
+tbody tr[data-state="not-reached"] td { opacity: 0.6; }
+
+input[type="range"] { width: 100%; }

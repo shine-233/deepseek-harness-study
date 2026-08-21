@@ -28,7 +28,7 @@ export const REQUIRED_PUBLISHED_PAGES = [
       'dsh-status-strip',
       'data-study-pages="110"',
       'data-index-files="2756"',
-      'data-learning-tests="63"',
+      'data-learning-tests="110"',
       'data-example-tests="8"',
       'data-structural-errors="0"',
       'dsh-learning-map',

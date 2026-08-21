@@ -1,0 +1,95 @@
+/*
+ * 工具可见性实验页的页内专用样式。token、卡片、按钮、oracle 列表、表格和页脚都在
+ * study-lab-shell.css 里，本文件只放同心集合图和分层计数条。
+ */
+
+.bundle-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bundle-check {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.bundle-check:has(input:checked) {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.nest-scroll {
+  overflow-x: auto;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-strong) 62%, transparent);
+}
+
+.nest-scroll svg { display: block; width: 100%; min-width: 640px; }
+
+/* 三圈用同一色相的三档明度表达层级，因为层级是有序的，不是并列的类别。 */
+.ring {
+  fill: none;
+  stroke-width: 2;
+}
+
+.ring-1 { stroke: color-mix(in srgb, var(--brand) 34%, transparent); stroke-dasharray: 6 5; }
+.ring-2 { stroke: color-mix(in srgb, var(--brand) 60%, transparent); stroke-dasharray: 8 4; }
+.ring-3 { stroke: var(--brand); }
+
+.ring-label {
+  fill: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chip-box {
+  fill: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.chip-text {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+
+/* 到达最内层与被挡住只分两档，且都带 ✓ / ✕ 字形，不靠颜色单独承载状态。 */
+.chip.level-3 .chip-box { fill: var(--allow-soft); stroke: var(--allow); }
+.chip.level-3 .chip-text { fill: var(--allow); font-weight: 700; }
+.chip.level-2 .chip-box { stroke: var(--deny); stroke-dasharray: 4 3; }
+.chip.level-2 .chip-text { fill: var(--deny); }
+.chip.level-1 .chip-box,
+.chip.level-0 .chip-box { stroke: var(--line-strong); stroke-dasharray: 3 3; }
+.chip.level-1 .chip-text,
+.chip.level-0 .chip-text { fill: var(--muted); }
+
+.funnel-bar { stroke-width: 0; }
+.funnel-bar.tone-allow { fill: color-mix(in srgb, var(--allow) 72%, transparent); }
+.funnel-bar.tone-policy { fill: color-mix(in srgb, var(--deny) 66%, transparent); }
+.funnel-bar.tone-scope { fill: color-mix(in srgb, var(--signal) 62%, transparent); }
+.funnel-bar.tone-bundle { fill: color-mix(in srgb, var(--muted) 46%, transparent); }
+
+tbody tr[data-state="3"] td:first-child { color: var(--allow); font-weight: 700; }
+tbody tr[data-state="2"] td:first-child { color: var(--deny); }
+tbody tr[data-state="0"] td { opacity: 0.62; }
+
+@media (forced-colors: active) {
+  .nest-scroll, .bundle-check { border: 1px solid CanvasText; }
+}

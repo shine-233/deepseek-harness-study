@@ -1,0 +1,35 @@
+/*
+ * Turn 流程实验页的页内专用样式。共用部分在 study-lab-shell.css。
+ */
+
+.trace-dot {
+  fill: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  transition: r 120ms ease;
+}
+
+/* 三档状态各自有独立的形状线索：进模型请求是实心，写日志是加粗描边，
+ * 拒绝和失败额外换描边色并在表格里带文字，所以状态不靠颜色单独承载。 */
+.trace-dot.is-logged { stroke: var(--brand); }
+.trace-dot.is-visible { fill: var(--brand); stroke: var(--brand); }
+.trace-dot.is-visible.is-logged { fill: var(--brand); stroke: var(--brand); stroke-width: 3; }
+.trace-dot.is-denied { stroke: var(--deny); stroke-dasharray: 3 2; }
+.trace-dot.is-failed { stroke: var(--signal); stroke-dasharray: 3 2; }
+.trace-dot:hover { r: 11; }
+
+/* 连线是关系而不是数值，所以用虚线，且不参与任何长度比较。 */
+.pair-link {
+  fill: none;
+  stroke: color-mix(in srgb, var(--allow) 62%, transparent);
+  stroke-dasharray: 5 4;
+  stroke-width: 2;
+}
+
+tbody tr[data-state="orphan"] td { color: var(--deny); font-weight: 700; }
+tbody tr[data-state="denied"] td:nth-child(3) { color: var(--deny); }
+tbody tr[data-state="failed"] td:nth-child(3) { color: var(--signal); }
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-dot { transition: none; }
+}

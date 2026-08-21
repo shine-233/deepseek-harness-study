@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Session 日志重放与恢复：状态是事件的函数，读不懂的必需事件必须拒绝而不是跳过">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Session 日志重放实验</title>
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./session-log-lab.css">
+</head>
+<body>
+  <a class="skip-link" href="#session-main">跳到实验</a>
+  <main class="lab-shell" id="session-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH STUDY · LOG REPLAY 01</p>
+        <h1>状态是事件的函数，不是页面记住的东西。</h1>
+        <p class="hero-lead">拖动重放位置，看状态怎么从日志折叠出来。再换到含未知事件的场景：标了 <code>ignorable</code> 的可以跳过，必需的那条必须让加载停在它之前——悄悄忽略它，后面每条事件都建立在一个没人知道的状态上。</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="./study/lessons/05-session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./turn-flow-lab.html">打开 Turn 流程实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 01</span>
+        <strong>横轴是事件序号，不是时间戳。</strong>
+        <p>事件类型和字段由本页定义；不连接 Host，不读写任何真实 Session。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="重放输入">
+      <form class="lab-form" id="session-form">
+        <label>
+          <span>日志场景</span>
+          <select id="scenario" name="scenario"></select>
+          <small id="scenario-note"></small>
+        </label>
+        <label>
+          <span>重放到第 <output id="upto-output">0</output> 条</span>
+          <input id="upto" type="range" min="0" max="9" step="1" value="9">
+          <small>从头折叠到这一条；再往后的事件不参与。</small>
+        </label>
+        <button class="button button-primary" type="submit">重放</button>
+      </form>
+      <p class="feedback" id="session-feedback" role="status" aria-live="polite"></p>
+      <dl class="metric-grid" aria-label="重放观测值">
+        <div><dt>事件</dt><dd id="metric-events">—</dd></div>
+        <div><dt>已应用</dt><dd id="metric-applied">—</dd></div>
+        <div><dt>已跳过</dt><dd id="metric-skipped">—</dd></div>
+        <div><dt>拒绝位置</dt><dd id="metric-refused">—</dd></div>
+        <div><dt>消息</dt><dd id="metric-messages">—</dd></div>
+        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="strip-card card" aria-labelledby="strip-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">EVENT DISPOSITION</p>
+          <h2 id="strip-title">每条事件的去向</h2>
+        </div>
+        <span class="schema-pill">sequence × disposition</span>
+      </div>
+      <p class="section-intro">一格一条事件，按序号排列。已应用、已跳过、导致拒绝和未达四种去向各有自己的字形和文字，不靠颜色单独区分。竖线是当前重放位置。</p>
+      <div class="plot-scroll" id="strip-plot"></div>
+      <p class="chart-note" id="strip-note"></p>
+    </section>
+
+    <section class="state-card card" aria-labelledby="state-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">FOLDED STATE</p>
+          <h2 id="state-title">折叠到这一条时的状态</h2>
+        </div>
+        <span class="schema-pill">pure fold</span>
+      </div>
+      <p class="section-intro">这一块完全由左边的重放位置决定。把滑块拖回去再拖回来，状态一定回到同一个值——oracle 会重放两次并逐字段比对。</p>
+      <dl class="state-grid" id="state-grid"></dl>
+      <div class="message-list-wrap">
+        <h3>重建出的消息序列</h3>
+        <ol class="message-list" id="message-list"></ol>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">INDEPENDENT ORACLE</p>
+            <h2>确定性和拒绝规则由 oracle 核对</h2>
+          </div>
+          <span class="schema-pill schema-oracle">replay audit</span>
+        </div>
+        <p class="section-intro">oracle 自己重放两次比对状态，再逐个前缀检查已应用条数与状态计数一致，并核对“被跳过的都标了 ignorable”“拒绝之后没有任何事件被应用”。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">EVIDENCE BOUNDARY</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>canProve</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>cannotProve</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">FULL TEXT ALTERNATIVE</p>
+          <h2 id="table-title">完整事件表</h2>
+        </div>
+        <span class="schema-pill">no script needed to read</span>
+      </div>
+      <p class="section-intro">图里的每一格，这张表都逐行给出，包括去向和原因。没有脚本或图形支持时从这里读。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="table-caption">当前场景的全部事件</caption>
+          <thead>
+            <tr>
+              <th scope="col">序号</th>
+              <th scope="col">类型</th>
+              <th scope="col">ignorable</th>
+              <th scope="col">去向</th>
+              <th scope="col">原因</th>
+            </tr>
+          </thead>
+          <tbody id="session-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数折叠 · 独立 oracle · 完整表格替代 · 不读写真实 Session</span>
+      <a href="./study/lessons/15-bundleprofileloader与发布安装.html">继续读 Bundle、Profile 与 Loader</a>
+    </footer>
+  </main>
+  <script type="module" src="./session-log-lab.js"></script>
+</body>
+</html>

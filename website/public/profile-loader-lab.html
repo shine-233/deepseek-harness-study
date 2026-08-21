@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Profile、Bundle 与 Loader 的解析顺序：顺序决定最终配置，配置错误显式失败">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Profile 解析顺序实验</title>
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./profile-loader-lab.css">
+</head>
+<body>
+  <a class="skip-link" href="#profile-main">跳到实验</a>
+  <main class="lab-shell" id="profile-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH STUDY · RESOLUTION ORDER 01</p>
+        <h1>同一组 Bundle，换个顺序就是另一份配置。</h1>
+        <p class="hero-lead">把「严格上限」拖到前面，<code>maxTurns</code> 的最终值就从 4 变成 12——因为决定结果的是最后一个写它的步骤。overlay 永远叠在所有 Bundle patch 之后，所以它能覆盖 Bundle，反过来不行。</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="./study/lessons/15-bundleprofileloader与发布安装.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./session-log-lab.html">打开日志重放实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 01</span>
+        <strong>横轴是声明顺序，不是加载耗时。</strong>
+        <p>Bundle 名、配置键和 overlay 层次由本页定义；不读取任何真实 Profile。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="解析输入">
+      <form class="lab-form" id="profile-form">
+        <label>
+          <span>Bundle 顺序（点箭头调整）</span>
+          <span class="order-list" id="order-list"></span>
+          <small>顺序就是配置的一部分：后写的覆盖先写的。</small>
+        </label>
+        <label>
+          <span>overlay</span>
+          <select id="overlay" name="overlay"></select>
+          <small>overlay 叠在所有 Bundle patch 之后。</small>
+        </label>
+        <label>
+          <span>加入一个坏引用</span>
+          <span class="broken-toggle">
+            <label class="bundle-check"><input id="broken" type="checkbox"><span>broken-ref</span></label>
+          </span>
+          <small>它的 patch 需要一个没人提供的插件，用来看清“显式失败”长什么样。</small>
+        </label>
+        <button class="button button-primary" type="submit">重新解析</button>
+      </form>
+      <p class="feedback" id="profile-feedback" role="status" aria-live="polite"></p>
+      <dl class="metric-grid" aria-label="解析观测值">
+        <div><dt>声明 Bundle</dt><dd id="metric-declared">—</dd></div>
+        <div><dt>已应用步骤</dt><dd id="metric-applied">—</dd></div>
+        <div><dt>失败位置</dt><dd id="metric-failed">—</dd></div>
+        <div><dt>已解析键</dt><dd id="metric-keys">—</dd></div>
+        <div><dt>被多次写</dt><dd id="metric-contested">—</dd></div>
+        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="matrix-card card" aria-labelledby="matrix-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">WHO WRITES WHAT</p>
+          <h2 id="matrix-title">每一步写了哪些键</h2>
+        </div>
+        <span class="schema-pill">step × key</span>
+      </div>
+      <p class="section-intro">行是解析步骤（Bundle 按声明顺序，overlay 在最后），列是配置键。实心格是这一步成为该键的最终写者，空心格是它写了但被后面覆盖，空白是没触及。</p>
+      <div class="matrix-scroll" id="matrix-plot"></div>
+      <p class="chart-note" id="matrix-note"></p>
+    </section>
+
+    <section class="final-card card" aria-labelledby="final-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">RESOLVED CONFIG</p>
+          <h2 id="final-title">最终配置和它的出处</h2>
+        </div>
+        <span class="schema-pill">value + writer</span>
+      </div>
+      <p class="section-intro">每个键都写明最终值和写它的那一步。没有任何步骤写过的键留空——那不是错误，是这份 Profile 没有声明它。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="final-caption">当前输入解析出的配置</caption>
+          <thead>
+            <tr>
+              <th scope="col">键</th>
+              <th scope="col">最终值</th>
+              <th scope="col">最终写者</th>
+            </tr>
+          </thead>
+          <tbody id="final-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">INDEPENDENT ORACLE</p>
+            <h2>顺序语义由 oracle 核对</h2>
+          </div>
+          <span class="schema-pill schema-oracle">order audit</span>
+        </div>
+        <p class="section-intro">oracle 自己重解析一次比对配置，再逐键手算最终值而不复用页面算好的写者表；它还检查失败之后没有任何步骤被应用、overlay 落在最后一步。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">EVIDENCE BOUNDARY</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>canProve</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>cannotProve</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="steps-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">FULL TEXT ALTERNATIVE</p>
+          <h2 id="steps-title">完整解析步骤</h2>
+        </div>
+        <span class="schema-pill">no script needed to read</span>
+      </div>
+      <p class="section-intro">图里的每一格，这张表都逐行给出，包括这一步写了什么、哪些成为最终值、哪些被覆盖。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="steps-caption">当前输入的全部解析步骤</caption>
+          <thead>
+            <tr>
+              <th scope="col">步</th>
+              <th scope="col">来源</th>
+              <th scope="col">类型</th>
+              <th scope="col">写入的键</th>
+              <th scope="col">成为最终值</th>
+              <th scope="col">被覆盖</th>
+              <th scope="col">是否应用</th>
+            </tr>
+          </thead>
+          <tbody id="steps-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数解析 · 独立 oracle · 完整表格替代 · 不读取真实 Profile</span>
+      <a href="./study/lessons/02-cordis与插件树.html">回到 Cordis 与插件树</a>
+    </footer>
+  </main>
+  <script type="module" src="./profile-loader-lab.js"></script>
+</body>
+</html>

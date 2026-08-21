@@ -91,6 +91,7 @@
     "study-bridge:test": "node --test study-tools/research-debug-bridge.test.mjs",
     "study-lab:test": "node --test study-tools/code-mode-evidence-lab.test.mjs",
     "study-graph:test": "node --test study-tools/package-graph.test.mjs",
+    "study-labs:test": "node --test study-tools/tool-visibility.test.mjs study-tools/turn-flow.test.mjs study-tools/session-log.test.mjs study-tools/profile-loader.test.mjs",
     "study-graph:check": "node study-tools/generate-package-graph.mjs --check",
     "study-bridge:contract-replay": "node study-tools/replay-research-debug-contract.mjs",
     "docs:build:mpa": "pnpm --filter @deepseek-ai/website exec vitepress build . --mpa && pnpm run verify-doc-site-fragments",

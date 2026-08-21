@@ -2,6 +2,25 @@
 
 这篇解释一个插件怎样从代码变成可以被 DSH 发现、组合、启动和卸载的安装单元。读完后，你应该能区分普通 Cordis 插件、Bundle、Profile、patch 文件和 Loader；也应该知道为什么 package.json 里有 dsh.bundle 只能说明装配格式，不能证明发布者是官方团队。
 
+## 亲手换一次解析顺序
+
+顺序是配置的一部分。下面这个组件让你调整 Bundle 的声明顺序，看最终配置跟着变：默认顺序下 `maxTurns` 解析成 4，把「严格上限」移到第一位后变成 12——同一组 Bundle，只换顺序。叠加命令行 overlay 后又变成 20，因为 overlay 永远在所有 Bundle patch 之后。
+
+<LessonWidget
+  id="profile-loader-lab"
+  url="/profile-loader-lab.html"
+  title="Profile 解析顺序实验"
+  :height="900"
+  fallback-href="#先记住四个对象"
+>
+
+不打开组件也能得到两个结论。第一，被写多次的键（本例是 `maxTurns`、`telemetry`）由最后一个写它的步骤决定最终值，所以换顺序会换结果；只被写一次的键不受顺序影响。第二，配置错误是显式失败而不是静默跳过：勾上那个「引用了不存在插件」的 Bundle 后，解析停在第 1 步，只有 1 步被应用，后面的 Bundle 一个都没跑——而不是跳过坏的那个继续。
+
+</LessonWidget>
+
+组件的横轴是声明顺序，不是加载耗时：它不能说明真实 DSH 的 Bundle 名、配置键或 patch 语法与这里相同，也不能说明插件激活顺序带来的副作用。
+
+
 ## 先记住四个对象
 
 | 对象 | 初学者可以怎样理解 | 它负责什么 | 它不负责什么 |
