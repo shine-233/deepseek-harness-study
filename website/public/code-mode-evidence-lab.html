@@ -16,7 +16,7 @@
   <main class="lab-shell" id="lab-main">
     <header class="hero-panel">
       <div class="hero-copy">
-        <p class="eyebrow">DSH STUDY · DETERMINISTIC LAB 01</p>
+        <p class="eyebrow">DSH 学习 · 确定性实验 01</p>
         <h1>内部工具调用，不能从权限管线旁边溜过去。</h1>
         <p class="hero-lead">改变策略、seed 和并发上限，然后逐帧检查四个子调用。默认场景会拒绝一次写入；切到“全部放行”后，写入仍先经过 policy lane，才进入工具主体。</p>
         <div class="hero-actions">
@@ -44,10 +44,10 @@
       <aside class="control-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="beaker">INPUT</p>
+            <p class="section-label" data-icon="beaker">输入</p>
             <h2>先改输入，再看结果</h2>
           </div>
-          <span class="schema-pill">pure model</span>
+          <span class="schema-pill">纯函数模型</span>
         </div>
         <form id="prediction-gate" class="prediction-gate">
           <p class="gate-question" id="gate-question">
@@ -111,14 +111,14 @@
           <div><span>body executions</span><strong id="metric-body-executions">3</strong></div>
           <div><span>denied bodies</span><strong id="metric-denied-bodies">0</strong></div>
           <div><span>body concurrency</span><strong id="metric-concurrency">2 / 2</strong></div>
-          <div class="metric-oracle"><span>oracle</span><strong id="metric-oracle" data-pass="true">PASS</strong></div>
+          <div class="metric-oracle"><span>独立校验</span><strong id="metric-oracle" data-pass="true">PASS</strong></div>
         </div>
       </aside>
 
       <article class="timeline-card card">
         <div class="section-heading timeline-heading">
           <div>
-            <p class="section-label" data-icon="timeline">SEEKABLE TIMELINE</p>
+            <p class="section-label" data-icon="timeline">可拖动时间轴</p>
             <h2>横轴是 tick，纵轴是执行 lane</h2>
           </div>
           <p id="motion-status" class="motion-status">正在读取动态效果偏好。</p>
@@ -168,10 +168,10 @@
       <article class="matrix-card card" aria-labelledby="matrix-title">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="table">PHASE COVERAGE</p>
+            <p class="section-label" data-icon="table">阶段覆盖</p>
             <h2 id="matrix-title">哪个阶段真的发生过</h2>
           </div>
-          <span class="schema-pill">call × phase</span>
+          <span class="schema-pill">调用 × 阶段</span>
         </div>
         <p class="section-intro">行是四个子调用，列是调度器实际执行的阶段顺序，格子里是该阶段的 tick。被拒绝的调用在 <code>body start</code> 和 <code>body end</code> 两列是空的——区分 allow 与 deny 靠的是这个空缺，不是颜色。</p>
         <div class="matrix-scroll" id="phase-matrix"></div>
@@ -180,10 +180,10 @@
       <article class="concurrency-card card" aria-labelledby="concurrency-heading">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="layers">CONCURRENCY BOUND</p>
+            <p class="section-label" data-icon="layers">并发上限</p>
             <h2 id="concurrency-heading">并发有没有越过上限</h2>
           </div>
-          <span class="schema-pill">tick × bodies</span>
+          <span class="schema-pill">刻度 × 执行中的主体</span>
         </div>
         <p class="section-intro">纵轴是同时处在执行区间的工具主体数量，虚线是本次请求的上限。阶梯而不是曲线：并发只在 tick 边界改变，在两个 tick 之间插值等于编造中间值。</p>
         <div class="concurrency-scroll" id="concurrency-plot"></div>
@@ -195,12 +195,12 @@
       <article class="oracle-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="gauge">INDEPENDENT ORACLE</p>
+            <p class="section-label" data-icon="gauge">独立校验</p>
             <h2>动画不负责给自己判分</h2>
           </div>
-          <span class="schema-pill schema-oracle">event audit</span>
+          <span class="schema-pill schema-oracle">事件校验</span>
         </div>
-        <p class="section-intro">oracle 重新读取事件流，独立核对 parent、阶段顺序、策略结果、主体执行次数、并发上限和外层结算顺序。测试还会篡改一条 deny 事件，确认 oracle 能报错。</p>
+        <p class="section-intro">独立校验（oracle） 重新读取事件流，独立核对 parent、阶段顺序、策略结果、主体执行次数、并发上限和外层结算顺序。测试还会篡改一条 deny 事件，确认 独立校验 能报错。</p>
         <ul class="oracle-list" id="oracle-list">
           <li data-pass="true"><strong>PASS · 等待模型运行</strong><span>页面载入后会显示逐项 expected / actual。</span></li>
         </ul>
@@ -209,17 +209,17 @@
       <article class="boundary-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="shield">EVIDENCE BOUNDARY</p>
+            <p class="section-label" data-icon="shield">证据边界</p>
             <h2>哪些结论可以带走</h2>
           </div>
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes">
-            <h3>canProve</h3>
+            <h3>能证明什么</h3>
             <ul id="can-prove-list"><li>等待模型运行。</li></ul>
           </div>
           <div class="boundary-no">
-            <h3>cannotProve</h3>
+            <h3>不能证明什么</h3>
             <ul id="cannot-prove-list"><li>等待模型运行。</li></ul>
           </div>
         </div>
@@ -229,7 +229,7 @@
     <section class="event-card card" aria-labelledby="event-table-title">
       <div class="section-heading event-heading">
         <div>
-          <p class="section-label">TEXT FALLBACK</p>
+          <p class="section-label">文字替代</p>
           <h2 id="event-table-title">每个事件都能按文字读取</h2>
         </div>
         <p>表格不随动画隐藏；未来事件只降低对比度。</p>
@@ -238,11 +238,11 @@
         <table>
           <thead>
             <tr>
-              <th scope="col">tick</th>
-              <th scope="col">lane</th>
-              <th scope="col">call</th>
-              <th scope="col">phase</th>
-              <th scope="col">decision</th>
+              <th scope="col">刻度</th>
+              <th scope="col">执行通道</th>
+              <th scope="col">调用</th>
+              <th scope="col">阶段</th>
+              <th scope="col">判定</th>
               <th scope="col">说明</th>
             </tr>
           </thead>
@@ -252,7 +252,7 @@
     </section>
 
     <section class="source-card card" aria-labelledby="source-title">
-      <p class="section-label">SOURCE LAYERS</p>
+      <p class="section-label">来源分层</p>
       <h2 id="source-title">页面依据什么，又没有运行什么</h2>
       <div class="source-columns">
         <div>

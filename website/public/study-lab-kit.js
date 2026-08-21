@@ -31,10 +31,11 @@ export function replaceList(target, values, emptyMessage) {
   }
 }
 
-/** oracle 每一条都给出 expected 和 actual，页面不替它总结成一个颜色。 */
+/** 独立校验的每一条都给出期望值和实测值，页面不替它总结成一个颜色。 */
 export function renderOracle(verdict, list, badge) {
   if (badge !== null && badge !== undefined) {
-    writeText(badge, verdict.pass ? 'PASS' : 'FAIL')
+    // 判定同时写进 dataset.pass，配色和图标读的是那一个布尔量，不是这段文字。
+    writeText(badge, verdict.pass ? '通过' : '未通过')
     badge.dataset.pass = String(verdict.pass)
   }
   list.replaceChildren()
@@ -43,8 +44,8 @@ export function renderOracle(verdict, list, badge) {
     item.dataset.pass = String(check.pass)
     const title = document.createElement('strong')
     const detail = document.createElement('span')
-    writeText(title, (check.pass ? 'PASS · ' : 'FAIL · ') + check.label)
-    writeText(detail, 'expected: ' + check.expected + '；actual: ' + check.actual)
+    writeText(title, (check.pass ? '通过 · ' : '未通过 · ') + check.label)
+    writeText(detail, '期望：' + check.expected + '；实测：' + check.actual)
     prefixIcon(title, check.pass ? 'check' : 'cross')
     item.append(title, detail)
     list.append(item)

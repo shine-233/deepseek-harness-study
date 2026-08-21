@@ -26,6 +26,23 @@ export const SOURCE_KINDS = Object.freeze([
 ])
 
 export const CHECK_IDS = Object.freeze(['coverage', 'privacy', 'integrity'])
+
+/**
+ * 三项协议检查的中文名。
+ *
+ * `checkId` 本身是协议值，出现在 request、result 和 PowerShell 脚本里，所以不翻译；
+ * 这张表只负责把它显示成读者读得懂的名字。缺项时退回原 id，不会显示成空白。
+ */
+const CHECK_LABELS = Object.freeze({
+  coverage: '证据覆盖',
+  privacy: '隐私',
+  integrity: '完整性',
+})
+
+/** 检查项的可见名称；未知 id 直接显示原值。 */
+function checkLabel(checkId) {
+  return CHECK_LABELS[checkId] ?? checkId
+}
 export const CHECK_STATUSES = Object.freeze(['PASS', 'PARTIAL', 'WARN', 'UNAVAILABLE', 'FAIL'])
 const RESULT_STATUSES = Object.freeze(['COMPLETE', 'PARTIAL', 'UNAVAILABLE', 'FAIL'])
 const FINDING_SEVERITIES = Object.freeze(['info', 'warning', 'error'])
@@ -694,11 +711,12 @@ function exampleResult(status = 'COMPLETE') {
     findings: [{
       code: complete ? 'REQUIRED_EVIDENCE_PRESENT' : partial ? 'EVIDENCE_KIND_MISSING' : unavailable ? 'EVIDENCE_NOT_SUPPLIED' : 'REQUEST_KIND_INVALID',
       severity: complete ? 'info' : partial ? 'warning' : unavailable ? 'info' : 'error',
+      // findingCodes 是协议码，跨工具比对用，保持原样；message 是给读者读的说明。
       message: complete
-        ? 'All requested evidence kinds are present in the explicit repro artifact.'
+        ? 'request 要求的每一种证据，都出现在这份显式提供的 repro 产物里。'
         : partial
-          ? 'Required evidence kind is missing: trace.'
-          : unavailable ? 'No explicit metadata-only repro artifact was supplied.' : 'The research request did not satisfy the bridge schema.',
+          ? '缺少一种必需的证据：trace。'
+          : unavailable ? '没有提供任何显式的、只含元数据的 repro 产物。' : '这次研究请求不满足桥接协议的结构要求。',
     }],
     privacy: {
       inputMode: 'explicit-file-only',
@@ -901,7 +919,7 @@ function initializePage() {
         const name = document.createElement('strong')
         const detail = document.createElement('span')
         item.dataset.status = check.status
-        writeText(name, check.checkId)
+        writeText(name, checkLabel(check.checkId))
         writeText(detail, `${check.status} · ${check.findingCodes.join(', ') || 'no finding code'}`)
         item.append(name, detail)
         checkResultsList.append(item)

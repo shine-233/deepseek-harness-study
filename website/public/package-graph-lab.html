@@ -16,7 +16,7 @@
   <main class="lab-shell" id="graph-main">
     <header class="hero-panel">
       <div class="hero-copy">
-        <p class="eyebrow">DSH STUDY · SOURCE-GROUNDED GRAPH 01</p>
+        <p class="eyebrow">DSH 学习 · 源码实测依赖图 01</p>
         <h1>最被依赖的包，是最小的那个。</h1>
         <p class="hero-lead">横轴是一个包 <code>src</code> 目录的行数，纵轴是同仓库里有多少个包在 <code>peerDependencies</code> 里指向它。两者可以完全脱钩——先看散点右下角和左上角，再按组筛选。</p>
         <div class="hero-actions">
@@ -32,7 +32,35 @@
       </aside>
     </header>
 
-    <section class="control-strip card" aria-label="视图输入">
+      <section class="control-strip card" aria-label="先预测，再改参数">
+        <form id="prediction-gate" class="prediction-gate">
+          <p class="gate-question" id="gate-question">散点图的横轴是包的 <code>src</code> 行数，纵轴是有多少个包在 <code>peerDependencies</code> 里指向它。先押一个注：把「排序」从行数换成被依赖次数，图上每个点的位置会怎么变？</p>
+          <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="unchanged">
+              <span>一个都不变——排序只改柱视图的先后，不改任何数值</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="rescaled">
+              <span>会重新标定坐标轴，所以点会移动</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="reordered">
+              <span>点会按新顺序重排位置</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="filtered">
+              <span>只留下被依赖次数高的包</span>
+            </label>
+          </div>
+          <div class="gate-actions">
+            <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+            <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+          </div>
+          <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+        </form>
+
+        <div id="gated-controls">
       <form id="graph-form">
         <label>
           <span>按组筛选</span>
@@ -60,17 +88,18 @@
         <div><dt>视图内边</dt><dd id="metric-edges">—</dd></div>
         <div><dt>src 行</dt><dd id="metric-lines">—</dd></div>
         <div><dt>零入度包</dt><dd id="metric-leaves">—</dd></div>
-        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+        <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
       </dl>
-    </section>
+    </div>
+      </section>
 
     <section class="scatter-card card" aria-labelledby="scatter-title">
       <div class="section-heading">
         <div>
-          <p class="section-label">SIZE × IN-DEGREE</p>
+          <p class="section-label">体量 × 被依赖次数</p>
           <h2 id="scatter-title">体量和被依赖程度是两件事</h2>
         </div>
-        <span class="schema-pill">lines × degree</span>
+        <span class="schema-pill">行数 × 被依赖次数</span>
       </div>
       <p class="section-intro">一个点是一个包。把鼠标停在任意一点上会显示它的行数和被依赖次数；换上面的「按组筛选」会重画这张图，只留那一组的包。只用一种颜色：49 个组无法用色相安全区分，所以组是筛选条件，不是颜色。只给落在角上的包直接标名字。</p>
       <div class="scatter-scroll" id="scatter-plot"></div>
@@ -83,10 +112,10 @@
     <section class="bar-card card" aria-labelledby="bar-title">
       <div class="section-heading">
         <div>
-          <p class="section-label">GROUP DETAIL</p>
+          <p class="section-label">组内明细</p>
           <h2 id="bar-title">组内的柱与依赖边</h2>
         </div>
-        <span class="schema-pill">height=lines · width=degree</span>
+        <span class="schema-pill">高=行数 · 粗=被依赖次数</span>
       </div>
       <p class="section-intro">柱高是 src 行数，柱的边框粗细是被依赖次数，横向位置只是排序后的次序，不承载数值。先把「按组筛选」换到某一组，这张图才会出现：节点超过 24 个时它不显示——密到看不清的图不如表格。把「排序」从行数换成被依赖次数，柱的先后会重排，但每根柱的高度和粗细一个都不变。</p>
       <div class="bar-scroll" id="bar-plot"></div>
@@ -97,29 +126,29 @@
       <article class="oracle-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label">INDEPENDENT ORACLE</p>
+            <p class="section-label">独立校验</p>
             <h2>图不给自己判分</h2>
           </div>
-          <span class="schema-pill schema-oracle">fixture audit</span>
+          <span class="schema-pill schema-oracle">固定数据校验</span>
         </div>
-        <p class="section-intro">oracle 不读页面上任何已渲染的值。它从 nodes 和 edges 重算包数、边数、入度、行数和组数，再和 fixture 自己记录的总数比对；fixture 被改过就会失败。</p>
+        <p class="section-intro">独立校验（oracle） 不读页面上任何已渲染的值。它从 nodes 和 edges 重算包数、边数、入度、行数和组数，再和 fixture 自己记录的总数比对；fixture 被改过就会失败。</p>
         <ul class="oracle-list" id="oracle-list"></ul>
       </article>
 
       <article class="boundary-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label">EVIDENCE BOUNDARY</p>
+            <p class="section-label">证据边界</p>
             <h2>哪些结论可以带走</h2>
           </div>
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes">
-            <h3>canProve</h3>
+            <h3>能证明什么</h3>
             <ul id="can-prove-list"></ul>
           </div>
           <div class="boundary-no">
-            <h3>cannotProve</h3>
+            <h3>不能证明什么</h3>
             <ul id="cannot-prove-list"></ul>
           </div>
         </div>
@@ -129,10 +158,10 @@
     <section class="table-card card" aria-labelledby="table-title">
       <div class="section-heading">
         <div>
-          <p class="section-label">FULL TEXT ALTERNATIVE</p>
+          <p class="section-label">完整文字替代</p>
           <h2 id="table-title">同一份数据的完整表格</h2>
         </div>
-        <span class="schema-pill">no script needed to read</span>
+        <span class="schema-pill">不用脚本也能读</span>
       </div>
       <p class="section-intro">上面两张图能表达的每一个数字，这张表都逐行给出。没有脚本、没有图形支持或开启减少动态效果时，从这里读。</p>
       <div class="table-scroll">
@@ -156,7 +185,7 @@
     </section>
 
     <footer class="page-footer">
-      <span id="footer-provenance">固定提交读数 · 纯函数模型 · 独立 oracle · 完整表格替代</span>
+      <span id="footer-provenance">固定提交读数 · 纯函数模型 · 独立 独立校验 · 完整表格替代</span>
       <a href="./study/lessons/02-cordis与插件树.html">继续读配套章节</a>
     </footer>
   </main>

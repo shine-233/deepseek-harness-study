@@ -12,6 +12,24 @@
 const REVEAL_CLASS = 'is-revealed'
 const PENDING_CLASS = 'awaits-reveal'
 
+/** 错峰总时长上限，与 revealMarks 里的 600 / marks.length 对应。 */
+const MAX_STAGGER_MS = 600
+
+/**
+ * 读 --dur-enter，用于决定何时可以安全清掉行内的错峰延迟。
+ *
+ * 时长的唯一归属是 study-tokens.css；这里只读，不复制数字。读不到就按 0 处理——
+ * 那种情况下没有过渡，也就没有需要等待的动画。
+ */
+function enterDurationMs() {
+  if (typeof getComputedStyle !== 'function') return 0
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--dur-enter').trim()
+  if (raw === '') return 0
+  const value = Number.parseFloat(raw)
+  if (!Number.isFinite(value)) return 0
+  return raw.endsWith('ms') ? value : value * 1000
+}
+
 function reducedMotion() {
   return typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -21,7 +39,7 @@ function reducedMotion() {
  * 给一棵 SVG 里的标记排进场顺序。
  *
  * @param root 包含标记的元素；它的子孙里带 data-reveal 的会被逐个放行。
- * @param stagger 相邻标记之间的间隔毫秒；总时长上限 600ms，标记再多也不会拖长。
+ * @param stagger 相邻标记之间的间隔毫秒；错峰总时长不超过 MAX_STAGGER_MS，标记再多也不会拖长。
  */
 export function revealMarks(root, stagger = 6) {
   const marks = [...root.querySelectorAll('[data-reveal]')]
@@ -30,7 +48,7 @@ export function revealMarks(root, stagger = 6) {
     for (const mark of marks) mark.classList.add(REVEAL_CLASS)
     return
   }
-  const step = Math.min(stagger, 600 / marks.length)
+  const step = Math.min(stagger, MAX_STAGGER_MS / marks.length)
   for (const [index, mark] of marks.entries()) {
     mark.classList.add(PENDING_CLASS)
     // 用 delay 而不是逐个 setTimeout：整批只交一次给合成器。
@@ -49,6 +67,13 @@ export function revealMarks(root, stagger = 6) {
       mark.classList.remove(PENDING_CLASS)
       mark.classList.add(REVEAL_CLASS)
     }
+    // 错峰只属于这一次进场。这些标记随后每次交互都会改类（时间轴推进会切
+    // is-past/is-current/is-future），行内 delay 留着的话，最后一个标记的状态更新
+    // 会比第一个晚将近 --dur-enter 的时间，一次点击看起来像是分批响应的。
+    // 等这一轮过渡跑完再清，清除本身不会打断进场。
+    setTimeout(() => {
+      for (const mark of marks) mark.style.transitionDelay = ''
+    }, MAX_STAGGER_MS + enterDurationMs())
   }
   if (typeof requestAnimationFrame === 'function') requestAnimationFrame(release)
   setTimeout(release, 60)

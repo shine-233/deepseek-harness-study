@@ -19,6 +19,7 @@ import {
   evaluateSessionLogOracle,
 } from './session-log-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
+import { installPredictionGate } from './study-lab-gate.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -222,4 +223,18 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  installPredictionGate({
+    form: document.getElementById('prediction-gate'),
+    locked: document.getElementById('gated-controls'),
+    feedback: document.getElementById('gate-feedback'),
+    correct: 'same-state',
+    explain: {
+      'same-state': 'REPLAY_IS_DETERMINISTIC 每次都重放两次并逐字段比对，就是在钉住这一点。',
+      drift: '重放不累积状态：每次都从空状态开始重新折叠这段日志。',
+      'depends-order': '路径不进入结果，只有前缀长度进入。',
+      'cannot-return': 'PREFIX_REPLAY_CONSISTENT 检查任意前缀都自洽，包括来回拖动之后。',
+    },
+  })
 }

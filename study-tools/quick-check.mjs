@@ -75,6 +75,7 @@ export function createChecks({ deep = false, example = false, runtime = false, s
     { label: '学习体验契约', ...nodeScript('verify-study-learning-contract.mjs') },
     { label: '首页状态数字', ...nodeScript('verify-study-home-metrics.mjs') },
     { label: 'Agent 审阅契约', ...nodeScript('verify-agent-review.mjs') },
+    { label: '实验页配色对比度', ...nodeScript('verify-lab-contrast.mjs') },
     { label: '固定提交源码链接', ...nodeScript('verify-study-links.mjs') },
     {
       label: '离线工具可见性 A/B',

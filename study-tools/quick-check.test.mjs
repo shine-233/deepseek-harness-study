@@ -10,6 +10,7 @@ test('default quick check is offline and keeps the first-time route small', () =
     '学习体验契约',
     '首页状态数字',
     'Agent 审阅契约',
+    '实验页配色对比度',
     '固定提交源码链接',
     '离线工具可见性 A/B',
   ])

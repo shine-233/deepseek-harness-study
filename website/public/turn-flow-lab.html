@@ -17,7 +17,7 @@
   <main class="lab-shell" id="turn-main">
     <header class="hero-panel">
       <div class="hero-copy">
-        <p class="eyebrow">DSH STUDY · TURN TRACE 01</p>
+        <p class="eyebrow">DSH 学习 · Turn 轨迹 01</p>
         <h1>进了模型请求的东西，日志里必须找得到。</h1>
         <p class="hero-lead">一次 Turn 不是一次模型调用。每拿到一个工具结果就要把它带回模型，所以一次 Turn 里有多次请求。而仓库自己的规则是：凡是能到达模型请求的输入，都要能从 Session 日志重建——这条规则可以逐条配对检查。</p>
         <div class="hero-actions">
@@ -33,7 +33,35 @@
       </aside>
     </header>
 
-    <section class="control-strip card" aria-label="场景输入">
+      <section class="control-strip card" aria-label="先预测，再改参数">
+        <form id="prediction-gate" class="prediction-gate">
+          <p class="gate-question" id="gate-question">这一页把一次 Turn 的每一步排成有序轨迹，右侧标出它写进日志的位置。先押一个注：切到「工具调用被拒绝」的场景，那次被拒的调用在日志里会留下什么？</p>
+          <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="has-event">
+              <span>仍然有调用和结果事件，但没有工具主体执行</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="nothing">
+              <span>什么都不留——被拒绝就等于没发生</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="body-only">
+              <span>留下主体执行记录，只是结果标成失败</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="result-only">
+              <span>只有结果事件，没有调用事件</span>
+            </label>
+          </div>
+          <div class="gate-actions">
+            <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+            <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+          </div>
+          <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+        </form>
+
+        <div id="gated-controls">
       <form class="lab-form" id="turn-form">
         <label>
           <span>场景</span>
@@ -49,17 +77,18 @@
         <div><dt>工具执行</dt><dd id="metric-runs">—</dd></div>
         <div><dt>日志事件</dt><dd id="metric-logged">—</dd></div>
         <div><dt>不可重建</dt><dd id="metric-orphan">—</dd></div>
-        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+        <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
       </dl>
-    </section>
+    </div>
+      </section>
 
     <section class="trace-card card" aria-labelledby="trace-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="timeline">ORDERED TRACE</p>
+          <p class="section-label" data-icon="timeline">有序轨迹</p>
           <h2 id="trace-title">五条 lane 上的有序步骤</h2>
         </div>
-        <span class="schema-pill">step × lane</span>
+        <span class="schema-pill">步骤 × 执行通道</span>
       </div>
       <p class="section-intro">横轴是步骤序号，纵轴是参与方。虚线把同一份内容的“写入日志”和“进入模型请求”连起来——这条线就是可重建性本身。没有连线的日志事件是只入库不回传给模型的内容。</p>
       <div class="plot-scroll" id="trace-plot"></div>
@@ -69,12 +98,12 @@
     <section class="pair-card card" aria-labelledby="pair-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="route">RECONSTRUCTABILITY</p>
+          <p class="section-label" data-icon="route">能否从日志重建</p>
           <h2 id="pair-title">每一份模型可见内容的日志出处</h2>
         </div>
-        <span class="schema-pill">payload pairing</span>
+        <span class="schema-pill">载荷配对</span>
       </div>
-      <p class="section-intro">一行一份内容。左边是它进入模型请求的步骤，右边是它写入日志的步骤。任何一行右边为空，就说明有内容进了模型却无法从日志重建——oracle 会因此失败。</p>
+      <p class="section-intro">一行一份内容。左边是它进入模型请求的步骤，右边是它写入日志的步骤。任何一行右边为空，就说明有内容进了模型却无法从日志重建——独立校验（oracle） 会因此失败。</p>
       <div class="table-scroll">
         <table>
           <caption id="pair-caption">当前场景的载荷配对</caption>
@@ -95,25 +124,25 @@
       <article class="oracle-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="beaker">INDEPENDENT ORACLE</p>
-            <h2>那条规则由 oracle 逐条配对</h2>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>那条规则由 独立校验 逐条配对</h2>
           </div>
-          <span class="schema-pill schema-oracle">trace audit</span>
+          <span class="schema-pill schema-oracle">轨迹校验</span>
         </div>
-        <p class="section-intro">oracle 只读步骤数组，自己重算“模型可见”和“已记录”两个集合再配对。它还检查步骤序号连续、输入先于第一次请求、每次被记录的调用都有结果、被拒绝的调用没有主体执行。</p>
+        <p class="section-intro">独立校验 只读步骤数组，自己重算“模型可见”和“已记录”两个集合再配对。它还检查步骤序号连续、输入先于第一次请求、每次被记录的调用都有结果、被拒绝的调用没有主体执行。</p>
         <ul class="oracle-list" id="oracle-list"></ul>
       </article>
 
       <article class="boundary-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="shield">EVIDENCE BOUNDARY</p>
+            <p class="section-label" data-icon="shield">证据边界</p>
             <h2>哪些结论可以带走</h2>
           </div>
         </div>
         <div class="boundary-columns">
-          <div class="boundary-yes"><h3>canProve</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>cannotProve</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
         </div>
       </article>
     </section>
@@ -121,10 +150,10 @@
     <section class="table-card card" aria-labelledby="steps-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="table">FULL TEXT ALTERNATIVE</p>
+          <p class="section-label" data-icon="table">完整文字替代</p>
           <h2 id="steps-title">完整步骤表</h2>
         </div>
-        <span class="schema-pill">no script needed to read</span>
+        <span class="schema-pill">不用脚本也能读</span>
       </div>
       <p class="section-intro">图里的每一步，这张表都逐行给出，包括它是否进入模型请求、是否写入日志。没有脚本或图形支持时从这里读。</p>
       <div class="table-scroll">
@@ -133,7 +162,7 @@
           <thead>
             <tr>
               <th scope="col">步</th>
-              <th scope="col">lane</th>
+              <th scope="col">执行通道</th>
               <th scope="col">阶段</th>
               <th scope="col">说明</th>
               <th scope="col">进模型请求</th>
@@ -147,7 +176,7 @@
     </section>
 
     <footer class="page-footer">
-      <span>纯函数模型 · 独立 oracle · 完整表格替代 · 不连接任何 Host</span>
+      <span>纯函数模型 · 独立 独立校验 · 完整表格替代 · 不连接任何 Host</span>
       <a href="./study/lessons/05-session日志与恢复.html">继续读 Session 日志与恢复</a>
     </footer>
   </main>

@@ -19,6 +19,7 @@ import {
   evaluateTurnOracle,
 } from './turn-flow-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
+import { installPredictionGate } from './study-lab-gate.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -205,4 +206,18 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  installPredictionGate({
+    form: document.getElementById('prediction-gate'),
+    locked: document.getElementById('gated-controls'),
+    feedback: document.getElementById('gate-feedback'),
+    correct: 'has-event',
+    explain: {
+      'has-event': 'DENIED_HAS_NO_BODY 和 EVERY_CALL_HAS_RESULT 两条校验项一起固定了这个组合。',
+      nothing: '那样就违反「进了模型请求的东西日志里必须找得到」——拒绝本身也是要重建的事实。',
+      'body-only': '拒绝发生在主体之前，所以主体一次都没跑。',
+      'result-only': '每个结果都能追到一次调用，否则日志无法重建这一步。',
+    },
+  })
 }

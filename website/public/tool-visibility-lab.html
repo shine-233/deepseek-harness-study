@@ -17,7 +17,7 @@
   <main class="lab-shell" id="visibility-main">
     <header class="hero-panel">
       <div class="hero-copy">
-        <p class="eyebrow">DSH STUDY · NESTED SETS 01</p>
+        <p class="eyebrow">DSH 学习 · 嵌套集合 01</p>
         <h1>模型看得见，不等于允许执行。</h1>
         <p class="hero-lead">工具要穿过三道收窄才能真的跑起来：Bundle 决定它是否<strong>已注册</strong>，agent 作用域决定它是否<strong>对模型可见</strong>，执行策略决定它是否<strong>允许执行</strong>。三层是嵌套的，收窄各由不同的东西负责。</p>
         <div class="hero-actions">
@@ -33,7 +33,35 @@
       </aside>
     </header>
 
-    <section class="control-strip card" aria-label="三层输入">
+      <section class="control-strip card" aria-label="先预测，再改参数">
+        <form id="prediction-gate" class="prediction-gate">
+          <p class="gate-question" id="gate-question">默认输入下，清单里的工具会经过「已注册 → 模型可见 → 允许执行」三层收窄。在动控件之前先押一个注：把「作用域」放宽一档，这三个数字会怎么变？</p>
+          <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="monotonic">
+              <span>三个数字都可能变大，但顺序仍然是 已注册 ≥ 模型可见 ≥ 允许执行</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="visible-only">
+              <span>只有「模型可见」变大，「允许执行」不受作用域影响</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="can-invert">
+              <span>放得足够宽时，「允许执行」可以超过「模型可见」</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="registered-fixed">
+              <span>「已注册」会跟着变小，因为作用域筛掉了一些工具</span>
+            </label>
+          </div>
+          <div class="gate-actions">
+            <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+            <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+          </div>
+          <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+        </form>
+
+        <div id="gated-controls">
       <form class="lab-form" id="visibility-form">
         <label>
           <span>已加载的 Bundle</span>
@@ -59,17 +87,18 @@
         <div><dt>模型可见</dt><dd id="metric-visible">—</dd></div>
         <div><dt>允许执行</dt><dd id="metric-allowed">—</dd></div>
         <div><dt>可见但不允许</dt><dd id="metric-gap">—</dd></div>
-        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+        <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
       </dl>
-    </section>
+    </div>
+      </section>
 
     <section class="nest-card card" aria-labelledby="nest-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="layers">NESTED SETS</p>
+          <p class="section-label" data-icon="layers">嵌套集合</p>
           <h2 id="nest-title">三个同心集合</h2>
         </div>
-        <span class="schema-pill">containment = level</span>
+        <span class="schema-pill">包含关系 = 层级</span>
       </div>
       <p class="section-intro">嵌套本身就是数据结构：一个工具画在它能到达的最内层里。上面三个控件各自收窄一层，可以逐个试：勾掉一个 Bundle，它的工具会掉到最外层；把 agent 作用域换成「只读研究」，write 和 execute 工具会停在「已注册」这一圈；把执行策略换成「只允许读」，它们会停在「模型可见」这一圈。把鼠标停在任意一个工具上会显示它被谁挡住。颜色只分“到达最内层”和“被挡住”两档，不编码 Bundle——Bundle 用文字标出。</p>
       <div class="nest-scroll" id="nest-plot"></div>
@@ -79,12 +108,12 @@
     <section class="funnel-card card" aria-labelledby="funnel-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="gauge">WHERE THEY STOP</p>
+          <p class="section-label" data-icon="gauge">各自停在哪里</p>
           <h2 id="funnel-title">十二个工具各自停在哪一层</h2>
         </div>
-        <span class="schema-pill">count per level</span>
+        <span class="schema-pill">每层数量</span>
       </div>
-      <p class="section-intro">条的长度是数量，四段之和恒等于清单里的工具总数——oracle 会检查这一点。三道收窄各挡下多少，一眼可比。</p>
+      <p class="section-intro">条的长度是数量，四段之和恒等于清单里的工具总数——独立校验（oracle） 会检查这一点。三道收窄各挡下多少，一眼可比。</p>
       <div class="plot-scroll" id="funnel-plot"></div>
       <p class="chart-note" id="funnel-note"></p>
     </section>
@@ -93,25 +122,25 @@
       <article class="oracle-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="beaker">INDEPENDENT ORACLE</p>
-            <h2>嵌套关系由 oracle 核对</h2>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>嵌套关系由 独立校验 核对</h2>
           </div>
-          <span class="schema-pill schema-oracle">set audit</span>
+          <span class="schema-pill schema-oracle">集合校验</span>
         </div>
-        <p class="section-intro">oracle 不读页面上任何已渲染的内容。它从工具数组重算三个集合，检查两条子集关系、数量单调、每个被挡工具都有原因、层级与标记一致，以及四种去向之和等于总数。</p>
+        <p class="section-intro">独立校验 不读页面上任何已渲染的内容。它从工具数组重算三个集合，检查两条子集关系、数量单调、每个被挡工具都有原因、层级与标记一致，以及四种去向之和等于总数。</p>
         <ul class="oracle-list" id="oracle-list"></ul>
       </article>
 
       <article class="boundary-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="shield">EVIDENCE BOUNDARY</p>
+            <p class="section-label" data-icon="shield">证据边界</p>
             <h2>哪些结论可以带走</h2>
           </div>
         </div>
         <div class="boundary-columns">
-          <div class="boundary-yes"><h3>canProve</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>cannotProve</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
         </div>
       </article>
     </section>
@@ -119,10 +148,10 @@
     <section class="table-card card" aria-labelledby="table-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="table">FULL TEXT ALTERNATIVE</p>
+          <p class="section-label" data-icon="table">完整文字替代</p>
           <h2 id="table-title">十二个工具的完整判定</h2>
         </div>
-        <span class="schema-pill">no script needed to read</span>
+        <span class="schema-pill">不用脚本也能读</span>
       </div>
       <p class="section-intro">图里的每一次判定，这张表都逐行给出，包括它到达哪一层、被谁挡住。没有脚本或图形支持时从这里读。</p>
       <div class="table-scroll">
@@ -132,8 +161,8 @@
             <tr>
               <th scope="col">工具</th>
               <th scope="col">Bundle</th>
-              <th scope="col">access</th>
-              <th scope="col">risk</th>
+              <th scope="col">访问类型</th>
+              <th scope="col">风险</th>
               <th scope="col">已注册</th>
               <th scope="col">模型可见</th>
               <th scope="col">允许执行</th>
@@ -146,7 +175,7 @@
     </section>
 
     <footer class="page-footer">
-      <span>纯函数模型 · 独立 oracle · 完整表格替代 · 不连接任何 Host</span>
+      <span>纯函数模型 · 独立 独立校验 · 完整表格替代 · 不连接任何 Host</span>
       <a href="./study/lessons/23-工具可见集合观测与性能实验.html">继续读观测与性能实验</a>
     </footer>
   </main>

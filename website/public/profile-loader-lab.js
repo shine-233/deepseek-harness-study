@@ -19,6 +19,7 @@ import {
 } from './profile-loader-model.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
+import { installPredictionGate } from './study-lab-gate.js'
 
 const DEFAULT_ORDER = ['base', 'web-tools', 'shell-tools', 'observability', 'strict-limits']
 
@@ -226,4 +227,18 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  installPredictionGate({
+    form: document.getElementById('prediction-gate'),
+    locked: document.getElementById('gated-controls'),
+    feedback: document.getElementById('gate-feedback'),
+    correct: 'overlay-last',
+    explain: {
+      'overlay-last': 'OVERLAY_APPLIES_LAST 和 LAST_WRITER_WINS 两条校验项一起决定了这个结果。',
+      'first-writer': '这一页的模型是「最后写的人赢」，不是「先声明的赢」。',
+      'bundle-priority': 'overlay 的位置是固定的最后一层，不参与 Bundle 之间的排序。',
+      merge: '这个模型里每个键取单一值，不做合并——所以顺序才这么关键。',
+    },
+  })
 }

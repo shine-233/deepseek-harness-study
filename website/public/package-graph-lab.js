@@ -8,6 +8,7 @@
 
 import { icon, prefixIcon } from './study-lab-icons.js'
 import { revealOnScroll } from './study-lab-reveal.js'
+import { installPredictionGate } from './study-lab-gate.js'
 import {
   BAR_VIEW_MAX_NODES,
   buildPackageGraphModel,
@@ -268,7 +269,7 @@ function renderTable(model, tableBody, caption) {
 }
 
 function renderOracle(verdict, list, badge) {
-  writeText(badge, verdict.pass ? 'PASS' : 'FAIL')
+  writeText(badge, verdict.pass ? '通过' : '未通过')
   badge.dataset.pass = String(verdict.pass)
   list.replaceChildren()
   for (const check of verdict.checks) {
@@ -276,8 +277,8 @@ function renderOracle(verdict, list, badge) {
     item.dataset.pass = String(check.pass)
     const title = document.createElement('strong')
     const detail = document.createElement('span')
-    writeText(title, (check.pass ? 'PASS · ' : 'FAIL · ') + check.label)
-    writeText(detail, 'expected: ' + check.expected + '；actual: ' + check.actual)
+    writeText(title, (check.pass ? '通过 · ' : '未通过 · ') + check.label)
+    writeText(detail, '期望：' + check.expected + '；实测：' + check.actual)
     prefixIcon(title, check.pass ? 'check' : 'cross')
     item.append(title, detail)
     list.append(item)
@@ -397,4 +398,18 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  installPredictionGate({
+    form: document.getElementById('prediction-gate'),
+    locked: document.getElementById('gated-controls'),
+    feedback: document.getElementById('gate-feedback'),
+    correct: 'unchanged',
+    explain: {
+      unchanged: '排序是阅读顺序，不是数据变换。散点的两个坐标都直接来自固定提交的读数。',
+      rescaled: '坐标轴由数据范围决定，换排序不改变数据范围。',
+      reordered: '散点没有「顺序」这个维度可以重排，位置完全由两个数值决定。',
+      filtered: '筛选是上面那个「按组筛选」，和排序是两件事。',
+    },
+  })
 }

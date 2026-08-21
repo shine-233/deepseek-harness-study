@@ -17,7 +17,7 @@
   <main class="lab-shell" id="profile-main">
     <header class="hero-panel">
       <div class="hero-copy">
-        <p class="eyebrow">DSH STUDY · RESOLUTION ORDER 01</p>
+        <p class="eyebrow">DSH 学习 · 解析顺序 01</p>
         <h1>同一组 Bundle，换个顺序就是另一份配置。</h1>
         <p class="hero-lead">把「严格上限」拖到前面，<code>maxTurns</code> 的最终值就从 4 变成 12——因为决定结果的是最后一个写它的步骤。overlay 永远叠在所有 Bundle patch 之后，所以它能覆盖 Bundle，反过来不行。</p>
         <div class="hero-actions">
@@ -33,7 +33,35 @@
       </aside>
     </header>
 
-    <section class="control-strip card" aria-label="解析输入">
+      <section class="control-strip card" aria-label="先预测，再改参数">
+        <form id="prediction-gate" class="prediction-gate">
+          <p class="gate-question" id="gate-question">这一页按顺序解析多层 Bundle patch，同一个键可能被写多次。先押一个注：把「overlay」从「不叠加」换成任意一档之后，一个 Bundle 和 overlay 都写过的键，最终值来自谁？</p>
+          <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="overlay-last">
+              <span>overlay，因为它排在所有 Bundle patch 之后</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="first-writer">
+              <span>第一个写它的 Bundle，先声明的优先</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="bundle-priority">
+              <span>取决于 Bundle 自己声明的优先级，overlay 不特殊</span>
+            </label>
+            <label class="gate-option">
+              <input type="radio" name="prediction" value="merge">
+              <span>两个值会合并，不是二选一</span>
+            </label>
+          </div>
+          <div class="gate-actions">
+            <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+            <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+          </div>
+          <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+        </form>
+
+        <div id="gated-controls">
       <form class="lab-form" id="profile-form">
         <label>
           <span>Bundle 顺序（点箭头调整）</span>
@@ -61,17 +89,18 @@
         <div><dt>失败位置</dt><dd id="metric-failed">—</dd></div>
         <div><dt>已解析键</dt><dd id="metric-keys">—</dd></div>
         <div><dt>被多次写</dt><dd id="metric-contested">—</dd></div>
-        <div class="metric-oracle"><dt>oracle</dt><dd id="metric-oracle">—</dd></div>
+        <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
       </dl>
-    </section>
+    </div>
+      </section>
 
     <section class="matrix-card card" aria-labelledby="matrix-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="fileUp">WHO WRITES WHAT</p>
+          <p class="section-label" data-icon="fileUp">谁写了哪一项</p>
           <h2 id="matrix-title">每一步写了哪些键</h2>
         </div>
-        <span class="schema-pill">step × key</span>
+        <span class="schema-pill">步骤 × 配置键</span>
       </div>
       <p class="section-intro">行是解析步骤（Bundle 按声明顺序，overlay 在最后），列是配置键。实心格是这一步成为该键的最终写者，空心格是它写了但被后面覆盖，空白是没触及。</p>
       <div class="matrix-scroll" id="matrix-plot"></div>
@@ -81,10 +110,10 @@
     <section class="final-card card" aria-labelledby="final-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="cube">RESOLVED CONFIG</p>
+          <p class="section-label" data-icon="cube">解析后的配置</p>
           <h2 id="final-title">最终配置和它的出处</h2>
         </div>
-        <span class="schema-pill">value + writer</span>
+        <span class="schema-pill">值 + 写入者</span>
       </div>
       <p class="section-intro">每个键都写明最终值和写它的那一步。没有任何步骤写过的键留空——那不是错误，是这份 Profile 没有声明它。</p>
       <div class="table-scroll">
@@ -106,25 +135,25 @@
       <article class="oracle-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="beaker">INDEPENDENT ORACLE</p>
-            <h2>顺序语义由 oracle 核对</h2>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>顺序语义由 独立校验（oracle） 核对</h2>
           </div>
-          <span class="schema-pill schema-oracle">order audit</span>
+          <span class="schema-pill schema-oracle">顺序校验</span>
         </div>
-        <p class="section-intro">oracle 自己重解析一次比对配置，再逐键手算最终值而不复用页面算好的写者表；它还检查失败之后没有任何步骤被应用、overlay 落在最后一步。</p>
+        <p class="section-intro">独立校验 自己重解析一次比对配置，再逐键手算最终值而不复用页面算好的写者表；它还检查失败之后没有任何步骤被应用、overlay 落在最后一步。</p>
         <ul class="oracle-list" id="oracle-list"></ul>
       </article>
 
       <article class="boundary-card card">
         <div class="section-heading">
           <div>
-            <p class="section-label" data-icon="shield">EVIDENCE BOUNDARY</p>
+            <p class="section-label" data-icon="shield">证据边界</p>
             <h2>哪些结论可以带走</h2>
           </div>
         </div>
         <div class="boundary-columns">
-          <div class="boundary-yes"><h3>canProve</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>cannotProve</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
         </div>
       </article>
     </section>
@@ -132,10 +161,10 @@
     <section class="table-card card" aria-labelledby="steps-title">
       <div class="section-heading">
         <div>
-          <p class="section-label" data-icon="table">FULL TEXT ALTERNATIVE</p>
+          <p class="section-label" data-icon="table">完整文字替代</p>
           <h2 id="steps-title">完整解析步骤</h2>
         </div>
-        <span class="schema-pill">no script needed to read</span>
+        <span class="schema-pill">不用脚本也能读</span>
       </div>
       <p class="section-intro">图里的每一格，这张表都逐行给出，包括这一步写了什么、哪些成为最终值、哪些被覆盖。</p>
       <div class="table-scroll">
@@ -158,7 +187,7 @@
     </section>
 
     <footer class="page-footer">
-      <span>纯函数解析 · 独立 oracle · 完整表格替代 · 不读取真实 Profile</span>
+      <span>纯函数解析 · 独立 独立校验 · 完整表格替代 · 不读取真实 Profile</span>
       <a href="./study/lessons/02-cordis与插件树.html">回到 Cordis 与插件树</a>
     </footer>
   </main>

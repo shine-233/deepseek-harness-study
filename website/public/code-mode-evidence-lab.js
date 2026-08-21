@@ -768,6 +768,7 @@ function renderTimeline(simulation, target) {
     const end = xFor(call.bodyEndTick)
     const y = yFor(call.lane)
     const rect = svgElement('rect', {
+      'data-reveal': '',
       x,
       y: y - 13,
       width: Math.max(4, end - x),
@@ -783,6 +784,7 @@ function renderTimeline(simulation, target) {
 
   for (const event of simulation.events) {
     const marker = svgElement('circle', {
+      'data-reveal': '',
       cx: xFor(event.tick),
       cy: yFor(event.lane),
       r: event.phase === 'policy-decision' ? 8 : 6,
@@ -804,6 +806,7 @@ function renderTimeline(simulation, target) {
   })
   svg.append(guide)
   target.replaceChildren(svg)
+  revealOnScroll(target)
 }
 
 function renderEventTable(simulation, tableBody) {
@@ -999,10 +1002,11 @@ function renderConcurrencyChart(simulation, target) {
     commands.push('L ' + String(x) + ' ' + String(yFor(series.points[index - 1].count)))
     commands.push('L ' + String(x) + ' ' + String(y))
   }
-  svg.append(svgElement('path', { d: commands.join(' '), class: 'conc-step' }))
+  svg.append(svgElement('path', { d: commands.join(' '), class: 'conc-step', 'data-reveal': '' }))
 
   for (const point of series.points) {
     const marker = svgElement('circle', {
+      'data-reveal': '',
       cx: xFor(point.tick),
       cy: yFor(point.count),
       r: 5,
@@ -1169,7 +1173,7 @@ function initializePage() {
       String(simulation.observations.maxObservedBodyConcurrency)
       + ' / ' + String(simulation.observations.requestedParallelism),
     )
-    writeText(metrics.oracle, simulation.oracle.pass ? 'PASS' : 'FAIL')
+    writeText(metrics.oracle, simulation.oracle.pass ? '通过' : '未通过')
     metrics.oracle.dataset.pass = String(simulation.oracle.pass)
     oracleList.replaceChildren()
     for (const check of simulation.oracle.checks) {
@@ -1177,8 +1181,8 @@ function initializePage() {
       item.dataset.pass = String(check.pass)
       const title = document.createElement('strong')
       const detail = document.createElement('span')
-      writeText(title, (check.pass ? 'PASS · ' : 'FAIL · ') + check.label)
-      writeText(detail, 'expected: ' + check.expected + '；actual: ' + check.actual)
+      writeText(title, (check.pass ? '通过 · ' : '未通过 · ') + check.label)
+      writeText(detail, '期望：' + check.expected + '；实测：' + check.actual)
       item.append(title, detail)
       oracleList.append(item)
     }

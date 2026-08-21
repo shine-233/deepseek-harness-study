@@ -87,6 +87,9 @@ jobs:
       - name: Verify the four lesson lab models
         run: pnpm run study-labs:test
 
+      - name: Verify the lab palette holds both contrast floors
+        run: pnpm run study-contrast:check
+
       - name: Verify and build documentation
         env:
           DOCS_BASE: ${{ steps.pages.outputs.base_path }}/

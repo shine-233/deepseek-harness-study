@@ -21,6 +21,7 @@ import {
   evaluateToolVisibilityOracle,
 } from './tool-visibility-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
+import { installPredictionGate } from './study-lab-gate.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -272,4 +273,18 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  installPredictionGate({
+    form: document.getElementById('prediction-gate'),
+    locked: document.getElementById('gated-controls'),
+    feedback: document.getElementById('gate-feedback'),
+    correct: 'monotonic',
+    explain: {
+      monotonic: '这一页的 COUNTS_MONOTONIC 校验项每次重算都检查这个不等式。',
+      'visible-only': '两层都会变：作用域先决定可见集合，执行策略再从可见集合里筛。',
+      'can-invert': 'ALLOWED_SUBSET_VISIBLE 校验项就是在排除这种情况——允许执行必须是可见的子集。',
+      'registered-fixed': '已注册只由加载了哪些 Bundle 决定，和作用域无关。',
+    },
+  })
 }
