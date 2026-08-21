@@ -193,6 +193,23 @@ test('只有整个 Turn 里都没有日志事件才算 orphan', () => {
   assert.ok(check.actual.includes(target.payloadId))
 })
 
+test('逐步推进时，每一个前缀上全部检查都通过', () => {
+  // 中间态不是违反。上一版只断言了可重建性那一条，于是漏掉了
+  // INPUTS_PRECEDE_REQUEST：推进到第一次模型请求之前，它按「请求在第 -1 步」判失败。
+  // 遍历全部检查，任何一条忘了做前缀感知都会在这里失败。
+  for (const scenario of SCENARIOS) {
+    const total = buildTurnModel({ scenario }).totalSteps
+    for (let upTo = 0; upTo < total; upTo += 1) {
+      const verdict = evaluateTurnOracle(buildTurnModel({ scenario, upTo }))
+      for (const check of verdict.checks) {
+        assert.equal(check.pass, true,
+          scenario + ' 第 ' + upTo + ' 步的 ' + check.id + ' 失败：' + check.actual)
+      }
+      assert.equal(verdict.pass, true, scenario + ' 第 ' + upTo + ' 步整体未通过')
+    }
+  }
+})
+
 test('收尾类检查只在推进到末尾时判定', () => {
   const partial = buildTurnModel({ scenario: 'two-tools', upTo: 4 })
   const partialVerdict = evaluateTurnOracle(partial)

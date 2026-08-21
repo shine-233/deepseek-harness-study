@@ -267,19 +267,23 @@ export function evaluateTurnOracle(model) {
     orphan.length === 0, '0 份无法重建',
     (orphan.join('、') || '0 份无法重建') + pendingNote)
 
+  /*
+   * 三条与「Turn 走到哪」有关的检查只在相关步骤已经出现时才判定。中途停下时，
+   * 「还没发生第一次模型请求」「调用了但结果还没到」「还没出现 turn-end」都是正常的，
+   * 判成失败会让读者以为不变量本来就不成立。
+   */
+  const atEnd = model.observations.steps === model.observations.totalSteps
+
   const firstRequest = model.steps.findIndex(entry => entry.phase === 'request')
   const inputsBefore = model.steps
     .slice(0, firstRequest === -1 ? 0 : firstRequest)
     .filter(entry => entry.modelVisible).length
   add('INPUTS_PRECEDE_REQUEST', '第一次模型请求之前已经装配好输入',
-    firstRequest > 0 && inputsBefore > 0,
-    '请求前至少 1 份输入', String(inputsBefore) + ' 份输入，请求在第 ' + String(firstRequest) + ' 步')
-
-  /*
-   * 下面两条只有在推进到末尾时才该判定。中途停下时，「调用了但结果还没到」和
-   * 「还没出现 turn-end」都是正常的，判成失败会把读者往错的方向带。
-   */
-  const atEnd = model.observations.steps === model.observations.totalSteps
+    firstRequest === -1 || (firstRequest > 0 && inputsBefore > 0),
+    firstRequest === -1 ? '第一次请求出现后才判定' : '请求前至少 1 份输入',
+    firstRequest === -1
+      ? '尚未推进到第一次模型请求'
+      : String(inputsBefore) + ' 份输入，请求在第 ' + String(firstRequest) + ' 步')
 
   const results = model.steps.filter(entry => entry.phase === 'tool-result-logged')
   const calls = model.steps.filter(entry => entry.phase === 'tool-call-logged')

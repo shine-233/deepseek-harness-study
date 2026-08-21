@@ -116,6 +116,8 @@ function initializePage() {
     form: document.querySelector('#turn-form'),
     scenario: document.querySelector('#scenario'),
     scenarioNote: document.querySelector('#scenario-note'),
+    upTo: document.querySelector('#upto'),
+    upToOutput: document.querySelector('#upto-output'),
     feedback: document.querySelector('#turn-feedback'),
     trace: document.querySelector('#trace-plot'),
     traceNote: document.querySelector('#trace-note'),
@@ -145,8 +147,15 @@ function initializePage() {
 
   const rebuild = () => {
     try {
-      const model = buildTurnModel({ scenario: elements.scenario.value })
+      const model = buildTurnModel({
+        scenario: elements.scenario.value,
+        upTo: Number(elements.upTo.value),
+      })
       const verdict = evaluateTurnOracle(model)
+
+      // 换场景时步数会变，上限跟着走；滑块停在越界值上会读出一个不存在的步骤。
+      elements.upTo.max = String(model.totalSteps - 1)
+      writeText(elements.upToOutput, String(model.input.upTo))
 
       writeText(elements.scenarioNote, model.scenario.description)
       renderTrace(model, elements.trace, elements.traceNote)
@@ -197,7 +206,16 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  elements.scenario.addEventListener('change', rebuild)
+  elements.scenario.addEventListener('change', () => {
+    // 换场景时步数会变，先把滑块拉到末尾，避免停在一个不存在的步骤上。
+    elements.upTo.value = elements.upTo.max
+    rebuild()
+  })
+  elements.upTo.addEventListener('input', rebuild)
+
+  // 首次进入显示完整 Turn；逐步推进是主动动作，不该是默认状态。
+  rebuild()
+  elements.upTo.value = elements.upTo.max
   rebuild()
 }
 
