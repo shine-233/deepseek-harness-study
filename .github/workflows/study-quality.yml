@@ -177,6 +177,8 @@ jobs:
         with:
           name: dsh-study-site-${{ github.sha }}
           path: website/.dist
+          # .dist 以点开头；v4 默认排除隐藏文件，不加这一项上传永远为空。
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 7
 
