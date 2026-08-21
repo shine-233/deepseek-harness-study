@@ -1708,3 +1708,52 @@ body::before {
     text-decoration: underline;
   }
 }
+
+/*
+ * 折叠起来的长参考表格。summary 自带行数，所以读者展开前就知道要面对多长的内容。
+ *
+ * 用原生 <details>：关掉脚本仍然能展开，浏览器的页内查找也能穿透进未展开的内容。
+ * 图表的文字替代表格不折叠——那些是无脚本场景下唯一能读到证据的地方。
+ */
+.vp-doc details.reference-table {
+  margin: 20px 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--dsh-reading-radius);
+  background: var(--dsh-reading-surface);
+}
+
+.vp-doc details.reference-table > summary {
+  padding: 10px 14px;
+  border-radius: var(--dsh-reading-radius);
+  cursor: pointer;
+  font-size: 0.92em;
+  font-weight: 600;
+  list-style: none;
+}
+
+.vp-doc details.reference-table > summary::-webkit-details-marker { display: none; }
+
+/* 三角自己画，因为默认标记在两种主题下的对比度不受控。 */
+.vp-doc details.reference-table > summary::before {
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--vp-c-brand-1);
+  content: '▸';
+  transition: transform var(--dsh-reading-dur, 0.2s) ease;
+}
+
+.vp-doc details.reference-table[open] > summary::before { content: '▾'; }
+
+.vp-doc details.reference-table > summary:hover { background: var(--vp-c-bg-alt); }
+
+.vp-doc details.reference-table[open] > summary {
+  border-bottom: 1px solid var(--vp-c-divider);
+  border-radius: var(--dsh-reading-radius) var(--dsh-reading-radius) 0 0;
+}
+
+.vp-doc details.reference-table > :not(summary) { margin: 0 14px 14px; }
+.vp-doc details.reference-table table { margin-top: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vp-doc details.reference-table > summary::before { transition: none; }
+}
