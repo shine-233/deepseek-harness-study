@@ -7,6 +7,30 @@
  */
 
 :root {
+  /*
+   * The stock theme names only Latin faces, so Chinese text falls through to the
+   * generic `sans-serif` and each platform picks a different face. Naming the CJK
+   * stack explicitly is the one typography change that costs no bytes: every face
+   * below ships with its operating system, and the lab pages set `default-src
+   * 'self'`, which forbids a font CDN. A self-hosted Chinese face is not an
+   * option either — Noto Sans SC is 17 MB and Microsoft YaHei 19 MB.
+   *
+   * Latin faces come first on purpose. A CJK font also carries Latin glyphs, and
+   * they are looser and lighter than a dedicated Latin face, so identifiers and
+   * numbers set in a CJK font read worse beside the surrounding code.
+   */
+  --dsh-font-sans:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans SC", "Noto Sans CJK SC",
+    "Microsoft YaHei UI", "Microsoft YaHei", "WenQuanYi Micro Hei",
+    ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --dsh-font-mono:
+    ui-monospace, "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Menlo, Consolas,
+    "Liberation Mono", "Sarasa Mono SC", "Noto Sans Mono CJK SC",
+    "Microsoft YaHei UI", "Microsoft YaHei", monospace;
+  --vp-font-family-base: var(--dsh-font-sans);
+  --vp-font-family-mono: var(--dsh-font-mono);
   --dsh-reading-line-height: 1.78;
   --dsh-reading-radius: 8px;
   --dsh-reading-radius-lg: 16px;
@@ -16,6 +40,16 @@
   --dsh-reading-shadow-strong: 0 22px 52px rgba(37, 58, 112, 0.14);
   --dsh-reading-progress: 0%;
 }
+
+/*
+ * Chinese has no inter-word spaces, so a Latin-tuned tracking value closes up
+ * the visual gaps a reader uses to segment. Keep body tracking at zero and let
+ * the line height carry the rhythm.
+ */
+.vp-doc :is(p, li, td, th, blockquote, dd) {
+  letter-spacing: 0;
+}
+
 
 /* The script only updates this percentage; it never records a reading history. */
 body::before {
