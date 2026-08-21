@@ -20,8 +20,16 @@ import {
 } from './turn-flow-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
+
+// 状态链接的输入契约：场景是枚举，步数上限由模型在运行时给出，
+// 所以这里只卡整数下界；越界值在恢复时会被拉回当前场景的最大步。
+const TURN_STATE_SCHEMA = {
+  scenario: { enum: TURN_SCENARIOS.map(scenario => scenario.id) },
+  upTo: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
+}
 
 const LANE_LABELS = {
   user: '用户',
@@ -134,6 +142,7 @@ function initializePage() {
     logged: document.querySelector('#metric-logged'),
     orphan: document.querySelector('#metric-orphan'),
     oracle: document.querySelector('#metric-oracle'),
+    copyLink: document.querySelector('#copy-state-link'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -197,8 +206,23 @@ function initializePage() {
       setFeedback('已重建 Turn：' + String(model.observations.steps) + ' 步，'
         + String(model.observations.modelRequests) + ' 次模型请求，'
         + String(model.observations.loggedEvents) + ' 个日志事件。', 'success')
+      persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '场景无效。', 'error')
+    }
+  }
+
+  // 状态进 URL hash：刷新或把链接发给别人，打开的就是同一份输入。
+  // replaceState 在 file:// 或沙箱环境下可能被拒；状态链接是增强，不是前提。
+  const persistState = () => {
+    try {
+      const nextHash = writeStateToHash(location.hash, {
+        scenario: elements.scenario.value,
+        upTo: Number(elements.upTo.value),
+      }, TURN_STATE_SCHEMA)
+      history.replaceState(null, '', nextHash)
+    } catch {
+      // 保持安静：hash 写不进去时页面行为不变。
     }
   }
 
@@ -213,10 +237,29 @@ function initializePage() {
   })
   elements.upTo.addEventListener('input', rebuild)
 
+  // 从状态链接恢复输入；链接缺失或损坏时保持默认场景，不报错打断阅读。
+  const restored = readStateFromHash(location.hash, TURN_STATE_SCHEMA)
+  const hasRestoredUpTo = restored !== null && restored.ok
+  if (restored !== null && restored.ok) {
+    elements.scenario.value = restored.value.scenario
+    elements.upTo.value = String(restored.value.upTo)
+  }
+
   // 首次进入显示完整 Turn；逐步推进是主动动作，不该是默认状态。
   rebuild()
-  elements.upTo.value = elements.upTo.max
-  rebuild()
+  if (!hasRestoredUpTo || Number(elements.upTo.value) > Number(elements.upTo.max)) {
+    elements.upTo.value = elements.upTo.max
+    rebuild()
+  }
+
+  elements.copyLink.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href)
+      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
+    } catch {
+      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
+    }
+  })
 }
 
 if (typeof document !== 'undefined') {
