@@ -66,11 +66,12 @@ function renderMatrix(model, target, note) {
         cell.setAttribute('aria-label', key + '：这一步没有应用')
       } else if (step.finalFor.includes(key)) {
         cell.dataset.mark = 'final'
-        writeText(cell, '●')
+        // 图标只加快扫读；语义由 aria-label 承担，去掉图标信息量不变。
+        cell.append(icon('disc', 13))
         cell.setAttribute('aria-label', key + '：这一步是最终写者')
       } else if (step.overriddenFor.includes(key)) {
         cell.dataset.mark = 'overridden'
-        writeText(cell, '○')
+        cell.append(icon('ring', 13))
         cell.setAttribute('aria-label', key + '：这一步写了但被后面覆盖')
       } else {
         cell.dataset.mark = 'untouched'

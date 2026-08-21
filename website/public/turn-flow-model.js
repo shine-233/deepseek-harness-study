@@ -127,7 +127,11 @@ function resolveInput(input = {}) {
   if (!TURN_SCENARIOS.some(candidate => candidate.id === scenario)) {
     throw new RangeError('unknown scenario: ' + String(scenario))
   }
-  return { scenario }
+  const upTo = input.upTo ?? Number.POSITIVE_INFINITY
+  if (typeof upTo !== 'number' || Number.isNaN(upTo)) {
+    throw new TypeError('upTo must be a number')
+  }
+  return { scenario, upTo }
 }
 
 /**
@@ -138,31 +142,61 @@ function resolveInput(input = {}) {
 export function buildTurnModel(input = {}) {
   const resolved = resolveInput(input)
   const scenario = TURN_SCENARIOS.find(candidate => candidate.id === resolved.scenario)
-  const steps = buildSteps(resolved.scenario)
+  const allSteps = buildSteps(resolved.scenario)
+
+  /*
+   * 推进到第 upTo 步为止。
+   *
+   * 配对只在这个前缀里算。如果拿全部步骤算配对再只显示前缀，推进到一半时会显示
+   * 一份内容「已经能从日志重建」，而那条日志事件其实还没发生——那是把结论提前给
+   * 出来了，也就毁掉了这一页要教的东西：可重建性是逐步建立的，不是一开始就成立。
+   */
+  const lastIndex = allSteps.length - 1
+  const upTo = Number.isFinite(resolved.upTo)
+    ? Math.max(0, Math.min(Math.trunc(resolved.upTo), lastIndex))
+    : lastIndex
+  const steps = allSteps.filter(entry => entry.index <= upTo)
 
   const modelVisible = steps.filter(entry => entry.modelVisible && entry.payloadId !== null)
   const logged = steps.filter(entry => entry.logged && entry.payloadId !== null)
   const loggedIds = new Set(logged.map(entry => entry.payloadId))
 
-  // 一份内容可能先写日志、再进模型请求，也可能同一步既进请求又写日志。配对看的是
-  // payloadId 是否在两个集合里都出现过，不看它出现在第几步。
-  const pairs = [...new Set(modelVisible.map(entry => entry.payloadId))].map(payloadId => ({
-    payloadId,
-    visibleAt: modelVisible.filter(entry => entry.payloadId === payloadId).map(entry => entry.index),
-    loggedAt: logged.filter(entry => entry.payloadId === payloadId).map(entry => entry.index),
-    reconstructable: loggedIds.has(payloadId),
-  }))
+  // 整个 Turn 里最终会被记录的 payload。用来区分「还没记」和「永远不会记」。
+  const loggedEverIds = new Set(
+    allSteps.filter(entry => entry.logged && entry.payloadId !== null).map(entry => entry.payloadId),
+  )
+
+  /*
+   * 一份内容可能先写日志、再进模型请求，也可能同一步既进请求又写日志。配对看的是
+   * payloadId 是否在两个集合里都出现过，不看它出现在第几步。
+   *
+   * 推进到中途时，一份内容可以「进了请求但这一步还没到写日志那一步」。那是正常的
+   * 中间状态，不是违反可重建性——所以 `status` 分三档，只有 `orphan` 是真的问题。
+   * 把中间态显示成失败会让读者以为不变量本来就不成立。
+   */
+  const pairs = [...new Set(modelVisible.map(entry => entry.payloadId))].map(payloadId => {
+    const reconstructable = loggedIds.has(payloadId)
+    return {
+      payloadId,
+      visibleAt: modelVisible.filter(entry => entry.payloadId === payloadId).map(entry => entry.index),
+      loggedAt: logged.filter(entry => entry.payloadId === payloadId).map(entry => entry.index),
+      reconstructable,
+      status: reconstructable ? 'logged' : loggedEverIds.has(payloadId) ? 'pending' : 'orphan',
+    }
+  })
 
   const requests = steps.filter(entry => entry.phase === 'request')
 
   return {
-    input: resolved,
+    input: { scenario: resolved.scenario, upTo },
     scenario: { id: scenario.id, label: scenario.label, description: scenario.description },
     lanes: LANES,
     steps,
+    totalSteps: allSteps.length,
     pairs,
     observations: {
       steps: steps.length,
+      totalSteps: allSteps.length,
       modelRequests: requests.length,
       toolRuns: steps.filter(entry => entry.phase === 'tool-run').length,
       toolFailures: steps.filter(entry => entry.failed === true).length,
@@ -207,13 +241,18 @@ export function evaluateTurnOracle(model) {
     badLane.length === 0, '0 个未知 lane',
     badLane.map(entry => entry.lane).join('、') || '0 个未知 lane')
 
-  const loggedIds = new Set(model.steps.filter(entry => entry.logged && entry.payloadId !== null)
-    .map(entry => entry.payloadId))
-  const orphan = [...new Set(model.steps
-    .filter(entry => entry.modelVisible && entry.payloadId !== null)
-    .map(entry => entry.payloadId))].filter(payloadId => !loggedIds.has(payloadId))
+  /*
+   * 可重建性按 `status` 判，不按「这一步有没有日志」判。
+   *
+   * 推进到中途时，一份内容进了请求而它的日志事件还在后面，那是 `pending`——正常的
+   * 中间态。只有 `orphan`（整个 Turn 走完都没有对应日志事件）才是违反。
+   */
+  const orphan = model.pairs.filter(pair => pair.status === 'orphan').map(pair => pair.payloadId)
+  const pending = model.pairs.filter(pair => pair.status === 'pending').map(pair => pair.payloadId)
+  const pendingNote = pending.length === 0 ? '' : '，另有 ' + String(pending.length) + ' 份日志事件还在后面'
   add('MODEL_VISIBLE_IS_LOGGED', '进入模型请求的每一份内容都有日志事件',
-    orphan.length === 0, '0 份无法重建', orphan.join('、') || '0 份无法重建')
+    orphan.length === 0, '0 份无法重建',
+    (orphan.join('、') || '0 份无法重建') + pendingNote)
 
   const firstRequest = model.steps.findIndex(entry => entry.phase === 'request')
   const inputsBefore = model.steps

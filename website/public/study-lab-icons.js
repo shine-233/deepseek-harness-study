@@ -33,10 +33,25 @@ const PATHS = {
     'M6.8 6.8 5.2 5.2', 'M18.8 18.8l-1.6-1.6', 'M6.8 17.2 5.2 18.8', 'M18.8 5.2l-1.6 1.6',
     'M12 7.6a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8z'],
   moon: ['M20 14.6A8.6 8.6 0 0 1 9.4 4a8.6 8.6 0 1 0 10.6 10.6z'],
+  /*
+   * 覆盖矩阵的两格标记。原来用 `●` 和 `○` 两个字形，那有本模块开头列的三个问题：
+   * 跨平台字重和基线不一致，部分系统会落到 emoji 字体，而这两个字形的差别本来就
+   * 只有「填充」一项——落到不同字体时最容易糊掉的正是这一项。
+   */
+  disc: ['M12 4.6a7.4 7.4 0 1 0 0 14.8 7.4 7.4 0 0 0 0-14.8z'],
+  ring: ['M12 5.4a6.6 6.6 0 1 0 0 13.2 6.6 6.6 0 0 0 0-13.2z'],
 }
 
 /** 需要实心才能在 16px 下认出来的图标。 */
-const FILLED = new Set(['shield'])
+const FILLED = new Set(['shield', 'disc'])
+
+/**
+ * 靠填充本身承载语义的图标。
+ *
+ * `shield` 用 0.16 的淡填充，形状由描边承担。`disc` 不行：它要和 `ring` 区分开，
+ * 而两者的唯一差别就是填不填——淡填充在 16px 下和空心几乎一样。
+ */
+const SOLID_FILL = new Set(['disc'])
 
 export const ICON_NAMES = Object.keys(PATHS)
 
@@ -67,7 +82,7 @@ export function icon(name, size = 16) {
     path.setAttribute('d', definition)
     if (FILLED.has(name)) {
       path.setAttribute('fill', 'currentColor')
-      path.setAttribute('fill-opacity', '0.16')
+      path.setAttribute('fill-opacity', SOLID_FILL.has(name) ? '1' : '0.16')
     }
     svg.append(path)
   }

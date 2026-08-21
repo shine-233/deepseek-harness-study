@@ -122,6 +122,40 @@
       <p class="chart-note" id="bar-note"></p>
     </section>
 
+    <section class="scene-card card" aria-labelledby="scene-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="cube">全局定位</p>
+          <h2 id="scene-title">49 个组的相对体量</h2>
+        </div>
+        <span class="schema-pill">高=行数 · 环=组 · 线=依赖</span>
+      </div>
+      <p class="section-intro">这一幕不是用来读数值的。要读某个包有多少行、被谁依赖，看上面的散点图和本页最后的表格——那两个都不用先点开。这里回答另一个问题：49 个组的体量差多大，排在一起是什么样子。前 14 个组占了 73% 的行数却只占 29% 的组数，这件事在表格里要逐行加，在这里一眼就看得到。</p>
+      <dl class="scene-legend">
+        <div><dt>柱高</dt><dd>src 行数，对数刻度（行数跨 37 到 8989，线性会把大半柱子压平）</dd></div>
+        <div><dt>环上位置</dt><dd>所属组。内环是行数最多的 12 组，外环是其余 37 组</dd></div>
+        <div><dt>连线</dt><dd>peerDependencies，线宽是被依赖次数。默认不画：1089 条边叠在 219 根柱子上看不出结构</dd></div>
+        <div><dt>颜色</dt><dd>只区分内外环。49 个组无法用色相安全区分，所以组由位置承载，不由颜色承载</dd></div>
+      </dl>
+      <div class="scene-launch">
+        <button class="button button-primary" id="scene-launch" type="button">启动 3D 场景</button>
+        <p class="scene-launch-note">默认不启动：连续渲染在手机上耗电，而这一幕不是读数值必需的。启动后可以拖动旋转，也可以用方向键；页面不会记住这个选择。</p>
+      </div>
+      <div class="scene-stage" id="scene-stage" hidden>
+        <canvas id="scene-canvas" tabindex="0" role="img"
+          aria-label="49 个组的包体量 3D 场景：柱高是 src 行数，环上位置是所属组。精确数值在本页最后的表格里。"></canvas>
+        <div class="scene-controls">
+          <label class="scene-toggle">
+            <input type="checkbox" id="scene-edges">
+            <span>画出最重的 120 条依赖边</span>
+          </label>
+          <button class="button button-secondary" id="scene-spin" type="button" aria-pressed="false">自动旋转</button>
+          <button class="button button-secondary" id="scene-stop" type="button">收起场景</button>
+        </div>
+        <p class="chart-note" id="scene-note"></p>
+      </div>
+    </section>
+
     <section class="evidence-grid" aria-label="Oracle 与证明边界">
       <article class="oracle-card card">
         <div class="section-heading">

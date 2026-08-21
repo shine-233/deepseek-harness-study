@@ -345,3 +345,77 @@ tbody tr:hover { background: color-mix(in srgb, var(--brand) 7%, transparent); }
   stroke: var(--signal);
   stroke-width: 1.25;
 }
+
+/*
+ * 3D 场景。默认不启动，所以这里的样式在按钮点下之前都不影响布局。
+ * 场景不承载精确数值——数值在散点图和表格里，那两个都不需要先交互。
+ */
+.scene-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-2xs);
+  margin: var(--space-sm) 0 0;
+}
+
+.scene-legend > div {
+  padding: var(--space-2xs) var(--space-xs);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-strong) 62%, transparent);
+}
+
+.scene-legend dt {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: var(--text-2xs);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.scene-legend dd { margin: 0; font-size: var(--text-sm); }
+
+.scene-launch { margin-top: var(--space-sm); }
+
+.scene-launch-note {
+  margin: var(--space-2xs) 0 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.scene-stage { margin-top: var(--space-sm); }
+
+#scene-canvas {
+  display: block;
+  width: 100%;
+  height: clamp(320px, 46vh, 560px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-strong) 62%, transparent);
+  cursor: grab;
+  touch-action: none;
+}
+
+#scene-canvas:active { cursor: grabbing; }
+
+.scene-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-top: var(--space-xs);
+}
+
+.scene-toggle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: var(--text-sm);
+}
+
+#scene-spin[aria-pressed="true"] { border-color: var(--brand); color: var(--brand); }
+
+@media (forced-colors: active) {
+  #scene-canvas { border: 1px solid CanvasText; }
+}

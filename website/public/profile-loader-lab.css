@@ -111,6 +111,24 @@
 
 .write-matrix td[data-mark="untouched"] { background: none; }
 
+/*
+ * 标记是内联 SVG，描边取 currentColor，所以配色跟着上面两条规则走，不引入第二套颜色。
+ *
+ * 不给单元格用 flex 或 grid：那会把 `td` 从表格布局里拿出来，整列宽度就不再对齐。
+ * 居中交给表格自己的 text-align / vertical-align，图标按 inline-block 对到中线——
+ * 默认的基线对齐会把替换元素压低几像素，一整列看起来就是歪的。
+ */
+.write-matrix td[data-mark="final"],
+.write-matrix td[data-mark="overridden"] {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.write-matrix td .icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .write-matrix td[data-mark="not-applied"] {
   color: var(--deny-ink);
   background: var(--deny-soft);

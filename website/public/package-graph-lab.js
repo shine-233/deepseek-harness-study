@@ -16,6 +16,7 @@ import {
 } from './package-graph-model.js'
 
 import { installThemeToggle } from './study-lab-theme.js'
+import { createPackageScene } from './study-lab-scene3d.js'
 
 const FIXTURE_URL = './package-graph.json'
 const SVG_NS = 'http://www.w3.org/2000/svg'
@@ -339,6 +340,10 @@ async function initializePage() {
   const verdict = evaluatePackageGraphOracle(fixture)
   renderOracle(verdict, oracleList, metrics.oracle)
 
+  // 3D 场景用全量模型，不跟随「按组筛选」：它要回答的是 49 个组的相对体量，
+  // 筛到一个组以后这句话就不成立了。数值视图（散点、柱、表格）才跟随筛选。
+  installScene(buildPackageGraphModel(fixture, { group: 'all', sort: 'lines' }))
+
   groupInput.replaceChildren()
   const all = document.createElement('option')
   all.value = 'all'
@@ -412,4 +417,118 @@ if (typeof document !== 'undefined') {
       filtered: '筛选是上面那个「按组筛选」，和排序是两件事。',
     },
   })
+}
+
+/**
+ * 3D 场景按需启动。
+ *
+ * 不在页面加载时就渲染：连续渲染耗电，而这一幕不是读数值必需的——散点图和表格
+ * 已经承载了全部数值，且都不需要先交互。启动状态不写 localStorage，所以刷新回到
+ * 默认的「不启动」。
+ */
+function installScene(model) {
+  const launch = document.getElementById('scene-launch')
+  const stage = document.getElementById('scene-stage')
+  const canvas = document.getElementById('scene-canvas')
+  const note = document.getElementById('scene-note')
+  const edges = document.getElementById('scene-edges')
+  const spin = document.getElementById('scene-spin')
+  const stop = document.getElementById('scene-stop')
+  if (launch === null || stage === null || canvas === null) return
+
+  const reducedMotion = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  let scene = null
+
+  const describe = () => {
+    if (scene === null || note === null) return
+    const { innerRingGroups } = scene.layout
+    writeText(note, '内环 ' + String(innerRingGroups) + ' 组，外环其余组，共 '
+      + String(model.nodes.length) + ' 根柱。柱高是对数刻度的 src 行数，'
+      + (scene.edgesVisible ? '正在画最重的 120 条依赖边。' : '依赖边未画。')
+      + ' 精确数值在本页最后的表格里，3D 有遮挡和透视，读不准数值。')
+  }
+
+  launch.addEventListener('click', () => {
+    if (scene === null) {
+      scene = createPackageScene(canvas, model, { reducedMotion })
+      if (scene === null) {
+        // canvas 不可用时保持二维视图，而不是留下一个空框。
+        writeText(launch, '这个浏览器不支持 canvas，二维图和表格仍然完整')
+        launch.disabled = true
+        return
+      }
+    }
+    stage.hidden = false
+    launch.hidden = true
+    scene.resize()
+    describe()
+    canvas.focus()
+  })
+
+  stop?.addEventListener('click', () => {
+    scene?.stopSpin()
+    stage.hidden = true
+    launch.hidden = false
+    if (spin !== null) spin.setAttribute('aria-pressed', 'false')
+    launch.focus()
+  })
+
+  edges?.addEventListener('change', () => {
+    scene?.setEdges(edges.checked)
+    describe()
+  })
+
+  spin?.addEventListener('click', () => {
+    if (scene === null) return
+    if (scene.spinning) {
+      scene.stopSpin()
+      spin.setAttribute('aria-pressed', 'false')
+      return
+    }
+    if (reducedMotion) {
+      // 尊重系统偏好：不自动旋转，但手动控制仍然可用。
+      writeText(spin, '系统已要求减少动态效果')
+      spin.disabled = true
+      return
+    }
+    scene.startSpin()
+    spin.setAttribute('aria-pressed', 'true')
+  })
+
+  // 拖动旋转。指针事件同时覆盖鼠标、触摸和笔。
+  let dragging = false
+  let lastX = 0
+  let lastY = 0
+  canvas.addEventListener('pointerdown', (event) => {
+    dragging = true
+    lastX = event.clientX
+    lastY = event.clientY
+    canvas.setPointerCapture(event.pointerId)
+  })
+  canvas.addEventListener('pointermove', (event) => {
+    if (!dragging || scene === null) return
+    scene.nudge((event.clientX - lastX) * 0.006, -(event.clientY - lastY) * 0.005)
+    lastX = event.clientX
+    lastY = event.clientY
+  })
+  for (const type of ['pointerup', 'pointercancel']) {
+    canvas.addEventListener(type, () => { dragging = false })
+  }
+
+  // 键盘等价操作：只能拖动的 3D 场景对键盘用户等于不存在。
+  canvas.addEventListener('keydown', (event) => {
+    if (scene === null) return
+    const step = event.shiftKey ? 0.24 : 0.08
+    const moves = {
+      ArrowLeft: [-step, 0], ArrowRight: [step, 0],
+      ArrowUp: [0, step], ArrowDown: [0, -step],
+    }
+    const move = moves[event.key]
+    if (move === undefined) return
+    event.preventDefault()
+    scene.nudge(move[0], move[1])
+  })
+
+  window.addEventListener('resize', () => { if (!stage.hidden) scene?.resize() })
 }
