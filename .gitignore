@@ -38,3 +38,9 @@ apps/web/dist/
 worktrees/
 .agents/worktrees/
 .typert-*/
+
+# Private research input. website/docs.ts scans study/ and publishes every
+# Markdown file it finds there, so research notes live outside it and stay
+# untracked. Keeping the directory ignored means a stray note cannot reach the
+# public site through a directory scan.
+/research-notes/

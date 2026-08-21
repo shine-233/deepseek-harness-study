@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 检查 study/source-evidence-manifest.json 里每条证据 locator 是否仍能定位到真实文件。
+ * 检查 research-notes/source-evidence-manifest.json 里每条证据 locator 是否仍能定位到真实文件。
  *
  * 这是路径可达性检查，不是证据语义审查：它只回答“这个 locator 现在还能打开吗”，
  * 不回答“这条 claim 的结论是否成立”。结论仍需读源码、读测试或重跑浏览器动作。
@@ -14,7 +14,7 @@
  *      让 “website/public/a.js and b.html” 这种同目录简写保持可读又可校验；
  *   4. 部分研究缓存因 Windows 路径长度限制没有完整 checkout，只能通过 Git object 读取，
  *      所以工作树里找不到时还要按 `HEAD:<path>` 在该来源的 Git 仓库里再查一次。
- * 第 4 条对应 study/34 记录的“通过 Git object 读取源码”，不是把缺失当成通过。
+ * 第 4 条对应研究记录里“通过 Git object 读取源码”的做法，不是把缺失当成通过。
  *
  * 退出码：全部可达为 0；出现不可达 locator 为 1。
  */
@@ -24,11 +24,20 @@ import { existsSync, readFileSync, statSync } from 'node:fs'
 import { isAbsolute, join, posix, resolve } from 'node:path'
 
 const root = process.cwd()
-const manifestPath = join(root, 'study', 'source-evidence-manifest.json')
+// The manifest is private research input, not published course content, so it
+// lives outside `study/` — everything under `study/` is scanned and published by
+// website/docs.ts. The old path is still accepted so an older tree keeps working.
+const manifestCandidates = [
+  join(root, 'research-notes', 'source-evidence-manifest.json'),
+  join(root, 'study', 'source-evidence-manifest.json'),
+]
+const manifestPath = manifestCandidates.find(candidate => existsSync(candidate)) ?? manifestCandidates[0]
 
 if (!existsSync(manifestPath)) {
-  console.error(`找不到 manifest：${manifestPath}`)
-  process.exit(1)
+  console.log('找不到 evidence manifest，跳过检查。找过这些位置：')
+  for (const candidate of manifestCandidates) console.log('  ' + candidate)
+  console.log('这份 manifest 是私有研究输入，不随仓库发布，所以在干净克隆里缺失是正常的。')
+  process.exit(0)
 }
 
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))

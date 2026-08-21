@@ -183,10 +183,13 @@ function collectFiles(explicit) {
   for (const name of ['SITE-HOME.md', 'START-HERE.md', 'README.zh.md']) {
     if (existsSync(join(root, name))) files.push(name)
   }
-  const studyDir = join(root, 'study')
-  if (existsSync(studyDir)) {
-    for (const entry of readdirSync(studyDir).sort()) {
-      if (entry.endsWith('.md') && statSync(join(studyDir, entry)).isFile()) files.push('study/' + entry)
+  // research-notes holds private research input; it is scanned when present
+  // because the same prose rules apply, but it is never published.
+  for (const directory of ['study', 'research-notes']) {
+    const absolute = join(root, directory)
+    if (!existsSync(absolute)) continue
+    for (const entry of readdirSync(absolute).sort()) {
+      if (entry.endsWith('.md') && statSync(join(absolute, entry)).isFile()) files.push(directory + '/' + entry)
     }
   }
   return files
