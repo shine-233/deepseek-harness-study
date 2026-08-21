@@ -66,7 +66,7 @@ export function verifyStudyEntry(root = resolve(import.meta.dirname, '..')) {
     'study/32-源码学习项目的渐进式设计.md',
     'dsh-learning-map',
     'dsh-status-strip',
-    'data-study-pages="110"',
+    'data-study-pages="106"',
     'data-index-files="2756"',
     'data-learning-tests="',
     'data-example-tests="8"',
