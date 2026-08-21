@@ -64,7 +64,7 @@
         </div>
         <span class="schema-pill">lines × degree</span>
       </div>
-      <p class="section-intro">一个点是一个包。只用一种颜色：49 个组无法用色相安全区分，所以组是筛选条件，不是颜色。只给落在角上的包直接标名字。</p>
+      <p class="section-intro">一个点是一个包。把鼠标停在任意一点上会显示它的行数和被依赖次数；换上面的「按组筛选」会重画这张图，只留那一组的包。只用一种颜色：49 个组无法用色相安全区分，所以组是筛选条件，不是颜色。只给落在角上的包直接标名字。</p>
       <div class="scatter-scroll" id="scatter-plot"></div>
       <p class="chart-note" id="scatter-note"></p>
     </section>
@@ -77,7 +77,7 @@
         </div>
         <span class="schema-pill">height=lines · width=degree</span>
       </div>
-      <p class="section-intro">柱高是 src 行数，柱的边框粗细是被依赖次数，横向位置只是排序后的次序，不承载数值。节点超过 24 个时这个视图不显示——密到看不清的图不如表格。</p>
+      <p class="section-intro">柱高是 src 行数，柱的边框粗细是被依赖次数，横向位置只是排序后的次序，不承载数值。先把「按组筛选」换到某一组，这张图才会出现：节点超过 24 个时它不显示——密到看不清的图不如表格。把「排序」从行数换成被依赖次数，柱的先后会重排，但每根柱的高度和粗细一个都不变。</p>
       <div class="bar-scroll" id="bar-plot"></div>
       <p class="chart-note" id="bar-note"></p>
     </section>
