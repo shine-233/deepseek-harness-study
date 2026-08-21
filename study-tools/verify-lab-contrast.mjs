@@ -178,7 +178,10 @@ function labStylesheets() {
   return readdirSync(dir)
     .filter(name => name.endsWith('.css'))
     .sort()
-    .map(name => ({ name, source: readFileSync(join(dir.pathname.replace(/^\//, ''), name), 'utf8') }))
+    // fileURLToPath 才是跨平台的转换。手工剥开头的 `/` 是为了 Windows 的 `/C:/...`，
+    // 但在 POSIX 上那个 `/` 是根，剥掉就把绝对路径变成了相对路径——CI 上表现为
+    // ENOENT 打开 'home/runner/...' 而不是 '/home/runner/...'。
+    .map(name => ({ name, source: readFileSync(new URL(name, dir), 'utf8') }))
 }
 
 /**
