@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { inspectStudyHomeMetrics } from './verify-study-home-metrics.mjs'
 
@@ -107,11 +107,52 @@ export function inspectBuiltStudySite(distRoot, pages = REQUIRED_PUBLISHED_PAGES
   return { checked, missingFiles, missingMarkers, missingAssets }
 }
 
+/**
+ * Collect the lesson links the standalone lab pages ship in website/public.
+ *
+ * GitHub Pages serves case-sensitively, so `05-session日志与恢复.html` is a
+ * different (missing) file from the built `05-Session日志与恢复.html`. These
+ * links shipped broken for exactly that reason; this inventory exists so a
+ * gate can compare them against the real build output instead of trusting
+ * that a route looks right.
+ *
+ * @param {string} publicDir - The lab pages directory.
+ * @returns {{ file: string, link: string }[]} One entry per href occurrence.
+ */
+export function collectLabLessonLinks(publicDir) {
+  const links = []
+  for (const name of readdirSync(publicDir).filter(name => name.endsWith('.html'))) {
+    const source = readFileSync(resolve(publicDir, name), 'utf8')
+    for (const match of source.matchAll(/href="\.?\/?(study\/lessons\/[^"#?]+)"/g)) {
+      links.push({ file: name, link: match[1] })
+    }
+  }
+  return links
+}
+
+/**
+ * Check collected lab links against the exact filenames in the build output.
+ *
+ * A directory listing comparison is deliberate: `existsSync` would pass on
+ * Windows and macOS case-insensitive filesystems and only fail on CI, which
+ * is precisely how the wrong-case links shipped unnoticed. Reading the built
+ * directory and comparing strings keeps the gate honest on every OS.
+ *
+ * @param {string} distRoot - VitePress output directory.
+ * @param {{ file: string, link: string }[]} [links] - Injectable link inventory.
+ * @returns {{ file: string, link: string }[]} Links with no exact-case target.
+ */
+export function inspectLabLessonLinks(distRoot, links = collectLabLessonLinks(resolve(repositoryRoot, 'website', 'public'))) {
+  const lessons = new Set(readdirSync(resolve(distRoot, 'study', 'lessons')))
+  return links.filter(entry => !lessons.has(entry.link.replaceAll('\\', '/').split('/').pop()))
+}
+
 function main() {
   const distRoot = resolve(repositoryRoot, 'website/.dist')
   const report = inspectBuiltStudySite(distRoot)
-  if (report.missingFiles.length === 0 && report.missingMarkers.length === 0 && report.missingAssets.length === 0) {
-    console.log(`verify-built-study-site: ${report.checked} beginner-route pages and reading assets are present.`)
+  const brokenLinks = inspectLabLessonLinks(distRoot)
+  if (report.missingFiles.length === 0 && report.missingMarkers.length === 0 && report.missingAssets.length === 0 && brokenLinks.length === 0) {
+    console.log(`verify-built-study-site: ${report.checked} beginner-route pages, reading assets, and every lab-page lesson link are present.`)
     return 0
   }
 
@@ -119,6 +160,7 @@ function main() {
   for (const asset of report.missingAssets) console.error(`  missing asset: ${asset}`)
   for (const file of report.missingFiles) console.error(`  missing page: ${file}`)
   for (const item of report.missingMarkers) console.error(`  missing marker: ${item.file} -> ${JSON.stringify(item.marker)}`)
+  for (const item of brokenLinks) console.error(`  broken lab link: ${item.file} -> ${item.link}（构建产物里没有这个文件名，注意大小写）`)
   return 1
 }
 

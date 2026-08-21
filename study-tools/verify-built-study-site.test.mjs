@@ -3,7 +3,12 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { inspectBuiltStudySite, REQUIRED_PUBLISHED_PAGES } from './verify-built-study-site.mjs'
+import {
+  collectLabLessonLinks,
+  inspectBuiltStudySite,
+  inspectLabLessonLinks,
+  REQUIRED_PUBLISHED_PAGES,
+} from './verify-built-study-site.mjs'
 
 test('the default home contract keeps a visible recovery lane for beginners', () => {
   const home = REQUIRED_PUBLISHED_PAGES.find(page => page.file === 'index.html')
@@ -44,6 +49,41 @@ test('the built-study contract reports a missing page and marker separately', ()
       missingMarkers: [{ file: 'index.html', marker: '缺失按钮' }],
       missingAssets: ['reading.css', 'favicon.svg'],
     })
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('lab lesson links collect from the public pages and strip ./ prefixes', () => {
+  const root = mkdtempSync(join(tmpdir(), 'dsh-lab-links-'))
+  try {
+    writeFileSync(join(root, 'turn-lab.html'),
+      '<a href="./study/lessons/05-Session日志与恢复.html">x</a>'
+      + '<a href="/study/lessons/00-开始这里.html">y</a>')
+    const links = collectLabLessonLinks(root)
+    assert.deepEqual(links, [
+      { file: 'turn-lab.html', link: 'study/lessons/05-Session日志与恢复.html' },
+      { file: 'turn-lab.html', link: 'study/lessons/00-开始这里.html' },
+    ])
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test('a wrong-case lesson link fails against a case-sensitive listing, not existsSync', () => {
+  const root = mkdtempSync(join(tmpdir(), 'dsh-lab-links-dist-'))
+  try {
+    mkdirSync(join(root, 'study', 'lessons'), { recursive: true })
+    // 构建产物里是大写 S；existsSync 在 Windows/macOS 上对错误大小写也会返回 true，
+    // 所以校验必须对照目录清单做精确字符串比较。
+    writeFileSync(join(root, 'study', 'lessons', '05-Session日志与恢复.html'), 'lesson')
+    const broken = inspectLabLessonLinks(root, [
+      { file: 'session-log-lab.html', link: 'study/lessons/05-session日志与恢复.html' },
+      { file: 'compaction-lab.html', link: 'study/lessons/05-Session日志与恢复.html' },
+    ])
+    assert.deepEqual(broken, [
+      { file: 'session-log-lab.html', link: 'study/lessons/05-session日志与恢复.html' },
+    ])
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
