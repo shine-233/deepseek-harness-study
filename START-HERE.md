@@ -23,7 +23,7 @@ pnpm run study:quick-check
 想把最小示例的 test 和 lint 也一起跑，再用：
 
 ```sh
-pnpm run study:quick-check -- --example
+pnpm run study:quick-check --example
 ```
 
 如果你已经在终端，只想先看“插件收到结果后会输出什么”，可以只运行示例的 demo：

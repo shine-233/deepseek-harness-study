@@ -100,7 +100,9 @@ jobs:
         run: pnpm lint
 
       - name: Run one-command offline study smoke
-        run: pnpm run study:quick-check -- --example --runtime
+        # pnpm 11 forwards `--` to the script, and quick-check.mjs rejects it as
+        # an unknown option, so the separator has to go.
+        run: pnpm run study:quick-check --example --runtime
 
       - name: Test the minimal observer example
         run: pnpm --dir study-examples/minimal-observer-plugin run test
@@ -155,7 +157,9 @@ jobs:
         run: pnpm run doc-sync
 
       - name: Verify the built Pages study shell
-        run: pnpm run study:quick-check -- --site
+        # pnpm 11 forwards `--` to the script, and quick-check.mjs rejects it as
+        # an unknown option, so the separator has to go.
+        run: pnpm run study:quick-check --site
 
       - name: Upload built study site for inspection
         if: success()
