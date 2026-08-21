@@ -57,6 +57,8 @@
 
 在 Codespaces 里可以一条命令自查教材完整性（不启动 DSH）：`pnpm run study:quick-check --example --runtime`。
 
+<a id="run"></a><a id="run-from-source"></a>
+
 ## 运行官方 DSH
 
 ```sh
