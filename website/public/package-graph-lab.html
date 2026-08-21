@@ -47,6 +47,11 @@
           </select>
           <small>换排序不改变任何数字，只改变阅读顺序。</small>
         </label>
+        <label>
+          <span>最小 src 行数：<output id="min-lines-output" for="min-lines">0</output></span>
+          <input id="min-lines" name="min-lines" type="range" min="0" max="9000" step="100" value="0">
+          <small>行数是连续量，拖动就能看小包怎样一层层退出视图。组和排序是分类值，所以它们仍然是下拉。</small>
+        </label>
         <button class="button button-primary" type="submit">重建视图</button>
       </form>
       <p class="feedback" id="graph-feedback" role="status" aria-live="polite"></p>
@@ -69,6 +74,9 @@
       </div>
       <p class="section-intro">一个点是一个包。把鼠标停在任意一点上会显示它的行数和被依赖次数；换上面的「按组筛选」会重画这张图，只留那一组的包。只用一种颜色：49 个组无法用色相安全区分，所以组是筛选条件，不是颜色。只给落在角上的包直接标名字。</p>
       <div class="scatter-scroll" id="scatter-plot"></div>
+        <p class="chart-note" id="scatter-size-legend">
+          点的面积编码第三个量：这个包在当前视图里依赖了多少个别的包。三个量在固定 fixture 上两两近似不相关（相关系数 +0.15、+0.18、−0.11），所以面积不是把横纵轴换个说法重复一遍。面积按平方根映射，因为人眼比较面积而不是半径。这一列在下面的表格里逐行给出，不依赖看图。
+        </p>
       <p class="chart-note" id="scatter-note"></p>
     </section>
 
@@ -139,6 +147,7 @@
               <th scope="col">src 文件</th>
               <th scope="col">被依赖（全仓库）</th>
               <th scope="col">被依赖（视图内）</th>
+              <th scope="col">依赖别人（视图内）</th>
             </tr>
           </thead>
           <tbody id="graph-table-body"></tbody>

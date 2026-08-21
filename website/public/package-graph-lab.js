@@ -82,7 +82,8 @@ function renderScatter(model, target, note) {
   svg.append(
     svgElement('title', { id: 'scatter-svg-title' }, '包体量与被依赖次数的散点图'),
     svgElement('desc', { id: 'scatter-svg-desc' },
-      '横轴是 src 行数，按对数刻度；纵轴是同仓库内被 peerDependencies 指向的次数。'
+      '横轴是 src 行数，按对数刻度；纵轴是同仓库内被 peerDependencies 指向的次数；'
+      + '点的面积是这个包在当前视图里依赖了多少个别的包。'
       + '完整数值在本页最后的表格里逐行给出。'),
   )
 
@@ -115,6 +116,14 @@ function renderScatter(model, target, note) {
 
   // 只给角上的包直接标名字：最大、最被依赖，以及“大而少被依赖”“小而多被依赖”
   // 两个反例。每个点都标名字会糊成一片。
+  // 第三维用面积编码，不用第三个空间轴：可旋转的 3D 散点有遮挡、透视让位置失真、
+  // 没有共享基线，读数比二维差。面积按平方根映射，因为人眼比较的是面积而不是半径。
+  const maxOut = Math.max(...model.nodes.map(node => node.dependsOnWithinView ?? 0), 1)
+  const radiusFor = (node) => {
+    const share = (node.dependsOnWithinView ?? 0) / maxOut
+    return 4 + Math.sqrt(share) * 7
+  }
+
   const labelled = new Set()
   const byLines = [...model.nodes].sort((a, b) => b.srcLines - a.srcLines)
   const byDegree = [...model.nodes].sort((a, b) => b.dependedOnBy - a.dependedOnBy)
@@ -128,13 +137,14 @@ function renderScatter(model, target, note) {
     const y = yFor(node.dependedOnBy)
     const isHub = model.observations.hubs.includes(node.id)
     const point = svgElement('circle', {
-      cx: x, cy: y, r: labelled.has(node.id) ? 7 : 5,
+      cx: x, cy: y, r: radiusFor(node).toFixed(2),
       class: 'point' + (isHub ? ' is-hub' : ''),
       'data-id': node.id,
       'data-reveal': '',
     })
     point.append(svgElement('title', {},
-      node.id + '：' + String(node.srcLines) + ' 行，被 ' + String(node.dependedOnBy) + ' 个包依赖'))
+      node.id + '：' + String(node.srcLines) + ' 行，被 ' + String(node.dependedOnBy)
+      + ' 个包依赖，本视图内依赖了 ' + String(node.dependsOnWithinView ?? 0) + ' 个包'))
     svg.append(point)
     if (labelled.has(node.id)) {
       const toLeft = x > width * 0.72
@@ -143,7 +153,7 @@ function renderScatter(model, target, note) {
       // A ring plus a leader line makes the annotated point findable among 219
       // dots; the label alone reads as one more piece of axis furniture.
       svg.append(
-        svgElement('circle', { cx: x, cy: y, r: 11, class: 'point-ring' }),
+        svgElement('circle', { cx: x, cy: y, r: (radiusFor(node) + 5).toFixed(2), class: 'point-ring' }),
         svgElement('line', { x1: anchorX, y1: y, x2: labelX, y2: y, class: 'point-leader' }),
         svgElement('text', {
           x: labelX + (toLeft ? -4 : 4), y: y + 4, class: 'point-label',
@@ -245,6 +255,7 @@ function renderTable(model, tableBody, caption) {
       node.id, node.group, node.npmName ?? '—',
       String(node.srcLines), String(node.srcFiles),
       String(node.dependedOnBy), String(node.degreeWithinView),
+      String(node.dependsOnWithinView ?? 0),
     ]) {
       const cell = document.createElement('td')
       writeText(cell, value)
@@ -277,6 +288,12 @@ async function initializePage() {
   const form = document.querySelector('#graph-form')
   const groupInput = document.querySelector('#group')
   const sortInput = document.querySelector('#sort')
+  const minLinesInput = document.querySelector('#min-lines')
+  const minLinesOutput = document.querySelector('#min-lines-output')
+  // 拖动时先更新读数，不等重建：读数是控件的一部分，不是模型输出。
+  minLinesInput?.addEventListener('input', () => {
+    if (minLinesOutput !== null) minLinesOutput.textContent = minLinesInput.value
+  })
   const feedback = document.querySelector('#graph-feedback')
   const scatter = document.querySelector('#scatter-plot')
   const scatterNote = document.querySelector('#scatter-note')
@@ -344,6 +361,7 @@ async function initializePage() {
       const model = buildPackageGraphModel(fixture, {
         group: groupInput.value,
         sort: sortInput.value,
+        minLines: Number(minLinesInput?.value ?? 0),
       })
       renderScatter(model, scatter, scatterNote)
       renderBars(model, bars, barNote)
