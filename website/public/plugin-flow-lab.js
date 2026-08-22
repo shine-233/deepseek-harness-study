@@ -135,6 +135,13 @@ function initializePage() {
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
 
+  for (const scenario of PLUGIN_SCENARIOS) {
+    const option = document.createElement('option')
+    option.value = scenario.id
+    writeText(option, scenario.label)
+    elements.scenario.append(option)
+  }
+
   // lanes 不是模型输出的一部分（模型里是常量 PLUGIN_LANES），
   // 这里挂到模型对象上让渲染层少传一个参数。
   const rebuild = () => {
