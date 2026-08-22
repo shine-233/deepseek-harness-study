@@ -29,4 +29,4 @@ Status: implemented
 
 ## Consequences
 
-课程、索引条目和实验 fixture 描述的树，与读者从 `npm pack @deepseek-ai/dsh@0.1.1-rc.2` 拿到的树一致。断言 rc.5/rc.6 差异行为的手写正文只在被检出处更新；这次迁移的语义审查是有边界的——41 份材料的链接路径存在性已验证，但基线间的深层行为差异除课程点名处外仍未逐行复审。首页基线行把这个边界摆给读者看。
+课程、索引条目和实验 fixture 描述的树，与读者从 `npm pack @deepseek-ai/dsh@0.1.1-rc.2` 拿到的树一致。一次带日期的限定语义复审记录在[第 18 课](../../../../study/18-维护更新与版本迁移.md)：agent-loop 的取消落盘、新增的 team 会话事件、llm `prepareCall` 代际绑定、code-mode 图片延迟注入和 app-boot 环境黑名单，都对照引用它们的课程逐项核对，措辞漂移处已修复。复审范围之外（vendor、apps/web、python SDK 及一切需要真实运行的部分）仍未复审；首页基线行把这个边界摆给读者看。

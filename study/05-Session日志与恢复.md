@@ -35,11 +35,13 @@
 | `step/start`、`step/end` | 标出一次模型请求及其工具处理的边界 |
 | `user/message` | 记录直接输入或模型可见的注入上下文 |
 | `assistant/chunk` | 保留流式输出，便于回放和 UI 保真 |
-| `assistant/message` | 保存一个 Step 最终组装出的 assistant 消息 |
+| `assistant/message` | 保存一个 Step 最终组装出的 assistant 消息；Turn 在流中途被取消时，已送达的前缀也会以此事件落盘并带 `interrupted: true` 标记 |
 | `tool/call` | 保存模型原样产生的工具名、调用 id 和参数字符串 |
 | `tool/result` | 保存模型可见结果以及工具私有的展示元数据 |
 | `request/header` | 保存本次请求使用的模型配置、系统提示词和工具 schema |
 | `request/context` | 保存提供方、模型和上下文容量等路由信息 |
+
+这张表是教学选摘，不是完整清单；全部已知事件类型见固定提交的 [`known-event-types.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/known-event-types.ts)。
 
 ## “模型可见即已记录”
 
