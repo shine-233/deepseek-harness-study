@@ -19,7 +19,9 @@ Status: implemented
 
 [`turn-flow-lab.js`](../../../../website/public/turn-flow-lab.js) 接线：每次重建成功后用 `history.replaceState` 把 `{ scenario, upTo }` 写进 hash；启动时先从合法 hash 恢复控件再首次渲染；hash 缺失或损坏时静默回退默认值；「复制状态链接」按钮复制完整 URL。`replaceState` 失败（file://、沙箱环境）被吞掉——状态链接是增强，不是前提。`upTo` 的上界在应用时对照当前场景步数校验；schema 只固定整数下界。
 
-[`study-tools/study-lab-state.test.mjs`](../../../../study-tools/study-lab-state.test.mjs) 的十个确定性测试覆盖往返、键序字节稳定性、schema 违约、损坏载荷、锚点保留和页面接线。其余实验保持现状；是否接入本模块由各实验自行决定，本 note 不强制。
+[`study-tools/study-lab-state.test.mjs`](../../../../study-tools/study-lab-state.test.mjs) 的十个确定性测试覆盖往返、键序字节稳定性、schema 违约、损坏载荷、锚点保留和页面接线。
+
+其余六个模型实验全部接入了同一契约。Session-log 与 turn-flow 同形（枚举场景 + 有界滑杆）。Tool-visibility 持久化勾选的 Bundle 加两个枚举；schema 新增 `stringList` 规则，条目必须来自模型认识的清单。Package-graph 的 group 枚举在启动时从 fixture 动态生成，恢复时对照当前选项校验，fixture 变化后旧链接安全回退到全貌。Profile-loader 持久化可重排的 Bundle 序列、overlay 枚举和坏引用开关；模块新增 `boolean` 规则，页面还要求恢复的 order 是默认清单的排列才接受。Code-mode 持久化 32 位 seed、三选一教学策略和并行上限；帧位置不进状态——时间轴位置是播放，不是输入。研究-Debug 桥刻意不接入：它的输入是用户手选的证据文件，链接带不动。
 
 ## Alternatives considered
 

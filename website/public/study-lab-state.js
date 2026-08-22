@@ -7,6 +7,7 @@
  *
  * schema 的每个键声明一种约束：
  *   'string'                  任意字符串
+ *   'boolean'                 true 或 false
  *   { enum: [...] }           必须是列出的值之一
  *   { integerRange: [a, b] }  整数且 a ≤ 值 ≤ b
  *   { stringList: [...] }     字符串数组，且每一项都在列出的值里（可重复、可为空）
@@ -51,6 +52,9 @@ export function decodeState(text, schema) {
 function checkRule(value, rule) {
   if (rule === 'string') {
     return typeof value === 'string' ? null : ' 不是字符串'
+  }
+  if (rule === 'boolean') {
+    return typeof value === 'boolean' ? null : ' 不是布尔值'
   }
   if (rule !== null && typeof rule === 'object' && Array.isArray(rule.enum)) {
     return rule.enum.includes(value) ? null : ' 不在允许的取值里'

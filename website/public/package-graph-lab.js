@@ -17,6 +17,7 @@ import {
 
 import { installThemeToggle } from './study-lab-theme.js'
 import { createPackageScene } from './study-lab-scene3d.js'
+import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 
 const FIXTURE_URL = './package-graph.json'
 const SVG_NS = 'http://www.w3.org/2000/svg'
@@ -360,6 +361,21 @@ async function initializePage() {
   // 打开页面第一眼就该是全貌；core 只有 2 个可见点，剩下是空白。
   groupInput.value = 'all'
 
+  // 状态链接的输入契约：group 的取值集合由 fixture 动态生成，sort 是页面静态枚举；
+  // 组名在恢复时对照当前选项校验，fixture 变化后旧链接安全回退到全貌。
+  const GROUP_STATE_SCHEMA = {
+    group: { enum: [...groupInput.options].map(option => option.value) },
+    sort: { enum: [...sortInput.options].map(option => option.value) },
+    minLines: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
+  }
+  const restored = readStateFromHash(location.hash, GROUP_STATE_SCHEMA)
+  if (restored !== null && restored.ok) {
+    groupInput.value = restored.value.group
+    sortInput.value = restored.value.sort
+    if (minLinesInput !== null) minLinesInput.value = String(restored.value.minLines)
+    if (minLinesOutput !== null) minLinesOutput.textContent = minLinesInput.value
+  }
+
   writeText(provenance, '固定提交 ' + fixture.commit.slice(0, 10) + ' · 纯函数模型 · 独立 oracle · 完整表格替代')
 
   const rebuild = () => {
@@ -384,8 +400,22 @@ async function initializePage() {
       writeText(metrics.leaves, String(model.observations.leaves))
       setFeedback('已从固定提交读数重建视图：' + String(model.observations.packages)
         + ' 个包，视图内 ' + String(model.observations.edgesWithinView) + ' 条依赖边。', 'success')
+      persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '视图输入无效。', 'error')
+    }
+  }
+
+  // 状态进 URL hash；replaceState 被拒（file:// 等）时页面行为不变。
+  const persistState = () => {
+    try {
+      history.replaceState(null, '', writeStateToHash(location.hash, {
+        group: groupInput.value,
+        sort: sortInput.value,
+        minLines: Number(minLinesInput?.value ?? 0),
+      }, GROUP_STATE_SCHEMA))
+    } catch {
+      // 保持安静。
     }
   }
 
@@ -395,6 +425,16 @@ async function initializePage() {
   })
   groupInput.addEventListener('change', rebuild)
   sortInput.addEventListener('change', rebuild)
+  minLinesInput?.addEventListener('input', rebuild)
+  const copyLink = document.querySelector('#copy-state-link')
+  copyLink?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href)
+      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
+    } catch {
+      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
+    }
+  })
   rebuild()
 }
 

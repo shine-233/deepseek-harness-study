@@ -20,8 +20,17 @@ import {
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 
 const DEFAULT_ORDER = ['base', 'web-tools', 'shell-tools', 'observability', 'strict-limits']
+
+// 状态链接的输入契约：order 必须是 DEFAULT_ORDER 的一个排列（stringList 先保证
+// 条目都认识，排列关系在恢复时单独核对）；overlay 是枚举；broken 是开关。
+const PROFILE_STATE_SCHEMA = {
+  order: { stringList: DEFAULT_ORDER },
+  overlay: { enum: OVERLAY_SOURCES.map(overlay => overlay.id) },
+  broken: 'boolean',
+}
 
 /**
  * 写入矩阵用 HTML 表格而不是 SVG：它本来就是一张表，用表格能直接获得表头关联、
@@ -118,6 +127,7 @@ function initializePage() {
     keys: document.querySelector('#metric-keys'),
     contested: document.querySelector('#metric-contested'),
     oracle: document.querySelector('#metric-oracle'),
+    copyLink: document.querySelector('#copy-state-link'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -208,8 +218,22 @@ function initializePage() {
           + String(model.config.maxTurns) + '，telemetry=' + String(model.config.telemetry) + '。'
         : '解析在第 ' + String(model.failure.stepIndex) + ' 步显式失败，不是跳过它继续。',
       model.failure === null ? 'success' : 'notice')
+      persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
+    }
+  }
+
+  // 状态进 URL hash；replaceState 被拒（file:// 等）时页面行为不变。
+  const persistState = () => {
+    try {
+      history.replaceState(null, '', writeStateToHash(location.hash, {
+        order,
+        overlay: elements.overlay.value,
+        broken: elements.broken.checked,
+      }, PROFILE_STATE_SCHEMA))
+    } catch {
+      // 保持安静。
     }
   }
 
@@ -219,8 +243,31 @@ function initializePage() {
   })
   elements.overlay.addEventListener('change', rebuild)
   elements.broken.addEventListener('change', rebuild)
+
+  // 从状态链接恢复输入：order 必须是默认清单的排列（同集合不重不漏）才接受。
+  const restored = readStateFromHash(location.hash, PROFILE_STATE_SCHEMA)
+  const isPermutation = value => (
+    Array.isArray(value)
+    && value.length === DEFAULT_ORDER.length
+    && [...value].sort().join() === [...DEFAULT_ORDER].sort().join()
+  )
+  if (restored !== null && restored.ok && isPermutation(restored.value.order)) {
+    order = [...restored.value.order]
+    elements.overlay.value = restored.value.overlay
+    elements.broken.checked = restored.value.broken
+  }
+
   renderOrder()
   rebuild()
+
+  elements.copyLink.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href)
+      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
+    } catch {
+      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
+    }
+  })
 }
 
 if (typeof document !== 'undefined') {

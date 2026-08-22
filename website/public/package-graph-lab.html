@@ -80,7 +80,8 @@
           <input id="min-lines" name="min-lines" type="range" min="0" max="9000" step="100" value="0">
           <small>行数是连续量，拖动就能看小包怎样一层层退出视图。组和排序是分类值，所以它们仍然是下拉。</small>
         </label>
-        <button class="button button-primary" type="submit">重建视图</button>
+          <button class="button button-primary" type="submit">重建视图</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
       </form>
       <p class="feedback" id="graph-feedback" role="status" aria-live="polite"></p>
       <dl class="metric-grid" aria-label="当前视图观测值">

@@ -6,6 +6,7 @@ import { revealOnScroll } from './study-lab-reveal.js'
 
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 
 /** Replace the declared markers with inline SVG. Requires a live document. */
 function installDeclaredIcons(scope = document) {
@@ -39,6 +40,14 @@ export const CODE_MODE_POLICIES = Object.freeze([
     description: '每个子调用都形成拒绝结果，工具主体执行次数保持为 0。',
   }),
 ])
+
+// 状态链接的输入契约：seed 是 32 位无符号整数，策略是三个教学枚举之一，
+// 并行上限在 1..MAX_PARALLELISM。帧位置不进状态——时间轴位置不算实验输入。
+const CODE_MODE_STATE_SCHEMA = {
+  seed: { integerRange: [0, UINT32_MAX] },
+  policy: { enum: CODE_MODE_POLICIES.map(policy => policy.id) },
+  parallelism: { integerRange: [1, MAX_PARALLELISM] },
+}
 
 const CALL_SPECS = Object.freeze([
   Object.freeze({
@@ -1206,8 +1215,22 @@ function initializePage() {
         + ' 个事件，' + String(denied) + ' 个拒绝，未连接任何 Host。',
         'success',
       )
+      persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '实验输入无效。', 'error')
+    }
+  }
+
+  // 状态进 URL hash；replaceState 被拒（file:// 等）时页面行为不变。
+  const persistState = () => {
+    try {
+      history.replaceState(null, '', writeStateToHash(location.hash, {
+        seed: Number(seedInput.value),
+        policy: policyInput.value,
+        parallelism: Number(parallelismInput.value),
+      }, CODE_MODE_STATE_SCHEMA))
+    } catch {
+      // 保持安静。
     }
   }
 
@@ -1281,7 +1304,25 @@ function initializePage() {
 
   writeText(parallelismOutput, parallelismInput.value)
   applyMotionPreference()
+
+  // 从状态链接恢复输入；链接缺失或损坏时保持默认输入，不报错打断阅读。
+  const restored = readStateFromHash(location.hash, CODE_MODE_STATE_SCHEMA)
+  if (restored !== null && restored.ok) {
+    seedInput.value = String(restored.value.seed)
+    policyInput.value = restored.value.policy
+    parallelismInput.value = String(restored.value.parallelism)
+  }
+
   rebuild()
+
+  document.querySelector('#copy-state-link')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href)
+      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
+    } catch {
+      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
+    }
+  })
 }
 
 if (typeof document !== 'undefined') {

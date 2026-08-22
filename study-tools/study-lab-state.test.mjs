@@ -97,3 +97,32 @@ test('the turn lab page wires the state module and its copy control', () => {
     assert.ok(script.includes(marker), 'turn-flow-lab.js must reference ' + marker)
   }
 })
+
+const STATE_WIRED_LABS = [
+  'turn-flow-lab',
+  'session-log-lab',
+  'tool-visibility-lab',
+  'package-graph-lab',
+  'profile-loader-lab',
+  'compaction-lab',
+  'code-mode-evidence-lab',
+]
+
+test('every model lab wires the same state-link contract', () => {
+  for (const name of STATE_WIRED_LABS) {
+    const html = readFileSync(fileURLToPath(new URL(`../website/public/${name}.html`, import.meta.url)), 'utf8')
+    assert.ok(html.includes('id="copy-state-link"'), `${name} 缺少复制状态链接按钮`)
+    const script = readFileSync(fileURLToPath(new URL(`../website/public/${name}.js`, import.meta.url)), 'utf8')
+    for (const marker of ['readStateFromHash', 'writeStateToHash']) {
+      assert.ok(script.includes(marker), `${name}.js 必须引用 ${marker}`)
+    }
+    assert.match(script, /const \w+_STATE_SCHEMA/, `${name}.js 必须声明自己的状态 schema`)
+  }
+})
+
+test('the research-debug bridge stays outside the hash-state contract on purpose', () => {
+  // 桥接页的"输入"是用户手选的证据文件，不存在可放进链接的教学参数；
+  // 把它接进 #state= 反而会暗示文件选择可以被链接替代。
+  const script = readFileSync(fileURLToPath(new URL('../website/public/research-debug-bridge.js', import.meta.url)), 'utf8')
+  assert.ok(!script.includes('study-lab-state'), '桥接页不应依赖状态链接模块')
+})

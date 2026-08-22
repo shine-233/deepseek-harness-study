@@ -264,8 +264,22 @@ function initializePage() {
       setFeedback('已重建三层：' + String(model.observations.registered) + ' 已注册 → '
         + String(model.observations.modelVisible) + ' 模型可见 → '
         + String(model.observations.executionAllowed) + ' 允许执行。', 'success')
+      persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
+    }
+  }
+
+  // 状态进 URL hash：刷新或把链接发给别人，打开的就是同一份输入。
+  const persistState = () => {
+    try {
+      history.replaceState(null, '', writeStateToHash(location.hash, {
+        bundles: [...elements.bundleChecks.querySelectorAll('input:checked')].map(input => input.value),
+        scope: elements.scope.value,
+        policy: elements.policy.value,
+      }, VISIBILITY_STATE_SCHEMA))
+    } catch {
+      // 保持安静：hash 写不进去时页面行为不变。
     }
   }
 
@@ -275,7 +289,27 @@ function initializePage() {
   })
   elements.scope.addEventListener('change', rebuild)
   elements.policy.addEventListener('change', rebuild)
+
+  // 从状态链接恢复输入；链接缺失或损坏时保持默认（全部勾选 + full/read-only）。
+  const restored = readStateFromHash(location.hash, VISIBILITY_STATE_SCHEMA)
+  if (restored !== null && restored.ok) {
+    for (const input of elements.bundleChecks.querySelectorAll('input')) {
+      input.checked = restored.value.bundles.includes(input.value)
+    }
+    elements.scope.value = restored.value.scope
+    elements.policy.value = restored.value.policy
+  }
+
   rebuild()
+
+  elements.copyLink.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href)
+      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
+    } catch {
+      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
+    }
+  })
 }
 
 if (typeof document !== 'undefined') {
