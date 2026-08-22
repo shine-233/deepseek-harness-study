@@ -316,6 +316,18 @@ if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+  // 正文术语联动：导语里的三个集合名悬停/聚焦时，指标卡高亮对应读数。
+  for (const term of document.querySelectorAll('[data-metric]')) {
+    const card = document.querySelector('#metric-' + term.getAttribute('data-metric'))?.closest('div')
+    if (card === null || card === undefined) continue
+    const on = () => card.classList.add('term-flash')
+    const off = () => card.classList.remove('term-flash')
+    term.addEventListener('pointerover', on)
+    term.addEventListener('pointerleave', off)
+    term.addEventListener('focus', on)
+    term.addEventListener('blur', off)
+  }
+
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 
   // 预测题门控：先押注，再解锁参数控件。答错也解锁。

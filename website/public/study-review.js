@@ -17,7 +17,7 @@ import {
   serializeReview,
   upcomingCount,
 } from './study-review-core.js'
-import { QUIZ_BANK } from './study-quiz.js'
+import { allQuestionsFor } from './study-quiz.js'
 
 /** 页面目录即站点根：部署在子路径下时同样成立。Node 导入时没有 location，惰性求值。 */
 function pageDir() {
@@ -36,7 +36,7 @@ function lessonHref(lessonId, source) {
 }
 
 function findQuestion(lessonId, qid) {
-  const bank = QUIZ_BANK[lessonId]
+  const bank = allQuestionsFor(lessonId)
   if (bank === undefined) return null
   return bank.find(question => question.id === qid) ?? null
 }

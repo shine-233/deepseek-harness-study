@@ -21,6 +21,9 @@ Status: implemented
 3. **种子随机变体**：`study-quiz.js` 新增纯函数 `mulberry32` + `shuffleQuiz`，打乱题目顺序和选项顺序，正确答案下标跟着自己的文本走。判分后出现「再练一轮」按钮，换一颗新种子重排。
 4. **滚动引导**：`study-scrolly.js`（与进度加载器同样由主题注入）把第 04 课里的空容器 `<div data-scrolly="turn-flow">` 变成左图右文：粘性轨迹图画泳道、圆点和载荷配对线，数据与实验页共用同一个 `buildTurnModel`。六段解说都是原生按钮；IntersectionObserver 驱动推进，点击可跳。
 5. **正文↔图联动**：包依赖图说明文字新增三个 `<button data-graph-id>` 术语（core/agent、llm/llm、skill/skill）；悬停或聚焦经既有 linker 在散点、柱视图和表格三处同时高亮同一包，点击滚动到对应表行。
+6. **播放按钮（跟进批次）**：kit 新增纯函数 `nextPlayValue` 与薄 DOM 层 `bindAutoAdvance`，给 turn-flow、session-log、llm-stream、compaction 四页配上「播放/暂停」按钮：以每帧 650ms 从头扫到尾，任何外部来源的输入（拖动或键盘步进——用自派发标记识别，不能用 isTrusted，因为重新派发的事件永远不可信）立即暂停，末帧自动停；减少动态效果时退化为一次点击走一帧。
+7. **模板化生成题（跟进批次）**：`generatedQuestionsFor` 用实验页渲染所用的同一批模型函数出题——第 04 课问 two-tools 场景两个固定步骤在哪条泳道，第 05 课问两种日志场景重放后的工具调用次数。id 稳定（`gen-04-lane-5` 式），错题本解析因此可用；选项按稳定顺序排列，位置随机仍交给 `shuffleQuiz`。`allQuestionsFor` 在组合层拼接，不触碰钉死为每课 3 道的手写题库。
+8. **第二处互链（跟进批次）**：tool-visibility 导语的 已注册 / 对模型可见 / 允许执行 改为可聚焦按钮，悬停或聚焦让对应指标卡闪现高亮（`.term-flash`，共享 shell 样式）。
 
 ## Alternatives considered
 
@@ -32,15 +35,15 @@ Status: implemented
 ## Consequences
 
 - 多一个 localStorage 键（`dsh-study-review-v1`）；除显式导出外不出本机，承诺与进度一致。
-- `data-learning-tests` 从 237 变 249，首页数字条在同一次改动里更新（验证器钉住这个值）。
+- 学习测试计数随跟进批次增到 284，首页数字条钉在 255 + 8（验证器强制同步）。
 - `study-review.js` 与 `study-scrolly.js` 纳入无 DOM 导入门禁覆盖；模型逻辑全部留在 Node 可测模块里。
 - 判分代码路径不变：变体就是普通的题目数组，以后加新题自动获得打乱能力。
 
 ## Verification
 
-`node --test study-tools/*.test.mjs` 278/278（新增 12：复习排程 8、变体与按键 4）；`verify-lab-contrast` 78 组配色通过；完整 `pnpm run docs:build` 全绿，含 verify-doc-site-fragments（5,976 处引用）、verify-built-study-site、verify-study-publication（108 源 → 108 页 → 13,474 链接）、学习体验契约、首页指标（当时为 249，后续跟进中重新钉住）。
+`node --test study-tools/*.test.mjs` 284/284（新增 17：复习排程 9 含跨月边界、变体与按键 4、生成题 5）；`verify-lab-contrast` 78 组配色通过；完整 `pnpm run docs:build` 全绿，含 verify-doc-site-fragments（5,976 处引用）、verify-built-study-site、verify-study-publication（108 源 → 108 页 → 13,474 链接）、学习体验契约、首页指标（当时为 249，后续跟进中重新钉住）。
 
-真实浏览器走查（Playwright Chromium 对本地预览构建，同日完成）：23/23 通过，覆盖四个界面——第 04 课滚动引导正常渲染，舞台 svg 带 aria-label，点击后 `aria-current` 唯一，Tab 从正文可到达段落按钮，零控制台错误；375px 视口下单列堆叠、stage 转静态定位、无横向溢出；turn-flow 滑块在焦点位于表单控件之外时 ← 步进 −1，滑块持焦时原生行为只走一步（不叠加），End 回到末帧；错题本页显示种入的到期题和课文出处回链，「记住了」把 streak 从 0 推到 1 并排到明天；课程自测答错 q1 后错题写入存储、「再练一轮」按钮出现、反馈里引用出处。减少动态效果模拟下段落过渡归零，点击跳转仍然可用。读屏的实际播报没有验证——验证到的是 ARIA 接线（`role="status"`、`aria-current`、`aria-label`）。
+真实浏览器走查（Playwright Chromium 对本地预览构建，同日完成）：31/31 通过——首轮 23 项之外新增：播放按钮进入播放态并推进滑块；手动步进会暂停播放（这项检查抓到一个真 bug：暂停条件原来键在 isTrusted 上，而重新派发的事件永不为真；已改为自派发标记）；第 04/05 课自测各渲染 5 题（3 手写 + 2 生成）；tool-visibility 导语术语悬停闪现对应指标卡，移开后清除。读屏的实际播报没有验证——验证到的是 ARIA 接线（`role="status"`、`aria-current`、`aria-label`）。
 
 ## Boundaries
 

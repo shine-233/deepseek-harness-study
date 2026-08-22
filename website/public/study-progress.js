@@ -27,7 +27,7 @@ import {
   serializeReview,
   upcomingCount,
 } from './study-review-core.js'
-import { QUIZ_BANK, gradeAnswers, shuffleQuiz } from './study-quiz.js'
+import { allQuestionsFor, gradeAnswers, shuffleQuiz } from './study-quiz.js'
 // 代码格挂载器：导入即自注册 MutationObserver，负责 js-run 围栏块的替换。
 import './study-code-cell.js'
 
@@ -195,8 +195,8 @@ function wireImport(importLabel, applyImported) {
 }
 
 async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore, applyAttempt, seed) {
-  const bank = QUIZ_BANK[lessonId]
-  if (bank === undefined || docRoot === null) return
+  const bank = allQuestionsFor(lessonId)
+  if (bank === undefined || bank.length === 0 || docRoot === null) return
   const questions = seed === undefined ? bank : shuffleQuiz(bank, seed)
 
   const section = document.createElement('section')

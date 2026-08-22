@@ -8,7 +8,7 @@ import {
   renderOracle,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons, bindRangeKeys } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys, bindAutoAdvance } from './study-lab-kit.js'
 import {
   STREAM_SCENARIOS,
   buildStreamModel,
@@ -184,6 +184,8 @@ function initializePage() {
   elements.upto.addEventListener('input', rebuild)
   // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
   bindRangeKeys(elements.upto)
+  const playButton = document.querySelector('#frame-play')
+  if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.upto)
 
   const restored = readStateFromHash(location.hash, STREAM_STATE_SCHEMA)
   if (restored !== null && restored.ok) {

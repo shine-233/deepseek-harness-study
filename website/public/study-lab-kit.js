@@ -136,6 +136,64 @@ export function bindRangeKeys(slider) {
 }
 
 /**
+ * 播放的下一步取值；已在末帧返回 null。纯函数，Node 里单独测试。
+ */
+export function nextPlayValue(value, min, max, step = 1) {
+  const cap = Number(max)
+  if (!Number.isFinite(cap) || !(Number(value) < cap)) return null
+  const size = Math.max(Number(step) || 1, 1)
+  return Math.min(cap, Number(value) + size)
+}
+
+/**
+ * 给时间轴滑块配一个播放按钮：点击在末帧之外连续逐帧推进，再点暂停；
+ * 到末帧自动停；用户手动拖动（可信 input 事件）立即暂停。
+ * 减少动态效果时不做连续推进，一次点击只走一帧，帧控件保持可用。
+ */
+export function bindAutoAdvance(playButton, slider) {
+  let timer = 0
+  const setPlaying = playing => {
+    playButton.setAttribute('aria-pressed', String(playing))
+    writeText(playButton, playing ? '暂停' : '播放')
+  }
+  const stop = () => {
+    if (timer !== 0) { clearInterval(timer); timer = 0 }
+    setPlaying(false)
+  }
+  const atEnd = () => !(Number(slider.value) < Number(slider.max))
+  // 自己派发的 input 不算用户操作；其余来源（拖动、键盘步进、其它模块）都暂停。
+  let selfDispatch = false
+  const dispatchInput = () => {
+    selfDispatch = true
+    slider.dispatchEvent(new Event('input', { bubbles: true }))
+    selfDispatch = false
+  }
+  const stepOnce = () => {
+    const next = nextPlayValue(slider.value, slider.min, slider.max, slider.step)
+    if (next === null) { stop(); return false }
+    slider.value = String(next)
+    dispatchInput()
+    return true
+  }
+  playButton.addEventListener('click', () => {
+    if (timer !== 0) { stop(); return }
+    const endsNow = atEnd()
+    if (prefersReducedMotion()) {
+      if (endsNow) { slider.value = String(slider.min ?? 0); dispatchInput() }
+      stepOnce()
+      setPlaying(false)
+      return
+    }
+    if (endsNow) { slider.value = String(slider.min ?? 0); dispatchInput() }
+    setPlaying(true)
+    timer = setInterval(() => { if (!stepOnce()) stop() }, 650)
+  })
+  slider.addEventListener('input', () => {
+    if (!selfDispatch && timer !== 0) stop()
+  })
+}
+
+/**
  * 给带 `data-icon` 的元素装上图标。
  *
  * 由标记声明用哪个图标，而不是由脚本按类名猜；这样加一个小节不用改脚本，

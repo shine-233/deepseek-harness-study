@@ -6,6 +6,9 @@
  * DOM 渲染层在本文件底部，只有被进度模块调用时才碰 document。
  */
 
+import { TURN_SCENARIOS, buildTurnModel } from './turn-flow-model.js'
+import { LOG_SCENARIOS, buildSessionLogModel } from './session-log-model.js'
+
 export const QUIZ_LESSONS = Object.freeze(['00-开始这里', '01-仓库地图', '02-Cordis与插件树', '03-核心文件精读', '04-Agent与Turn流程', '05-Session日志与恢复'])
 
 /**
@@ -271,6 +274,81 @@ export function shuffleQuiz(questions, seed) {
     if (answer < 0) throw new Error('选项文本在打乱后丢失：' + correctText)
     return Object.freeze({ ...question, options, answer })
   }))
+}
+
+/**
+ * 数据驱动的生成题：与实验页共用同一批模型函数，读数即答案。
+ *
+ * 生成在模块加载时完成一次，输入固定、输出固定；选项按稳定顺序排列，
+ * 正确答案的文本永远在 options 里，位置随机交给 shuffleQuiz。
+ * 生成题不进 QUIZ_BANK：题库测试钉住手写题为每课恰好 3 道，生成题
+ * 通过 allQuestionsFor 在组合层追加。
+ */
+
+const TURN_LANE_LABELS = Object.freeze({
+  user: '用户',
+  context: '上下文装配',
+  model: '模型',
+  tool: '工具',
+  session: 'Session 日志',
+})
+
+function turnLaneQuestion(stepIndex) {
+  const scenario = TURN_SCENARIOS.find(candidate => candidate.id === 'two-tools')
+  const step = buildTurnModel({ scenario: 'two-tools' }).steps[stepIndex]
+  if (step === undefined) return null
+  const correct = TURN_LANE_LABELS[step.lane] ?? step.lane
+  const options = [correct, ...Object.entries(TURN_LANE_LABELS)
+    .filter(([lane]) => lane !== step.lane)
+    .map(([, label]) => label)]
+  return {
+    id: 'gen-04-lane-' + String(stepIndex),
+    q: '「' + scenario.label + '」场景的第 ' + String(stepIndex) + ' 步「' + step.detail + '」发生在哪条参与方泳道上？',
+    options,
+    answer: 0,
+    explain: '第 ' + String(stepIndex) + ' 步的泳道是「' + correct + '」。完整轨迹可在 Turn 流程实验里逐步查看。',
+    source: 'website/public/turn-flow-model.js 的 buildSteps（与实验页同一份数据）',
+  }
+}
+
+function sessionReadingsQuestion(scenarioId) {
+  const model = buildSessionLogModel({ scenario: scenarioId })
+  const readings = model.observations
+  const truth = readings.toolCalls
+  const optionValues = [...new Set([truth, truth + 1, Math.max(0, truth - 1), readings.toolFailures])]
+  const options = optionValues.map(value => String(value) + ' 次')
+  return {
+    id: 'gen-05-tools-' + scenarioId,
+    q: '完整重放「' + model.scenario.label + '」场景的日志后，恢复出的状态里有几次工具调用？',
+    options,
+    answer: optionValues.indexOf(truth),
+    explain: '重放是纯函数：同一段日志永远得到 toolCalls=' + String(truth) + '。读数来自 Session 日志实验用的同一个模型。',
+    source: 'website/public/session-log-model.js 的 replaySessionLog',
+  }
+}
+
+/** 每课的生成题；返回新数组，调用方可以自由拼接和打乱。 */
+export function generatedQuestionsFor(lessonId) {
+  const generated = []
+  if (lessonId === '04-Agent与Turn流程') {
+    for (const stepIndex of [5, 11]) {
+      const question = turnLaneQuestion(stepIndex)
+      if (question !== null) generated.push(question)
+    }
+  }
+  if (lessonId === '05-Session日志与恢复') {
+    for (const scenarioId of LOG_SCENARIOS.slice(0, 2).map(candidate => candidate.id)) {
+      generated.push(sessionReadingsQuestion(scenarioId))
+    }
+  }
+  return generated
+}
+
+/** 手写题库加生成题的完整组合；判分、复习解析都用这一份。 */
+export function allQuestionsFor(lessonId) {
+  const bank = QUIZ_BANK[lessonId]
+  if (bank === undefined) return undefined
+  return [...bank, ...generatedQuestionsFor(lessonId)]
 }
 
 /** 判一份答卷：answers 以题号为键，值是选项下标；返回每题对错和总分。 */

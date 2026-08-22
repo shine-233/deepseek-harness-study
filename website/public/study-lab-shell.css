@@ -316,3 +316,26 @@ tbody tr:hover { background: color-mix(in srgb, var(--brand) 7%, transparent); }
   .icon { stroke: CanvasText; }
   [data-pass="true"] .icon, [data-pass="true"].icon { stroke: CanvasText; }
 }
+
+/* 播放按钮的按下态与正文术语联动的高亮（共享层）。 */
+button[aria-pressed="true"] {
+  border-color: var(--brand, #3aa2ff);
+  color: var(--brand, #3aa2ff);
+  font-weight: 600;
+}
+
+.term-flash {
+  outline: 2px solid var(--brand, #3aa2ff);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* 正文术语联动：说明文字里的可聚焦术语，悬停/聚焦高亮对应视图元素。 */
+.term-ref {
+  font: inherit;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--brand, #3aa2ff);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
