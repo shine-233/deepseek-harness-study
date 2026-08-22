@@ -38,8 +38,10 @@ A pattern survey of best-in-class interactive teaching sites (Distill.pub, VisuA
 
 ## Verification
 
-`node --test study-tools/*.test.mjs` 278/278 (12 new: review schedule 8, variants/keys 4); `verify-lab-contrast` 78 pairs pass; full `pnpm run docs:build` green including verify-doc-site-fragments (5,976 refs), verify-built-study-site, verify-study-publication (108 sources → 108 pages → 13474 links), learning contract, home metrics (249).
+`node --test study-tools/*.test.mjs` 278/278 (12 new: review schedule 8, variants/keys 4); `verify-lab-contrast` 78 pairs pass; full `pnpm run docs:build` green including verify-doc-site-fragments (5,976 refs), verify-built-study-site, verify-study-publication (108 sources → 108 pages → 13474 links), learning contract, home metrics (249 at the time; re-pinned after follow-ups).
+
+Real-browser walkthrough (Playwright Chromium against a local preview build, same day): 23/23 checks pass across four surfaces — lesson 04 scroll guide renders with aria-labelled stage, exactly one `aria-current` beat after click, Tab reachability from body, zero console errors; 375px viewport collapses the guide to one column with static stage and no horizontal overflow; turn-flow slider steps −1 on ArrowLeft only when focus is outside form controls, native single-step while focused (no double-step), End returns to last frame; review page shows a seeded due item with its lesson source link, 记住了 advances streak 0→1 and reschedules tomorrow; answering quiz q1 wrong writes the miss into storage, shows the 再练一轮 button, and cites the source in feedback. Reduced-motion emulation zeroes beat transitions while click-to-jump keeps working. Screen-reader announcement itself was not exercised — ARIA wiring (`role="status"`, `aria-current`, `aria-label`) is what was verified.
 
 ## Boundaries
 
-No real-browser walkthrough yet for the new surfaces (focus order with the sticky stage, narrow-screen scrolly stacking, screen-reader announcement of beat changes); lesson 33 still lists that class of unknowns. The review intervals are pedagogy constants, not claims about optimal spacing research.
+One real-browser walkthrough pass exists (see Verification) but it is a point-in-time check, not an automated regression: screen-reader spoken output, other labs' narrow screens, and Pages-specific serving remain unexercised; lesson 33 keeps that class of work as its standing unknown. The review intervals are pedagogy constants, not claims about optimal spacing research.

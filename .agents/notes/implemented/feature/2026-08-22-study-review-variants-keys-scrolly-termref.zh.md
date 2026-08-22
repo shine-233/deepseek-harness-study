@@ -38,8 +38,10 @@ Status: implemented
 
 ## Verification
 
-`node --test study-tools/*.test.mjs` 278/278（新增 12：复习排程 8、变体与按键 4）；`verify-lab-contrast` 78 组配色通过；完整 `pnpm run docs:build` 全绿，含 verify-doc-site-fragments（5,976 处引用）、verify-built-study-site、verify-study-publication（108 源 → 108 页 → 13,474 链接）、学习体验契约、首页指标（249）。
+`node --test study-tools/*.test.mjs` 278/278（新增 12：复习排程 8、变体与按键 4）；`verify-lab-contrast` 78 组配色通过；完整 `pnpm run docs:build` 全绿，含 verify-doc-site-fragments（5,976 处引用）、verify-built-study-site、verify-study-publication（108 源 → 108 页 → 13,474 链接）、学习体验契约、首页指标（当时为 249，后续跟进中重新钉住）。
+
+真实浏览器走查（Playwright Chromium 对本地预览构建，同日完成）：23/23 通过，覆盖四个界面——第 04 课滚动引导正常渲染，舞台 svg 带 aria-label，点击后 `aria-current` 唯一，Tab 从正文可到达段落按钮，零控制台错误；375px 视口下单列堆叠、stage 转静态定位、无横向溢出；turn-flow 滑块在焦点位于表单控件之外时 ← 步进 −1，滑块持焦时原生行为只走一步（不叠加），End 回到末帧；错题本页显示种入的到期题和课文出处回链，「记住了」把 streak 从 0 推到 1 并排到明天；课程自测答错 q1 后错题写入存储、「再练一轮」按钮出现、反馈里引用出处。减少动态效果模拟下段落过渡归零，点击跳转仍然可用。读屏的实际播报没有验证——验证到的是 ARIA 接线（`role="status"`、`aria-current`、`aria-label`）。
 
 ## Boundaries
 
-新界面还没做真实浏览器走查（粘性图的焦点顺序、窄屏下滚动引导的堆叠、读屏对段落切换的播报）；第 33 课仍把这类项列为未知。复习间隔是教学常数，不声称来自最优间隔研究的结论。
+真实浏览器走查已做一轮（见 Verification），但那是时点检查，不是自动化回归：读屏实际播报、其余实验页的窄屏、Pages 环境的伺服行为仍未走；第 33 课继续把这类工作列为长期未知。复习间隔是教学常数，不声称来自最优间隔研究的结论。

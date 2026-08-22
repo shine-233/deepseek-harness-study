@@ -81,6 +81,13 @@ test('到期过滤按天比较：今天与过去到期都算到期，未来不�
   assert.equal(upcomingCount(state, '2026-08-22T08:00:00Z'), 1)
 })
 
+test('到期日跨月按 UTC 日历推进，不受时分秒影响', () => {
+  const state = recordAttempt(emptyReview(), '01-仓库地图', 'q2', false, '2026-01-31T23:30:00Z')
+  assert.equal(state.items['01-仓库地图|q2'].due, '2026-02-01')
+  const passed = recordAttempt(state, '01-仓库地图', 'q2', true, '2026-02-01T00:10:00Z')
+  assert.equal(passed.items['01-仓库地图|q2'].due, '2026-02-02')
+})
+
 test('合并同一条目取较新的 ts', () => {
   const local = recordAttempt(emptyReview(), '01-仓库地图', 'q1', false, '2026-08-20T00:00:00Z')
   const importedBase = recordAttempt(emptyReview(), '01-仓库地图', 'q1', false, '2026-08-19T00:00:00Z')

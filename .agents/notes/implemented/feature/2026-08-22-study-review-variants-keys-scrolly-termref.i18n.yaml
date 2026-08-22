@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-22-study-review-variants-keys-scrolly-termref.md
-2026-08-22-study-review-variants-keys-scrolly-termref.md: b1bcde8123d1e602613fbfc5f953ba976310fa98
-2026-08-22-study-review-variants-keys-scrolly-termref.zh.md: 67b67dc9a5c43ded8a872c4eabc88d4444840f6e
+2026-08-22-study-review-variants-keys-scrolly-termref.md: cb1bf097e58be8504937726bb0bd3ff39ed6f745
+2026-08-22-study-review-variants-keys-scrolly-termref.zh.md: add5818f0c8a2ac7a5b9c87b6d731917e4098dda
