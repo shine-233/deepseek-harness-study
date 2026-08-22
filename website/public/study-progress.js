@@ -144,11 +144,15 @@ function buildWidget(state, lessonId, reviewHref, reviewLabel) {
   importLabel.style.cursor = 'pointer'
   importLabel.style.textDecoration = 'underline'
 
+  const labsLink = document.createElement('a')
+  labsLink.textContent = '实验室'
+  labsLink.href = siteBase() + 'study-labs.html'
+
   const reviewLink = document.createElement('a')
   reviewLink.textContent = reviewLabel
   reviewLink.href = reviewHref
 
-  pill.append(toggle, count, exportLink, importLabel, reviewLink)
+  pill.append(toggle, count, labsLink, exportLink, importLabel, reviewLink)
 
   const status = document.createElement('p')
   status.id = WIDGET_ID + '-status'

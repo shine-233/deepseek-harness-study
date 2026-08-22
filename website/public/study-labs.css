@@ -1,0 +1,258 @@
+/* 实验室总览页样式：只补页面特有的部分，外壳与主题变量来自共享层。 */
+
+.lab-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.lab-chip {
+  border: 1px solid var(--vp-c-divider, rgba(0,0,0,.14));
+  background: var(--vp-c-bg, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 13.5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.lab-chip:hover {
+  border-color: var(--vp-c-brand-1, #3050d6);
+}
+
+.lab-chip[aria-pressed="true"] {
+  background: var(--vp-c-brand-1, #3050d6);
+  border-color: var(--vp-c-brand-1, #3050d6);
+  color: #fff;
+}
+
+.lab-chip-count {
+  margin-left: 6px;
+  font-size: 12px;
+  opacity: .75;
+}
+
+.lab-card-grid {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.lab-card {
+  border: 1px solid var(--vp-c-divider, rgba(0,0,0,.12));
+  border-radius: 14px;
+  background: var(--vp-c-bg-soft, transparent);
+  overflow: hidden;
+}
+
+.lab-mini {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 10px 14px 0;
+  box-sizing: border-box;
+  color: var(--vp-c-text-2, inherit);
+}
+
+.lab-card-body {
+  padding: 10px 18px 18px;
+}
+
+.lab-card h3 {
+  margin: 4px 0 8px;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.lab-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lab-card h3 a:hover {
+  color: var(--vp-c-brand-1, #3050d6);
+  text-decoration: underline;
+}
+
+.lab-card-question {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--vp-c-text-2, inherit);
+}
+
+.lab-card-progress {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: var(--vp-c-brand-1, #3050d6);
+}
+
+.lab-card-tags {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lab-card-tags .schema-pill {
+  font-size: 12px;
+}
+
+.lab-card-links {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.lab-card-links .button {
+  font-size: 13.5px;
+}
+
+.lab-lesson-link {
+  font-size: 13px;
+  color: var(--vp-c-text-2, inherit);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lab-lesson-link:hover {
+  color: var(--vp-c-brand-1, #3050d6);
+}
+
+.lab-card.is-hidden {
+  display: none;
+}
+
+/* 迷你示意图：线稿风格，颜色随主题。 */
+
+.lm-line,
+.lm-axis,
+.lm-link,
+.lm-flow,
+.lm-dash {
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.lm-dash {
+  stroke-dasharray: 3 3;
+}
+
+.lm-bar,
+.lm-chunk,
+.lm-cell {
+  fill: currentColor;
+  opacity: .45;
+}
+
+.lm-hi,
+.lm-message,
+.lm-summary,
+.lm-star,
+.lm-core {
+  fill: var(--vp-c-brand-1, #3050d6);
+}
+
+.lm-stale {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2;
+}
+
+.lm-dot {
+  fill: currentColor;
+  opacity: .7;
+}
+
+.lm-box {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.lm-accent {
+  stroke: var(--vp-c-brand-1, #3050d6);
+}
+
+.lm-arrow {
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lm-scatter {
+  fill: currentColor;
+  opacity: .5;
+}
+
+.lm-ring,
+.lm-gate {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.lm-mid {
+  opacity: .65;
+}
+
+.lm-denied {
+  stroke-dasharray: 4 3;
+}
+
+.lm-layer {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.lm-last {
+  fill: var(--vp-c-brand-1, #3050d6);
+  fill-opacity: .18;
+  stroke: var(--vp-c-brand-1, #3050d6);
+}
+
+.lm-node {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.lm-sub-off {
+  stroke-dasharray: 3 3;
+}
+
+.lm-file {
+  fill: var(--vp-c-bg, transparent);
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.lm-file-fold {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-chip,
+  .lab-card,
+  .lab-card h3 a {
+    transition: none;
+  }
+}

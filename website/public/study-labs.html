@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="十个可以动手做的确定性实验：固定输入、固定输出、自带 oracle，不联网、不调模型">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>实验室总览：十个能上手拆的实验</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./study-labs.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#labs-main">跳到实验列表</a>
+  <main class="lab-shell" id="labs-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 实验室总览</p>
+        <h1>十个能上手拆的实验。</h1>
+        <p class="hero-lead">每个实验固定输入、固定输出、自带 oracle；不联网、不调模型，结论当场可查。先按目的挑一个，做完再回配套课对答案。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-secondary" href="/">回到课程</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="数据边界">
+        <span class="warning-index">SOURCE / 10</span>
+        <strong>这些是教学模型，页面不启动真实 DSH。</strong>
+        <p>数字来自固定提交 aa6c361 的静态证据；运行耗时、token 数和真实 provider 行为都不在测量范围。</p>
+      </aside>
+    </header>
+
+    <section class="card" aria-label="你的进度">
+      <dl class="metric-grid">
+        <div><dt>亲手做过的实验</dt><dd id="metric-labs-done">—</dd></div>
+        <div><dt>已读配套课</dt><dd id="metric-lessons-read">—</dd></div>
+        <div><dt>计入进度</dt><dd>9 / 10 个页面</dd></div>
+      </dl>
+      <p class="feedback" id="labs-progress-feedback" role="status" aria-live="polite">进度只写本机浏览器，不上传。</p>
+    </section>
+
+    <section class="card" aria-label="按目的筛选">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">目的筛选</p>
+          <h2>你想先弄懂什么</h2>
+        </div>
+        <span class="schema-pill">选择会记进网址，刷新不丢</span>
+      </div>
+      <div class="lab-filter" role="group" aria-label="按目的筛选实验">
+        <button type="button" class="lab-chip" data-group="all" aria-pressed="true">全部<span class="lab-chip-count" data-count="all"></span></button>
+        <button type="button" class="lab-chip" data-group="main" aria-pressed="false">主链路怎么跑<span class="lab-chip-count" data-count="main"></span></button>
+        <button type="button" class="lab-chip" data-group="plugin" aria-pressed="false">插件怎么挂<span class="lab-chip-count" data-count="plugin"></span></button>
+        <button type="button" class="lab-chip" data-group="evidence" aria-pressed="false">边界与交接<span class="lab-chip-count" data-count="evidence"></span></button>
+      </div>
+      <p class="feedback" id="lab-filter-feedback" role="status" aria-live="polite"></p>
+    </section>
+
+    <section aria-label="实验室列表">
+      <ul class="lab-card-grid" role="list">
+
+        <li class="lab-card" data-group="main" data-lab="turn-flow" data-lesson="04-Agent与Turn流程">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <line class="lm-line" x1="6" y1="30" x2="114" y2="30"/>
+            <rect class="lm-bar lm-hi" x="5" y="20" width="3" height="20" rx="1"/>
+            <rect class="lm-bar" x="16" y="24" width="3" height="12" rx="1"/>
+            <rect class="lm-bar" x="27" y="24" width="3" height="12" rx="1"/>
+            <rect class="lm-bar" x="38" y="24" width="3" height="12" rx="1"/>
+            <rect class="lm-bar lm-hi" x="49" y="20" width="3" height="20" rx="1"/>
+            <rect class="lm-bar" x="60" y="24" width="3" height="12" rx="1"/>
+            <rect class="lm-bar" x="71" y="24" width="3" height="12" rx="1"/>
+            <rect class="lm-bar lm-hi" x="82" y="20" width="3" height="20" rx="1"/>
+            <rect class="lm-bar" x="93" y="24" width="3" height="12" rx="1"/>
+            <rect class="lm-bar lm-hi" x="104" y="20" width="3" height="20" rx="1"/>
+            <circle class="lm-dot" cx="6.5" cy="50" r="2"/>
+            <circle class="lm-dot" cx="28" cy="50" r="2"/>
+            <circle class="lm-dot" cx="50" cy="50" r="2"/>
+            <circle class="lm-dot" cx="72" cy="50" r="2"/>
+            <circle class="lm-dot" cx="94" cy="50" r="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Turn 流程与日志对应</h3>
+            <p class="lab-card-question">一次 Turn 展开成 20 步、4 次模型请求、9 条日志事件。滑杆停在哪一步，都能对上这一步写进了日志哪一行。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">步进滑杆</li>
+              <li class="schema-pill">场景切换</li>
+              <li class="schema-pill">状态链复制</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./turn-flow-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/04-Agent与Turn流程.html">配套课 · Agent 与 Turn</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="session-log" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box" x="8" y="10" width="34" height="10" rx="2"/>
+            <rect class="lm-box" x="8" y="29" width="34" height="10" rx="2"/>
+            <rect class="lm-box" x="8" y="48" width="34" height="10" rx="2"/>
+            <rect class="lm-box lm-accent" x="78" y="10" width="34" height="10" rx="2"/>
+            <rect class="lm-box lm-accent" x="78" y="29" width="34" height="10" rx="2"/>
+            <rect class="lm-box lm-accent" x="78" y="48" width="34" height="10" rx="2"/>
+            <line class="lm-link" x1="42" y1="15" x2="78" y2="15"/>
+            <line class="lm-link" x1="42" y1="34" x2="78" y2="34"/>
+            <line class="lm-link" x1="42" y1="53" x2="78" y2="53"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Session 日志重放</h3>
+            <p class="lab-card-question">拖动重放位置，看状态怎么从日志逐条折叠出来。切到含未知事件的场景：必需事件会让加载停下，标了 ignorable 的才能跳过。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">重放拖杆</li>
+              <li class="schema-pill">未知事件场景</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./session-log-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · Session 日志与恢复</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="llm-stream" data-lesson="06-LLM与工具执行">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-chunk" x="8" y="12" width="14" height="9" rx="2"/>
+            <rect class="lm-chunk" x="26" y="12" width="18" height="9" rx="2"/>
+            <rect class="lm-chunk" x="48" y="12" width="12" height="9" rx="2"/>
+            <rect class="lm-chunk" x="64" y="12" width="20" height="9" rx="2"/>
+            <rect class="lm-chunk lm-stale" x="88" y="12" width="16" height="9" rx="2"/>
+            <path class="lm-arrow" d="M60 28 v10 m-5 -6 l5 6 l5 -6"/>
+            <rect class="lm-message" x="8" y="46" width="96" height="12" rx="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>LLM 流式拼装</h3>
+            <p class="lab-card-question">chunk 按到达顺序进 BlockAssembler；finish 之后才到的重复增量必须被丢掉，否则同一段话出现两遍。逐步推进序列，看着消息拼完。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">单步推进</li>
+              <li class="schema-pill">迟到块开关</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./llm-stream-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/06-LLM与工具执行.html">配套课 · LLM 与工具执行</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="compaction" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-cell" x="8" y="8" width="14" height="10" rx="2"/>
+            <rect class="lm-cell" x="8" y="22" width="14" height="10" rx="2"/>
+            <rect class="lm-cell" x="8" y="36" width="14" height="10" rx="2"/>
+            <rect class="lm-cell" x="26" y="8" width="14" height="10" rx="2"/>
+            <rect class="lm-cell" x="26" y="22" width="14" height="10" rx="2"/>
+            <rect class="lm-cell lm-dim" x="26" y="36" width="14" height="10" rx="2"/>
+            <path class="lm-arrow" d="M52 30 h16 m-6 -5 l6 5 l-6 5"/>
+            <rect class="lm-summary" x="78" y="14" width="34" height="16" rx="3"/>
+            <rect class="lm-cell" x="78" y="40" width="15" height="10" rx="2"/>
+            <rect class="lm-cell" x="97" y="40" width="15" height="10" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>上下文压缩</h3>
+            <p class="lab-card-question">拉「保留轮数」，看 surface 折成摘要、最近几轮原样留下；原始日志一条不少，摘要逐条引用它们。两层怎么算账，当场对。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">保留轮数滑杆</li>
+              <li class="schema-pill">前后对照</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./compaction-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · Session 日志与恢复</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="package-graph" data-lesson="02-Cordis与插件树">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <path class="lm-axis" d="M14 6 v52 h100"/>
+            <circle class="lm-scatter" cx="26" cy="50" r="3"/>
+            <circle class="lm-scatter" cx="33" cy="44" r="3"/>
+            <circle class="lm-scatter" cx="24" cy="40" r="3"/>
+            <circle class="lm-scatter" cx="80" cy="22" r="3"/>
+            <circle class="lm-scatter" cx="90" cy="16" r="3"/>
+            <circle class="lm-scatter" cx="98" cy="26" r="3"/>
+            <circle class="lm-star" cx="106" cy="52" r="4"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>包依赖图证据</h3>
+            <p class="lab-card-question">横轴是一个包 src 的行数，纵轴是多少个包在 peerDependencies 里指向它。最被依赖的包往往最小：右下角和左上角各讲一个故事。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">散点筛选</li>
+              <li class="schema-pill">可选 3D 场景</li>
+              <li class="schema-pill">表格回退</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./package-graph-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/02-Cordis与插件树.html">配套课 · Cordis 与插件树</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="tool-visibility" data-lesson="22-工具可见性与非侵入扩展">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-ring" x="10" y="8" width="100" height="52" rx="6"/>
+            <rect class="lm-ring lm-mid" x="26" y="18" width="68" height="32" rx="5"/>
+            <rect class="lm-core" x="42" y="27" width="36" height="14" rx="4"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>工具可见性三层集合</h3>
+            <p class="lab-card-question">已注册、模型可见、允许执行是三层嵌套的收窄，各由不同的东西负责。开关任意一层，另外两层的计数跟着变。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">集合开关</li>
+              <li class="schema-pill">计数联动</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./tool-visibility-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/22-工具可见性与非侵入扩展.html">配套课 · 工具可见性</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="profile-loader" data-lesson="15-BundleProfileLoader与发布安装">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-layer" x="18" y="8" width="84" height="13" rx="3"/>
+            <rect class="lm-layer" x="18" y="27" width="84" height="13" rx="3"/>
+            <rect class="lm-layer lm-last" x="18" y="46" width="84" height="13" rx="3"/>
+            <path class="lm-arrow" d="M104 14 v8 m-4 -4 l4 4 l4 -4" transform="translate(6 0)"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Profile 解析顺序</h3>
+            <p class="lab-card-question">同一组 Bundle，把「严格上限」拖到前面，maxTurns 就从 4 变 12：决定结果的是最后一个写它的步骤。overlay 永远叠在最后。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">顺序拖拽</li>
+              <li class="schema-pill">装配对照</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./profile-loader-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/15-BundleProfileLoader与发布安装.html">配套课 · Bundle 与 Profile</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="plugin-flow" data-lesson="11-如何写一个合规插件">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <circle class="lm-node" cx="60" cy="14" r="7"/>
+            <line class="lm-line" x1="60" y1="21" x2="24" y2="46"/>
+            <line class="lm-line" x1="60" y1="21" x2="60" y2="46"/>
+            <line class="lm-line" x1="60" y1="21" x2="96" y2="46"/>
+            <circle class="lm-node" cx="24" cy="52" r="7"/>
+            <circle class="lm-node lm-sub-off" cx="60" cy="52" r="7"/>
+            <circle class="lm-node" cx="96" cy="52" r="7"/>
+            <line class="lm-dash" x1="60" y1="45" x2="60" y2="58"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>插件订阅与日志</h3>
+            <p class="lab-card-question">只观察 tools/result 的最小插件摆在三层时间线上：关掉订阅，执行照常广播、宿主照常写日志，少的只有它的预览。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">订阅开关</li>
+              <li class="schema-pill">时间线单步</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./plugin-flow-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/11-如何写一个合规插件.html">配套课 · 写合规插件</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="evidence" data-lab="code-mode-evidence" data-lesson="33-确定性可视化实验协议与Code-Mode权限管线">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-gate" x="8" y="24" width="24" height="18" rx="3"/>
+            <rect class="lm-gate" x="40" y="24" width="24" height="18" rx="3"/>
+            <rect class="lm-gate lm-denied" x="72" y="24" width="24" height="18" rx="3"/>
+            <path class="lm-flow" d="M32 33 h8 M64 33 h8"/>
+            <path class="lm-flow" d="M96 33 h8 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-box lm-accent" x="104" y="26" width="10" height="14" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Code Mode 权限管线</h3>
+            <p class="lab-card-question">子调用也要过完整管线。改策略和 seed，逐帧检查四个子调用：默认场景拒绝一次写入，「全部放行」后写入仍先过 policy lane。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">策略切换</li>
+              <li class="schema-pill">逐帧检查</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./code-mode-evidence-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">配套课 · 可视化协议</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="evidence" data-lab="research-debug-bridge" data-lesson="29-研究与-Debug-协作">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box" x="6" y="18" width="36" height="30" rx="4"/>
+            <rect class="lm-box lm-accent" x="78" y="18" width="36" height="30" rx="4"/>
+            <path class="lm-file" d="M54 20 h9 l6 6 v20 h-15 z"/>
+            <path class="lm-file-fold" d="M63 20 v6 h6"/>
+            <path class="lm-arrow" d="M44 33 h8 m-4 -4 l4 4 l-4 4"/>
+            <path class="lm-arrow" d="M76 41 h-8 m4 -4 l-4 4 l4 4"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>研究 ↔ Debug 离线桥</h3>
+            <p class="lab-card-question">课程网站和独立 Debug 工具之间只靠显式文件交接：这边生成 request 文件，那边回填结果文件，页面逐项核对结论。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">文件导入导出</li>
+              <li class="schema-pill">结论回填核对</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./research-debug-bridge.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/29-研究与-Debug-协作.html">配套课 · 研究与 Debug 协作</a>
+            </p>
+          </div>
+        </li>
+
+      </ul>
+      <p class="feedback" id="lab-empty-feedback" hidden>这一组暂时没有实验。换一个筛选条件看看。</p>
+    </section>
+
+    <footer class="page-footer">
+      <span>进度只写本机浏览器 · 数据不出本机</span>
+      <a href="/">回课程首页</a>
+    </footer>
+  </main>
+  <script type="module" src="./study-labs.js"></script>
+</body>
+</html>

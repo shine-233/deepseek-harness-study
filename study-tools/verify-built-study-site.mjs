@@ -67,6 +67,18 @@ export const REQUIRED_PUBLISHED_PAGES = [
     label: '学习工具箱',
     markers: ['不启动 DSH', 'verify-study-entry.mjs', '真实 ToolRuntime'],
   },
+  {
+    file: 'study-labs.html',
+    label: '实验室总览',
+    markers: [
+      '十个能上手拆的实验',
+      'lab-card-grid',
+      'data-lab="turn-flow"',
+      'data-lab="research-debug-bridge"',
+      'study/lessons/04-Agent与Turn流程.html',
+      '按目的筛选实验',
+    ],
+  },
 ]
 
 /** Assets that make the reading layer visible on the published site. */
