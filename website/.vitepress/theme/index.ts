@@ -21,7 +21,9 @@ export default {
     // 用编译期替换的 BASE_URL 拼绝对路径——withBase 在部分构建里拿不到站点前缀，
     // 会把 src 解析成课程页目录下的相对路径（线上 404 的根因）。
     if (typeof window !== 'undefined') {
-      const base = import.meta.env.BASE_URL ?? '/'
+      // 根 tsconfig 不含 vite/client 类型，这里对 import.meta.env 做一次显式窄化。
+      const env = (import.meta as unknown as { env?: { BASE_URL?: string } }).env
+      const base = env?.BASE_URL ?? '/'
       const script = document.createElement('script')
       script.type = 'module'
       script.src = (base.endsWith('/') ? base : base + '/') + 'study-progress.js'
