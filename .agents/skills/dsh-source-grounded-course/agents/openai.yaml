@@ -1,0 +1,4 @@
+interface:
+  display_name: "DSH Source-Grounded Course"
+  short_description: "Build evidence-backed interactive courses"
+  default_prompt: "Use $dsh-source-grounded-course to turn a pinned codebase and reference site into a tested interactive course."
