@@ -20,8 +20,16 @@ import {
 } from './session-log-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
+
+// 状态链接的输入契约：场景是枚举；重放位置的上界由模型按日志长度给出，
+// 这里只卡整数下界，越界值在恢复时被拉回当前场景的末尾。
+const SESSION_STATE_SCHEMA = {
+  scenario: { enum: LOG_SCENARIOS.map(scenario => scenario.id) },
+  upTo: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
+}
 
 const DISPOSITION_GLYPH = {
   applied: '✓',
@@ -149,6 +157,7 @@ function initializePage() {
     refused: document.querySelector('#metric-refused'),
     messages: document.querySelector('#metric-messages'),
     oracle: document.querySelector('#metric-oracle'),
+    copyLink: document.querySelector('#copy-state-link'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -200,8 +209,22 @@ function initializePage() {
         : '加载在第 ' + String(model.observations.refusedAt) + ' 条被拒绝；之前的 '
           + String(model.observations.applied) + ' 条已折叠成可用的部分状态。',
       model.observations.refusedAt === null ? 'success' : 'notice')
+      persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
+    }
+  }
+
+  // 状态进 URL hash：刷新或把链接发给别人，打开的就是同一份输入。
+  // replaceState 在 file:// 或沙箱环境下可能被拒；状态链接是增强，不是前提。
+  const persistState = () => {
+    try {
+      history.replaceState(null, '', writeStateToHash(location.hash, {
+        scenario: elements.scenario.value,
+        upTo: Number(elements.upTo.value),
+      }, SESSION_STATE_SCHEMA))
+    } catch {
+      // 保持安静：hash 写不进去时页面行为不变。
     }
   }
 
@@ -215,7 +238,29 @@ function initializePage() {
     rebuild()
   })
   elements.upTo.addEventListener('input', rebuild)
+
+  // 从状态链接恢复输入；链接缺失或损坏时保持默认场景，不报错打断阅读。
+  const restored = readStateFromHash(location.hash, SESSION_STATE_SCHEMA)
+  const hasRestoredUpTo = restored !== null && restored.ok
+  if (restored !== null && restored.ok) {
+    elements.scenario.value = restored.value.scenario
+    elements.upTo.value = String(restored.value.upTo)
+  }
+
   rebuild()
+  if (!hasRestoredUpTo || Number(elements.upTo.value) > Number(elements.upTo.max)) {
+    elements.upTo.value = elements.upTo.max
+    rebuild()
+  }
+
+  elements.copyLink.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href)
+      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
+    } catch {
+      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
+    }
+  })
 }
 
 if (typeof document !== 'undefined') {

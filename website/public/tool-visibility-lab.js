@@ -22,8 +22,17 @@ import {
 } from './tool-visibility-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
+
+// 状态链接的输入契约：勾选的 Bundle 必须都来自模型认识的清单；
+// 作用域和执行策略是枚举。空勾选是合法输入，对应“什么都没装”的教学状态。
+const VISIBILITY_STATE_SCHEMA = {
+  bundles: { stringList: TOOL_BUNDLES },
+  scope: { enum: AGENT_SCOPES.map(scope => scope.id) },
+  policy: { enum: EXECUTION_POLICIES.map(policy => policy.id) },
+}
 
 const LEVEL_LABELS = ['未注册', '已注册', '模型可见', '允许执行']
 
@@ -186,6 +195,7 @@ function initializePage() {
     allowed: document.querySelector('#metric-allowed'),
     gap: document.querySelector('#metric-gap'),
     oracle: document.querySelector('#metric-oracle'),
+    copyLink: document.querySelector('#copy-state-link'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)

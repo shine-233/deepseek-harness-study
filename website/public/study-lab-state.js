@@ -9,6 +9,7 @@
  *   'string'                  任意字符串
  *   { enum: [...] }           必须是列出的值之一
  *   { integerRange: [a, b] }  整数且 a ≤ 值 ≤ b
+ *   { stringList: [...] }     字符串数组，且每一项都在列出的值里（可重复、可为空）
  */
 
 const STATE_SEGMENT = 'state='
@@ -53,6 +54,12 @@ function checkRule(value, rule) {
   }
   if (rule !== null && typeof rule === 'object' && Array.isArray(rule.enum)) {
     return rule.enum.includes(value) ? null : ' 不在允许的取值里'
+  }
+  if (rule !== null && typeof rule === 'object' && Array.isArray(rule.stringList)) {
+    if (!Array.isArray(value)) return ' 不是列表'
+    return value.every(item => typeof item === 'string' && rule.stringList.includes(item))
+      ? null
+      : ' 含未知条目'
   }
   if (rule !== null && typeof rule === 'object' && Array.isArray(rule.integerRange)) {
     const [min, max] = rule.integerRange

@@ -1,4 +1,4 @@
-# 14｜官方 HookBridge 与兼容层
+# 官方 HookBridge 与兼容层
 
 > 证据范围：本文解释上游 `deepseek-ai/deepseek-harness` 固定提交 [`aa6c361a972c8369148dea7380bb5c21c24e07ec`][fixed-tree]（`0.1.1-rc.2`）中的 `hook-protocol`、Claude Code bridge、Codex bridge、对应 README、Agent Note 和测试源码。人工对照完成于 2026-08-16（Asia/Shanghai）的上一个固定基线；迁移到当前基线后只验证了链接路径仍存在，没有逐行复读版本差异。
 

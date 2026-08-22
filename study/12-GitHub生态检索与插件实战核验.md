@@ -75,7 +75,7 @@ per_page=30
 | 插件管理器 | [dsh-web-plugin-manager](https://github.com/LX2000WASD/dsh-web-plugin-manager/tree/1162fb2182e5ec61f90614c79dd4900465ffd097) | README 自述安装、回滚、环境变量扫描、REST 路由、安装守卫和市场 | 管理器拥有比普通插件更大的安装和更新影响面；“有质量门”仍不等于官方安全审查 |
 | 运行时注入 | [dsh-super-injector](https://github.com/yjh051108/dsh-super-injector/tree/f4ef59fb31439225abefe45d6e793235a2a9d5e0) | Loader entry、Fiber、模块缓存、junction 和宿主内部表 | 是运行时注入/兼容层边界案例，不应改写成普通插件教程 |
 
-这里还有一个常见误区：有些社区 README 会把项目叫作“official bundle plugin”或“官方插件形态”。这通常可能只是在说“使用官方可识别的 Bundle 格式”，并不代表 DeepSeek AI 维护、审核或背书。判断身份要看仓库归属、发布者、许可证、官方源码是否实际包含它，以及官方文档是否列出它；不能只看项目自己写的形容词。
+这里还有一个常见误区：有些社区 README 会把项目叫作“official bundle plugin”或“官方插件形态”。这通常只是在说“使用官方可识别的 Bundle 格式”，并不代表 DeepSeek AI 维护、审核或背书。判断身份要看仓库归属、发布者、许可证、官方源码是否实际包含它，以及官方文档是否列出它；不能只看项目自己写的形容词。
 
 ## 四、怎样从一个 GitHub 仓库判断它到底是什么
 

@@ -22,7 +22,7 @@
 
 > 当外层 `run_code` 程序发起多个内部调用时，策略拒绝是否会阻止工具主体执行？策略允许时，内部调用是否仍先经过同一条 policy lane？并发安全调用和 exclusive 调用在这个模型里怎样排列？
 
-上游源码给出可核对的依据。Code Mode 的 bridge 让内部绑定进入 registry 的 staged scheduler；前置阶段和提交阶段在有序 driver lane 中运行，只有 around-dispatch/body 阶段可以并发，exclusive 调用会先排空并发池，再独占运行，屏障持续到提交完成。[``code-mode.ts`` 的调度注释](../packages/core/tools/src/code-mode.ts#L342-L357)和[实时并行 Agent Note](../.agents/notes/implemented/feature/2026-07-26-code-mode-live-parallel-dispatch.md)描述了这条约定。
+上游源码给出可核对的依据。Code Mode 的 bridge 让内部绑定进入 registry 的 staged scheduler；前置阶段和提交阶段在有序 driver lane 中运行，只有 around-dispatch/body 阶段可以并发。exclusive 调用会先排空并发池再独占运行，屏障持续到提交完成。[``code-mode.ts`` 的调度注释](../packages/core/tools/src/code-mode.ts#L342-L357)和[实时并行 Agent Note](../.agents/notes/implemented/feature/2026-07-26-code-mode-live-parallel-dispatch.md)描述了这条约定。
 
 “拒绝后主体不执行”也不是动画作者凭经验补的。`prepareExecution` 在策略或 guard 产生 denial 时返回 `post-result`，而不是 `dispatch`；真正调用工具主体的 `dispatchToolBody` 只有在调度器拿到 `dispatch` 后才会运行。可以对照 [``index.ts`` 的 prepare 路径](../packages/core/tools/src/index.ts#L1463-L1505)和[主体调用路径](../packages/core/tools/src/index.ts#L1527-L1558)。
 

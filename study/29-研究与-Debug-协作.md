@@ -39,7 +39,7 @@
 
 ## 第一步：在网站生成 request
 
-在本页的互动组件里填写课程定位、问题标题和所需 source kind，然后点击“生成 request”。页面会把规范化后的 v1 JSON 显示在预览区；点击“下载 JSON”才会创建下载文件。下次打开页面时，可以手动选择之前下载的 request JSON，页面会先做 v1 schema 校验，再恢复表单、预设边界和预览；页面不使用浏览器存储，也不会恢复 schema 之外的字段。request 预览下方还会显示两步 PowerShell 命令模板，帮助你把路径替换成自己审阅过的输入、repro 和 result 路径；页面不会自动执行模板。
+在本页的互动组件里填写课程定位、问题标题和所需 source kind，然后点击“生成 request”。页面会把规范化后的 v1 JSON 显示在预览区；点击“下载 JSON”才会创建下载文件。下次打开页面时，可以手动选择之前下载的 request JSON，页面会先做 v1 schema 校验，再恢复表单、预设边界和预览。页面不使用浏览器存储，也不会恢复 schema 之外的字段。request 预览下方还会显示两步 PowerShell 命令模板，帮助你把路径替换成自己审阅过的输入、repro 和 result 路径；页面不会自动执行模板。
 
 request 的最小形状如下：
 
@@ -101,7 +101,7 @@ absolutePathsStored    = false
 networkAccessed        = false
 ```
 
-这些字段是安全合同，不是让工具相信一段任意文本的魔法。桥接只读取字段和允许的 source metadata；它不会读取被忽略字段，也不会为缺失字段自动扫描别处。如果 `repro-export` 输出目录旁有 `manifest.json`，桥接会核对 `repro.json` 的 SHA-256；没有 manifest 时会显示 `integrity=absent` warning，而不是声称哈希已验证。
+这些字段是安全合同，不是让工具相信一段任意文本的魔法。桥接只读取字段和允许的 source metadata；它不会读取被忽略字段，也不会为缺失字段自动扫描别处。如果 `repro-export` 输出目录旁有 `manifest.json`，桥接会核对 `repro.json` 的 SHA-256。没有 manifest 时会显示 `integrity=absent` warning，而不是声称哈希已验证。
 
 ## 第三步：显式运行 Debug bridge
 
@@ -151,7 +151,7 @@ evidence.trust = declared-metadata-only
 
 当前 `requestedChecks` 只有三项：`coverage` 检查 source kind 覆盖，`privacy` 检查 repro 的 metadata-only 声明，`integrity` 检查同目录 manifest 的哈希。未知或重复 check 会 fail-closed。旧 result 没有 `checks` 时仍可导入，但工作台会明确标成 legacy，不把旧的总状态解释成每项检查都通过。
 
-课程工作台提供 8 个研究节点预设：Session 恢复、工具失败、Guard 权限、Context Compaction、Scheduler 并发、子 Agent 交接、插件溯源和桥接自身。预设只生成问题和 `canProve/cannotProve` 边界，不预先声称证据存在。
+课程工作台提供 8 个研究节点预设：Session 恢复、工具失败、Guard 权限、Context Compaction、Scheduler 并发、子 Agent 交接、插件溯源和桥接自身。预设只生成问题和 `canProve/cannotProve` 边界，不预先声称证据存在；每个预设对应一个具体的研究问题，选最接近你卡住的那一个即可。
 
 ## 练习：把一个过大的问题改成可审计问题
 

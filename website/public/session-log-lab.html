@@ -74,6 +74,8 @@
           <small>从头折叠到这一条；再往后的事件不参与。</small>
         </label>
         <button class="button button-primary" type="submit">重放</button>
+        <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+        <small>当前输入会写进地址栏 #state= 后面：刷新页面不丢，把链接发给别人打开的就是同一份输入。不用账号，不写本机存储。</small>
       </form>
       <p class="feedback" id="session-feedback" role="status" aria-live="polite"></p>
       <dl class="metric-grid" aria-label="重放观测值">
