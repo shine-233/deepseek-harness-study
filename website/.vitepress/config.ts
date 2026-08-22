@@ -432,6 +432,16 @@ export default withMermaid({
     ['style', {}, siteStyle],
     ['script', {}, readingProgressScript],
     ['script', {}, scrollbarScript],
+    // 课程页的学习进度与自测题组件。VitePress 是单页应用，这里无条件加载模块，
+    // 是否渲染由模块内的路径守卫决定。站点根从 favicon 链接反推（发布门禁保证
+    // 它存在于任何 DOCS_BASE 下），避免相对路径解析进课程页目录。
+    ['script', { type: 'module' }, `
+{
+  const icon = document.querySelector('link[rel="icon"]')
+  const iconHref = icon?.getAttribute('href') ?? '/favicon.svg'
+  const rootPath = new URL(iconHref, location.href).pathname.replace(/[^/]*$/, '')
+  import(rootPath + 'study-progress.js')
+}`],
   ],
   cleanUrls: true,
   srcDir: '.generated',
