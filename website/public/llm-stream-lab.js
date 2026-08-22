@@ -160,6 +160,7 @@ function initializePage() {
         + String(model.observations.rejectedCount) + '。', 'success')
       persistState()
     } catch (error) {
+      console.error('[stream] rebuild failed', error)
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
     }
   }
