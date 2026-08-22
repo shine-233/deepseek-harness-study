@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-22-study-copy-and-index-quality.md
-2026-08-22-study-copy-and-index-quality.md: 6bc11309a4b7603ade049950c95a3d506cd58968
-2026-08-22-study-copy-and-index-quality.zh.md: a7d021ed6fc0d42a625a3a08d00effcb0d8f1b1a
+2026-08-22-study-copy-and-index-quality.md: bd7d0c4f6146041b5a927d377d297f10e418abc7
+2026-08-22-study-copy-and-index-quality.zh.md: b74ef3cb2f6d588f3afdb15b4f6bd52ba3e25ae0

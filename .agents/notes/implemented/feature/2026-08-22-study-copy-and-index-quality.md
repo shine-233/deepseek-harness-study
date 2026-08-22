@@ -14,7 +14,7 @@ A full pass over the 108 published study pages surfaced several defects that no 
 - Lesson 13's recommended reading order was seven consecutive「再读」link lines, including an orphan fragment `[schema](…)。` with no verb.
 - Five lab footers read「独立 独立校验」— a mechanical word substitution had doubled the word where「独立 oracle 校验」was meant.
 - Seven reader-facing sentences used the buzzword「闭环」where plain wording works.
-- The generated index called `packages/attachment/attachment-local/src/request-image.ts` a「智能体运行时」file because its basename contains `request`; the file's own header says "Deterministic cached image versions for model requests."
+- The generated index called the upstream attachment-local source file `request-image.ts` a「智能体运行时」file because its basename contains `request`; the file's own header says "Deterministic cached image versions for model requests."
 - Test-case entries whose concept fell back to a path echo produced self-referential purposes like「检查 `tests/x.spec.ts` 的具体场景」— the audited object was the auditor.
 - Large index pages (packages-client has 923 entries) rendered every entry as one flat `###` list with no group structure.
 

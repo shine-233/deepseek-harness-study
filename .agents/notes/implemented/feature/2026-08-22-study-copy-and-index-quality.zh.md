@@ -14,7 +14,7 @@ Status: implemented
 - 第 13 课推荐阅读顺序是七行连续的「再读」链接，其中还有一句没有动词的孤链残句 `[schema](…)。`
 - 五个实验室页脚写成「独立 独立校验」——一次机械词替换把「独立 oracle 校验」中的 oracle 替换后叠词了。
 - 七处面向读者的话术使用「闭环」，换成平实说法不损失信息。
-- 自动索引把 `packages/attachment/attachment-local/src/request-image.ts` 标成「智能体运行时」，只因文件名含 `request`；该文件自己的顶部注释写的是 "Deterministic cached image versions for model requests."
+- 自动索引把 上游 attachment-local 的源文件 `request-image.ts` 标成「智能体运行时」，只因文件名含 `request`；该文件自己的顶部注释写的是 "Deterministic cached image versions for model requests."
 - 测试条目的 concept 回退成路径回声时，用途字段出现自指：「检查 `tests/x.spec.ts` 的具体场景」——被审对象就是审计者自己。
 - 大索引页（packages-client 有 923 条）所有条目平铺成一级 `###` 列表，没有任何分组结构。
 
