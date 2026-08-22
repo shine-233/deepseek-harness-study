@@ -147,10 +147,16 @@ function buildWidget(state, lessonId, reviewHref, reviewLabel) {
   const labsLink = document.createElement('a')
   labsLink.textContent = '实验室'
   labsLink.href = siteBase() + 'study-labs.html'
+  labsLink.target = '_blank'
+  labsLink.rel = 'noreferrer'
 
   const reviewLink = document.createElement('a')
   reviewLink.textContent = reviewLabel
   reviewLink.href = reviewHref
+  // 独立页不是 VitePress 路由：不加 target 时站内点击会被 SPA 路由接住，
+  // 剥掉 .html 后渲染成客户端 404（错题本此前一直如此）。
+  reviewLink.target = '_blank'
+  reviewLink.rel = 'noreferrer'
 
   pill.append(toggle, count, labsLink, exportLink, importLabel, reviewLink)
 
