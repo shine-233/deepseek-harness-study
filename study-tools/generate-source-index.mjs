@@ -321,6 +321,7 @@ const ROLE_OVERRIDES = new Map([
   ['packages/api/remotes/src/agent-lookup.ts', { role: '远程 Agent 查找器', purpose: '它按远程 session、owner 和 parent 关系查找可访问的 Agent，并在找不到或越过所有权边界时返回可诊断的错误。' }],
   ['packages/attachment/attachment-local/src/image.ts', { role: '图像格式探测器', purpose: '它在附件进入本地存储时完整解码图像，在已经验证过的读取路径上只探测头部元数据，并统一处理格式、尺寸和像素限制。' }],
   ['packages/attachment/attachment-local/src/store.ts', { role: '本地附件内容存储', purpose: '它把附件按内容摘要保存到 DSH_HOME 下的私有目录，校验文件、去重相同字节，并在读取时重新检查所有者和部署限制。' }],
+  ['packages/attachment/attachment-local/src/request-image.ts', { role: '图像请求版本缓存', purpose: '它为随模型请求发送的图像生成确定性的缓存版本：按总像素预算投影尺寸，在允许的质量列表内编码，并让缓存键携带变换版本号。' }],
   ['packages/session/session-persistence-jsonl/src/format.ts', { role: 'JSONL 磁盘格式', purpose: '它定义 JSONL 会话文件的路径编码、目录布局、首行 header、事件记录和截断修复规则。' }],
   ['packages/llm/llm-pi-ai/src/catalog.ts', { role: '模型目录物化器', purpose: '它把 pi-ai 的 provider/model catalog 与用户 route 配置合并成 Harness 可使用的模型快照，并拒绝不可服务的配置。' }],
   ['packages/llm/llm-deepseek/src/sse.ts', { role: 'DeepSeek SSE 流解析器', purpose: '它把 SSE 字节流拆成事件数据，处理分块重组、UTF-8/CRLF/BOM、注释和 DONE 结束标记；流在结束前没有 DONE 时报告截断。' }],
@@ -538,6 +539,7 @@ const SPECIFIC_DESIGN_REASONS = new Map([
   ['packages/api/remotes/src/agent-lookup.ts', '远程 Agent 的可见性取决于 session、owner 和 parent 关系，不能让每个 API handler 自己拼接授权判断；查找器统一关系遍历和错误语义，越权会在进入业务操作前被挡住。'],
   ['packages/attachment/attachment-local/src/image.ts', '图像安全检查要区分完整解码和已验证读取路径的快速头部探测；把格式、尺寸和像素限制放在附件边界，既控制资源消耗，也避免各消费者用不一致的猜测。'],
   ['packages/attachment/attachment-local/src/store.ts', '附件内容适合按摘要去重，但文件系统读取又必须检查所有者、私有目录和部署限制；把内容寻址、写入校验和读取复核集中在存储层，调用者不用重复实现安全规则。'],
+  ['packages/attachment/attachment-local/src/request-image.ts', '同一张附件图会被多条消息反复读取；把尺寸投影、质量选择和缓存收敛到同一个确定性入口，读取结果可以复现，验证测试也能逐条核对解码事实与编码结果一致。'],
   ['packages/session/session-persistence-jsonl/src/format.ts', 'JSONL 是会话恢复和审计依赖的长期格式，路径编码、header、事件记录和截断修复必须由同一规则解释；格式层独立后，Session 领域代码不必承担磁盘细节。'],
   ['packages/llm/llm-pi-ai/src/catalog.ts', '模型能力来自安装的 catalog 和用户 route 配置两处来源，必须在请求前合并并校验；把物化过程放在配置边界，可以把缺字段和不兼容模型变成清晰的启动错误。'],
   ['packages/llm/llm-deepseek/src/sse.ts', '网络字节边界不等于 SSE 事件边界，UTF-8、CRLF、多行 data 和 DONE 还会跨 chunk 出现；独立 framing 解析器把这些协议细节挡在 DeepSeek 适配器之外，并能明确报告截断。'],
@@ -688,16 +690,22 @@ function rawPurposeFor(file, role, meta = {}) {
   if (role.role === '测试工具') return `它为 ${concept}的测试提供组装、模拟或渲染辅助，让真正的测试用例可以把重点放在行为和断言上。`
   if (role.role === '测试夹具') {
     const topics = scannedTestTopics(meta)
+    // concept 回退成「某包里的 tests/…」路径回声时，改用不自指的表述。
+    const subject = rawConcept.startsWith('`') ? '同包测试' : concept
     return topics.length > 0
-      ? `它为 ${concept}的测试提供固定输入、进程、事件或快照；源码中可见的测试主题包括${topics.map(topic => `“${topic}”`).join('、')}。`
-      : `它为 ${concept}的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。`
+      ? `它为 ${subject}提供固定输入、进程、事件或快照；源码中可见的测试主题包括${topics.map(topic => `“${topic}”`).join('、')}。`
+      : `它为 ${subject}提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。`
   }
   if (role.role === '测试用例') {
     const topics = scannedTestTopics(meta)
     const testName = stem(file)
-    return topics.length > 0
-      ? `它用自动化测试检查 ${concept}的具体场景，包括${topics.map(topic => `“${topic}”`).join('、')}；这些断言把“应该发生什么”变成可以重复运行的证据。`
-      : `它围绕“${testName}”写出可重复运行的断言，覆盖成功、失败或边界行为；读者可以从测试输入、触发动作和断言反推实现契约。`
+    if (topics.length > 0) {
+      // 路径回声会让句子变成「检查自己」，此时让扫描到的真实测试主题领句。
+      return rawConcept.startsWith('`')
+        ? `它围绕“${testName}”写出可重复运行的断言，覆盖的场景包括${topics.map(topic => `“${topic}”`).join('、')}；这些断言把“应该发生什么”变成可以重复运行的证据。`
+        : `它用自动化测试检查 ${concept}的具体场景，包括${topics.map(topic => `“${topic}”`).join('、')}；这些断言把“应该发生什么”变成可以重复运行的证据。`
+    }
+    return `它围绕“${testName}”写出可重复运行的断言，覆盖成功、失败或边界行为；读者可以从测试输入、触发动作和断言反推实现契约。`
   }
   if (role.role === '测试支持') return `它为“${stem(file)}”相关测试提供共享准备或环境支持；真正的行为断言由导入它的测试用例完成。`
   if (role.role === '测试与验证') return `它围绕 ${concept}写出可重复运行的断言，覆盖成功、失败或边界行为。`
@@ -1388,13 +1396,33 @@ function main() {
 
   for (const [bucket, files] of [...buckets.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     files.sort()
+    // 大页按所属包插入二级标题：VitePress 右侧大纲因此获得分组导航，
+    // 平铺几百个条目的页面不再只能靠浏览器搜索定位。
+    const useGroups = files.length >= 40
+    const groupOf = file => packageRootFor(file)
     const lines = [
       `# 源文件索引：${titleForBucket(bucket)}`,
       '',
       `本页由 \`study-tools/generate-source-index.mjs\` 根据官方提交 \`${commit}\` 生成，共 ${files.length} 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。`,
       '',
     ]
+    if (useGroups) {
+      const groupCounts = new Map()
+      for (const file of files) {
+        const key = groupOf(file)
+        groupCounts.set(key, (groupCounts.get(key) ?? 0) + 1)
+      }
+      lines.push(`条目按所属包分组：${[...groupCounts.entries()].map(([key, count]) => `${key}（${count} 条）`).join('、')}。`, '')
+    }
+    let currentGroup
     for (const file of files) {
+      if (useGroups) {
+        const group = groupOf(file)
+        if (group !== currentGroup) {
+          currentGroup = group
+          lines.push(`## ${group}`, '')
+        }
+      }
       const role = roleFor(file)
       const meta = readMeta(file, sourceTexts)
       const relation = testRelations(file, sourceFiles, importGraph)

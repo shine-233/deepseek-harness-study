@@ -1796,3 +1796,20 @@ body::before {
     to { transform: rotate(360deg); }
   }
 }
+
+/* 行内代码的长 token（URL 路径、点分字段名）允许在窄屏任意断行，
+   防止单个 span 把正文撑出视口；pre 块保持横向滚动不受影响。 */
+.vp-doc :not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+/* A/B 基准对比条形图（23 课）：内联 SVG 随栏宽缩放，暗色模式走主题变量。 */
+.dsh-ab-chart {
+  margin: 1.25rem 0;
+}
+.dsh-ab-chart svg {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+}

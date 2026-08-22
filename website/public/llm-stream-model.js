@@ -42,6 +42,11 @@ function buildArrivals(scenarioId) {
   return arrivals
 }
 
+/** 场景的完整到达序列（含尚未推进到的块），供文字替代表格逐行列出。 */
+export function listArrivals(scenarioId) {
+  return buildArrivals(scenarioId)
+}
+
 /** 接受规则独立成函数：迟到（finish 后）且与更早到达内容相同的增量被拒绝。 */
 function acceptArrivals(arrivals, upTo) {
   const accepted = []

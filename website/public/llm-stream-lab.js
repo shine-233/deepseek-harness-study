@@ -13,6 +13,7 @@ import {
   STREAM_SCENARIOS,
   buildStreamModel,
   evaluateStreamOracle,
+  listArrivals,
 } from './llm-stream-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
@@ -101,6 +102,35 @@ function renderStream(model, target, note) {
     : '拖动滑块推进到达序列；迟到增量在最后一步才出现。')
 }
 
+function renderStreamTable(model, body, caption) {
+  const verdictFor = (chunk, arrived, rejectedHere) => {
+    if (!arrived) return '尚未到达'
+    if (rejectedHere) return '拒绝：finish 后的迟到重复'
+    if (chunk.kind === 'text') return '接受：拼入正文'
+    if (chunk.kind === 'tool-call') return '接受：单独计为工具调用'
+    return '接受：不进入正文'
+  }
+  writeText(caption, '场景「' + model.scenario.label + '」推进到第 '
+    + String(model.input.upTo) + ' 个到达时的逐块判定')
+  const rows = listArrivals(model.scenario.id).map((chunk) => {
+    const arrived = chunk.arrival <= model.input.upTo
+    const rejectedHere = model.rejected.some(item => item.arrival === chunk.arrival)
+    const tr = document.createElement('tr')
+    for (const text of [
+      '#' + String(chunk.arrival),
+      chunk.kind,
+      chunk.kind === 'tool-call' ? chunk.name + ' ' + chunk.args : chunk.text,
+      verdictFor(chunk, arrived, rejectedHere),
+    ]) {
+      const cell = document.createElement('td')
+      writeText(cell, text)
+      tr.append(cell)
+    }
+    return tr
+  })
+  body.replaceChildren(...rows)
+}
+
 function initializePage() {
   const elements = {
     form: document.querySelector('#stream-form'),
@@ -111,6 +141,8 @@ function initializePage() {
     feedback: document.querySelector('#stream-feedback'),
     plot: document.querySelector('#stream-plot'),
     note: document.querySelector('#stream-note'),
+    tableBody: document.querySelector('#stream-table-body'),
+    tableCaption: document.querySelector('#stream-table-caption'),
     messageText: document.querySelector('#message-text'),
     oracleList: document.querySelector('#oracle-list'),
     canProve: document.querySelector('#can-prove-list'),
@@ -146,6 +178,7 @@ function initializePage() {
       writeText(elements.scenarioNote, model.scenario.description)
 
       renderStream(model, elements.plot, elements.note)
+      renderStreamTable(model, elements.tableBody, elements.tableCaption)
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
       writeText(elements.messageText, model.messageText === '' ? '（空）' : model.messageText)

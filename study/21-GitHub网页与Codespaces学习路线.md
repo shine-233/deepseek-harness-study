@@ -34,7 +34,7 @@ GitHub 官方把 `github.dev` 定义为完全运行在浏览器中的轻量编�
 
 GitHub Codespaces 是运行在云端 Docker 容器和虚拟机中的开发环境，可以从仓库的分支或固定 commit 创建，并从浏览器中的 VS Code 界面连接。官方默认环境是 Ubuntu Linux；即使你的电脑是 Windows，Codespace 里的命令和文件系统也按 Linux 处理。
 
-在本仓库网页上可以通过 `Code → Codespaces` 查看入口。当前入口显示“Create a codespace on master”，但本学习会话没有点击创建；打开菜单本身不会启动云端资源。当前学习仓库没有提交 `.devcontainer/` 配置，因此如果以后创建 Codespace，GitHub 会按官方默认开发容器准备环境，而不是使用一套本仓库自定义的 Windows 配置。
+在本仓库网页上可以通过 `Code → Codespaces` 查看入口。当前入口显示“Create a codespace on master”；打开菜单本身不会启动云端资源。本仓库核验时只确认到这一步，没有实际创建过 Codespace，因此创建之后的容器准备流程以官方文档为准。当前学习仓库没有提交 `.devcontainer/` 配置，因此如果以后创建 Codespace，GitHub 会按官方默认开发容器准备环境，而不是使用一套本仓库自定义的 Windows 配置。
 
 创建后，先在云端终端确认目录和 Node，再按需要运行学习仓库自己的检查：
 

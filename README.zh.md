@@ -14,7 +14,7 @@
 
 发现文档事实错误、链接问题、教程无法复现或社区扩展风险时，请使用[按类型填写的 Issue 表单](https://github.com/shine-233/deepseek-harness-study/issues/new/choose)；不要提交密钥、Cookie 或私有运行日志。
 
-## 八个可以动手的实验
+## 十个可以动手的实验
 
 教材的核心不是"看过"，而是每个关键结论都能在一个确定性实验里验证或证伪。实验全部离线运行：固定输入、固定输出、独立 oracle、公开 canProve/cannotProve；它们是教学模型，不启动真实 DSH、provider 或模型。
 
@@ -24,9 +24,11 @@
 | [包依赖图证据](https://shine-233.github.io/deepseek-harness-study/package-graph-lab.html) | 227 个包、50 个组的依赖形状；含可选的 3D 组体量场景（带 2D 表格回退） |
 | [Profile 解析顺序](https://shine-233.github.io/deepseek-harness-study/profile-loader-lab.html) | Bundle 声明顺序怎样决定最终装配出的配置 |
 | [Session 日志重放](https://shine-233.github.io/deepseek-harness-study/session-log-lab.html) | 为什么模型可见内容必须能从事件日志重建 |
+| [LLM 流式拼装](https://shine-233.github.io/deepseek-harness-study/llm-stream-lab.html) | chunk 按到达顺序怎样拼成一条消息；finish 之后的迟到重复块为什么必须丢弃 |
 | [工具可见性三层集合](https://shine-233.github.io/deepseek-harness-study/tool-visibility-lab.html) | "已注册、模型可见、执行允许"为什么是三件事 |
 | [Code Mode 权限管线](https://shine-233.github.io/deepseek-harness-study/code-mode-evidence-lab.html) | Code Mode 子调用为什么仍要经过完整权限管线 |
 | [上下文压缩](https://shine-233.github.io/deepseek-harness-study/compaction-lab.html) | 压缩前后各保留什么、丢什么、oracle 怎样核对 |
+| [插件订阅与日志](https://shine-233.github.io/deepseek-harness-study/plugin-flow-lab.html) | 订阅、策略拒绝和卸载怎样影响一个观察插件；插件动作与 Session 日志为什么是两回事 |
 | [研究 ↔ Debug 离线桥](https://shine-233.github.io/deepseek-harness-study/research-debug-bridge.html) | 课程网站与独立 Debug 工具怎样用显式文件交接 |
 
 ## 课程地图

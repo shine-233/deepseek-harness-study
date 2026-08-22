@@ -102,6 +102,31 @@
       <ul class="oracle-list" id="oracle-list"></ul>
     </section>
 
+    <section class="table-card card" aria-labelledby="stream-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="stream-table-title">每个到达块的逐条判定</h2>
+        </div>
+        <span class="schema-pill">不用图形也能读</span>
+      </div>
+      <p class="section-intro">时间轴里的每一个方块，这张表都逐行给出：它是什么类型、当前推演位置下被接受还是被拒绝。没有图形支持时从这里读。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="stream-table-caption">当前场景与推演位置下的全部到达块</caption>
+          <thead>
+            <tr>
+              <th scope="col">到达序号</th>
+              <th scope="col">类型</th>
+              <th scope="col">内容</th>
+              <th scope="col">装配判定</th>
+            </tr>
+          </thead>
+          <tbody id="stream-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="evidence-grid" aria-label="证据边界">
       <article class="boundary-card card">
         <div class="section-heading">
@@ -118,7 +143,7 @@
     </section>
 
     <footer class="page-footer">
-      <span>纯函数模型 · 独立校验 · 不连接任何 provider</span>
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 provider</span>
       <a href="./study/lessons/06-LLM与工具执行.html">继续读 LLM 与工具执行</a>
     </footer>
   </main>
