@@ -19,6 +19,19 @@
 
 注入方式从探测 favicon 的内联脚本迁到官方扩展点：`theme/index.ts` 用 `withBase` 加载模块。
 
+## 备选方案
+
+- 用 `new Function` 在页面内直接编辑执行：否决——实验室页面的 CSP 有意严格（`unsafe-eval` 是安全退步），且宿主页面的 eval 让用户代码能碰到页面存储。
+- WebContainers 或远程 Playground 类运行时：否决——外部服务、网络依赖和授权成本，与离线、无后端的立场冲突。
+- 流程实验室的步进滑杆：暂缓——compaction 实验室同样没有；前缀截断会重复 turn-flow 的 oracle 语义，却不增加新的教学点。
+
+## 后果
+
+- 进度状态现在存放在 localStorage；START-HERE 的隐私披露覆盖了它，跨设备改用导出/导入。
+- 以后每个公开模块都必须把 DOM 访问放进环境守卫；import 门禁会替我们盯着这件事。
+- 自测题成为新的维护面：新增试点课时需要配带出处的题目，否则题库会悄悄停在三个课。
+- 第 11 课现在带两个交互嵌入加三段代码围栏，是全站最重的教学页；下一轮浏览器 QA 要盯构建体积和移动端布局。
+
 ## 验证
 
 `node --test study-tools/*.test.mjs` 全绿（plugin-flow 新增 12 例，含篡改与全网格覆盖）；修复 import 门禁抓到的顶层 DOM 访问后，`study:quick-check -- --example --runtime` 通过；`docs:build` 通过，首页指标重新同步（227 + 8）。

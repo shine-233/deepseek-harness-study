@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-22-progress-quiz-code-cell-plugin-flow.md
-2026-08-22-progress-quiz-code-cell-plugin-flow.md: b79a9c27907fb93e17f8d696fba42cb97de4c6cb
-2026-08-22-progress-quiz-code-cell-plugin-flow.zh.md: 56ab1de3745b13aa24acd8776cb549c277fe2bf8
+2026-08-22-progress-quiz-code-cell-plugin-flow.md: 6702f93190f5d4b4508856a6683bf2a604de6654
+2026-08-22-progress-quiz-code-cell-plugin-flow.zh.md: e356213d8dbbeefbd7c25a2bf04a26443a717b24
