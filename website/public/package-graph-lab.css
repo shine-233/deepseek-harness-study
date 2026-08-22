@@ -30,6 +30,8 @@ select {
 
 .scatter-scroll, .bar-scroll, .table-scroll {
   overflow-x: auto;
+  /* 滚到头就停，不把横向滑动连带成整页滚动。 */
+  overscroll-behavior-x: contain;
   margin-top: 18px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -126,6 +128,7 @@ thead th button.sort-key {
 }
 
 th[aria-sort]:not([aria-sort="none"]) { color: var(--brand); }
+thead th button.sort-key:hover { color: var(--brand); }
 th[aria-sort="ascending"] button.sort-key::after { content: "▲"; font-size: 9px; }
 th[aria-sort="descending"] button.sort-key::after { content: "▼"; font-size: 9px; }
 
@@ -148,7 +151,7 @@ th[aria-sort="descending"] button.sort-key::after { content: "▼"; font-size: 9
 }
 
 .scatter-scroll svg.is-magnified { cursor: grab; }
-.scatter-scroll svg.is-panning { cursor: grabbing; }
+.scatter-scroll svg.is-panning { cursor: grabbing; user-select: none; }
 
 .evidence-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
 .evidence-grid > * { min-width: 0; margin-top: 20px; }

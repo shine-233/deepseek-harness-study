@@ -27,6 +27,8 @@ body {
 }
 
 button, input, select { font: inherit; }
+/* 移动端点按不再等待双击缩放判定；所有实验页的按钮统一受益。 */
+button { touch-action: manipulation; }
 a { color: var(--brand); }
 
 :focus-visible {

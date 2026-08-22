@@ -739,6 +739,8 @@ async function initializePage() {
   }
 
   let fixture = null
+  // fixture 是同源静态文件，通常瞬间到达；慢网或冷缓存时先声明状态，控件区不留空白。
+  setFeedback('正在读取固定提交快照…')
   try {
     const response = await fetch(FIXTURE_URL)
     if (!response.ok) throw new Error('fixture 返回 HTTP ' + String(response.status))
