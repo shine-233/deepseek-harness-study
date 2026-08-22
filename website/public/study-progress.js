@@ -19,6 +19,8 @@ import {
   summarize,
 } from './study-progress-core.js'
 import { QUIZ_BANK, gradeAnswers } from './study-quiz.js'
+// 代码格挂载器：导入即自注册 MutationObserver，负责 js-run 围栏块的替换。
+import './study-code-cell.js'
 
 const STORAGE_KEY = 'dsh-study-progress-v2'
 const WIDGET_ID = 'dsh-progress-pill'
