@@ -17,7 +17,7 @@ const BASE_CHUNKS = Object.freeze([
   Object.freeze({ kind: 'reasoning', text: '用户想要配置示例。' }),
   Object.freeze({ kind: 'text', text: '好的，' }),
   Object.freeze({ kind: 'text', text: '下面是 retry 的配置：' }),
-  Object.freeze({ kind: 'tool-call', name: 'read_file', args: '{ "path": "retry.yml" }' }),
+  Object.freeze({ kind: 'tool-call', name: 'read_file', args: '{ "path": "retry.yml" }', text: '{ "path": "retry.yml" }' }),
   Object.freeze({ kind: 'text', text: '\n需要的话我可以逐行解释。' }),
 ])
 
