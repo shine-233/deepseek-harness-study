@@ -33,21 +33,15 @@ export function buildRunnerDocument(userCode) {
 
 const MAX_OUTPUT_LINES = 200
 
-function isCellCode(node) {
-  return node instanceof HTMLElement
-    && node.tagName === 'CODE'
-    && /language-js-run/.test(node.className)
-}
-
 /** 扫描容器里的 js-run 围栏块并替换为可运行单元格；幂等。 */
 export function mountCodeCells(container) {
   if (!(container instanceof Element)) return 0
   let mounted = 0
-  for (const code of container.querySelectorAll('pre > code')) {
-    if (!isCellCode(code)) continue
-    const pre = code.parentElement
-    if (pre.dataset.dshCell === 'mounted') continue
-    replaceWithCell(pre, code.textContent ?? '')
+  // VitePress/Shiki 把语言类放在外层 div 上：div.language-js-run > (copy/lang + pre)。
+  for (const block of container.querySelectorAll('div[class*="language-js-run"]')) {
+    if (block.dataset.dshCell === 'mounted') continue
+    const source = (block.querySelector('pre') ?? block).textContent ?? ''
+    replaceWithCell(block, source)
     mounted += 1
   }
   return mounted
@@ -144,7 +138,7 @@ function appendLine(output, data, countLine) {
 }
 
 if (typeof document !== 'undefined') {
-  // 与进度组件同一套 SPA 策略：MutationObserver 盯正文替换，逐次挂载新出现的格子。
+  // 与进度组件同一套时序：等 Vue 完成 hydration 再挂载，避免水合不匹配。
   let timer = 0
   const observer = new MutationObserver(() => {
     clearTimeout(timer)
@@ -153,14 +147,13 @@ if (typeof document !== 'undefined') {
       if (docRoot !== null) mountCodeCells(docRoot)
     }, 120)
   })
-  const start = () => {
-    const docRoot = document.querySelector('.vp-doc')
-    if (docRoot !== null) mountCodeCells(docRoot)
-    observer.observe(document.body, { childList: true, subtree: true })
+  const startWhenSettled = () => {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const docRoot = document.querySelector('.vp-doc')
+      if (docRoot !== null) mountCodeCells(docRoot)
+      observer.observe(document.body, { childList: true, subtree: true })
+    }))
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start, { once: true })
-  } else {
-    start()
-  }
+  if (document.readyState === 'complete') startWhenSettled()
+  else addEventListener('load', startWhenSettled, { once: true })
 }

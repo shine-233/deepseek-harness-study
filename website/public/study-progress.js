@@ -301,6 +301,14 @@ if (typeof document !== 'undefined') {
     }, 120)
   })
 
-  initialize()
-  observer.observe(document.body, { childList: true, subtree: true })
+  // 等 Vue 完成 hydration 再注入非受控节点：load 之后多等两帧，
+  // 避免水合期间改写 .vp-doc 触发 "Hydration completed but contains mismatches"。
+  const startWhenSettled = () => {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      initialize()
+      observer.observe(document.body, { childList: true, subtree: true })
+    }))
+  }
+  if (document.readyState === 'complete') startWhenSettled()
+  else addEventListener('load', startWhenSettled, { once: true })
 }
