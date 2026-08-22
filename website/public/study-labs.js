@@ -121,4 +121,6 @@ function main() {
   for (const card of document.querySelectorAll('.lab-card')) showCardProgress(card, state)
 }
 
-main()
+if (typeof document !== 'undefined') {
+  main()
+}
