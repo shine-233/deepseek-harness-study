@@ -24,10 +24,17 @@ export default {
       // 根 tsconfig 不含 vite/client 类型，这里对 import.meta.env 做一次显式窄化。
       const env = (import.meta as unknown as { env?: { BASE_URL?: string } }).env
       const base = env?.BASE_URL ?? '/'
+      // 公共页面（错题本等）运行时拼绝对链接用；先写值再注入脚本。
+      ;(window as unknown as { __DSH_STUDY_BASE__?: string }).__DSH_STUDY_BASE__ = base
       const script = document.createElement('script')
       script.type = 'module'
       script.src = (base.endsWith('/') ? base : base + '/') + 'study-progress.js'
       document.head.append(script)
+      // 滚动引导：只在带 data-scrolly 容器的课程页实际渲染，其余页面开销是一次扫描。
+      const scrolly = document.createElement('script')
+      scrolly.type = 'module'
+      scrolly.src = (base.endsWith('/') ? base : base + '/') + 'study-scrolly.js'
+      document.head.append(scrolly)
     }
   },
 } satisfies Theme
