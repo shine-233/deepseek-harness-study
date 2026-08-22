@@ -22,7 +22,7 @@ export default {
       ],
       answer: 2,
       explain: '「第三步：理解 Node.js 20 弃用提示」列出三种可能来源，并用远端日志定位本例：GitHub 把该 action 强制运行在 Node 24 并发出弃用警告，不是项目代码写了 Node 20。',
-      source: 'study/30-安全告警与网页发布维护.md#第三步：理解 Node.js 20 弃用提示',
+      source: 'study/30-安全告警与网页发布维护.md#安全告警与网页发布维护',
     },
     {
       id: 'q3',
@@ -34,7 +34,7 @@ export default {
       ],
       answer: 0,
       explain: '「第二步：用小批次升级和门禁确认」明确：audit endpoint 缺失只反映镜像能力；更换 registry 或升级依赖由维护者选择，不能为了让命令变绿而删锁文件、关告警或加无依据忽略规则。',
-      source: 'study/30-安全告警与网页发布维护.md#第二步：用小批次升级和门禁确认',
+      source: 'study/30-安全告警与网页发布维护.md#安全告警与网页发布维护',
     },
   ],
   '31-学习工具箱': [
@@ -48,7 +48,7 @@ export default {
       ],
       answer: 1,
       explain: '「懒人入口：先复制一条命令」：quick-check 做的是文档、索引、契约和离线快照等静态检查；首页「学习工具测试」数字随测试增删自动重算（写作时是 190），也不是 DSH 运行时指标。',
-      source: 'study/31-学习工具箱.md#懒人入口：先复制一条命令',
+      source: 'study/31-学习工具箱.md#学习工具箱不启动-dsh-也能做的检查',
     },
     {
       id: 'q2',
@@ -60,7 +60,7 @@ export default {
       ],
       answer: 2,
       explain: '「懒人入口：先复制一条命令」：--site 面向发布产物，前提是已有 Pages 构建；它能证明静态外壳完整，不能证明浏览器、屏幕阅读器或人工阅读体验已被逐页审计。',
-      source: 'study/31-学习工具箱.md#懒人入口：先复制一条命令',
+      source: 'study/31-学习工具箱.md#学习工具箱不启动-dsh-也能做的检查',
     },
     {
       id: 'q3',
@@ -72,7 +72,7 @@ export default {
       ],
       answer: 0,
       explain: '「工具三点五：运行真实宿主的离线 A/B」：报告证明本地宿主在两个可见集合下如何生成快照、schema 和 prompt assembly；绝对时间只是本机相对记录，不是性能承诺。',
-      source: 'study/31-学习工具箱.md#工具三点五：运行真实宿主的离线 A/B',
+      source: 'study/31-学习工具箱.md#学习工具箱不启动-dsh-也能做的检查',
     },
   ],
   '32-源码学习项目的渐进式设计': [
@@ -86,7 +86,7 @@ export default {
       ],
       answer: 2,
       explain: '「先说结论：渐进式不是把内容删薄」：第四件事专门把静态阅读、宿主本地实验、真实 DSH、provider 和模型证据分开，防止读者越级声称结论。',
-      source: 'study/32-源码学习项目的渐进式设计.md#先说结论：渐进式不是把内容删薄',
+      source: 'study/32-源码学习项目的渐进式设计.md#源码学习项目的渐进式设计',
     },
     {
       id: 'q2',
@@ -124,7 +124,7 @@ export default {
       ],
       answer: 2,
       explain: '「为什么 deny 仍然有 post-execute 和 result」：默认场景 policy checks=4、body executions=3、denied bodies=0；policy 决定主体是否执行，post-execute 处理已形成的拒绝结果，result 让调用者知道如何结算。源码对应 prepareExecution 在 denial 时返回 post-result 而非 dispatch。',
-      source: 'study/33-确定性可视化实验协议与Code-Mode权限管线.md#为什么 deny 仍然有 post-execute 和 result',
+      source: 'study/33-确定性可视化实验协议与Code-Mode权限管线.md#确定性可视化实验协议与-code-mode-权限管线',
     },
     {
       id: 'q2',
@@ -136,7 +136,7 @@ export default {
       ],
       answer: 0,
       explain: '「`simulateCodeMode` 返回什么」：observations 从事件重新计数，oracle 至少检查 PARENT_LINKED、PIPELINE_ORDERED、DENIED_BODY_ZERO 等六件事，因此篡改事件流会被抓住。',
-      source: 'study/33-确定性可视化实验协议与Code-Mode权限管线.md#`simulateCodeMode` 返回什么',
+      source: 'study/33-确定性可视化实验协议与Code-Mode权限管线.md#确定性可视化实验协议与-code-mode-权限管线',
     },
     {
       id: 'q3',
@@ -174,7 +174,7 @@ export default {
       ],
       answer: 0,
       explain: '注意这条本身是作者判断及其对教材的影响，不是源码事实：用户数据混入难度、熟练度、模型版本等变量，归因已是因果比较，普通日志统计回答不了。',
-      source: 'study/34-作者的判断与理由.md#判断四：自然用户日志不能直接证明因果收益',
+      source: 'study/34-作者的判断与理由.md#本教材作者的判断与理由',
     },
     {
       id: 'q3',
@@ -186,7 +186,7 @@ export default {
       ],
       answer: 2,
       explain: '这是作者的观点页：判断二承认「底层都是循环」是对的抽象，但明确说由此推出「能力相同」就错了；它影响课文按数据流而非架构名词编排。',
-      source: 'study/34-作者的判断与理由.md#判断二：「底层都是 loop」是个有用的抽象，但推不出架构等价',
+      source: 'study/34-作者的判断与理由.md#本教材作者的判断与理由',
     },
   ],
 }

@@ -10,7 +10,7 @@ export default {
       ],
       answer: 1,
       explain: '「Cordis 基础」fiber.ts 条目：Fiber 是一个插件实例的运行记录，保存插件状态、已校验配置、依赖服务、效果清理函数和卸载过程；PENDING 到 DISPOSED 等状态让异步启动和失败可以被观察。',
-      source: 'study/03-核心文件精读.md#Cordis 基础',
+      source: 'study/03-核心文件精读.md#核心文件精读',
     },
     {
       id: 'q2',
@@ -22,7 +22,7 @@ export default {
       ],
       answer: 2,
       explain: '「启动、Profile 与 Bundle」profile.ts 条目：补丁按层叠加，每层只改自己拥有的配置行，用户就能换模型、工具或策略而不必复制整个 Bundle。',
-      source: 'study/03-核心文件精读.md#启动、Profile 与 Bundle',
+      source: 'study/03-核心文件精读.md#核心文件精读',
     },
     {
       id: 'q3',
@@ -34,7 +34,7 @@ export default {
       ],
       answer: 0,
       explain: '「LLM 流和 DeepSeek 适配器」adapter.ts 条目：供应商差异应停在适配器边界；适配器在一次 stream 开始时冻结连接和凭据，还处理 idle timeout、取消、重试信息和 request id。',
-      source: 'study/03-核心文件精读.md#LLM 流和 DeepSeek 适配器',
+      source: 'study/03-核心文件精读.md#核心文件精读',
     },
   ],
   '04-Agent与Turn流程': [
@@ -48,7 +48,7 @@ export default {
       ],
       answer: 2,
       explain: '「亲手看一次 Turn 展开」：这一次 Turn 有 20 步、4 次模型请求、9 个日志事件；组件横轴是步骤序号不是时间，不能说明真实 token 数、耗时或重试次数。',
-      source: 'study/04-Agent与Turn流程.md#亲手看一次 Turn 展开',
+      source: 'study/04-Agent与Turn流程.md#agent-与-turn-流程',
     },
     {
       id: 'q2',
@@ -60,7 +60,7 @@ export default {
       ],
       answer: 0,
       explain: '「agent/pre-step 为什么重要」：这是决定哪些消息进入 Step、并可以拒绝本次输入的关键扩展点；首次领取被拒绝时仍落一条无 Step 的 Turn 结束。',
-      source: 'study/04-Agent与Turn流程.md#agent/pre-step 为什么重要',
+      source: 'study/04-Agent与Turn流程.md#agent-与-turn-流程',
     },
     {
       id: 'q3',
@@ -110,7 +110,7 @@ export default {
       ],
       answer: 1,
       explain: '「Surface 和历史不是一回事」及压缩实验结论：被替换的事件一条也不会从日志消失；少了任何一条序号，“摘要恰好引用被替换事件”的独立校验就会失败；最近几轮永远逐字保留。',
-      source: 'study/05-Session日志与恢复.md#Surface 和历史不是一回事',
+      source: 'study/05-Session日志与恢复.md#session-日志与恢复',
     },
   ],
   '06-LLM与工具执行': [
@@ -136,7 +136,7 @@ export default {
       ],
       answer: 0,
       explain: '「工具 schema 为什么单独存在」：schema DSL 编译成 JSON Schema 并在执行前再次验证；注册表全集不等于当前 agent 发给模型的集合，限制工具移除的是整段 schema 成本。',
-      source: 'study/06-LLM与工具执行.md#工具 schema 为什么单独存在',
+      source: 'study/06-LLM与工具执行.md#llm-与工具执行',
     },
     {
       id: 'q3',
@@ -162,7 +162,7 @@ export default {
       ],
       answer: 2,
       explain: '「二、这次 GitHub 搜索查到了什么」：查询只覆盖公开 repository 元数据中被 topic 标记的候选集合，不包括私有、已删除或没 topic 的项目；此前 per_page=5 快照曾返回 4099，两个数字都是不同时间的快照。',
-      source: 'study/12-GitHub生态检索与插件实战核验.md#二、这次 GitHub 搜索查到了什么',
+      source: 'study/12-GitHub生态检索与插件实战核验.md#github-生态检索与插件实战核验',
     },
     {
       id: 'q2',
@@ -174,7 +174,7 @@ export default {
       ],
       answer: 1,
       explain: '「再看真正的资源和权限」：tools/result、ctx.tools.register() 或 inject 工具声明不会自动产生操作系统沙箱；安装脚本里的 prepare/postinstall 和子进程同样都在用户机器权限范围内，要单独检查。',
-      source: 'study/12-GitHub生态检索与插件实战核验.md#再看真正的资源和权限',
+      source: 'study/12-GitHub生态检索与插件实战核验.md#3-再看真正的资源和权限',
     },
     {
       id: 'q3',
@@ -186,7 +186,7 @@ export default {
       ],
       answer: 0,
       explain: '「六、为什么当前社区特别容易出现版本错位」：本仓库固定 0.1.1-rc.2，多个社区 README 自述测试 0.1.0-rc.6；核验还要同时看 commit、package.json、patch 清单、入口源码、安装文档、测试与 CI 是否一致。',
-      source: 'study/12-GitHub生态检索与插件实战核验.md#六、为什么当前社区特别容易出现版本错位',
+      source: 'study/12-GitHub生态检索与插件实战核验.md#github-生态检索与插件实战核验',
     },
   ],
   '13-官方工具插件完整契约': [
@@ -200,7 +200,7 @@ export default {
       ],
       answer: 0,
       explain: '「guard 为什么是单调拒绝」：单调拒绝是为了避免“后注册的普通监听器意外绕过拥有方策略”；ask 审批在没有可用 approval service 时应退化为拒绝。',
-      source: 'study/13-官方工具插件完整契约.md#guard 为什么是单调拒绝',
+      source: 'study/13-官方工具插件完整契约.md#官方工具插件完整契约',
     },
     {
       id: 'q2',
@@ -212,7 +212,7 @@ export default {
       ],
       answer: 1,
       explain: '「并发：只有严格 true 才安全」：并行工具不能不受保护地修改父 agent 状态、共享文件、全局缓存等；状态更新不满足交换性就应返回 false。测试要覆盖 true 和所有保守降级路径。',
-      source: 'study/13-官方工具插件完整契约.md#并发：只有严格 true 才安全',
+      source: 'study/13-官方工具插件完整契约.md#官方工具插件完整契约',
     },
     {
       id: 'q3',

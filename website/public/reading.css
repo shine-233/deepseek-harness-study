@@ -1778,3 +1778,21 @@ body::before {
   color: var(--vp-c-text-1);
 }
 .VPHome .dsh-status-metric strong { font-variant-numeric: tabular-nums; }
+
+/* 首页装饰动态版：同心环缓慢呼吸、点阵方格缓旋。纯 CSS，无 JS、无资源加载。 */
+@media (prefers-reduced-motion: no-preference) {
+  .VPHome .VPHero::before {
+    animation: home-ring-breathe 16s ease-in-out infinite alternate;
+  }
+  .VPHome .VPHero::after {
+    animation: home-dots-spin 90s linear infinite;
+  }
+  @keyframes home-ring-breathe {
+    from { transform: scale(1); }
+    to { transform: scale(1.045); }
+  }
+  @keyframes home-dots-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}

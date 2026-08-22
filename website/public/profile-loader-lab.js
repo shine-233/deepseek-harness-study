@@ -11,7 +11,7 @@ import {
   renderOracle,
   renderRows,
   requireElements,
-  writeText, installDeclaredIcons } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import {
   OVERLAY_SOURCES,
   buildProfileModel,
@@ -273,6 +273,7 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
+  installScrollProgress()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 

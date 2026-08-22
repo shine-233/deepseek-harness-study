@@ -19,7 +19,7 @@ import quizBankF from './study-quiz-bank-f.js'
  * 题库。source 字段告诉读者答案依据在哪一节或哪个源文件；
  * explain 在提交后显示，答对答错都显示，因为解释才是学习材料。
  */
-const QUIZ_BANK = {
+export const QUIZ_BANK = {
   '00-开始这里': Object.freeze([
     Object.freeze({
       id: 'q1',
@@ -103,7 +103,7 @@ const QUIZ_BANK = {
       ],
       answer: 0,
       explain: 'Cordis 基础一节：Fiber 按相反顺序清理已登记的效果；插件绕过注册机制私建的 timer、watcher 或子进程不在它的视野里。',
-      source: 'study/02-Cordis与插件树.md',
+      source: 'study/02-Cordis与插件树.md#context插件共同工作的范围',
     }),
     Object.freeze({
       id: 'q2',
@@ -111,7 +111,7 @@ const QUIZ_BANK = {
       options: ['返回 true', '调用 next()', '重新抛出事件'],
       answer: 1,
       explain: '事件分发模式一节：waterfall 需要监听器调用 next() 才继续；直接返回等于短路整条链。',
-      source: 'study/02-Cordis与插件树.md',
+      source: 'study/02-Cordis与插件树.md#context插件共同工作的范围',
     }),
     Object.freeze({
       id: 'q3',
@@ -123,7 +123,7 @@ const QUIZ_BANK = {
       ],
       answer: 1,
       explain: '组件边界声明：这张图只读清单和行数，dependencies、动态 import 和 cordis.yml 装配都没有画进去。',
-      source: 'website/public/package-graph-lab.html 的证据边界',
+      source: 'study/02-Cordis与插件树.md#这棵树到底有多大谁在树的中间',
     }),
   ]),
   '03-核心文件精读': Object.freeze([
@@ -251,8 +251,8 @@ for (const bank of EXTRA_QUIZ_BANKS) {
     QUIZ_BANK[lessonId] = Object.freeze(questions)
   }
 }
-Object.freeze(QUIZ_BANK)
 
+Object.freeze(QUIZ_BANK)
 export const QUIZ_LESSONS = Object.freeze(Object.keys(QUIZ_BANK).sort())
 
 /**

@@ -10,7 +10,7 @@ export default {
       ],
       answer: 2,
       explain: '「Host 和 Client」一节：Host 在 Node 侧运行，Client 在浏览器侧运行；两边通过 API／远程协议和 Session 事件传递信息，Client 不应直接访问 Node 的文件系统或模型密钥。',
-      source: 'study/07-HostClient示例测试发布.md#Host 和 Client',
+      source: 'study/07-HostClient示例测试发布.md#hostclient示例测试与发布',
     },
     {
       id: 'q2',
@@ -124,7 +124,7 @@ export default {
       ],
       answer: 2,
       explain: '「工具事件不是同一种 Hook」表格：tools/result 是只观察的 live event，不能通过监听器替换结果，也不是权限授权；tool/result 是日志事实，不是实时 hook。想记录结果用前者，不要把两者混成同一个事件。',
-      source: 'study/10-社区生态与扩展边界.md#工具事件不是同一种 Hook',
+      source: 'study/10-社区生态与扩展边界.md#工具事件不是同一种-hook',
     },
     {
       id: 'q2',
@@ -136,7 +136,7 @@ export default {
       ],
       answer: 0,
       explain: '「Event 是观察和决策的扩展点」一节：普通观察者用 emit 类事件；需要协作修改或决策才用带明确返回类型的 waterfall，而只观察、不拥有决策权的 waterfall 监听器必须调用 next()，否则会短路后续行为。',
-      source: 'study/10-社区生态与扩展边界.md#4. Event 是观察和决策的扩展点',
+      source: 'study/10-社区生态与扩展边界.md#社区生态与扩展边界',
     },
     {
       id: 'q3',
@@ -148,7 +148,7 @@ export default {
       ],
       answer: 1,
       explain: '「GitHub dsh-plugin topic 代表什么，不代表什么」一节：topic 是用户自报的发现标签，不是官方注册表；计数受时间、索引、可见性和查询参数影响，结果还混入目录、桌面应用等项目，引用时必须保留查询 URL 和日期。',
-      source: 'study/10-社区生态与扩展边界.md#GitHub dsh-plugin topic 代表什么，不代表什么',
+      source: 'study/10-社区生态与扩展边界.md#社区生态与扩展边界',
     },
   ],
   '11-如何写一个合规插件': [
@@ -174,7 +174,7 @@ export default {
       ],
       answer: 1,
       explain: '「第二个例子：注册自己的工具」一节：使用 ctx.tools.register()，不要直接向工具 Map 写入；注册返回的清理函数由当前 Fiber 追踪，参数校验、结果 schema、模型展示和执行流水线由 dsh-tools 负责，插件只提供定义和执行逻辑。',
-      source: 'study/11-如何写一个合规插件.md#第二个例子：注册自己的工具',
+      source: 'study/11-如何写一个合规插件.md#如何写一个合规插件',
     },
     {
       id: 'q3',
@@ -186,7 +186,7 @@ export default {
       ],
       answer: 0,
       explain: '「测试不能只看“加载成功”」一节的表格和说明：卸载测试要求 dispose 后再次触发并确认没有旧输出；最小 Context 测试适合快速定位，Loader 启动的组合测试才验证了 package manifest、配置层和实际依赖关系，二者不能互相替代。',
-      source: 'study/11-如何写一个合规插件.md#测试不能只看“加载成功”',
+      source: 'study/11-如何写一个合规插件.md#如何写一个合规插件',
     },
   ],
 }

@@ -8,7 +8,7 @@ import {
   renderOracle,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons, bindRangeKeys, bindAutoAdvance } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys, bindAutoAdvance, installScrollProgress } from './study-lab-kit.js'
 import {
   STREAM_SCENARIOS,
   buildStreamModel,
@@ -212,6 +212,7 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
+  installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 
   installPredictionGate({

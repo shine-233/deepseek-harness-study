@@ -29,7 +29,7 @@ export default {
       ],
       answer: 2,
       explain: '「“自进化”必须先变成可审计的实验」给出最小可信门槛：目标、数据、版本和回滚明确之前，自动产生改动不等于自动证明改动有益；否则提升可能来自模型更换、任务更换或样本选择偏差等混杂因素。',
-      source: 'study/26-后续研究路线.md#“自进化”必须先变成可审计的实验',
+      source: 'study/26-后续研究路线.md#后续研究路线从学习材料走到运行证据',
     },
     {
       id: 'q3',
@@ -41,7 +41,7 @@ export default {
       ],
       answer: 0,
       explain: '「P1：社区项目审核顺序」把「项目自称支持」拆成证据层：README 是声明，静态源码是结构证据，Bundle 装配是加载证据，真实 DSH 启动是运行证据，模型调用是 provider 证据，卸载和回滚才是生命周期证据。',
-      source: 'study/26-后续研究路线.md#P1：社区项目审核顺序',
+      source: 'study/26-后续研究路线.md#后续研究路线从学习材料走到运行证据',
     },
   ],
   '27-工具预算与插件责任决策卡': [
@@ -67,7 +67,7 @@ export default {
       ],
       answer: 0,
       explain: '「五问决策卡：我到底在写什么」末尾专门区分这两个译名：公开工具登记接口走正常插件生命周期；改写操作系统注册表属于第 5 层之外的宿主级动作，普通插件作者不应把它藏进安装路径。',
-      source: 'study/27-工具预算与插件责任决策卡.md#五问决策卡：我到底在写什么',
+      source: 'study/27-工具预算与插件责任决策卡.md#工具预算与插件责任从万物皆插件到可维护生态',
     },
     {
       id: 'q3',
@@ -93,7 +93,7 @@ export default {
       ],
       answer: 1,
       explain: '「运行真实 Loader 全流程」指出 serviceAbsent 和 entriesRemaining 才是卸载断言的重点；tickCount 只是插件定时器对实际生命周期的可观察信号，不是模型调用，也不是伪造的固定文本，卸载后应停止并被清理。',
-      source: 'study/28-最小插件工作台.md#运行真实 Loader 全流程',
+      source: 'study/28-最小插件工作台.md#最小插件工作台构建--注册--卸载',
     },
     {
       id: 'q2',
@@ -131,7 +131,7 @@ export default {
       ],
       answer: 0,
       explain: '「第二步：先运行两个确定性检查」说明 demo 只用一个很小的 fake context 发出公开事件，没有启动 DSH、Profile、Loader、provider 或模型；三条命令成功只证明学习示例自己的行为和语法规则。',
-      source: 'study/28-最小插件示例与学习检查.md#第二步：先运行两个确定性检查',
+      source: 'study/28-最小插件示例与学习检查.md#最小插件示例与学习检查',
     },
     {
       id: 'q2',
@@ -143,7 +143,7 @@ export default {
       ],
       answer: 2,
       explain: '「第三步：做一次安全修改」的核心是体验「测试和配置一起维护」：只改配置而不更新受测输入，或只改测试而没有对应行为，都无法构成有效验证；默认值不属于这次练习要动的部分。',
-      source: 'study/28-最小插件示例与学习检查.md#第三步：做一次安全修改',
+      source: 'study/28-最小插件示例与学习检查.md#最小插件示例与学习检查',
     },
     {
       id: 'q3',
@@ -155,7 +155,7 @@ export default {
       ],
       answer: 1,
       explain: '「这套示例为什么比“大而全 demo”更适合第一步」对比了两者的排错成本：最小示例把变量减到最少，等你能说清证据边界后，再按同样结构逐步增加工具、限制和 Loader 卸载例子。',
-      source: 'study/28-最小插件示例与学习检查.md#这套示例为什么比“大而全 demo”更适合第一步',
+      source: 'study/28-最小插件示例与学习检查.md#这套示例为什么比大而全-demo更适合第一步',
     },
   ],
   '29-研究与-Debug-协作': [
@@ -181,7 +181,7 @@ export default {
       ],
       answer: 0,
       explain: '「第四步：回到网站导入 result」说明未知或重复 check 会 fail-closed；repro-export 旁没有 manifest.json 时显示 integrity=absent warning，而不是声称哈希已验证。',
-      source: 'study/29-研究与-Debug-协作.md#第四步：回到网站导入 result',
+      source: 'study/29-研究与-Debug-协作.md#研究与-debug-协作一份-request另一份-result',
     },
     {
       id: 'q3',
@@ -193,7 +193,7 @@ export default {
       ],
       answer: 2,
       explain: '「第四步：回到网站导入 result」强调 COMPLETE 不是「故障已修复」：trust 等于 declared-metadata-only 表示只对显式 artifact 负责，真实运行时事实仍需要 Host/Session 层的证据。',
-      source: 'study/29-研究与-Debug-协作.md#第四步：回到网站导入 result',
+      source: 'study/29-研究与-Debug-协作.md#研究与-debug-协作一份-request另一份-result',
     },
   ],
 }

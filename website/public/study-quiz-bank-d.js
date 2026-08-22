@@ -48,7 +48,7 @@ export default {
       ],
       answer: 2,
       explain: '「路线一：直接在 GitHub 网页端阅读」：GitHub 会直接渲染 Markdown，相对链接可以继续点击，不需要先把仓库保存到本机；普通网页最简单稳定，适合先建立整体认识。',
-      source: 'study/21-GitHub网页与Codespaces学习路线.md#路线一：直接在 GitHub 网页端阅读',
+      source: 'study/21-GitHub网页与Codespaces学习路线.md#github-网页githubdev-与-codespaces-学习路线',
     },
     {
       id: 'q2',
@@ -60,7 +60,7 @@ export default {
       ],
       answer: 0,
       explain: '「路线二」列出 github.dev 不能做的事：无集成终端、不能装 pnpm、不能跑 node study-tools/...、不能构建 DSH；它通过浏览器中的 GitHub Repositories 扩展读仓库而非本地 clone。提供终端的是 Codespaces。未提交修改暂存在浏览器本地存储，重要笔记要及时提交。',
-      source: 'study/21-GitHub网页与Codespaces学习路线.md#路线二：用 github.dev 在浏览器里搜索和记笔记',
+      source: 'study/21-GitHub网页与Codespaces学习路线.md#github-网页githubdev-与-codespaces-学习路线',
     },
     {
       id: 'q3',
@@ -72,7 +72,7 @@ export default {
       ],
       answer: 1,
       explain: '「路线三：需要运行时再开 Codespaces」：当前学习仓库没有提交 .devcontainer/ 配置，因此创建时按官方默认开发容器准备；即使本机是 Windows，Codespace 里的命令和文件系统也按 Linux 处理。创建前还应确认额度与计费由谁承担。',
-      source: 'study/21-GitHub网页与Codespaces学习路线.md#路线三：需要运行时再开 Codespaces',
+      source: 'study/21-GitHub网页与Codespaces学习路线.md#github-网页githubdev-与-codespaces-学习路线',
     },
   ],
   '22-工具可见性与非侵入扩展': [
@@ -136,7 +136,7 @@ export default {
       ],
       answer: 1,
       explain: '「不要只测 schema 字节数」和快照字段表：bytes / 4 只是非常粗略的启发式估计，不同 tokenizer 对中文、JSON 结构等的切分不同；离线检查器输出的粗略 token 数也只能用来比较快照。',
-      source: 'study/23-工具可见集合观测与性能实验.md#不要只测 schema 字节数',
+      source: 'study/23-工具可见集合观测与性能实验.md#工具可见集合观测与性能实验',
     },
     {
       id: 'q3',
@@ -174,7 +174,7 @@ export default {
       ],
       answer: 0,
       explain: '「Hook codec：协议成功不等于集成成功」：codec 不替 bridge 决定安装位置、事件匹配或权限；「复用了官方协议类型」和「真的能被目标宿主加载」是两条不同证据。exit 2 只是协议层表示阻断并取 stderr，与安装无关。',
-      source: 'study/24-高风险索引人工抽查.md#Hook codec：协议成功不等于集成成功',
+      source: 'study/24-高风险索引人工抽查.md#高风险索引人工抽查',
     },
     {
       id: 'q3',
@@ -200,7 +200,7 @@ export default {
       ],
       answer: 0,
       explain: '「第一步：只打开学习首页」：第一次不要点 Code、不要创建 Codespace、也不要从逐文件索引第一页开始顺序阅读；正确入口是「第一次来，按这里走」和 START-HERE。',
-      source: 'study/25-从首页到第一次产出的动手任务单.md#第一步：只打开学习首页',
+      source: 'study/25-从首页到第一次产出的动手任务单.md#15-分钟动手任务单从首页到第一次产出',
     },
     {
       id: 'q2',
@@ -212,7 +212,7 @@ export default {
       ],
       answer: 1,
       explain: '「先分清 5 分钟和 15 分钟」：前 5 分钟只读六个词和目录分工，做到就可以停下；选路线、打开固定版本源文件、写记录属于完整的 15 分钟产出，不要混成一个模糊的时间承诺。',
-      source: 'study/25-从首页到第一次产出的动手任务单.md#先分清 5 分钟和 15 分钟',
+      source: 'study/25-从首页到第一次产出的动手任务单.md#15-分钟动手任务单从首页到第一次产出',
     },
     {
       id: 'q3',
@@ -224,7 +224,7 @@ export default {
       ],
       answer: 2,
       explain: '「第五步：复制这张学习记录」：「我还没有证明什么」必须填写，用来把静态源码证据和运行时证据分开，让下一位读者能回到同一个固定文件继续核对。',
-      source: 'study/25-从首页到第一次产出的动手任务单.md#第五步：复制这张学习记录',
+      source: 'study/25-从首页到第一次产出的动手任务单.md#15-分钟动手任务单从首页到第一次产出',
     },
   ],
 }

@@ -347,3 +347,27 @@ button[aria-pressed="true"] {
 @media (prefers-reduced-motion: reduce) {
   .lab-shell .button, .lab-shell .button:hover, .lab-shell .button:active { transform: none; transition: none; }
 }
+
+/* 页顶滚动进度条：位置映射滚动，不是时间动画；不支持的浏览器保持零宽。 */
+#dsh-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  width: 100%;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-bright, var(--brand)));
+  pointer-events: none;
+}
+@supports (animation-timeline: scroll()) {
+  #dsh-scroll-progress {
+    animation: dsh-scroll-progress-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes dsh-scroll-progress-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+}

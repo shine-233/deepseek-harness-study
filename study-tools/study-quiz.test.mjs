@@ -32,16 +32,22 @@ function collectHeadingAnchors(markdown) {
   return anchors
 }
 
-test('QUIZ_LESSONS covers the six main-chain lessons in course order', () => {
-  assert.deepEqual([...QUIZ_LESSONS], [
+test('QUIZ_LESSONS covers the six main-chain lessons plus every bank entry, in sorted order', () => {
+  // 题库已从六课试点铺开到全部课程；清单改为按键名排序派生，
+  // 这里固定主干六课必须在内、且清单与题库键完全一致。
+  const mainChain = [
     '00-开始这里',
     '01-仓库地图',
     '02-Cordis与插件树',
     '03-核心文件精读',
     '04-Agent与Turn流程',
     '05-Session日志与恢复',
-  ])
-  assert.equal(QUIZ_LESSONS.length, 6)
+  ]
+  for (const lesson of mainChain) {
+    assert.ok(QUIZ_LESSONS.includes(lesson), '主干课缺失：' + lesson)
+  }
+  assert.equal(QUIZ_LESSONS.length >= 30, true,
+    '全课程覆盖后应超过 30 门，实际 ' + QUIZ_LESSONS.length)
   assert.deepEqual(Object.keys(QUIZ_BANK).sort(), [...QUIZ_LESSONS].sort())
 })
 

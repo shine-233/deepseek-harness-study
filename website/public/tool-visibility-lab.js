@@ -12,7 +12,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import {
   AGENT_SCOPES,
   EXECUTION_POLICIES,
@@ -315,6 +315,7 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
+  installScrollProgress()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   // 正文术语联动：导语里的三个集合名悬停/聚焦时，指标卡高亮对应读数。
   for (const term of document.querySelectorAll('[data-metric]')) {

@@ -13,6 +13,7 @@
 import { icon } from './study-lab-icons.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { installScrollProgress } from './study-lab-kit.js'
 import {
   BAR_VIEW_MAX_NODES,
   buildPackageGraphModel,
@@ -865,6 +866,7 @@ async function initializePage() {
 if (typeof document !== 'undefined') {
   void initializePage()
   installDeclaredIcons()
+  installScrollProgress()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 

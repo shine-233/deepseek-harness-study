@@ -207,3 +207,18 @@ export function installDeclaredIcons(scope = document) {
     prefixIcon(target, target.dataset.icon, Number(target.dataset.iconSize ?? 16))
   }
 }
+
+/**
+ * 在页面顶部安装滚动进度条。
+ *
+ * 进度映射由 CSS 的 scroll() 时间轴驱动（见 study-lab-shell.css 的
+ * @supports 块）：浏览器支持就显示，不支持或无滚动时保持不可见的零宽条。
+ * 纯展示元素，aria-hidden，不参与交互与存储。
+ */
+export function installScrollProgress() {
+  if (document.getElementById('dsh-scroll-progress') !== null) return
+  const bar = document.createElement('div')
+  bar.id = 'dsh-scroll-progress'
+  bar.setAttribute('aria-hidden', 'true')
+  document.body.append(bar)
+}
