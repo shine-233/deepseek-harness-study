@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-22-study-lab-hub.md
-2026-08-22-study-lab-hub.md: b587043f1e6530d9232ff6591a6de95e43b49ecc
-2026-08-22-study-lab-hub.zh.md: c48f226036d830a56e4375b2d979bc707c542ac0
+2026-08-22-study-lab-hub.md: a68c2d8a7e729f3fd7abf1e1bb850a137e82edd0
+2026-08-22-study-lab-hub.zh.md: c5e8a87fdc1a6963ba8cddb223d77467caca923a
