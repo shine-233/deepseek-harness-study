@@ -1307,3 +1307,6 @@ tbody tr:last-child td {
   .icon { stroke: CanvasText; }
   [data-pass="true"] .icon, [data-pass="true"].icon { stroke: CanvasText; }
 }
+
+/* 标题断行平衡：与共享层实验页一致，避免中文词组被拆到两行。 */
+h1 { text-wrap: balance; letter-spacing: -0.01em; }

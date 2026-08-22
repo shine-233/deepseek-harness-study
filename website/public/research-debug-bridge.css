@@ -1297,3 +1297,6 @@ text.flow-constant { transition: fill var(--dur-fast, 120ms) ease; }
 @media (prefers-reduced-motion: reduce) {
   text.flow-constant { transition: none; }
 }
+
+/* 标题断行平衡：与共享层实验页一致，避免中文词组被拆到两行。 */
+h1 { text-wrap: balance; letter-spacing: -0.01em; }
