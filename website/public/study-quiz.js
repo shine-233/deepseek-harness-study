@@ -8,14 +8,18 @@
 
 import { TURN_SCENARIOS, buildTurnModel } from './turn-flow-model.js'
 import { LOG_SCENARIOS, buildSessionLogModel } from './session-log-model.js'
-
-export const QUIZ_LESSONS = Object.freeze(['00-开始这里', '01-仓库地图', '02-Cordis与插件树', '03-核心文件精读', '04-Agent与Turn流程', '05-Session日志与恢复'])
+import quizBankA from './study-quiz-bank-a.js'
+import quizBankB from './study-quiz-bank-b.js'
+import quizBankC from './study-quiz-bank-c.js'
+import quizBankD from './study-quiz-bank-d.js'
+import quizBankE from './study-quiz-bank-e.js'
+import quizBankF from './study-quiz-bank-f.js'
 
 /**
  * 题库。source 字段告诉读者答案依据在哪一节或哪个源文件；
  * explain 在提交后显示，答对答错都显示，因为解释才是学习材料。
  */
-export const QUIZ_BANK = Object.freeze({
+const QUIZ_BANK = {
   '00-开始这里': Object.freeze([
     Object.freeze({
       id: 'q1',
@@ -236,7 +240,20 @@ export const QUIZ_BANK = Object.freeze({
       source: 'study/05-Session日志与恢复.md#恢复fork-和修复',
     }),
   ]),
-})
+}
+
+// 静态题库分片（bank-a…bank-f）覆盖其余课程；已有手写条目的课以现行条目为准，
+// 分片里的重复键自动让位——这样新课先写 bank 分片、后补精修条目时不会互相覆盖。
+const EXTRA_QUIZ_BANKS = [quizBankA, quizBankB, quizBankC, quizBankD, quizBankE, quizBankF]
+for (const bank of EXTRA_QUIZ_BANKS) {
+  for (const [lessonId, questions] of Object.entries(bank)) {
+    if (Object.prototype.hasOwnProperty.call(QUIZ_BANK, lessonId)) continue
+    QUIZ_BANK[lessonId] = Object.freeze(questions)
+  }
+}
+Object.freeze(QUIZ_BANK)
+
+export const QUIZ_LESSONS = Object.freeze(Object.keys(QUIZ_BANK).sort())
 
 /**
  * 稳定的 32 位种子随机数：同一颗种子永远得到同一个序列。

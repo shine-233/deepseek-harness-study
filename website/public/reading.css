@@ -1757,3 +1757,24 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   .vp-doc details.reference-table > summary::before { transition: none; }
 }
+
+/* 首页横幅降噪：统一表面与左侧重音线，替代满底色块的堆叠感。 */
+.VPHome .vp-doc .custom-block {
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+  border-left-width: 3px;
+  background: var(--vp-c-bg-soft);
+}
+.VPHome .vp-doc .custom-block.warning {
+  border-left-color: var(--vp-c-warning-1, #b8942a);
+  background: color-mix(in srgb, var(--vp-c-warning-soft, #fff7e6) 45%, var(--vp-c-bg));
+}
+.VPHome .vp-doc .custom-block.tip { border-left-color: var(--vp-c-brand-1); }
+.VPHome .vp-doc blockquote,
+.VPHome blockquote {
+  border-left: 3px solid var(--vp-c-brand-1);
+  background: transparent;
+  padding-left: 16px;
+  color: var(--vp-c-text-1);
+}
+.VPHome .dsh-status-metric strong { font-variant-numeric: tabular-nums; }
