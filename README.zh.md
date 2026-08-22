@@ -2,7 +2,7 @@
 
 [![Study material quality](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml) [![Deploy documentation](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml)
 
-这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套十个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。English mirror: [README.md](README.md)。
+这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套十一个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。English mirror: [README.md](README.md)。
 
 ## 三条入口
 
@@ -14,7 +14,7 @@
 
 发现文档事实错误、链接问题、教程无法复现或社区扩展风险时，请使用[按类型填写的 Issue 表单](https://github.com/shine-233/deepseek-harness-study/issues/new/choose)；不要提交密钥、Cookie 或私有运行日志。
 
-## 十个可以动手的实验
+## 十一个可以动手的实验
 
 教材的核心不是"看过"，而是每个关键结论都能在一个确定性实验里验证或证伪。实验全部离线运行：固定输入、固定输出、独立 oracle、公开 canProve/cannotProve；它们是教学模型，不启动真实 DSH、provider 或模型。
 
@@ -29,6 +29,7 @@
 | [Code Mode 权限管线](https://shine-233.github.io/deepseek-harness-study/code-mode-evidence-lab.html) | Code Mode 子调用为什么仍要经过完整权限管线 |
 | [上下文压缩](https://shine-233.github.io/deepseek-harness-study/compaction-lab.html) | 压缩前后各保留什么、丢什么、oracle 怎样核对 |
 | [插件订阅与日志](https://shine-233.github.io/deepseek-harness-study/plugin-flow-lab.html) | 订阅、策略拒绝和卸载怎样影响一个观察插件；插件动作与 Session 日志为什么是两回事 |
+| [Hook 瀑布短路](https://shine-233.github.io/deepseek-harness-study/hook-flow-lab.html) | 瀑布监听器直接 return 而不调用 next 会怎样；被跳过的兜底和最终结果的作者 |
 | [研究 ↔ Debug 离线桥](https://shine-233.github.io/deepseek-harness-study/research-debug-bridge.html) | 课程网站与独立 Debug 工具怎样用显式文件交接 |
 
 ## 课程地图

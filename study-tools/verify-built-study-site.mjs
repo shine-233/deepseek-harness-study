@@ -71,9 +71,10 @@ export const REQUIRED_PUBLISHED_PAGES = [
     file: 'study-labs.html',
     label: '实验室总览',
     markers: [
-      '十个能上手拆的实验',
+      '十一个能上手拆的实验',
       'lab-card-grid',
       'data-lab="turn-flow"',
+      'data-lab="hook-flow"',
       'data-lab="research-debug-bridge"',
       'study/lessons/04-Agent与Turn流程.html',
       '按目的筛选实验',
