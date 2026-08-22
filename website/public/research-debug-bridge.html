@@ -55,6 +55,75 @@
       </ol>
     </header>
 
+    <section class="flow-panel" aria-labelledby="flow-title">
+      <p class="section-label" data-icon="route">生命周期流转</p>
+      <h2 id="flow-title">一份证据从课程到 Debug 的完整路径</h2>
+      <p class="section-intro">这张图是导航辅助，不是新证据：流程走向由本页表单驱动，协议本身见第 29 课。切换研究节点预设会重新生成 request，「当前阶段」标记因此停在起点；导入 result 之后走到哪个出口，以 B 区卡片显示的状态为准。</p>
+      <div class="flow-scroller">
+        <svg class="flow-svg" viewBox="0 0 1180 330" role="img" aria-labelledby="flow-svg-title flow-svg-desc">
+          <title id="flow-svg-title">研究 request、脱敏 repro 与诊断 result 的文件流转图</title>
+          <desc id="flow-svg-desc">主链路三步：课程页提出 request.json；Debug 工具只读用户显式指定的文件并跑脱敏 repro；result.json 回填本页。回填后按四种状态收尾：COMPLETE 回到课程继续，PARTIAL 补齐缺失证据，UNAVAILABLE 先导出 repro，FAIL 检查请求或产物。</desc>
+          <g class="flow-stage" data-flow-stage="request">
+            <rect x="8" y="36" width="252" height="112" rx="16"/>
+            <text class="flow-badge" x="134" y="26" text-anchor="middle">当前阶段</text>
+            <text class="flow-title" x="134" y="88" text-anchor="middle">request.json</text>
+            <text class="flow-sub" x="134" y="120" text-anchor="middle">课程页提出</text>
+          </g>
+          <g class="flow-arrow">
+            <path d="M264 92H290"/>
+            <polygon points="290,84 302,92 290,100"/>
+          </g>
+          <g class="flow-stage" data-flow-stage="repro">
+            <rect x="308" y="36" width="252" height="112" rx="16"/>
+            <text class="flow-title" x="434" y="88" text-anchor="middle">Debug 工具</text>
+            <text class="flow-sub" x="434" y="120" text-anchor="middle">跑脱敏 repro</text>
+          </g>
+          <g class="flow-arrow">
+            <path d="M564 92H590"/>
+            <polygon points="590,84 602,92 590,100"/>
+          </g>
+          <g class="flow-stage" data-flow-stage="result">
+            <rect x="608" y="36" width="252" height="112" rx="16"/>
+            <text class="flow-title" x="734" y="88" text-anchor="middle">result.json</text>
+            <text class="flow-sub" x="734" y="120" text-anchor="middle">回填本页</text>
+          </g>
+          <g class="flow-fan">
+            <path d="M864 92H908"/>
+            <path d="M908 41V299"/>
+            <path d="M908 41H936"/>
+            <path d="M908 127H936"/>
+            <path d="M908 213H936"/>
+            <path d="M908 299H936"/>
+            <polygon points="936,34 948,41 936,48"/>
+            <polygon points="936,120 948,127 936,134"/>
+            <polygon points="936,206 948,213 936,220"/>
+            <polygon points="936,292 948,299 936,306"/>
+          </g>
+          <g class="flow-exit flow-exit-complete">
+            <rect x="952" y="10" width="220" height="62" rx="14"/>
+            <text class="flow-constant" x="1062" y="37" text-anchor="middle">COMPLETE</text>
+            <text class="flow-action" x="1062" y="58" text-anchor="middle">回到课程继续</text>
+          </g>
+          <g class="flow-exit flow-exit-partial">
+            <rect x="952" y="96" width="220" height="62" rx="14"/>
+            <text class="flow-constant" x="1062" y="123" text-anchor="middle">PARTIAL</text>
+            <text class="flow-action" x="1062" y="144" text-anchor="middle">补齐缺失证据</text>
+          </g>
+          <g class="flow-exit flow-exit-unavailable">
+            <rect x="952" y="182" width="220" height="62" rx="14"/>
+            <text class="flow-constant" x="1062" y="209" text-anchor="middle">UNAVAILABLE</text>
+            <text class="flow-action" x="1062" y="230" text-anchor="middle">先导出 repro</text>
+          </g>
+          <g class="flow-exit flow-exit-fail">
+            <rect x="952" y="268" width="220" height="62" rx="14"/>
+            <text class="flow-constant" x="1062" y="295" text-anchor="middle">FAIL</text>
+            <text class="flow-action" x="1062" y="316" text-anchor="middle">检查请求或产物</text>
+          </g>
+        </svg>
+      </div>
+      <p class="chart-note">文字替代：request.json 由课程页提出（本页 A 区生成并下载），交给你在本机运行的 Debug 工具；它只读你显式指定的脱敏输入，跑出 repro 并写出 result.json；result 回填到本页 B 区做 schema 校验。四个出口各带下一步：COMPLETE 回到课程继续；PARTIAL 补齐缺失证据；UNAVAILABLE 先导出 repro；FAIL 检查请求或产物。这张图不新增任何证据，逐项检查结果以 B 区卡片为准。</p>
+    </section>
+
     <section class="workspace-grid" aria-label="离线桥接工作台">
       <article class="card request-card">
         <div class="card-heading">

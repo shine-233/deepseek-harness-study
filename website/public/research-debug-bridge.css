@@ -54,6 +54,7 @@ input {
 
 .hero-panel,
 .card,
+.flow-panel,
 .boundary-panel {
   border: 1px solid var(--line);
   background: var(--surface);
@@ -290,6 +291,165 @@ h1 {
   background: linear-gradient(90deg, transparent, var(--signal), transparent);
   content: "";
   animation: packet 2.8s ease-in-out infinite;
+}
+
+/*
+ * 生命周期流转图。静态 SVG 写在 HTML 里，JS 只按表单侧状态切换 data-current，
+ * 没有任何动画或过渡；文字替代在 .chart-note，读法与图一一对应。
+ */
+.flow-panel {
+  margin-top: 22px;
+  padding: clamp(24px, 3.4vw, 42px);
+  border-radius: var(--radius-lg);
+}
+
+.section-intro {
+  max-width: 900px;
+  margin: 14px 0 0;
+  color: var(--muted);
+}
+
+.flow-scroller {
+  margin-top: 18px;
+  overflow-x: auto;
+}
+
+.flow-svg {
+  display: block;
+  width: 100%;
+  min-width: 880px;
+  height: auto;
+}
+
+.flow-stage rect {
+  fill: var(--brand-soft);
+  stroke: var(--brand);
+  stroke-width: 1.5;
+}
+
+.flow-stage[data-current] rect {
+  fill: var(--signal-soft);
+  stroke: var(--signal);
+  stroke-width: 3;
+}
+
+.flow-badge {
+  visibility: hidden;
+  fill: var(--signal-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.flow-stage[data-current] .flow-badge {
+  visibility: visible;
+}
+
+.flow-title {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.flow-sub {
+  fill: var(--muted);
+  font-size: 15px;
+}
+
+.flow-arrow path,
+.flow-fan path {
+  fill: none;
+  stroke-width: 2;
+}
+
+.flow-arrow path {
+  stroke: var(--brand);
+}
+
+.flow-fan path {
+  stroke: var(--line-strong);
+}
+
+.flow-arrow polygon,
+.flow-fan polygon {
+  stroke: none;
+}
+
+.flow-arrow polygon {
+  fill: var(--brand);
+}
+
+.flow-fan polygon {
+  fill: var(--line-strong);
+}
+
+.flow-exit rect {
+  stroke-width: 1.5;
+}
+
+.flow-exit-complete rect {
+  fill: var(--allow-soft);
+  stroke: var(--allow);
+}
+
+.flow-exit-partial rect,
+.flow-exit-unavailable rect {
+  fill: var(--warning-soft);
+  stroke: var(--warning);
+}
+
+.flow-exit-fail rect {
+  fill: var(--deny-soft);
+  stroke: var(--deny);
+}
+
+/* 协议常量用同色相的 -ink 步进做正文色，动作行用 --ink；颜色不单独承载状态。 */
+.flow-constant {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.flow-action {
+  fill: var(--ink);
+  font-size: 14px;
+}
+
+.flow-exit-complete .flow-constant {
+  fill: var(--allow-ink);
+}
+
+.flow-exit-partial .flow-constant,
+.flow-exit-unavailable .flow-constant {
+  fill: var(--warning-ink);
+}
+
+.flow-exit-fail .flow-constant {
+  fill: var(--deny-ink);
+}
+
+.chart-note {
+  max-width: 900px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+@media (forced-colors: active) {
+  .flow-stage rect,
+  .flow-exit rect,
+  .flow-arrow polygon,
+  .flow-fan polygon {
+    stroke: CanvasText;
+  }
+
+  .flow-arrow path,
+  .flow-arrow polygon,
+  .flow-fan path,
+  .flow-fan polygon {
+    fill: CanvasText;
+  }
 }
 
 .workspace-grid {

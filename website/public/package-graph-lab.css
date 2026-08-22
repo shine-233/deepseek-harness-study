@@ -1,134 +1,12 @@
 /*
  * 包依赖图实验页。
  *
- * 沿用 code-mode-evidence-lab.css 的 token 命名和已验证取值，所以两个实验页是同
- * 一套视觉语言。数据色的验证记录见那份文件的文件头：分类色 --brand / --signal 在
- * 两种模式下六项检查全过；状态色的绿红对在色盲下无法靠色相区分，所以状态一律带
- * 字形和文字标签。
+ * 基础外壳（token、排版、卡片、按钮、读数、oracle 列表、证据边界、表格、页脚）
+ * 由 study-lab-shell.css 统一提供，本文件只剩这一页的表单、图表、3D 场景和
+ * 联动/缩放/排序控件。数据色的验证记录见 code-mode-evidence-lab.css 的文件头：
+ * 分类色 --brand / --signal 在两种模式下六项检查全过；状态色的绿红对在色盲下
+ * 无法靠色相区分，所以状态一律带字形和文字标签。
  */
-
-
-
-* { box-sizing: border-box; }
-
-html { min-width: 320px; }
-
-body {
-  min-width: 320px;
-  margin: 0;
-  color: var(--ink);
-  background:
-    radial-gradient(circle at 4% 0%, color-mix(in srgb, var(--brand-soft) 75%, transparent), transparent 32rem),
-    radial-gradient(circle at 98% 18%, color-mix(in srgb, var(--signal-soft) 58%, transparent), transparent 29rem),
-    var(--page);
-  font-family: var(--sans);
-  line-height: 1.6;
-}
-
-button, input, select { font: inherit; }
-a { color: var(--brand); }
-
-:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--signal) 80%, white);
-  outline-offset: 3px;
-}
-
-.skip-link {
-  position: absolute;
-  z-index: 10;
-  top: 8px;
-  left: 12px;
-  padding: 8px 13px;
-  border-radius: 8px;
-  color: var(--surface-strong);
-  background: var(--brand);
-  transform: translateY(-160%);
-}
-
-.skip-link:focus { transform: translateY(0); }
-
-.lab-shell {
-  width: min(1540px, calc(100% - 40px));
-  margin: 0 auto;
-  padding: 28px 0 48px;
-}
-
-.card, .hero-panel {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
-}
-
-.card {
-  margin-top: 20px;
-  padding: clamp(22px, 3vw, 38px);
-  border-radius: var(--radius-lg);
-}
-
-.hero-panel {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
-  gap: 26px;
-  padding: clamp(28px, 5vw, 60px);
-  border-radius: var(--radius-xl);
-}
-
-.eyebrow, .section-label, .warning-index, .schema-pill, .metric-grid dt, .page-footer span {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.eyebrow { margin: 0; color: var(--muted); }
-
-h1 {
-  max-width: 900px;
-  margin: 22px 0 0;
-  font-size: clamp(2.1rem, 5vw, 4.2rem);
-  font-weight: 800;
-  letter-spacing: -0.055em;
-  line-height: 1;
-}
-
-h2 { margin: 0; font-size: clamp(1.2rem, 1.9vw, 1.65rem); letter-spacing: -0.03em; }
-h3 { margin: 0 0 8px; font-size: 0.94rem; }
-
-.hero-lead { max-width: 760px; margin: 22px 0 0; color: var(--muted); font-size: clamp(0.98rem, 1.5vw, 1.12rem); }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
-
-.button {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  padding: 10px 17px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  cursor: pointer;
-  font-weight: 750;
-  text-decoration: none;
-  transition: transform 160ms ease, background 160ms ease;
-}
-
-.button:hover { transform: translateY(-2px); }
-.button-primary { color: #fff; background: var(--brand); }
-.button-primary:hover { background: var(--brand-bright); }
-.button-secondary { border-color: var(--line-strong); color: var(--ink); background: color-mix(in srgb, var(--surface-strong) 65%, transparent); }
-
-.model-warning {
-  align-self: start;
-  padding: 17px;
-  border: 1px solid color-mix(in srgb, var(--signal) 35%, var(--line));
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--signal-soft) 78%, var(--surface));
-}
-
-.warning-index { color: var(--signal-ink); }
-.model-warning strong { display: block; margin: 8px 0; }
-.model-warning p { margin: 0; color: var(--muted); font-size: 0.88rem; }
 
 #graph-form {
   display: flex;
@@ -150,50 +28,6 @@ select {
   background: var(--surface-strong);
 }
 
-.feedback { margin: 16px 0 0; color: var(--muted); font-size: 0.88rem; }
-.feedback[data-tone="success"] { color: var(--allow-ink); }
-.feedback[data-tone="error"] { color: var(--deny-ink); }
-
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-  gap: 12px;
-  margin: 18px 0 0;
-}
-
-.metric-grid > div {
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--surface-strong) 62%, transparent);
-}
-
-.metric-grid dt { margin: 0 0 6px; color: var(--muted); }
-.metric-grid dd { margin: 0; font-family: var(--mono); font-size: 1.24rem; font-weight: 750; font-variant-numeric: tabular-nums; }
-.metric-oracle dd[data-pass="true"] { color: var(--allow-ink); }
-.metric-oracle dd[data-pass="false"] { color: var(--deny-ink); }
-
-.section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
-.section-label { margin: 0 0 8px; color: var(--brand); }
-
-.schema-pill {
-  padding: 5px 11px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.section-intro { margin: 14px 0 0; color: var(--muted); font-size: 0.94rem; }
-
-.chart-note {
-  margin: 16px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.86rem;
-}
-
 .scatter-scroll, .bar-scroll, .table-scroll {
   overflow-x: auto;
   margin-top: 18px;
@@ -204,22 +38,11 @@ select {
 
 .scatter-scroll, .bar-scroll { padding: 14px; }
 /*
- * 图表在容器变窄时会等比缩小，SVG 里的字号也跟着缩。按 .lab-shell 到 .plot-scroll
- * 的盒模型推算：1270 单位宽的图在 1440px 视口下拿到 1296px（缩放 1.02），到 1024px
- * 视口只剩 895px（缩放 0.70），11px 的文字实际只有 7.7px。
- *
- * 所以给 SVG 设一个接近设计宽度的 min-width：低于它就横向滚动，而不是继续缩小到
- * 读不出来。完整表格始终是这张图的文字替代，滚动不是唯一出路。
- */
-/*
  * 图宽由脚本按容器算出并写进 viewBox，所以缩放恒为 1，SVG 里的字号就是屏幕上的
- * 字号。这里不再设 min-width：设了只会在窄屏强制出现一条本不需要的横向滚动条。
+ * 字号。这里不设 min-width：设了只会在窄屏强制出现一条本不需要的横向滚动条。
  * 宽度下限由脚本负责（760，保证坐标轴标签不互相压住），到不了才滚动。
  */
 .scatter-scroll svg, .bar-scroll svg { display: block; width: 100%; }
-
-.grid { stroke: var(--line); stroke-width: 1; }
-.baseline { stroke: var(--line-strong); stroke-width: 1; }
 
 .axis, .axis-title, .bar-label, .bar-value, .bar-degree, .point-label {
   fill: var(--muted);
@@ -228,21 +51,23 @@ select {
   font-variant-numeric: tabular-nums;
 }
 
-.axis-title { font-size: 14px; font-weight: 750; }
 .point-label { fill: var(--ink); font-size: 14px; font-weight: 750; }
 .bar-value { fill: var(--ink); font-weight: 750; }
 .bar-degree { fill: var(--brand); font-weight: 750; }
 
+/*
+ * 点的几何（cx/cy/r）由脚本的键控补间驱动：CSS transition 会和补间叠加成二次
+ * 缓动，所以这里不给几何属性挂 transition。悬停反馈改用描边加粗表达。
+ */
 .point {
   fill: color-mix(in srgb, var(--brand) 55%, transparent);
   stroke: var(--brand);
   stroke-width: 2;
-  transition: r 120ms ease;
 }
 
 /* 枢纽只是同一序列里的一个状态，不是第二个序列；形状加粗描边，名字仍由标签给出。 */
 .point.is-hub { fill: var(--signal); stroke: var(--signal); }
-.point:hover { r: 9; }
+.point:hover { stroke-width: 3.5; }
 
 .bar {
   fill: color-mix(in srgb, var(--brand) 26%, transparent);
@@ -251,82 +76,97 @@ select {
 
 .bar.is-hub { fill: color-mix(in srgb, var(--signal) 26%, transparent); stroke: var(--signal); }
 
-.evidence-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
-.evidence-grid > * { min-width: 0; margin-top: 20px; }
+/*
+ * 联动高亮：指针停在散点、柱或表格行的任何一处，三处同时亮起。用 --signal
+ * 而不是新的颜色——它已经在「枢纽」语义里出现过，这里复用同一个强调通道。
+ */
+tr.is-linked td { background: color-mix(in srgb, var(--signal) 14%, transparent); }
+.point.is-linked { stroke-width: 3.5; fill: color-mix(in srgb, var(--signal) 45%, transparent); }
+.bar.is-linked { stroke-width: 3px; }
 
-.oracle-list { margin: 18px 0 0; padding: 0; list-style: none; }
+/* 参数变化时新建的标记淡入一次；既有标记的位置移动走脚本补间，不经这里。 */
+@keyframes mark-enter { from { opacity: 0; } }
+.is-entering { animation: mark-enter var(--dur-enter, 200ms) ease-out; }
 
-.oracle-list li {
-  display: grid;
-  gap: 4px;
-  padding: 11px 0;
-  border-top: 1px solid var(--line);
+/*
+ * 自绘数值提示。原生 <title> 延迟约一秒且触屏基本不可用；提示是 fixed 定位的
+ * 便签，pointer-events 关掉避免遮挡指针路径，信息本体仍在表格里逐行可查。
+ */
+.plot-tooltip {
+  position: fixed;
+  z-index: 30;
+  max-width: 300px;
+  padding: 8px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-md);
+  font-family: var(--mono);
+  font-size: var(--text-xs, 0.78rem);
+  line-height: 1.5;
+  pointer-events: none;
 }
 
-.oracle-list li:first-child { border-top: 0; }
-.oracle-list strong { font-size: 0.9rem; }
-.oracle-list li[data-pass="true"] strong { color: var(--allow-ink); }
-.oracle-list li[data-pass="false"] strong { color: var(--deny-ink); }
-.oracle-list span { color: var(--muted); font-family: var(--mono); font-size: 0.78rem; }
+.plot-tooltip[hidden] { display: none; }
 
-.boundary-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
-.boundary-columns ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: 0.88rem; }
-.boundary-columns li { margin-bottom: 8px; }
-.boundary-yes h3 { color: var(--allow-ink); }
-.boundary-no h3 { color: var(--deny-ink); }
+/* 排序表头：按钮继承表头的 mono 小字风格，激活列加品牌色和方向箭头。 */
+thead th button.sort-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
 
-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
-caption { padding: 14px; color: var(--muted); font-size: 0.82rem; text-align: left; }
-th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; }
-thead th { position: sticky; top: 0; color: var(--muted); background: var(--surface-strong); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; }
-td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-tbody tr:hover { background: color-mix(in srgb, var(--brand) 7%, transparent); }
+th[aria-sort]:not([aria-sort="none"]) { color: var(--brand); }
+th[aria-sort="ascending"] button.sort-key::after { content: "▲"; font-size: 9px; }
+th[aria-sort="descending"] button.sort-key::after { content: "▼"; font-size: 9px; }
 
-.page-footer {
+/* 缩放控件组：紧凑版按钮，键盘与触屏的缩放等价物。 */
+.zoom-controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
+  gap: 8px;
+  margin-top: 16px;
 }
+
+.button.button-compact {
+  min-height: 34px;
+  padding: 6px 13px;
+  border-color: var(--line-strong);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface-strong) 65%, transparent);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.scatter-scroll svg.is-magnified { cursor: grab; }
+.scatter-scroll svg.is-panning { cursor: grabbing; }
+
+.evidence-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.evidence-grid > * { min-width: 0; margin-top: 20px; }
 
 @media (max-width: 1080px) {
   .hero-panel, .evidence-grid, .boundary-columns { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* 这里的过渡只标记指针位置，不编码任何数值，去掉不损失信息。 */
+/* 进场淡入与按钮过渡都只是动效，去掉不损失信息；补间在脚本里自行尊重偏好。 */
 @media (prefers-reduced-motion: reduce) {
-  .button, .point { transition: none; }
+  .button { transition: none; }
+  .is-entering { animation: none; }
 }
 
 @media (forced-colors: active) {
   .card, .hero-panel, .scatter-scroll, .bar-scroll, .table-scroll { border: 1px solid CanvasText; }
   .button, select { border: 1px solid ButtonText; }
-}
-
-/*
- * 内联图标。语义由旁边的文字标签承担，图标只加快扫读；去掉全部图标后信息量不变。
- * 用 currentColor 描边，所以颜色跟随所在容器，不引入第二套配色。
- */
-.icon {
-  flex: none;
-  vertical-align: -0.16em;
-  margin-right: 0.42em;
-}
-
-.has-icon {
-  display: inline-flex;
-  align-items: baseline;
-}
-
-/* 图标不参与减少动态效果的判断，它本身不动。 */
-@media (forced-colors: active) {
-  .icon { stroke: CanvasText; }
-  [data-pass="true"] .icon, [data-pass="true"].icon { stroke: CanvasText; }
+  .plot-tooltip { border: 1px solid CanvasText; }
 }
 
 /*

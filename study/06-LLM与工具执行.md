@@ -4,6 +4,20 @@
 
 ## LLM 的三层
 
+<LessonWidget
+  id="llm-stream-lab"
+  url="/llm-stream-lab.html"
+  title="流式装配实验室"
+  :height="1000"
+  fallback-href="#llm-的三层"
+>
+
+不打开组件也能得到核心结论：chunk 按到达顺序进入装配器，`finish` 之后才到的重复增量会被忽略——同一段话不会在消息里出现两遍。逐步推进到达序列，可以看到正文逐块拼出、工具调用单独计数，而所有这些都与 provider 的网络行为无关。
+
+</LessonWidget>
+
+组件里的 chunk 文本是固定教学数据；它不能证明真实 provider 的乱序传输、token 计数或 DeepSeek 适配器的处理结果。
+
 1. `packages/llm/llm/src/index.ts` 定义统一的消息、错误、调用配置、模型注册和 `LlmAdapter`。
 2. `packages/llm/llm/src/assembler.ts` 把增量 `StreamChunk` 组装成完整内容块和 assistant message。
 3. `packages/llm/llm-deepseek/src/adapter.ts` 与 `sse.ts` 负责 DeepSeek 的 HTTP 和 SSE 细节。

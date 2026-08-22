@@ -1,0 +1,26 @@
+/*
+ * 流式装配实验页的页内专用样式。共用部分在 study-lab-shell.css。
+ */
+
+.st-text { fill: var(--brand); }
+.st-reasoning {
+  fill: color-mix(in srgb, var(--signal-soft) 80%, transparent);
+  stroke: var(--signal);
+}
+.st-tool { fill: var(--allow); }
+.st-text.accepted, .st-reasoning.accepted, .st-tool.accepted { stroke: var(--line-strong); }
+
+.is-rejected {
+  fill: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  stroke: var(--deny);
+  stroke-width: 2.5;
+}
+
+.dsh-message-text {
+  margin: 8px 0 16px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--brand);
+  background: var(--surface);
+  white-space: pre-wrap;
+  font-size: 15px;
+}

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="chunk 按到达顺序进入装配器，finish 后的迟到增量必须被忽略——可交互的流式装配实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>流式装配实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./llm-stream-lab.css">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#stream-main">跳到实验</a>
+  <main class="lab-shell" id="stream-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · LLM 流 01</p>
+        <h1>迟到的重复块，不该第二次进消息。</h1>
+        <p class="hero-lead">模型的回答以 chunk 为单位逐段到达。BlockAssembler 按到达顺序收集它们，finish 之后才到的重复增量必须被忽略——否则同一段话会出现两遍。逐步推进到达序列，亲眼看着消息被拼出来。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/06-LLM与工具执行.html">阅读配套课程</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 05</span>
+        <strong>上排是到达序号。</strong>
+        <p>页面不连接 provider，不测量延迟；chunk 文本是固定教学数据，不是真实模型输出。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：迟到重复场景推进到最后一步，「好的，」这句话在最终消息里出现几次？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="once"><span>1 次——迟到的那份被忽略</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="twice"><span>2 次——两份都会被接受</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="zero"><span>0 次——重复触发整体重置</span></label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="stream-form">
+          <label>
+            <span>场景</span>
+            <select id="scenario" name="scenario"></select>
+            <small id="scenario-note"></small>
+          </label>
+          <label>
+            <span>推进到第 <output id="upto-output">0</output> 个到达</span>
+            <input id="upto" type="range" min="0" max="6" step="1" value="6">
+            <small>拖回前面可以看任意前缀的装配状态；拖到末尾处理迟到增量。</small>
+          </label>
+          <button class="button button-primary" type="submit">重新装配</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="stream-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="装配观测值">
+          <div><dt>已到达</dt><dd id="metric-arrived">—</dd></div>
+          <div><dt>已接受</dt><dd id="metric-accepted">—</dd></div>
+          <div><dt>被拒绝</dt><dd id="metric-rejected">—</dd></div>
+          <div><dt>正文字符</dt><dd id="metric-chars">—</dd></div>
+          <div><dt>工具调用</dt><dd id="metric-tools">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="stream-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">到达与接受</p>
+          <h2 id="stream-title">上排是到达序号，下排是进入消息的块</h2>
+        </div>
+        <span class="schema-pill">到达 × 接受</span>
+      </div>
+      <p class="section-intro">上排每个方块是一个按到达顺序进来的 chunk；下排只画被装配器接受的块。红色描边的方块是被拒绝的迟到重复——它到达了，但不会出现在消息里。</p>
+      <div class="plot-scroll" id="stream-plot"></div>
+      <p class="chart-note" id="stream-note"></p>
+    </section>
+
+    <section class="card message-card" aria-labelledby="message-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">装配结果</p>
+          <h2 id="message-title">当前前缀拼出的正文</h2>
+        </div>
+        <span class="schema-pill">tool-call 单列</span>
+      </div>
+      <blockquote class="dsh-message-text" id="message-text"></blockquote>
+      <ul class="oracle-list" id="oracle-list"></ul>
+    </section>
+
+    <section class="evidence-grid" aria-label="证据边界">
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 不连接任何 provider</span>
+      <a href="./study/lessons/06-LLM与工具执行.html">继续读 LLM 与工具执行</a>
+    </footer>
+  </main>
+  <script type="module" src="./llm-stream-lab.js"></script>
+</body>
+</html>

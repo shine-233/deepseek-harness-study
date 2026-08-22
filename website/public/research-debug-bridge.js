@@ -6,11 +6,15 @@ import { icon, prefixIcon } from './study-lab-icons.js'
 
 import { installThemeToggle } from './study-lab-theme.js'
 
-function installDeclaredIcons(scope = document) {
-  for (const target of scope.querySelectorAll('[data-icon]')) {
-    prefixIcon(target, target.dataset.icon, Number(target.dataset.iconSize ?? 16))
-  }
-}
+// 与 study-lab-kit.js 逐个对比同名导出后的去重结论：
+// - installDeclaredIcons 与 kit 导出逐行一致，删掉本地版改用 kit 的。
+// - writeText 保留本地实现（见其定义处的注释）：kit 版不校验目标、且会把
+//   null/undefined 渲染成字符串 "null"/"undefined"；本页的导入渲染路径要求
+//   缺值留空而不是显示占位文本，research-debug-bridge.test.mjs 也直接从本模块
+//   导入这个导出。
+// - svgElement 在本文件从未存在过；生命周期流转图是写在 HTML 里的静态 SVG，
+//   不需要构造器。
+import { installDeclaredIcons } from './study-lab-kit.js'
 const SCHEMA_VERSION = 1
 const REQUEST_KIND = 'dsh-research-diagnostic-request'
 const RESULT_KIND = 'dsh-research-diagnostic-result'
@@ -780,6 +784,7 @@ function initializePage() {
   const findingsList = document.querySelector('#findings-list')
   const privacyList = document.querySelector('#privacy-list')
   const resultFeedback = document.querySelector('#result-feedback')
+  const flowStages = document.querySelectorAll('[data-flow-stage]')
 
   if (!(form instanceof HTMLFormElement)
     || !(presetSelect instanceof HTMLSelectElement)
@@ -813,6 +818,16 @@ function initializePage() {
   const setFeedback = (target, message, tone = 'neutral') => {
     target.dataset.tone = tone
     writeText(target, message)
+  }
+
+  // 流转图唯一的动态行为：表单侧生成出一份合法 request，就把「当前阶段」标在
+  // 流程起点（换预设必然触发重新生成，自定义字段改坏则清空标记）。导入 result
+  // 属于 B 区卡片的状态展示，图不为它重复表态；这一范围约定写在图的 intro 里。
+  const updateFlowStage = (stage) => {
+    for (const node of flowStages) {
+      if (node.dataset.flowStage === stage) node.dataset.current = ''
+      else node.removeAttribute('data-current')
+    }
   }
 
   const buildFromForm = () => {
@@ -884,10 +899,12 @@ function initializePage() {
       currentRequest = buildFromForm()
       writeText(requestPreview, JSON.stringify(currentRequest, null, 2))
       downloadButton.disabled = false
+      updateFlowStage('request')
       setFeedback(requestFeedback, 'request 已在浏览器内生成；尚未读取本机文件，也没有发送网络请求。', 'success')
     } catch (error) {
       currentRequest = null
       downloadButton.disabled = true
+      updateFlowStage(null)
       writeText(requestPreview, '')
       setFeedback(requestFeedback, error instanceof Error ? error.message : 'request 生成失败。', 'error')
     }

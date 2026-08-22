@@ -1,19 +1,20 @@
-// The two earliest labs predate the shared kit and stay self-contained, so they
-// take the icon module directly. It has no other dependency, and an element
-// without `data-icon` keeps its plain text.
-import { icon, prefixIcon } from './study-lab-icons.js'
+// 教学模型（simulate、独立 oracle、帧序列）留在本文件；渲染辅助改用共享的
+// study-lab-kit。kit 的 renderOracle / renderBoundary / renderRows 会引入本页
+// 从未有过的图标和另一套行数据集契约，按「页面现行为优先」保留原样，差异见各处注释。
+import { icon } from './study-lab-icons.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
-
-/** Replace the declared markers with inline SVG. Requires a live document. */
-function installDeclaredIcons(scope = document) {
-  for (const target of scope.querySelectorAll('[data-icon]')) {
-    prefixIcon(target, target.dataset.icon, Number(target.dataset.iconSize ?? 16))
-  }
-}
+import {
+  installDeclaredIcons,
+  makeFeedback,
+  prefersReducedMotion,
+  replaceList,
+  svgElement,
+  writeText,
+} from './study-lab-kit.js'
 
 const UINT32_MAX = 0xffffffff
 const MAX_PARALLELISM = 3
@@ -676,29 +677,6 @@ export function frameAt(simulation, index) {
   return simulation.frames[resolved]
 }
 
-export function writeText(target, value) {
-  target.textContent = String(value)
-}
-
-const SVG_NS = 'http://www.w3.org/2000/svg'
-
-function svgElement(name, attributes = {}, textValue = null) {
-  const element = document.createElementNS(SVG_NS, name)
-  for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, String(value))
-  if (textValue !== null) writeText(element, textValue)
-  return element
-}
-
-function replaceList(target, values, emptyMessage) {
-  target.replaceChildren()
-  const rows = values.length === 0 ? [emptyMessage] : values
-  for (const value of rows) {
-    const item = document.createElement('li')
-    writeText(item, value)
-    target.append(item)
-  }
-}
-
 function phaseLabel(phase) {
   const labels = {
     'outer-dispatch': 'outer dispatch',
@@ -818,6 +796,10 @@ function renderTimeline(simulation, target) {
   revealOnScroll(target)
 }
 
+/**
+ * 与 kit 的 renderRows 的差异：本页行带 data-tick / data-event-id，供逐帧联动
+ * 高亮和当前帧定位；kit 版只支持 key/state 数据集，表达不了这个契约，所以保留自绘。
+ */
 function renderEventTable(simulation, tableBody) {
   tableBody.replaceChildren()
   for (const event of simulation.events) {
@@ -1085,15 +1067,13 @@ function initializePage() {
   let simulation = null
   let frameIndex = 0
   let timer = null
+  // 布尔判断走 kit 的 prefersReducedMotion；这里保留 MediaQueryList 句柄，
+  // 是因为系统偏好变化时要实时停掉自动播放，kit 不暴露这个订阅点。
   const motionQuery = typeof window.matchMedia === 'function'
     ? window.matchMedia('(prefers-reduced-motion: reduce)')
     : null
 
-  const reducedMotion = () => motionQuery?.matches === true
-  const setFeedback = (message, tone = 'neutral') => {
-    feedback.dataset.tone = tone
-    writeText(feedback, message)
-  }
+  const setFeedback = makeFeedback(feedback)
   const setPlayingLabel = playing => {
     writeText(playButton, playing ? '暂停' : '播放')
     playButton.setAttribute('aria-pressed', String(playing))
@@ -1184,6 +1164,9 @@ function initializePage() {
     )
     writeText(metrics.oracle, simulation.oracle.pass ? '通过' : '未通过')
     metrics.oracle.dataset.pass = String(simulation.oracle.pass)
+    // 与 kit 的 renderOracle 的差异：kit 版会给每条校验标题加 check/cross 图标，
+    // 本页列表保持纯文字（页面现行为优先）；badge 文本、data-pass 和期望/实测
+    // 行的写法与 kit 完全一致，所以不引入该导出。
     oracleList.replaceChildren()
     for (const check of simulation.oracle.checks) {
       const item = document.createElement('li')
@@ -1195,6 +1178,8 @@ function initializePage() {
       item.append(title, detail)
       oracleList.append(item)
     }
+    // 不用 kit 的 renderBoundary：它会顺带给两栏的 h3 标题加图标，本页标题
+    // 保持纯文字；列表填充部分与 kit 的 replaceList 行为相同。
     replaceList(canProveList, simulation.canProve, '没有 canProve 声明。')
     replaceList(cannotProveList, simulation.cannotProve, '没有 cannotProve 声明。')
     setFrame(0)
@@ -1236,7 +1221,7 @@ function initializePage() {
 
   const play = () => {
     if (simulation === null) return
-    if (reducedMotion()) {
+    if (prefersReducedMotion()) {
       pause()
       setFeedback('系统已启用减少动态效果；请使用上一步、下一步或滑块逐帧查看。', 'notice')
       return
@@ -1251,7 +1236,7 @@ function initializePage() {
   }
 
   const applyMotionPreference = () => {
-    const reduced = reducedMotion()
+    const reduced = prefersReducedMotion()
     if (reduced) pause()
     playButton.disabled = reduced
     writeText(
