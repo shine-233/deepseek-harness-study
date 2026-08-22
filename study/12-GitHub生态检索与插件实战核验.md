@@ -10,7 +10,7 @@
 
 本仓库固定的上游提交是 [`aa6c361a972c8369148dea7380bb5c21c24e07ec`](https://github.com/deepseek-ai/deepseek-harness/tree/aa6c361a972c8369148dea7380bb5c21c24e07ec)。这个提交的 Git tree 有 7,903 个文件，生成器按照源码扩展名白名单识别出 2,973 个代码或界面源文件，分到 `study/文件索引/` 的 66 个索引页中。
 
-每一条索引不是只有一个文件名，而是包含下面这些字段：
+每一条索引包含下面这些字段：
 
 <details class="reference-table">
 <summary>展开一、怎样证明“每个源文件都有对应材料”（10 行）</summary>

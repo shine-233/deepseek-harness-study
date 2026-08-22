@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="订阅、策略拒绝与卸载如何影响一个观察插件：可交互的最小插件事件流实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>插件事件流实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./plugin-flow-lab.css">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#flow-main">跳到实验</a>
+  <main class="lab-shell" id="flow-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 插件生命周期</p>
+        <h1>订阅决定收不收得到；日志跟订阅无关。</h1>
+        <p class="hero-lead">一个只观察 tools/result 的最小插件，三层参与方摆在同一条有序时间线上：工具执行、事件广播、插件动作，外加宿主写的 Session 日志。切场景、开关订阅、拉预览长度——看预览和日志各自服从什么规则。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/11-如何写一个合规插件.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./turn-flow-lab.html">打开 Turn 轨迹实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 04</span>
+        <strong>纵轴是参与方，横轴是序号。</strong>
+        <p>页面不连接 Host，不加载真实 Loader；预览文本来自固定教学常量，不是真实工具结果。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：切到「中途卸载」，卸载后第二次广播发生——这一次的预览和日志各会怎样？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="neither">
+            <span>都没有——插件已卸载，宿主也不再记日志</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="logged-only">
+            <span>没有预览，但 call 和 result 照样写日志</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="still-preview">
+            <span>还有预览——卸载只是界面上的事</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="flow-form">
+          <label>
+            <span>场景</span>
+            <select id="scenario" name="scenario"></select>
+            <small id="scenario-note"></small>
+          </label>
+          <label>
+            <span>订阅 tools/result</span>
+            <select id="subscribed" name="subscribed">
+              <option value="yes">已订阅（挂载时注册监听）</option>
+              <option value="no">未订阅（纯摆设插件）</option>
+            </select>
+            <small>未订阅的插件仍然被挂载，只是广播不会送到它面前。</small>
+          </label>
+          <label>
+            <span>预览长度 <output id="length-output">20</output> 字</span>
+            <input id="max-length" type="range" min="0" max="60" step="1" value="20">
+            <small>0 会写出一条空字符串预览——这也是一条真实的预览记录。</small>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
+        </form>
+        <p class="feedback" id="flow-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="事件流观测值">
+          <div><dt>步骤</dt><dd id="metric-steps">—</dd></div>
+          <div><dt>广播次数</dt><dd id="metric-broadcasts">—</dd></div>
+          <div><dt>日志条目</dt><dd id="metric-logs">—</dd></div>
+          <div><dt>预览数</dt><dd id="metric-previews">—</dd></div>
+          <div><dt>结束活跃效果</dt><dd id="metric-effects">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="flow-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">有序时间线</p>
+          <h2 id="flow-title">四条 lane 上的插件生命周期</h2>
+        </div>
+        <span class="schema-pill">步骤 × 参与方</span>
+      </div>
+      <p class="section-intro">纵轴是参与方，横轴是步骤序号。观察插件 lane 上的实心点写预览，空心点表示“未订阅所以无动作”；Session 日志 lane 的每一步都由宿主写入——它不关心插件在不在。</p>
+      <div class="plot-scroll" id="flow-plot"></div>
+      <p class="chart-note" id="flow-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>四条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验自己重推一遍时间线，再检查日志完整性、预览截断规则、效果账目和卸载语义；它不读渲染层的任何中间量。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="steps-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="steps-title">完整步骤表</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">图里的每一步，这张表都逐行给出：属于哪条 lane、做了什么、是否写入日志、有没有登记或注销效果。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="steps-caption">当前场景的全部步骤</caption>
+          <thead>
+            <tr>
+              <th scope="col">步</th>
+              <th scope="col">参与方</th>
+              <th scope="col">阶段</th>
+              <th scope="col">说明</th>
+              <th scope="col">写入日志</th>
+              <th scope="col">效果变动</th>
+              <th scope="col">预览文本</th>
+            </tr>
+          </thead>
+          <tbody id="steps-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/11-如何写一个合规插件.html">继续读如何写一个合规插件</a>
+    </footer>
+  </main>
+  <script type="module" src="./plugin-flow-lab.js"></script>
+</body>
+</html>

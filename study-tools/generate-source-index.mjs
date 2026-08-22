@@ -461,7 +461,7 @@ const SPECIFIC_PURPOSES = new Map([
   ['packages/core/tools/src/testing.ts', '它提供 canonical tool-definition 测试夹具工厂，让各个工具测试使用一致的定义和参数材料；这些对象服务于测试，不是默认产品工具。'],
   ['packages/core/session/src/preparation.ts', '它管理尚未发布的 Session 及其 provider-owned 状态，提供可释放且幂等的准备生命周期；prepare 不等于 publish，发布后旧的 provider 回调必须变成安全的 no-op。'],
   ['packages/core/session/src/chunk-rows.ts', '它把会话事件整理成可以分页和渲染的行；分页行是面向读取的结构，不等于原始事件数组，因此历史折叠、边界和游标规则集中在这里。'],
-  ['packages/core/session/src/request-header.ts', '它定义请求配置变化的持久化 header，给每次请求选择和后续恢复提供锚点；这不是普通辅助函数，而是会话日志解释请求上下文的一部分。'],
+  ['packages/core/session/src/request-header.ts', '它定义请求配置变化的持久化 header，给每次请求选择和后续恢复提供锚点；它是会话日志解释请求上下文的一部分。'],
   ['apps/cli/tsdown.config.ts', '它定义 CLI 的 Node/ESM 构建边界，入口指向 `lib/types/bin.js`，并关闭不需要的 declaration 输出；构建产物因此从真正的命令入口开始，而不是把开发源文件路径暴露给用户。'],
   ['packages/core/agent-default-model/tsdown.config.ts', '它把默认模型包拆成 `index.js` 和 `invariant.js` 两个入口：正常能力与运行时不变量可以分别被依赖，避免只想检查配置的调用者加载完整实现。'],
   ['apps/web/vite.config.ts', '它约束浏览器构建边界，禁止 standalone serve，安排 vendor chunk，并把 boot grammar 等资源纳入构建；Web 开发服务器不能绕过 Harness 正式的启动组合。'],

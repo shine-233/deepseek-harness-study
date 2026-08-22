@@ -925,7 +925,7 @@
 
 - 所属层：packages/core：可复用的 Harness 功能包
 - 文件角色：请求配置持久化锚点
-- 这个文件有什么用：它定义请求配置变化的持久化 header，给每次请求选择和后续恢复提供锚点；这不是普通辅助函数，而是会话日志解释请求上下文的一部分。
+- 这个文件有什么用：它定义请求配置变化的持久化 header，给每次请求选择和后续恢复提供锚点；它是会话日志解释请求上下文的一部分。
 - 为什么这样设计：请求模型、工具或配置发生变化时，恢复逻辑必须知道当时采用了什么选择；把配置变化写成 Session 可识别的 header，能让持久化事实解释请求，而不是依赖当前环境猜测。
 - 文件级设计证据：源码顶部注释把它定位为“Request-header reconstruction utilities over full request/header session events. Anyone holding a session log reconstructs the EpochHeader any request was built under by taking the latest canonical snapshot; the loop uses the same equality helper to avoid l...”；固定提交中扫描到的声明包括 `canonicalHeader`、`headerEquals`、`foldRequestHeader`、`sameSchema`；本地静态 import 图显示它直接依赖 2 个源文件，并被 1 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/core/session/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/README.md)、[packages/core/session/src/types.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/types.ts)、[packages/llm/llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)

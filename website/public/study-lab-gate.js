@@ -8,9 +8,33 @@
  * 门控只挡「改参数重跑」这类探索性控件，不挡阅读：图、表格、oracle、证据边界
  * 从一开始就完整可见。答错也解锁——目的是让你先表态，不是考试。
  *
- * 选择不写 localStorage：预测是一次性的学习动作，记住它反而让重看这一页时
- * 跳过了这一步。
+ * 预测本身仍不落存储：重看这一页时应当重新押注。但提交或跳过成功会把当前实验页
+ * 记入学习进度的 labs 表（键 dsh-study-progress-v2），作为「亲手做过这个实验」的
+ * 证据；localStorage 不可用时静默跳过，只影响记录，不影响解锁。
  */
+
+import { emptyState, markLabDone, mergeProgress, normalizeLessonId, parseProgress, serializeProgress } from './study-progress-core.js'
+
+const PROGRESS_KEY = 'dsh-study-progress-v2'
+
+/**
+ * 把一个实验记入进度。解析已存数据后按时间戳合并写入，防止覆盖已有课程与自测
+ * 记录；隐私模式或坏数据时安静放弃。
+ *
+ * @param labId 形如 'lab:turn-flow' 的实验标识。
+ * @returns 是否成功写入了存储。
+ */
+function rememberLab(labId) {
+  try {
+    const stored = parseProgress(window.localStorage.getItem(PROGRESS_KEY))
+    const delta = markLabDone(emptyState(), labId, new Date().toISOString())
+    window.localStorage.setItem(PROGRESS_KEY, serializeProgress(mergeProgress(stored, delta)))
+    return true
+  } catch {
+    // localStorage 抛错只发生在存储不可用的环境里；记录是增强，解锁不能依赖它。
+    return false
+  }
+}
 
 /**
  * 装一个预测题门控。
@@ -28,6 +52,17 @@ export function installPredictionGate({ form, locked, feedback, correct, explain
   }
 
   let unlocked = false
+  let progressNoted = false
+
+  // 记录成功才在状态行追加一句；失败或非实验页时保持原文案。
+  const noteProgress = () => {
+    if (progressNoted) return ''
+    if (typeof location === 'undefined') return ''
+    const labId = normalizeLessonId(location.pathname)
+    if (labId === null || !rememberLab(labId)) return ''
+    progressNoted = true
+    return ' 已记入学习进度。'
+  }
 
   const lock = () => {
     // inert 同时挡住指针、键盘和辅助技术；只设 disabled 会让屏幕阅读器
@@ -45,7 +80,7 @@ export function installPredictionGate({ form, locked, feedback, correct, explain
     const verdict = chosen === correct ? '预测正确。' : '预测和模型结果不一致。'
     const detail = explain[chosen] ?? ''
     feedback.dataset.tone = chosen === correct ? 'success' : 'error'
-    feedback.textContent = verdict + (detail === '' ? '' : ' ' + detail) + ' 控件已解锁，去改参数看它怎么变。'
+    feedback.textContent = verdict + (detail === '' ? '' : ' ' + detail) + ' 控件已解锁，去改参数看它怎么变。' + noteProgress()
   }
 
   lock()
@@ -69,7 +104,7 @@ export function installPredictionGate({ form, locked, feedback, correct, explain
       locked.inert = false
       locked.dataset.gated = 'skipped'
       feedback.dataset.tone = 'neutral'
-      feedback.textContent = '已跳过预测，控件解锁。回头想试的话，刷新页面就能再来一次。'
+      feedback.textContent = '已跳过预测，控件解锁。回头想试的话，刷新页面就能再来一次。' + noteProgress()
     })
   }
 

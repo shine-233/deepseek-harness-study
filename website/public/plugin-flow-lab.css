@@ -1,0 +1,32 @@
+/*
+ * 插件事件流实验页的页内专用样式。共用部分在 study-lab-shell.css。
+ */
+
+/* 四条 lane 各一个固定色相：颜色只区分参与方，不编码数值；
+ * 全部走既有 token 组合，正文一律用 -ink 阶进，marks 只出现在圆点上。 */
+.pf-dot {
+  fill: var(--brand);
+  stroke: var(--surface-strong);
+  stroke-width: 2;
+  transition: r 120ms ease;
+}
+.pf-dot:hover { r: 11; }
+.pf-dot.is-preview { fill: var(--allow); stroke: var(--line-strong); }
+.pf-dot.is-broadcast { fill: var(--signal); }
+.pf-dot.is-unload {
+  fill: color-mix(in srgb, var(--signal-soft) 70%, transparent);
+  stroke: var(--signal);
+  stroke-dasharray: 3 2;
+}
+.pf-dot.is-skip {
+  fill: var(--surface-strong);
+  stroke: var(--muted);
+}
+
+tbody tr[data-state="preview"] td { font-weight: 700; }
+tbody tr[data-state="skip"] td:nth-child(5) { color: var(--muted); }
+tbody tr[data-state="log"] td:nth-child(4) { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-dot { transition: none; }
+}

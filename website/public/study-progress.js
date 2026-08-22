@@ -20,7 +20,7 @@ import {
 } from './study-progress-core.js'
 import { QUIZ_BANK, gradeAnswers } from './study-quiz.js'
 
-const STORAGE_KEY = 'dsh-study-progress-v1'
+const STORAGE_KEY = 'dsh-study-progress-v2'
 const WIDGET_ID = 'dsh-progress-pill'
 
 /** localStorage 在隐私模式或 file:// 下可能抛错：读写都包住，坏掉时退化为内存态。 */

@@ -6,7 +6,7 @@
  * DOM 渲染层在本文件底部，只有被进度模块调用时才碰 document。
  */
 
-export const QUIZ_LESSONS = Object.freeze(['00-开始这里', '01-仓库地图', '02-Cordis与插件树'])
+export const QUIZ_LESSONS = Object.freeze(['00-开始这里', '01-仓库地图', '02-Cordis与插件树', '03-核心文件精读', '04-Agent与Turn流程', '05-Session日志与恢复'])
 
 /**
  * 题库。source 字段告诉读者答案依据在哪一节或哪个源文件；
@@ -117,6 +117,120 @@ export const QUIZ_BANK = Object.freeze({
       answer: 1,
       explain: '组件边界声明：这张图只读清单和行数，dependencies、动态 import 和 cordis.yml 装配都没有画进去。',
       source: 'website/public/package-graph-lab.html 的证据边界',
+    }),
+  ]),
+  '03-核心文件精读': Object.freeze([
+    Object.freeze({
+      id: 'q1',
+      q: '从输入到回答，谁打开 Turn 和 Step，谁把过程记录下来？',
+      options: [
+        'Session 先打开 Turn，Agent Loop 再把日志翻译成模型请求',
+        'Agent Loop 打开 Turn 和 Step，Session 把输入、模型片段、工具调用和结果追加成日志',
+        'LLM Adapter 决定 Turn 的开关，Tools 负责记录全过程',
+      ],
+      answer: 1,
+      explain: '「先看总链路」一节：Cordis Context 起，Profile 读 Bundle 挂载插件，Agent Loop 打开 Turn 和 Step，Session 记录输入、模型片段、工具调用和结果；LLM Adapter 只产生流式片段。',
+      source: 'study/03-核心文件精读.md#先看总链路',
+    }),
+    Object.freeze({
+      id: 'q2',
+      q: '想替换基础 Bundle 里的一行默认配置（比如换默认模型），按 Profile 一节应该怎么做？',
+      options: [
+        '复制整个 Bundle，改掉那一行后整体替换原来的 Bundle',
+        '修改 app-boot 启动入口，在挂载前硬编码覆盖这个默认值',
+        '在 Bundle 之上加一层只改这一行的补丁：profile 层覆盖 Bundle 层，home 层和命令行 --patch 再继续覆盖',
+      ],
+      answer: 2,
+      explain: '「启动、Profile 与 Bundle」一节：补丁按层叠加——Bundle 层先来，profile 层覆盖它，home 层和命令行 --patch 继续覆盖；每层只改自己拥有的配置行，所以不必复制整个 Bundle。',
+      source: 'study/03-核心文件精读.md#启动profile-与-bundle',
+    }),
+    Object.freeze({
+      id: 'q3',
+      q: '工具执行结果的“给模型的文本”和“给人的卡片”是什么关系？',
+      options: [
+        '是同一份字符串，UI 原样显示发给模型的文本',
+        '卡片由模型返回的 HTML 渲染，给模型的文本只是兜底',
+        '是两回事：展示意图抽成 provider-neutral 类型后由各前端渲染；给模型的文本另行规范化',
+      ],
+      answer: 2,
+      explain: '「工具注册、schema 与展示」一节 presentation.ts：工具执行结果给模型看的文本和给人看的卡片不是一回事；展示意图抽成中立类型后，Web、CLI 各自渲染同一意图。',
+      source: 'study/03-核心文件精读.md#工具注册schema-与展示',
+    }),
+  ]),
+  '04-Agent与Turn流程': Object.freeze([
+    Object.freeze({
+      id: 'q1',
+      q: '“带两个工具调用的 Turn”实验里，一次 Turn 为什么出现了 4 次模型请求？',
+      options: [
+        '组件把每次工具执行都误计成了一次模型请求',
+        '为了对抗限流，同一个请求被自动重试了四次',
+        '每拿到一个工具结果都要把它带回模型才能继续，于是同一 Turn 内开出后续 Step',
+      ],
+      answer: 2,
+      explain: '「亲手看一次 Turn 展开」：一次 Turn 不是一次模型调用，20 步里模型请求出现 4 次。「为什么要分 Turn 和 Step」补充：工具结果让同一 Turn 进入下一个 Step，而不是伪装成新的用户请求。',
+      source: 'study/04-Agent与Turn流程.md#亲手看一次-turn-展开',
+    }),
+    Object.freeze({
+      id: 'q2',
+      q: '首次输入在 `agent/pre-step` 被拒绝后，日志里会留下什么？',
+      options: [
+        '什么都不留，这次输入就像没有发生过',
+        '伪造一条 assistant/message，把拒绝原因写成模型回复存下来',
+        '一条没有 Step 的 Turn 结束记录，用来解释“为什么用户发了话却没有模型请求”',
+      ],
+      answer: 2,
+      explain: '「`agent/pre-step` 为什么重要」一节：首次领取被拒绝时仍会记录一个没有 Step 的 Turn 结束；「为什么要分 Turn 和 Step」也说明被拒绝或取消的 Turn 可以没有 Step 但仍被记录。',
+      source: 'study/04-Agent与Turn流程.md#agentpre-step-为什么重要',
+    }),
+    Object.freeze({
+      id: 'q3',
+      q: '模型流里出现 tool-call block 后，DSH 怎样处理它？',
+      options: [
+        'Agent Loop 直接调用本地函数，并把输出拼进一段隐藏提示词',
+        '交给 Tools 服务重新检查可见性、参数、审批和并发；结果写回 Session，下一次 prompt 由日志推导',
+        '由 LLM Adapter 在同一条 HTTP 连接里代为执行并直接返回结果',
+      ],
+      answer: 1,
+      explain: '「工具调用怎样回来」一节：Agent Loop 不直接执行函数，而是交给 Tools 服务；结果回到 Session 后，下一次 prompt 由日志推导，而不是 Agent 私自拼隐藏文本。',
+      source: 'study/04-Agent与Turn流程.md#工具调用怎样回来',
+    }),
+  ]),
+  '05-Session日志与恢复': Object.freeze([
+    Object.freeze({
+      id: 'q1',
+      q: 'Session 为什么保存完整事件日志，而不只保存最后一段文本？',
+      options: [
+        '因为事件日志比文本更短，可以节省磁盘空间',
+        '因为 JSON 比 Markdown 更容易被前端解析和传输',
+        '这样“模型为何看到某段内容、崩溃停在哪、fork 从哪个事件开始”都变成从原始事实推导的投影问题',
+      ],
+      answer: 2,
+      explain: '「为什么不只保存最后一段文本」一节：原始事件是事实，模型历史、UI 卡片、transcript 和统计都是从事实推导出的不同视图；只存最后文本就无法回答这些追溯问题。',
+      source: 'study/05-Session日志与恢复.md#为什么不只保存最后一段文本',
+    }),
+    Object.freeze({
+      id: 'q2',
+      q: '“模型可见即已记录”这条规则主要防止哪类错误？',
+      options: [
+        '防止模型生成超出长度限制的超长回答',
+        '防止重启后模型历史看起来一样、却缺少某个隐式注入，导致行为悄悄变化且无法解释',
+        '防止用户在界面上删除或篡改历史消息',
+      ],
+      answer: 1,
+      explain: '「模型可见即已记录」一节：任何会影响模型请求的内容都必须能从 Session 日志重建；动态运行时上下文因此生成来源明确的 user/message，请求头在配置改变时追加新快照。',
+      source: 'study/05-Session日志与恢复.md#模型可见即已记录',
+    }),
+    Object.freeze({
+      id: 'q3',
+      q: '进程在工具执行中途崩溃后恢复时，“修复”会怎么做？',
+      options: [
+        '把没跑完的工具标记为成功，保证会话能继续往下走',
+        '丢弃崩溃点之后的整段会话，请用户从头再来',
+        '根据日志中的未闭合事实补出 interrupted 状态，不假装工具成功',
+      ],
+      answer: 2,
+      explain: '「恢复、fork 和修复」一节：修复根据日志中的未闭合事实补出 interrupted 状态；这不等于假装工具成功。',
+      source: 'study/05-Session日志与恢复.md#恢复fork-和修复',
     }),
   ]),
 })

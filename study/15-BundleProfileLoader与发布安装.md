@@ -63,7 +63,7 @@ Bundle package.json
   -> 应用开始工作
 ```
 
-这不是一个函数把所有事情做完，而是不同层分别拥有自己的事实。Bundle 只提供一层组合，Profile 决定哪些层参与，patch 决定最终配置，Loader 负责生命周期，宿主负责进程退出和诊断。
+不同层各自拥有自己的事实：Bundle 只提供一层组合，Profile 决定哪些层参与，patch 决定最终配置，Loader 负责生命周期，宿主负责进程退出和诊断。
 
 ## Bundle manifest 怎样被识别
 
