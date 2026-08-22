@@ -23,9 +23,10 @@ Status: implemented
 5. **正文↔图联动**：包依赖图说明文字新增三个 `<button data-graph-id>` 术语（core/agent、llm/llm、skill/skill）；悬停或聚焦经既有 linker 在散点、柱视图和表格三处同时高亮同一包，点击滚动到对应表行。
 6. **播放按钮（跟进批次）**：kit 新增纯函数 `nextPlayValue` 与薄 DOM 层 `bindAutoAdvance`，给 turn-flow、session-log、llm-stream、compaction 四页配上「播放/暂停」按钮：按各实验节奏扫完全程（turn-flow 700ms 便于读阶段说明，session-log 450ms 应对密集格，llm-stream 320ms 贴近流式体感，compaction 800ms 看柱形逐档变化），任何外部来源的输入（拖动或键盘步进——用自派发标记识别，不能用 isTrusted，因为重新派发的事件永远不可信）立即暂停，末帧自动停；减少动态效果时退化为一次点击走一帧。
 7. **模板化生成题（跟进批次）**：`generatedQuestionsFor` 用实验页渲染所用的同一批模型函数出题——第 04 课三道（两个固定步骤的泳道、完整轨迹的模型请求数），第 05 课三道（两种场景的工具调用数、「序号有缺口」场景在哪里停下）。id 稳定（`gen-04-lane-5` 式），错题本解析因此可用；选项按稳定顺序排列，位置随机仍交给 `shuffleQuiz`。`allQuestionsFor` 在组合层拼接，不触碰钉死为每课 3 道的手写题库。
-8. 9. **截图驱动的视觉打磨（跟进批次）**：用 Playwright 对首页和 turn-flow 做前后截图审计，发现首页四条不同底色的满宽提示块堆叠、实验页大标题把「必须」拆成两行、预测选项没有选中态反馈、按钮无悬停回应、指标表用了比例数字。全部用手写 CSS 在既有令牌上修：首页自定义块统一为一族表面加 3px 左重音线（warning 经 color-mix 保留暖色但降饱和），引用行改为品牌色左线；实验页 h1 用 text-wrap balance；预测选项加 ：has(input:checked) 品牌底、悬停轻移与 focus-visible 环；新增共享 --ease-out-soft 缓动；按钮悬停上浮 1px 带软阴影、按下回落；dd/td/th 启用 tabular-nums；滑块取品牌 accent-color。动效只用 transform/opacity 且在 prefers-reduced-motion 下全部关闭。
+8. **截图驱动的视觉打磨（跟进批次）**：用 Playwright 对首页和 turn-flow 做前后截图审计，发现首页四条不同底色的满宽提示块堆叠、实验页大标题把「必须」拆成两行、预测选项没有选中态反馈、按钮无悬停回应、指标表用了比例数字。全部用手写 CSS 在既有令牌上修：首页自定义块统一为一族表面加 3px 左重音线（warning 经 color-mix 保留暖色但降饱和），引用行改为品牌色左线；实验页 h1 用 text-wrap balance；预测选项加 ：has(input:checked) 品牌底、悬停轻移与 focus-visible 环；新增共享 --ease-out-soft 缓动；按钮悬停上浮 1px 带软阴影、按下回落；dd/td/th 启用 tabular-nums；滑块取品牌 accent-color。动效只用 transform/opacity 且在 prefers-reduced-motion 下全部关闭。
+9. **装饰动态化、滚动进度条与暗色审计（跟进批次）**：首页同心环以 16s 缓慢呼吸、点阵方格每 90s 旋转一圈，纯 CSS 关键帧在 prefers-reduced-motion 下关闭。页顶滚动进度条由 kit 新原语 installScrollProgress() 注入，八个链接 shell 样式表的实验页全部接入；进度映射走 CSS 的 animation-timeline: scroll() 并包在 @supports 里——不支持的浏览器渲染零宽不可见条。
 
-**第三处互链（跟进批次）**：research-debug 桥接页把说明文字里的四个出口状态名改成按钮，悬停即高亮流程带上的对应文字；tool-visibility 导语的 已注册 / 对模型可见 / 允许执行 改为可聚焦按钮，悬停或聚焦让对应指标卡闪现高亮（`.term-flash`，共享 shell 样式）。
+10. **第三处互链（跟进批次）**：research-debug 桥接页把说明文字里的四个出口状态名改成按钮，悬停即高亮流程带上的对应文字；tool-visibility 导语的 已注册 / 对模型可见 / 允许执行 改为可聚焦按钮，悬停或聚焦让对应指标卡闪现高亮（`.term-flash`，共享 shell 样式）。
 
 ## Alternatives considered
 
