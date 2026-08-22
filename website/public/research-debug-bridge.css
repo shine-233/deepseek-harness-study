@@ -1278,3 +1278,22 @@ code {
   .icon { stroke: CanvasText; }
   [data-pass="true"] .icon, [data-pass="true"].icon { stroke: CanvasText; }
 }
+
+/* 正文出口状态与流程带文字的联动高亮（共享层不进本页，样式就地声明）。 */
+.term-ref {
+  font: inherit;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--brand, #3aa2ff);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+text.flow-constant.term-flash {
+  fill: var(--brand, #3aa2ff);
+  font-weight: 700;
+}
+text.flow-constant { transition: fill var(--dur-fast, 120ms) ease; }
+@media (prefers-reduced-motion: reduce) {
+  text.flow-constant { transition: none; }
+}

@@ -327,6 +327,39 @@ function sessionReadingsQuestion(scenarioId) {
   }
 }
 
+function turnRequestCountQuestion() {
+  const scenario = TURN_SCENARIOS.find(candidate => candidate.id === 'two-tools')
+  const model = buildTurnModel({ scenario: 'two-tools' })
+  const truth = model.observations.modelRequests
+  const optionValues = [...new Set([truth, truth + 1, Math.max(1, truth - 1), truth + 2])]
+  const options = optionValues.map(value => String(value) + ' 次')
+  return {
+    id: 'gen-04-requests-two-tools',
+    q: '「' + scenario.label + '」的完整轨迹里有几次模型请求？',
+    options,
+    answer: optionValues.indexOf(truth),
+    explain: '每拿到一个工具结果都要带回模型：' + String(truth) + ' 次请求对应一次初始输入加三次工具结果回传。',
+    source: 'website/public/turn-flow-model.js 的 buildSteps（与实验页同一份数据）',
+  }
+}
+
+function sessionRefusalQuestion(scenarioId) {
+  const model = buildSessionLogModel({ scenario: scenarioId })
+  const stop = model.observations.refusedAt
+  if (stop === null || stop === undefined) return null
+  const optionValues = [...new Set([stop, stop + 1, Math.max(1, stop - 1), model.maxSequence])
+    .add(model.maxSequence + 1)]
+  const options = [...optionValues].sort((a, b) => a - b).map(value => '序号 ' + String(value))
+  return {
+    id: 'gen-05-refusal-' + scenarioId,
+    q: '重放「' + model.scenario.label + '」场景的日志时，加载会在哪里停下？',
+    options,
+    answer: [...optionValues].sort((a, b) => a - b).indexOf(stop),
+    explain: '必需事件读不懂或序号缺口都会让加载停下并报告位置；停下之前的事件已经折叠出可用的部分状态，这里停在序号 ' + String(stop) + '。',
+    source: 'website/public/session-log-model.js 的 replaySessionLog 拒绝规则',
+  }
+}
+
 /** 每课的生成题；返回新数组，调用方可以自由拼接和打乱。 */
 export function generatedQuestionsFor(lessonId) {
   const generated = []
@@ -335,11 +368,14 @@ export function generatedQuestionsFor(lessonId) {
       const question = turnLaneQuestion(stepIndex)
       if (question !== null) generated.push(question)
     }
+    generated.push(turnRequestCountQuestion())
   }
   if (lessonId === '05-Session日志与恢复') {
     for (const scenarioId of LOG_SCENARIOS.slice(0, 2).map(candidate => candidate.id)) {
       generated.push(sessionReadingsQuestion(scenarioId))
     }
+    const refusal = sessionRefusalQuestion('gap')
+    if (refusal !== null) generated.push(refusal)
   }
   return generated
 }

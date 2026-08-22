@@ -264,7 +264,7 @@ function initializePage() {
   // 焦点在页面其它地方时，← / → / Home / End 直接步进保留轮数。
   bindRangeKeys(elements.keepRecent)
   const playButton = document.querySelector('#frame-play')
-  if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.keepRecent)
+  if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.keepRecent, { stepMs: 800 })
 
   // 从状态链接恢复输入；链接缺失或损坏时保持默认输入，不报错打断阅读。
   const restored = readStateFromHash(location.hash, COMPACTION_STATE_SCHEMA)

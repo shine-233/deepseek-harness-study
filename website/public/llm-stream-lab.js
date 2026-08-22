@@ -185,7 +185,7 @@ function initializePage() {
   // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
   bindRangeKeys(elements.upto)
   const playButton = document.querySelector('#frame-play')
-  if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.upto)
+  if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.upto, { stepMs: 320 })
 
   const restored = readStateFromHash(location.hash, STREAM_STATE_SCHEMA)
   if (restored !== null && restored.ok) {

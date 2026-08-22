@@ -1061,5 +1061,18 @@ if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
+  // 正文出口状态联动：说明文字里的状态名悬停/聚焦时，流程带上对应文字高亮。
+  for (const term of document.querySelectorAll('[data-outcome]')) {
+    const target = document.querySelector('text.flow-constant[data-outcome="' + term.getAttribute('data-outcome') + '"]')
+    if (target === null) continue
+    const on = () => target.classList.add('term-flash')
+    const off = () => target.classList.remove('term-flash')
+    term.addEventListener('pointerover', on)
+    term.addEventListener('pointerleave', off)
+    term.addEventListener('focus', on)
+    term.addEventListener('blur', off)
+    term.addEventListener('click', () => target.scrollIntoView({ block: 'nearest' }))
+  }
+
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 }

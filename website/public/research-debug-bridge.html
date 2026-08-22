@@ -102,27 +102,27 @@
           </g>
           <g class="flow-exit flow-exit-complete">
             <rect x="952" y="10" width="220" height="62" rx="14"/>
-            <text class="flow-constant" x="1062" y="37" text-anchor="middle">COMPLETE</text>
+            <text class="flow-constant" data-outcome="COMPLETE" x="1062" y="37" text-anchor="middle">COMPLETE</text>
             <text class="flow-action" x="1062" y="58" text-anchor="middle">回到课程继续</text>
           </g>
           <g class="flow-exit flow-exit-partial">
             <rect x="952" y="96" width="220" height="62" rx="14"/>
-            <text class="flow-constant" x="1062" y="123" text-anchor="middle">PARTIAL</text>
+            <text class="flow-constant" data-outcome="PARTIAL" x="1062" y="123" text-anchor="middle">PARTIAL</text>
             <text class="flow-action" x="1062" y="144" text-anchor="middle">补齐缺失证据</text>
           </g>
           <g class="flow-exit flow-exit-unavailable">
             <rect x="952" y="182" width="220" height="62" rx="14"/>
-            <text class="flow-constant" x="1062" y="209" text-anchor="middle">UNAVAILABLE</text>
+            <text class="flow-constant" data-outcome="UNAVAILABLE" x="1062" y="209" text-anchor="middle">UNAVAILABLE</text>
             <text class="flow-action" x="1062" y="230" text-anchor="middle">先导出 repro</text>
           </g>
           <g class="flow-exit flow-exit-fail">
             <rect x="952" y="268" width="220" height="62" rx="14"/>
-            <text class="flow-constant" x="1062" y="295" text-anchor="middle">FAIL</text>
+            <text class="flow-constant" data-outcome="FAIL" x="1062" y="295" text-anchor="middle">FAIL</text>
             <text class="flow-action" x="1062" y="316" text-anchor="middle">检查请求或产物</text>
           </g>
         </svg>
       </div>
-      <p class="chart-note">文字替代：request.json 由课程页提出（本页 A 区生成并下载），交给你在本机运行的 Debug 工具；它只读你显式指定的脱敏输入，跑出 repro 并写出 result.json；result 回填到本页 B 区做 schema 校验。四个出口各带下一步：COMPLETE 回到课程继续；PARTIAL 补齐缺失证据；UNAVAILABLE 先导出 repro；FAIL 检查请求或产物。这张图不新增任何证据，逐项检查结果以 B 区卡片为准。</p>
+      <p class="chart-note">文字替代：request.json 由课程页提出（本页 A 区生成并下载），交给你在本机运行的 Debug 工具；它只读你显式指定的脱敏输入，跑出 repro 并写出 result.json；result 回填到本页 B 区做 schema 校验。四个出口各带下一步：<button type="button" class="term-ref" data-outcome="COMPLETE">COMPLETE</button> 回到课程继续；<button type="button" class="term-ref" data-outcome="PARTIAL">PARTIAL</button> 补齐缺失证据；<button type="button" class="term-ref" data-outcome="UNAVAILABLE">UNAVAILABLE</button> 先导出 repro；<button type="button" class="term-ref" data-outcome="FAIL">FAIL</button> 检查请求或产物。这张图不新增任何证据，逐项检查结果以 B 区卡片为准。</p>
     </section>
 
     <section class="workspace-grid" aria-label="离线桥接工作台">

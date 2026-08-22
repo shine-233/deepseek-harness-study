@@ -149,8 +149,11 @@ export function nextPlayValue(value, min, max, step = 1) {
  * 给时间轴滑块配一个播放按钮：点击在末帧之外连续逐帧推进，再点暂停；
  * 到末帧自动停；用户手动拖动（可信 input 事件）立即暂停。
  * 减少动态效果时不做连续推进，一次点击只走一帧，帧控件保持可用。
+ *
+ * @param options.stepMs 每帧间隔；按实验节奏给值——读阶段说明的页面慢些，
+ *   模拟流式到达的页面快些。不给则用 650ms 的通用值。
  */
-export function bindAutoAdvance(playButton, slider) {
+export function bindAutoAdvance(playButton, slider, { stepMs = 650 } = {}) {
   let timer = 0
   const setPlaying = playing => {
     playButton.setAttribute('aria-pressed', String(playing))
@@ -186,7 +189,7 @@ export function bindAutoAdvance(playButton, slider) {
     }
     if (endsNow) { slider.value = String(slider.min ?? 0); dispatchInput() }
     setPlaying(true)
-    timer = setInterval(() => { if (!stepOnce()) stop() }, 650)
+    timer = setInterval(() => { if (!stepOnce()) stop() }, Math.max(stepMs, 120))
   })
   slider.addEventListener('input', () => {
     if (!selfDispatch && timer !== 0) stop()
