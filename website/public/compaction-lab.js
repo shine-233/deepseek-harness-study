@@ -12,7 +12,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys } from './study-lab-kit.js'
 import {
   COMPACTION_SCENARIOS,
   buildCompactionModel,
@@ -261,6 +261,8 @@ function initializePage() {
     rebuild()
   })
   elements.keepRecent.addEventListener('input', rebuild)
+  // 焦点在页面其它地方时，← / → / Home / End 直接步进保留轮数。
+  bindRangeKeys(elements.keepRecent)
 
   // 从状态链接恢复输入；链接缺失或损坏时保持默认输入，不报错打断阅读。
   const restored = readStateFromHash(location.hash, COMPACTION_STATE_SCHEMA)

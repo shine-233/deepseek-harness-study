@@ -717,6 +717,21 @@ async function initializePage() {
   })
   tableBody.addEventListener('mouseleave', () => linker.clear())
 
+  // 正文术语联动：说明文字里的包名（data-graph-id）悬停或聚焦时，
+  // 三处视图高亮同一个包；离开就恢复。键盘可达：术语本身是按钮。
+  const termLeave = () => linker.clear()
+  for (const term of document.querySelectorAll('[data-graph-id]')) {
+    term.addEventListener('pointerover', () => linker.show(term.getAttribute('data-graph-id')))
+    term.addEventListener('pointerleave', termLeave)
+    term.addEventListener('focus', () => linker.show(term.getAttribute('data-graph-id')))
+    term.addEventListener('blur', termLeave)
+    term.addEventListener('click', () => {
+      linker.show(term.getAttribute('data-graph-id'))
+      tableBody.querySelector('tr[data-id="' + CSS.escape(term.getAttribute('data-graph-id') ?? '') + '"]')
+        ?.scrollIntoView({ block: 'nearest' })
+    })
+  }
+
   // 排序状态只在表头循环，不进 URL hash：它是阅读辅助，不是实验输入。
   // lastModel 在 fixture 载入前是 null，此时点排序直接忽略。
   let tableSort = null

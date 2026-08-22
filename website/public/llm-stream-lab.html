@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./llm-stream-lab.css">
+  <link rel="icon" href="./favicon.svg">
   <script src="./study-theme-boot.js"></script>
 </head>
 <body>
@@ -57,7 +58,7 @@
           <label>
             <span>推进到第 <output id="upto-output">0</output> 个到达</span>
             <input id="upto" type="range" min="0" max="6" step="1" value="6">
-            <small>拖回前面可以看任意前缀的装配状态；拖到末尾处理迟到增量。</small>
+            <small>拖回前面可以看任意前缀的装配状态；拖到末尾处理迟到增量。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
           </label>
           <button class="button button-primary" type="submit">重新装配</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>

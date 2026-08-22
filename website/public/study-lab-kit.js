@@ -100,6 +100,42 @@ export function prefersReducedMotion() {
 }
 
 /**
+ * 计算时间轴滑块对一个按键的下一个值；返回 null 表示这个键不由滑块处理。
+ * 纯函数，在 Node 里单独测试；DOM 接线在 bindRangeKeys。
+ */
+export function nextRangeValue(key, value, min, max, step = 1) {
+  const size = Math.max(Number(step) || 1, 0)
+  const actions = { ArrowLeft: value - size, ArrowRight: value + size, Home: min, End: max }
+  const next = actions[key]
+  if (next === undefined || !Number.isFinite(next)) return null
+  return Math.min(max, Math.max(min, next))
+}
+
+/**
+ * 焦点不在任何表单控件上时，用 ← / → 逐步、Home / End 直达首末，
+ * 驱动实验页的主时间轴滑块；滑块自己持有焦点时交给浏览器原生行为，
+ * 不做二次步进。修改通过 input 事件提交，各页面现有的重建接线照常运行。
+ * DOM 类型只在浏览器里求值：本模块会被 Node 的无 DOM 门禁导入。
+ */
+export function bindRangeKeys(slider) {
+  document.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return
+    const target = event.target
+    if (target instanceof HTMLInputElement
+      || target instanceof HTMLSelectElement
+      || target instanceof HTMLTextAreaElement
+      || target instanceof HTMLButtonElement) return
+    if (typeof target === 'object' && target !== null && target.isContentEditable === true) return
+    if (document.activeElement === slider) return
+    const next = nextRangeValue(event.key, Number(slider.value), Number(slider.min), Number(slider.max), Number(slider.step))
+    if (next === null) return
+    event.preventDefault()
+    slider.value = String(next)
+    slider.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+}
+
+/**
  * 给带 `data-icon` 的元素装上图标。
  *
  * 由标记声明用哪个图标，而不是由脚本按类名猜；这样加一个小节不用改脚本，

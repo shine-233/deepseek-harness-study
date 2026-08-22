@@ -235,6 +235,44 @@ export const QUIZ_BANK = Object.freeze({
   ]),
 })
 
+/**
+ * 稳定的 32 位种子随机数：同一颗种子永远得到同一个序列。
+ * 变体因此可以复现——把种子写进链接，别人打开的就是同一份打乱结果。
+ */
+export function mulberry32(seed) {
+  let state = seed >>> 0
+  return function next() {
+    state = (state + 0x6D2B79F5) | 0
+    let t = Math.imul(state ^ (state >>> 15), 1 | state)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+function seededShuffle(items, random) {
+  const out = [...items]
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(random() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
+/**
+ * 由种子生成一轮练习变体：题目顺序和每题的选项顺序都换，正确答案始终跟着
+ * 自己的选项文本走。题干、解释和出处原样保留；判分函数不需要任何改动。
+ */
+export function shuffleQuiz(questions, seed) {
+  const random = mulberry32(seed)
+  return Object.freeze(seededShuffle(questions, random).map(question => {
+    const correctText = question.options[question.answer]
+    const options = Object.freeze(seededShuffle(question.options, random))
+    const answer = options.indexOf(correctText)
+    if (answer < 0) throw new Error('选项文本在打乱后丢失：' + correctText)
+    return Object.freeze({ ...question, options, answer })
+  }))
+}
+
 /** 判一份答卷：answers 以题号为键，值是选项下标；返回每题对错和总分。 */
 export function gradeAnswers(questions, answers) {
   const results = questions.map(question => {

@@ -12,7 +12,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys } from './study-lab-kit.js'
 import {
   TURN_SCENARIOS,
   buildTurnModel,
@@ -236,6 +236,8 @@ function initializePage() {
     rebuild()
   })
   elements.upTo.addEventListener('input', rebuild)
+  // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
+  bindRangeKeys(elements.upTo)
 
   // 从状态链接恢复输入；链接缺失或损坏时保持默认场景，不报错打断阅读。
   const restored = readStateFromHash(location.hash, TURN_STATE_SCHEMA)

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./compaction-lab.css">
+  <link rel="icon" href="./favicon.svg">
   <script src="./study-theme-boot.js"></script>
 </head>
 <body>
@@ -67,7 +68,7 @@
           <label>
             <span>最近保留 <output id="keep-output">0</output> 轮（其余替换为摘要）</span>
             <input id="keep-recent" type="range" min="0" max="12" step="1" value="2">
-            <small>0 表示全部历史都进摘要；拉到最大等于不压缩。摘要本身也有成本，不是免费的。</small>
+            <small>0 表示全部历史都进摘要；拉到最大等于不压缩。摘要本身也有成本，不是免费的。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
           </label>
           <button class="button button-primary" type="submit">重新折叠</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>

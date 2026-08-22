@@ -262,3 +262,14 @@ th[aria-sort="descending"] button.sort-key::after { content: "▼"; font-size: 9
 @media (forced-colors: active) {
   #scene-canvas { border: 1px solid CanvasText; }
 }
+
+/* 正文术语联动：说明文字里的包名按钮，视觉上像链接但可聚焦。 */
+.term-ref {
+  font: inherit;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--vp-c-brand-1, #3aa2ff);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}

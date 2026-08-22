@@ -1,0 +1,75 @@
+/* 错题本页面样式：只补页面特有的部分，外壳与主题变量来自共享层。 */
+
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.import-label {
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: underline;
+  color: var(--vp-c-text-2, inherit);
+}
+
+.review-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.review-item {
+  border: 1px solid var(--vp-c-divider, rgba(0,0,0,.12));
+  border-radius: 12px;
+  padding: 14px 18px;
+  background: var(--vp-c-bg-soft, transparent);
+}
+
+.review-meta {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--vp-c-text-2, inherit);
+}
+
+.review-item details summary {
+  cursor: pointer;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.review-item ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+
+.review-correct {
+  color: var(--vp-c-brand-1, #1a7f37);
+  font-weight: 600;
+  list-style: none;
+  margin-left: -20px;
+}
+
+.review-item p {
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--vp-c-text-2, inherit);
+}
+
+.review-source {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-item,
+  .review-actions button {
+    transition: none;
+  }
+}

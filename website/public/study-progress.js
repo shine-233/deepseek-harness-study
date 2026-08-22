@@ -18,7 +18,16 @@ import {
   serializeProgress,
   summarize,
 } from './study-progress-core.js'
-import { QUIZ_BANK, gradeAnswers } from './study-quiz.js'
+import {
+  dueItems,
+  mergeReview,
+  parseReview,
+  recordAttempt,
+  REVIEW_STORAGE_KEY,
+  serializeReview,
+  upcomingCount,
+} from './study-review-core.js'
+import { QUIZ_BANK, gradeAnswers, shuffleQuiz } from './study-quiz.js'
 // 代码格挂载器：导入即自注册 MutationObserver，负责 js-run 围栏块的替换。
 import './study-code-cell.js'
 
@@ -26,12 +35,12 @@ const STORAGE_KEY = 'dsh-study-progress-v2'
 const WIDGET_ID = 'dsh-progress-pill'
 
 /** localStorage 在隐私模式或 file:// 下可能抛错：读写都包住，坏掉时退化为内存态。 */
-function createStorage() {
+function createStorage(storageKey) {
   let memory = null
   const available = (() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY + '.probe', '1')
-      window.localStorage.removeItem(STORAGE_KEY + '.probe')
+      window.localStorage.setItem(storageKey + '.probe', '1')
+      window.localStorage.removeItem(storageKey + '.probe')
       return true
     } catch {
       return false
@@ -41,11 +50,14 @@ function createStorage() {
     available,
     read() {
       if (!available) return memory
-      try { return window.localStorage.getItem(STORAGE_KEY) } catch { return memory }
+      try { return window.localStorage.getItem(storageKey) } catch { return memory }
     },
     write(text) {
-      if (!available) { memory = text; return }
-      try { window.localStorage.setItem(STORAGE_KEY, text) } catch { memory = text }
+      if (available) {
+        try { window.localStorage.setItem(storageKey, text); return } catch { memory = text }
+      } else {
+        memory = text
+      }
     },
   }
 }
@@ -57,6 +69,15 @@ function loadState(storage) {
 function saveState(storage, state) {
   storage.write(serializeProgress(state))
   return state
+}
+
+function loadReview(storage) {
+  return parseReview(storage.read())
+}
+
+function saveReview(storage, review) {
+  storage.write(serializeReview(review))
+  return review
 }
 
 function injectStyles() {
@@ -97,7 +118,7 @@ function injectStyles() {
   document.head.append(style)
 }
 
-function buildWidget(state, lessonId) {
+function buildWidget(state, lessonId, reviewHref, reviewLabel) {
   const summary = summarize(state)
   const pill = document.createElement('div')
   pill.id = WIDGET_ID
@@ -123,7 +144,11 @@ function buildWidget(state, lessonId) {
   importLabel.style.cursor = 'pointer'
   importLabel.style.textDecoration = 'underline'
 
-  pill.append(toggle, count, exportLink, importLabel)
+  const reviewLink = document.createElement('a')
+  reviewLink.textContent = reviewLabel
+  reviewLink.href = reviewHref
+
+  pill.append(toggle, count, exportLink, importLabel, reviewLink)
 
   const status = document.createElement('p')
   status.id = WIDGET_ID + '-status'
@@ -169,9 +194,10 @@ function wireImport(importLabel, applyImported) {
   })
 }
 
-async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore) {
-  const questions = QUIZ_BANK[lessonId]
-  if (questions === undefined || docRoot === null) return
+async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore, applyAttempt, seed) {
+  const bank = QUIZ_BANK[lessonId]
+  if (bank === undefined || docRoot === null) return
+  const questions = seed === undefined ? bank : shuffleQuiz(bank, seed)
 
   const section = document.createElement('section')
   section.className = 'dsh-quiz'
@@ -219,6 +245,7 @@ async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore) {
     }
     const verdict = gradeAnswers(questions, answers)
     verdict.results.forEach((result, index) => {
+      applyAttempt(lessonId, questions[index].id, result.pass)
       const fieldset = form.children[index]
       const feedback = fieldset.querySelector('.explain')
       feedback.hidden = false
@@ -230,6 +257,16 @@ async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore) {
       className: verdict.score === verdict.total ? 'result-pass' : '',
       textContent: `得分 ${verdict.score}/${verdict.total}。可以改选项重新判分。`,
     }))
+    const again = document.createElement('button')
+    again.type = 'button'
+    again.textContent = '再练一轮（题目与选项重新打乱）'
+    again.className = 'button'
+    again.addEventListener('click', () => {
+      section.remove()
+      void renderQuizInto(docRoot, lessonId, getState, applyQuizScore, applyAttempt,
+        Math.floor(Math.random() * 0x7FFFFFFF)).catch(() => {})
+    })
+    section.append(again)
     applyQuizScore(lessonId, verdict.score, verdict.total)
     section.scrollIntoView({ block: 'nearest' })
   })
@@ -238,20 +275,38 @@ async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore) {
   docRoot.append(section)
 }
 
+/** 站点前缀：主题在注入脚本前写进 window；直接打开 lab 页时回退到根路径。 */
+function siteBase() {
+  if (typeof window === 'undefined') return '/'
+  const baked = window.__DSH_STUDY_BASE__
+  return typeof baked === 'string' && baked.length > 0 ? baked : '/'
+}
+
 function initialize() {
   const lessonId = normalizeLessonId(location.pathname)
   if (lessonId === null) return
   const docRoot = document.querySelector('.vp-doc') ?? document.querySelector('main')
   if (docRoot === null) return
 
-  const storage = createStorage()
+  const storage = createStorage(STORAGE_KEY)
   let state = loadState(storage)
+  const reviewStorage = createStorage(REVIEW_STORAGE_KEY)
+  let reviewState = loadReview(reviewStorage)
 
   injectStyles()
-  const { pill, toggle, exportLink, importLabel, status } = buildWidget(state, lessonId)
+  const dueNow = dueItems(reviewState, new Date().toISOString()).length
+  const upcoming = upcomingCount(reviewState, new Date().toISOString())
+  const reviewLabel = '错题本' + (dueNow + upcoming > 0 ? '（' + String(dueNow + upcoming) + '）' : '')
+  const { pill, toggle, exportLink, importLabel, status } = buildWidget(
+    state,
+    lessonId,
+    siteBase() + 'study-review.html',
+    reviewLabel,
+  )
   document.body.append(pill)
 
   const persist = () => saveState(storage, state)
+  const persistReview = () => saveReview(reviewStorage, reviewState)
   toggle.addEventListener('click', () => {
     if (state.lessons[lessonId]?.done === true) {
       delete state.lessons[lessonId]
@@ -281,6 +336,13 @@ function initialize() {
   renderQuizInto(docRoot, lessonId, () => state, (id, score, total) => {
     state = recordQuiz(state, id, score, total, new Date().toISOString())
     persist()
+  }, (id, qid, pass) => {
+    reviewState = recordAttempt(reviewState, id, qid, pass, new Date().toISOString())
+    persistReview()
+    const counter = pill.querySelector('a[href$="study-review.html"]')
+    const total2 = dueItems(reviewState, new Date().toISOString()).length
+      + upcomingCount(reviewState, new Date().toISOString())
+    if (counter !== null) counter.textContent = '错题本（' + String(total2) + '）'
   }).catch(() => {
     // 自测题渲染失败不影响正文阅读和进度记录。
   })
