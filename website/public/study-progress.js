@@ -286,15 +286,19 @@ function initialize() {
 
 // VitePress 是单页应用：路由切换不会重载页面，用 MutationObserver 盯正文替换。
 // 每次进入新的课程页就先拆掉旧组件再重建，否则 pill 上还挂着上一课的 lessonId。
-let initTimer = 0
-const observer = new MutationObserver(() => {
-  clearTimeout(initTimer)
-  initTimer = setTimeout(() => {
-    document.getElementById(WIDGET_ID)?.remove()
-    if (normalizeLessonId(location.pathname) === null) return
-    initialize()
-  }, 120)
-})
+// 整个自动初始化必须待在浏览器守卫里：lab-modules-import-without-dom 门禁会在
+// Node 里导入本文件，模块顶层碰 document 会直接失败。
+if (typeof document !== 'undefined') {
+  let initTimer = 0
+  const observer = new MutationObserver(() => {
+    clearTimeout(initTimer)
+    initTimer = setTimeout(() => {
+      document.getElementById(WIDGET_ID)?.remove()
+      if (normalizeLessonId(location.pathname) === null) return
+      initialize()
+    }, 120)
+  })
 
-initialize()
-observer.observe(document.body, { childList: true, subtree: true })
+  initialize()
+  observer.observe(document.body, { childList: true, subtree: true })
+}
