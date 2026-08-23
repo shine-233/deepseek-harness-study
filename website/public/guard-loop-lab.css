@@ -1,0 +1,29 @@
+/*
+ * 循环卫生实验页的页面专用样式。其余布局来自 study-lab-shell.css。
+ */
+
+/* 每条泳道一种状态色类：颜色只编码参与方与阶段，不编码数值。
+ * 全部走 token 组合，文字一律 -ink 色阶；marks 只允许出现在圆点上。 */
+.gl-dot {
+  fill: var(--brand);
+  stroke: var(--surface-strong);
+  stroke-width: 2;
+  transition: r 120ms ease;
+}
+.gl-dot:hover { r: 11; }
+.gl-dot.is-block { fill: var(--signal); }
+.gl-dot.is-undo {
+  fill: var(--surface-strong);
+  stroke: var(--muted);
+  stroke-dasharray: 3 2;
+}
+.gl-dot.is-exec {
+  fill: var(--allow);
+}
+
+tbody tr[data-state="block"] td:nth-child(4) { font-weight: 700; }
+tbody tr[data-state="undo"] td { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-dot { transition: none; }
+}

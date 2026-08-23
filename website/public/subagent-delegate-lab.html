@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="委派边界的深度检查与子会话的回报结算：可交互的 subagent 委派实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>subagent 委派实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./subagent-delegate-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sd-main">跳到实验</a>
+  <main class="lab-shell" id="sd-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 委派与隔离</p>
+        <h1>边界不放行，子会话就不存在。</h1>
+        <p class="hero-lead">一次委派要过一道深度检查：没到上限，子 Agent 在自己的 Session 里执行任务并恰好回报一次——成功摘要或失败原因都算完整结算；到了上限，委派在边界处被拒，本轮不产生任何子工作。父子工作分泳道，隔离就是这条链的意义。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/03-核心文件精读.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./session-fork-lab.html">打开 Session fork 实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 10</span>
+        <strong>纵轴是参与方，横轴是步骤序号。</strong>
+        <p>页面不启动真实子进程或 worker；时间线来自固定教学常量。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：把「委派边界」切到「深度上限」，无论子任务的结局是什么——「子 Agent」的 Session 还会启动吗？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="spawns-anyway">
+            <span>会——边界只记一笔日志，不拦截</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="rejected-at-boundary">
+            <span>不会——委派在边界处被拒，本轮不产生任何子工作</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="spawns-silent">
+            <span>会启动，只是没有回报</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="sd-form">
+          <label>
+            <span>当前深度</span>
+            <select id="depth" name="depth">
+              <option value="within-limit">低于上限（可委派）</option>
+              <option value="beyond-limit">已达深度上限</option>
+            </select>
+            <small>深度上限来自 persona 与工具过滤的同一族设计。</small>
+          </label>
+          <label>
+            <span>子任务结局</span>
+            <select id="outcome" name="outcome">
+              <option value="report">回报成功摘要</option>
+              <option value="fail">回报失败与原因</option>
+            </select>
+            <small>失败也是一次完整结算：父对话需要知道发生了什么。</small>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
+        </form>
+        <p class="feedback" id="sd-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="委派观测值">
+          <div><dt>子是否启动</dt><dd id="metric-childran">—</dd></div>
+          <div><dt>边界结论</dt><dd id="metric-depth">—</dd></div>
+          <div><dt>回报类型</dt><dd id="metric-report">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="sd-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">有序时间线</p>
+          <h2 id="sd-title">四条泳道上的一次委派</h2>
+        </div>
+        <span class="schema-pill">步骤 × 参与方</span>
+      </div>
+      <p class="section-intro">纵轴是参与方，横轴是步骤序号。虚线圆环是边界拒绝；被接受的委派里，子的执行永远只落在自己的泳道，回报单独成格。</p>
+      <div class="plot-scroll" id="sd-plot"></div>
+      <p class="chart-note" id="sd-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>四条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验自己重推一遍时间线，再核对深度限制、泳道隔离、回报账目和确定性；它不读渲染层的任何中间量。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="sd-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="sd-table-title">完整步骤表</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">图里的每一步，这张表都逐行给出：属于哪条泳道、做了什么、结算落在谁身上。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="sd-table-caption">当前输入的全部步骤</caption>
+          <thead>
+            <tr>
+              <th scope="col">步</th>
+              <th scope="col">泳道</th>
+              <th scope="col">阶段</th>
+              <th scope="col">说明</th>
+              <th scope="col">备注</th>
+            </tr>
+          </thead>
+          <tbody id="sd-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/03-核心文件精读.html">继续读核心文件精读</a>
+    </footer>
+  </main>
+  <script type="module" src="./subagent-delegate-lab.js"></script>
+</body>
+</html>

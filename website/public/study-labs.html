@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="十一个可以动手做的确定性实验：固定输入、固定输出、自带 oracle，不联网、不调模型">
+  <meta name="description" content="十五个可以动手做的确定性实验：固定输入、固定输出、自带 oracle，不联网、不调模型">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>实验室总览：十一个能上手拆的实验</title>
+  <title>实验室总览：十五个能上手拆的实验</title>
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./study-labs.css">
@@ -19,7 +19,7 @@
     <header class="hero-panel">
       <div class="hero-copy">
         <p class="eyebrow">DSH 学习 · 实验室总览</p>
-        <h1>十一个能上手拆的实验。</h1>
+        <h1>十五个能上手拆的实验。</h1>
         <p class="hero-lead">每个实验固定输入、固定输出、自带 oracle；不联网、不调模型，结论当场可查。先按目的挑一个，做完再回配套课对答案。</p>
         <div class="hero-actions">
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
@@ -317,6 +317,100 @@
             <p class="lab-card-links">
               <a class="button button-primary" href="./hook-flow-lab.html">进实验室</a>
               <a class="lab-lesson-link" href="./study/lessons/14-官方HookBridge与兼容层.html">配套课 · Hook Bridge</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="session-fork" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <line class="lm-line" x1="10" y1="20" x2="52" y2="20"/>
+            <circle class="lm-node lm-sub-off" cx="58" cy="20" r="6"/>
+            <line class="lm-line" x1="64" y1="20" x2="104" y2="20"/>
+            <line class="lm-dash" x1="58" y1="26" x2="58" y2="40"/>
+            <line class="lm-line" x1="10" y1="48" x2="46" y2="48"/>
+            <circle class="lm-node" cx="52" cy="48" r="7"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Session fork 与修复</h3>
+            <p class="lab-card-question">工具意图入册后进程崩溃，随后又 fork——子会话继承哪些东西？恢复阶段会把那次没有结果的工具写成什么？</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">预测门控</li>
+              <li class="schema-pill">时间线单步</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./session-fork-lab.html">进实验室</a>
+              <a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · 日志与恢复</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="approval-flow" data-lesson="13-官方工具插件完整契约">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <circle class="lm-node" cx="24" cy="34" r="7"/>
+            <line class="lm-line" x1="31" y1="34" x2="49" y2="34"/>
+            <rect class="lm-box lm-accent" x="51" y="23" width="22" height="22" rx="4"/>
+            <line class="lm-line" x1="75" y1="34" x2="88" y2="34"/>
+            <circle class="lm-node lm-sub-off" cx="96" cy="34" r="7"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>审批流</h3>
+            <p class="lab-card-question">一次 ask 走过审批服务与应答者。把应答者拿走会发生什么？allow 的授权范围到底有多大？</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">预测门控</li>
+              <li class="schema-pill">退化拒绝</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./approval-flow-lab.html">进实验室</a>
+              <a class="lab-lesson-link" href="./study/lessons/13-官方工具插件完整契约.html">配套课 · 工具插件契约</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="subagent-delegate" data-lesson="03-核心文件精读">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box" x="8" y="22" width="30" height="24" rx="4"/>
+            <line class="lm-line" x1="38" y1="34" x2="54" y2="34"/>
+            <rect class="lm-box lm-accent" x="56" y="22" width="22" height="24" rx="4"/>
+            <line class="lm-line" x1="78" y1="34" x2="94" y2="34"/>
+            <circle class="lm-node" cx="102" cy="34" r="7"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>subagent 委派</h3>
+            <p class="lab-card-question">委派要过一道深度检查。到了上限，边界拦截的是任务还是整个子会话？失败回报算不算完整结算？</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">深度上限</li>
+              <li class="schema-pill">泳道隔离</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./subagent-delegate-lab.html">进实验室</a>
+              <a class="lab-lesson-link" href="./study/lessons/03-核心文件精读.html">配套课 · 核心文件精读</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="guard-loop" data-lesson="22-工具可见性与非侵入扩展">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <circle class="lm-node" cx="16" cy="34" r="7"/>
+            <line class="lm-line" x1="23" y1="34" x2="41" y2="34"/>
+            <rect class="lm-box lm-accent" x="43" y="22" width="24" height="24" rx="4"/>
+            <line class="lm-dash" x1="67" y1="34" x2="85" y2="34"/>
+            <circle class="lm-node lm-sub-off" cx="93" cy="34" r="7"/>
+            <line class="lm-line" x1="100" y1="34" x2="112" y2="34"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>循环卫生</h3>
+            <p class="lab-card-question">同一个调用被连续发出：守卫从第几次开始拦？后置结算能不能把拦截改写回已执行？执行账目还平衡吗？</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">阈值拦截</li>
+              <li class="schema-pill">单调拒绝</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./guard-loop-lab.html">进实验室</a>
+              <a class="lab-lesson-link" href="./study/lessons/22-工具可见性与非侵入扩展.html">配套课 · 工具可见性</a>
             </p>
           </div>
         </li>

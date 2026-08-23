@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="fork 的前缀继承与崩溃后的 interrupted 修复：可交互的会话日志实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Session fork 与崩溃修复实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./session-fork-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sf-main">跳到实验</a>
+  <main class="lab-shell" id="sf-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 日志与恢复</p>
+        <h1>崩溃留下的缺口，由 unknown 诚实补上。</h1>
+        <p class="hero-lead">追加式日志不怕崩溃：工具意图已经入册，结果缺失这件事本身就是可读的事实。打开 fork，子 Session 会先继承父日志的前缀——parent、seed length 和边界都被记录；恢复阶段则把没有结果的工具补成 interrupted 加 unknown，绝不假装成功。切切换开关，看三种路径各自怎么收束。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./hook-flow-lab.html">打开 Hook 瀑布实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 09</span>
+        <strong>纵轴是参与方，横轴是步骤序号。</strong>
+        <p>页面不读写真实 Session 文件；崩溃是教学标记，不是真实信号。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：「工具意图」入册后进程崩溃，随后又打开了「fork」——恢复阶段会把那次工具写成什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="marked-ok">
+            <span>标记为成功——反正没人知道当时发生了什么</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="interrupted-unknown">
+            <span>补出 interrupted，结果记为 unknown——不假装成功</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="dropped-intent">
+            <span>意图被丢弃，当作什么都没发生过</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="sf-form">
+          <label>
+            <span>崩溃点</span>
+            <select id="crash" name="crash">
+              <option value="complete">完整一轮（无崩溃）</option>
+              <option value="crash-mid-tool">崩溃：意图已入册、结果永远缺失</option>
+            </select>
+            <small>崩溃不是一条事件，它表现为「这条结果不会出现」。</small>
+          </label>
+          <label>
+            <span>fork 开关</span>
+            <select id="fork" name="fork">
+              <option value="no-fork">不 fork：只在原链路上恢复</option>
+              <option value="fork">fork：先继承父前缀再继续</option>
+            </select>
+            <small>继承记录三件事：parent、seed length 和边界。</small>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
+        </form>
+        <p class="feedback" id="sf-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="恢复观测值">
+          <div><dt>继承前缀长度</dt><dd id="metric-inherited">—</dd></div>
+          <div><dt>interrupted 修复</dt><dd id="metric-repairs">—</dd></div>
+          <div><dt>收束泳道</dt><dd id="metric-closing">—</dd></div>
+          <div><dt>幽灵成功</dt><dd id="metric-ghost">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="sf-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">有序时间线</p>
+          <h2 id="sf-title">三条泳道上的崩溃与继承</h2>
+        </div>
+        <span class="schema-pill">步骤 × 参与方</span>
+      </div>
+      <p class="section-intro">纵轴是参与方，横轴是步骤序号。虚线圆环是崩溃标记，恢复泳道的实心点是 unknown 修复，子 Session 泳道的第一步永远是前缀继承。</p>
+      <div class="plot-scroll" id="sf-plot"></div>
+      <p class="chart-note" id="sf-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>四条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验自己重推一遍时间线，再核对修复诚实度、幽灵成功禁令和前缀继承；它不读渲染层的任何中间量。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="sf-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="sf-table-title">完整步骤表</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">图里的每一步，这张表都逐行给出：属于哪条泳道、做了什么、带没带继承或修复标记。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="sf-table-caption">当前输入的全部步骤</caption>
+          <thead>
+            <tr>
+              <th scope="col">步</th>
+              <th scope="col">泳道</th>
+              <th scope="col">阶段</th>
+              <th scope="col">说明</th>
+              <th scope="col">备注</th>
+            </tr>
+          </thead>
+          <tbody id="sf-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/05-Session日志与恢复.html">继续读 Session 日志与恢复</a>
+    </footer>
+  </main>
+  <script type="module" src="./session-fork-lab.js"></script>
+</body>
+</html>

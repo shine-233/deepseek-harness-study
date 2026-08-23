@@ -1,0 +1,624 @@
+<script setup lang="ts">
+/**
+ * DSH 学习手账首页（鲸落手账方向）。
+ *
+ * 吉祥物「阿溟」：像素画风原创演绎——字符网格逐行贪婪合并成 SVG rect，
+ * shape-rendering="crispEdges" 保证像素锐利。形象致敬社区鲸鱼娘二创
+ * （原型：上善无形「溟月」、ZipZipPipe 女仆装版，CC BY-NC-SA 4.0，非商用）。
+ *
+ * 交互：分栏切换（课程 / 实验标本册 / 索引与数字）、集章卡（localStorage 持久化，
+ * 盖满触发阿溟开心表情）、左栏目录联动、戳吉祥物的彩蛋台词。
+ */
+import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import { withBase } from 'vitepress'
+
+/* ---------- 像素画阿溟 ---------- */
+
+/** 字符调色板：一个字符对应一个颜色，'.' 为透明。 */
+const PALETTE: Record<string, string> = {
+  h: '#7db8ff', // 发丝高光
+  H: '#3b79f0', // 头发主色
+  d: '#2a5cc9', // 发侧深色
+  W: '#ffffff', // 女仆发带
+  S: '#fff6ed', // 脸部
+  s: '#f5ddc4', // 手
+  E: '#22315e', // 眼睛
+  w: '#ffffff', // 眼内高光
+  B: '#ffb9c6', // 腮红
+  D: '#2f63d6', // 裙身
+  r: '#2454b8', // 裙摆暗部
+  A: '#fffdf7', // 围裙
+  C: '#f07a5a', // 领结
+  T: '#5e9bff', // 鲸鳍
+}
+
+const GRID_W = 22
+
+/** 像素画本体：每行一个字符串；渲染器把行长补齐/裁齐到 GRID_W。 */
+const SPRITE = [
+  '..........hh..........',
+  '.........hHHh.........',
+  '........HHHHHHHH......',
+  '......WWWWWWWWWWWW....',
+  '.....hHHHHHHHHHHHHh...',
+  '.TT.hHHHHHHHHHHHHh.TT.',
+  '.TT.HHHHHHHHHHHHHH.TT.',
+  '..T.HHHHHHHHHHHHHH.T..',
+  '....HHhhhhhhhhhhHH....',
+  '...dHSSSSSSSSSSSSHd...',
+  '...dSSSSSSSSSSSSSSd...',
+  '...dSwEESSSSSwEESd....',
+  '...dSEEESSSSSEEESd....',
+  '...dBBSSSSSSSSSSBBd...',
+  '....SSSSSSSSSSSSSS....',
+  '......SSSSSSSSSS......',
+  '.......AAAAAAAA.......',
+  '.....DDDCCCCCCDDD.....',
+  '..DD.DDDDAAAADDDD.DD..',
+  '..DD.DDDDAAAADDDD.DD..',
+  '..ss.DDDDAAAADDDD.ss..',
+  '....rrrrrrrrrrrrrr....',
+]
+
+interface PixelRect {
+  x: number
+  y: number
+  w: number
+  fill: string
+  eye?: boolean
+}
+
+/** 同色横向贪婪合并成 rect；眼睛格单独标记以便做眨眼动画。 */
+function rowRects(row: string, y: number): PixelRect[] {
+  const cells = row.padEnd(GRID_W, '.').slice(0, GRID_W).split('')
+  const rects: PixelRect[] = []
+  let x = 0
+  while (x < cells.length) {
+    const ch = cells[x]
+    let w = 1
+    while (x + w < cells.length && cells[x + w] === ch) w++
+    if (ch !== '.') {
+      rects.push({
+        x,
+        y,
+        w,
+        fill: PALETTE[ch] ?? '#cccccc',
+        eye: [...Array(w)].every((_, i) => cells[x + i] === 'E' || cells[x + i] === 'w'),
+      })
+    }
+    x += w
+  }
+  return rects
+}
+
+const BASE_RECTS = SPRITE.flatMap((row, y) => rowRects(row, y))
+
+/** 表情切换的嘴部覆盖块（普通嘴 / 开心嘴）。 */
+const MOUTHS: Record<'normal' | 'happy', { x: number; y: number; w: number }[]> = {
+  normal: [{ x: 10, y: 14, w: 2 }],
+  happy: [
+    { x: 8, y: 14, w: 6 },
+    { x: 9, y: 13, w: 1 },
+    { x: 14, y: 13, w: 1 },
+  ],
+}
+const MOUTH_FILL = '#c9566b'
+
+/* ---------- 状态与交互 ---------- */
+
+type ViewName = 'lessons' | 'labs' | 'index'
+
+const VIEWS: { id: ViewName; label: string }[] = [
+  { id: 'lessons', label: '课程' },
+  { id: 'labs', label: '实验标本册' },
+  { id: 'index', label: '索引与数字' },
+]
+const view = ref<ViewName>('lessons')
+
+function activate(next: ViewName): void {
+  view.value = next
+}
+function onTabKey(event: KeyboardEvent): void {
+  const index = VIEWS.findIndex((item) => item.id === view.value)
+  if (event.key === 'ArrowRight') activate(VIEWS[(index + 1) % VIEWS.length].id)
+  else if (event.key === 'ArrowLeft') activate(VIEWS[(index - 1 + VIEWS.length) % VIEWS.length].id)
+}
+
+/** 左栏目录 → 切栏并滚动到内容区。 */
+function goTo(next: ViewName): void {
+  activate(next)
+  document.getElementById('dj-sheet')?.scrollIntoView({
+    behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    block: 'start',
+  })
+}
+
+/* ---------- 集章卡 ---------- */
+
+interface StampLesson {
+  id: string
+  num: string
+  title: string
+  hint: string
+  href: string
+}
+const LESSONS: StampLesson[] = [
+  { id: 'l00', num: '00', title: '开始这里', hint: '六个词 + 心智模型', href: withBase('/study/') },
+  { id: 'l01', num: '01', title: '仓库地图', hint: '输入从哪里进来', href: withBase('/study/') },
+  { id: 'l04', num: '04', title: 'Agent 与 Turn', hint: '主链路怎么跑', href: withBase('/study/lessons/04-Agent与Turn流程') },
+  { id: 'l11', num: '11', title: '写一个合规插件', hint: '注册到卸载全程', href: withBase('/study/lessons/11-如何写一个合规插件') },
+  { id: 'l25', num: '25', title: '十五分钟任务单', hint: '第一条学习记录', href: withBase('/study/lessons/25-从首页到第一次产出的动手任务单') },
+  { id: 'l28', num: '28', title: '最小插件工作台', hint: '测试跑绿才算数', href: withBase('/study/examples/minimal-observer') },
+]
+
+const STORAGE_KEY = 'am-stamps-home'
+const stampedIds = ref<Record<string, boolean>>({})
+const hydrated = ref(false)
+
+onMounted(() => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) stampedIds.value = JSON.parse(raw) as Record<string, boolean>
+  } catch {
+    /* 忽略损坏的历史数据，按空卡处理 */
+  }
+  hydrated.value = true
+})
+
+function persist(): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stampedIds.value))
+  } catch {
+    /* 存不了就算了，章只活在本次会话 */
+  }
+}
+function toggleStamp(id: string): void {
+  if (!hydrated.value) return
+  stampedIds.value = { ...stampedIds.value, [id]: !stampedIds.value[id] }
+  persist()
+}
+function resetStamps(): void {
+  stampedIds.value = {}
+  persist()
+}
+const doneCount = computed(
+  () => LESSONS.filter((lesson) => stampedIds.value[lesson.id]).length,
+)
+const allDone = computed(() => doneCount.value === LESSONS.length)
+
+/* ---------- 阿溟台词 ---------- */
+
+const mood = ref<'normal' | 'happy'>('normal')
+const quipIndex = ref(0)
+const QUIPS = ['戳我干什么，去读书。', '印章不盖，读了白读。', '实验标本册里那头鲸，是我远房表哥。']
+const note = computed(() =>
+  allDone.value
+    ? '全读完了？鱼片，\n你比我勤快。'
+    : mood.value === 'normal' && !justPoked.value
+      ? '今天读到哪一格了？\n盖个章再走。'
+      : QUIPS[quipIndex.value % QUIPS.length],
+)
+const justPoked = ref(false)
+let moodTimer: ReturnType<typeof setTimeout> | undefined
+function poke(): void {
+  if (allDone.value) return
+  justPoked.value = true
+  quipIndex.value += 1
+  clearTimeout(moodTimer)
+  moodTimer = setTimeout(() => {
+    justPoked.value = false
+  }, 2600)
+}
+watchEffect(() => {
+  mood.value = allDone.value ? 'happy' : 'normal'
+})
+</script>
+
+<template>
+  <div class="dj-page">
+    <!-- 手账封面 -->
+    <header class="dj-cover">
+      <span class="dj-tape" aria-hidden="true"></span>
+      <span class="dj-tape dj-tape-butter" aria-hidden="true"></span>
+      <h1 class="dj-title">DSH 读源码<span>手账</span></h1>
+      <p class="dj-date">
+        <i>基线 aa6c361a · 上游 0.1.1-rc.2</i><i>社区自建 · 非官方</i><i>2026 年 8 月</i>
+      </p>
+      <p class="dj-intro">
+        不用装环境，也不用 API key。这本手账把 DSH 拆成三块：<strong>课程、实验、索引</strong>。
+        左边盖你的章，右边挑一块开始——读完一条算一条。
+      </p>
+    </header>
+
+    <div class="dj-grid">
+      <!-- 左栏便签 -->
+      <aside class="dj-side">
+        <div class="dj-mascot-card">
+          <svg
+            :data-mood="mood"
+            class="dj-mascot"
+            :viewBox="`0 0 ${GRID_W} ${SPRITE.length}`"
+            shape-rendering="crispEdges"
+            role="img"
+            aria-label="吉祥物阿溟：像素画风鲸鱼娘"
+            @click="poke"
+          >
+            <g v-for="rect in BASE_RECTS" :key="`p${rect.x}-${rect.y}`">
+              <rect :class="{ 'dj-eye': rect.eye }" :x="rect.x" :y="rect.y" width="1" height="1" :fill="rect.fill" />
+            </g>
+            <g fill="#5e9bff">
+              <rect x="19" y="15" width="2" height="1" />
+              <rect x="20" y="16" width="2" height="1" />
+              <rect x="21" y="17" width="1" height="2" />
+            </g>
+            <g :fill="MOUTH_FILL">
+              <rect
+                v-for="(part, i) in MOUTHS[mood]"
+                :key="`m${i}`"
+                :x="part.x"
+                :y="part.y"
+                :width="part.w"
+                height="1"
+              />
+            </g>
+          </svg>
+          <p class="dj-mascot-note">{{ note }}</p>
+        </div>
+
+        <div class="dj-stamp-card">
+          <h3>
+            <span>集章卡 · 已收 <b>{{ doneCount }}</b>/{{ LESSONS.length }} 枚</span>
+            <button type="button" class="dj-reset" @click="resetStamps">撕掉重盖</button>
+          </h3>
+          <ul class="dj-stamp-list">
+            <li
+              v-for="lesson in LESSONS"
+              :key="lesson.id"
+              :class="{ 'dj-done': stampedIds[lesson.id] }"
+            >
+              <button
+                type="button"
+                class="dj-stamp-btn"
+                :class="{ 'dj-on': stampedIds[lesson.id] }"
+                :aria-pressed="String(Boolean(stampedIds[lesson.id]))"
+                @click="toggleStamp(lesson.id)"
+              >
+                {{ stampedIds[lesson.id] ? '已读' : lesson.num }}
+              </button>
+              <span class="dj-stamp-label">
+                <a :href="lesson.href">{{ lesson.title }}</a>
+                <small>{{ lesson.hint }}</small>
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <nav class="dj-toc" aria-label="翻到哪页了">
+          <h3>翻到哪页了</h3>
+          <button
+            v-for="item in VIEWS"
+            :key="item.id"
+            type="button"
+            :aria-current="view === item.id ? 'true' : undefined"
+            @click="goTo(item.id)"
+          >
+            {{ item.label }}
+          </button>
+        </nav>
+      </aside>
+
+      <!-- 右侧正文 -->
+      <main class="dj-main">
+        <div class="dj-tabs" role="tablist" aria-label="手账分栏" @keydown="onTabKey">
+          <button
+            v-for="item in VIEWS"
+            :id="`dj-tab-${item.id}`"
+            :key="item.id"
+            type="button"
+            role="tab"
+            :aria-selected="String(view === item.id)"
+            :tabindex="view === item.id ? 0 : -1"
+            :aria-controls="`dj-view-${item.id}`"
+            @click="activate(item.id)"
+          >
+            {{ item.label }}
+          </button>
+        </div>
+
+        <section v-show="view === 'lessons'" id="dj-view-lessons" role="tabpanel" aria-labelledby="dj-tab-lessons" class="dj-sheet">
+          <article class="dj-entry dj-entry-first">
+            <span class="dj-start-badge">从这里开始</span>
+            <span class="dj-no">壹</span><h3>我第一次来</h3>
+            <p>
+              先认六个词：<strong>插件、服务、事件、Profile、Bundle、Turn</strong>。
+              只读网页，什么都不装，读完你就能画出仓库的地图。
+            </p>
+            <p class="dj-note">六个词读完，第一课就算过了，别贪多。</p>
+            <a :href="withBase('/study/')">打开第一课 →</a>
+          </article>
+          <article class="dj-entry">
+            <span class="dj-no">贰</span><h3>照着任务单走</h3>
+            <p>
+              不想做选择题就抄作业：15 分钟任务单按顺序点开页面，最后<strong>写下第一条带源码证据的学习记录</strong>
+              ——看过哪个文件、看到了什么、还没证明什么。
+            </p>
+            <p class="dj-note">记录要落到具体文件上哦，「大概看懂了」不算数。</p>
+            <a :href="withBase('/study/lessons/25-从首页到第一次产出的动手任务单')">开始任务单 →</a>
+          </article>
+          <article class="dj-entry">
+            <span class="dj-no">叁</span><h3>想动手写插件</h3>
+            <p>
+              先跑<strong>最小示例的单元测试和 lint</strong>。示例跑绿只证明示例没坏；
+              真实 DSH 的运行证据另算，教材里两种账分开记。
+            </p>
+            <p class="dj-note">没跑过就写「已验证」……阿溟会顺着网线来找你的。</p>
+            <a :href="withBase('/study/examples/minimal-observer')">查看最小示例 →</a>
+          </article>
+
+          <div class="dj-course-map">
+            <h4>整本手账的目录</h4>
+            <div class="dj-stage-grid">
+              <div class="dj-stage">
+                <b>① 认识 DSH</b>
+                <p><a :href="withBase('/study/')">00 开始这里</a> · 01 仓库地图 · 02 Cordis 与插件树 · 25 动手任务单 · 27 工具预算决策卡</p>
+              </div>
+              <div class="dj-stage">
+                <b>② 主链路精读</b>
+                <p>03 核心文件精读 · 04 Agent 与 Turn · 05 Session 日志与恢复 · 06 LLM 与工具执行 · 07 Host/Client 与发布</p>
+              </div>
+              <div class="dj-stage">
+                <b>③ 插件与生态</b>
+                <p>10 扩展边界 · <a :href="withBase('/study/lessons/11-如何写一个合规插件')">11 写一个合规插件</a> · 13 工具插件契约 · 15 Bundle / Profile / Loader · 22 工具可见性 · 28 最小插件工作台</p>
+              </div>
+              <div class="dj-stage">
+                <b>④ 实验与治理</b>
+                <p>16 学习工作簿 · 19 测试卸载证据 · 29 质量检查与审阅 · 33 可视化实验协议 · 34 作者的判断与理由</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section v-show="view === 'labs'" id="dj-view-labs" role="tabpanel" aria-labelledby="dj-tab-labs" class="dj-sheet">
+          <div class="dj-lab-grid">
+            <a class="dj-lab-chip" :href="withBase('/turn-flow-lab.html')"><b><i>其一</i>Turn 流程与日志</b><span>步进滑杆停在任意一步，看一次输入怎样走到 Session 日志</span></a>
+            <a class="dj-lab-chip" :href="withBase('/package-graph-lab.html')"><b><i>其二</i>包依赖图</b><span>227 个包、50 个组的依赖形状，含可选 3D 场景</span></a>
+            <a class="dj-lab-chip" :href="withBase('/profile-loader-lab.html')"><b><i>其三</i>Profile 解析顺序</b><span>声明顺序怎样决定最终装配出的配置</span></a>
+            <a class="dj-lab-chip" :href="withBase('/session-log-lab.html')"><b><i>其四</i>Session 日志重放</b><span>模型可见内容为什么必须能从事件日志重建</span></a>
+            <a class="dj-lab-chip" :href="withBase('/llm-stream-lab.html')"><b><i>其五</i>LLM 流式拼装</b><span>finish 之后迟到的重复块，为什么必须丢弃</span></a>
+            <a class="dj-lab-chip" :href="withBase('/tool-visibility-lab.html')"><b><i>其六</i>工具可见性三层</b><span>已注册、模型可见、执行允许，是三件事</span></a>
+            <a class="dj-lab-chip" :href="withBase('/code-mode-evidence-lab.html')"><b><i>其七</i>Code Mode 权限管线</b><span>子调用为什么仍要经过完整权限管线</span></a>
+            <a class="dj-lab-chip" :href="withBase('/compaction-lab.html')"><b><i>其八</i>上下文压缩</b><span>压缩前后各保留什么、丢什么，oracle 怎样核对</span></a>
+            <a class="dj-lab-chip" :href="withBase('/plugin-flow-lab.html')"><b><i>其九</i>插件订阅与日志</b><span>订阅、策略拒绝和卸载怎样影响观察插件</span></a>
+            <a class="dj-lab-chip" :href="withBase('/research-debug-bridge.html')"><b><i>其十</i>研究 ↔ Debug 桥</b><span>课程网站与 Debug 工具怎样用显式文件交接</span></a>
+            <a class="dj-lab-chip" :href="withBase('/hook-flow-lab.html')"><b><i>其十一</i>Hook 瀑布短路</b><span>不调用 next 就短路，兜底和结果作者跟着变</span></a>
+            <a class="dj-lab-chip" :href="withBase('/approval-flow-lab.html')"><b><i>其十二</i>审批流</b><span>没有应答者时，询问怎样退化为拒绝</span></a>
+            <a class="dj-lab-chip" :href="withBase('/session-fork-lab.html')"><b><i>其十三</i>Session fork 与修复</b><span>前缀继承与 interrupted 的 unknown 修复</span></a>
+            <a class="dj-lab-chip" :href="withBase('/subagent-delegate-lab.html')"><b><i>其十四</i>subagent 委派</b><span>深度上限在边界拦截；回报是完整结算</span></a>
+            <a class="dj-lab-chip" :href="withBase('/guard-loop-lab.html')"><b><i>其十五</i>循环卫生</b><span>阈值拦截与单调拒绝，执行账目始终平衡</span></a>
+          </div>
+          <p class="dj-lab-hint">全部离线可复现：固定输入、固定输出、独立 oracle。做完记得回来盖第贰格的章。</p>
+        </section>
+
+        <section v-show="view === 'index'" id="dj-view-index" role="tabpanel" aria-labelledby="dj-tab-index" class="dj-sheet">
+          <div class="dj-polaroid-row">
+            <figure class="dj-polaroid">
+              <div class="dj-photo"><b>108</b></div>
+              <figcaption>页中文教材</figcaption>
+            </figure>
+            <figure class="j-polaroid">
+              <div class="dj-photo"><b>2973</b></div>
+              <figcaption>个逐文件导读卡</figcaption>
+            </figure>
+            <figure class="dj-polaroid">
+              <div class="dj-photo"><b>15</b></div>
+              <figcaption>个离线实验</figcaption>
+            </figure>
+          </div>
+          <div class="dj-memo">
+            <b>丑话备忘：</b>页面打得开、链接点得通，只说明教材完整。真实模型调用、插件卸载、provider 延迟是另外几种证据，
+            实验里分开交代。这页贴在最前面，防止有人把「读了」写成「验证了」。
+          </div>
+          <div class="dj-feedback">
+            <h4>发现手账有错？按类型递条子</h4>
+            <div class="dj-note-row">
+              <a class="dj-sticky" href="https://github.com/shine-233/deepseek-harness-study/issues/new?template=doc-fact-error.yml" target="_blank" rel="noopener">
+                <b>文档事实错误</b><i>结论和源码对不上时用这张</i>
+              </a>
+              <a class="dj-sticky" href="https://github.com/shine-233/deepseek-harness-study/issues/new?template=tutorial-reproduction.yml" target="_blank" rel="noopener">
+                <b>教程无法复现</b><i>照着做卡住时用这张</i>
+              </a>
+              <a class="dj-sticky" href="https://github.com/shine-233/deepseek-harness-study/issues/new?template=broken-link.yml" target="_blank" rel="noopener">
+                <b>链接或页面问题</b><i>点了没反应、404 时用这张</i>
+              </a>
+              <a class="dj-sticky" href="https://github.com/shine-233/deepseek-harness-study/issues/new?template=community-audit.yml" target="_blank" rel="noopener">
+                <b>社区扩展审计</b><i>插件风险线索用这张</i>
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="dj-footer">
+      形象致敬社区的 DeepSeek 鲸鱼娘二创——原型：上善无形「溟月」、ZipZipPipe 女仆装版（CC BY-NC-SA 4.0，非商用）。
+      本站吉祥物为原创演绎，与 DeepSeek AI 无关。
+    </footer>
+  </div>
+</template>
+
+<style scoped>
+.dj-page{
+  --paper:#faf6ee; --card:#fffdf7;
+  --ink:#22364f; --ink-soft:#5a6e85; --line:#e3d9c4;
+  --red:#c94f3d; --blue-ink:#2b5aa6;
+  --tape-mint:#bfe8d9; --tape-butter:#ffe9a8; --tape-coral:#ffc4b8; --tape-sky:#bbd9ff;
+
+  font-family:'Noto Serif SC',Georgia,'Microsoft YaHei',serif;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:radial-gradient(#ddd2bd 1.1px,transparent 1.1px);
+  background-size:24px 24px;
+  margin:-24px -24px 0; padding:22px clamp(16px,4vw,36px) 0;
+  min-height:100vh;
+}
+.dj-cover{position:relative;background:var(--card);border:1px solid var(--line);border-radius:6px;
+  padding:30px 32px 24px;box-shadow:4px 5px 0 rgba(43,90,166,.08);max-width:1080px;margin:0 auto;}
+.dj-tape{position:absolute;width:96px;height:27px;top:-13px;left:38px;background:var(--tape-mint);
+  opacity:.85;transform:rotate(-3deg);box-shadow:0 1px 3px rgba(34,54,79,.15);}
+.dj-tape-butter{left:auto;right:44px;background:var(--tape-butter);transform:rotate(2.5deg);}
+.dj-title{font-family:'Ma Shan Zheng','Noto Serif SC',serif;font-weight:400;font-size:clamp(32px,4.4vw,44px);
+  line-height:1.35;border:none;padding:0;margin:0;}
+.dj-title span{color:var(--blue-ink);}
+.dj-date{font-family:'Noto Sans SC';font-size:12.5px;color:var(--ink-soft);margin:6px 0 10px;display:flex;gap:12px;flex-wrap:wrap;padding:0;}
+.dj-date i{font-style:normal;border:1px solid var(--line);border-radius:4px;padding:1px 8px;background:#fdfaf2;}
+.dj-intro{font-size:15.5px;color:var(--ink-soft);max-width:38em;margin:0;}
+.dj-intro strong{color:var(--ink);}
+
+.dj-grid{display:grid;grid-template-columns:280px 1fr;gap:36px;align-items:start;max-width:1080px;margin:26px auto 0;}
+
+.dj-side{display:flex;flex-direction:column;gap:20px;position:sticky;top:70px;}
+.dj-mascot-card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px 14px 12px;
+  position:relative;transform:rotate(-1.6deg);box-shadow:3px 4px 0 rgba(43,90,166,.10);transition:.25s;text-align:center;}
+.dj-mascot-card:hover{transform:rotate(0);}
+.dj-mascot{width:150px;height:auto;display:block;margin:0 auto;cursor:pointer;
+  image-rendering:pixelated;animation:dj-float 3.4s steps(2,end) infinite alternate;}
+@keyframes dj-float{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+.dj-eye{animation:dj-blink 4.6s steps(1,end) infinite;}
+@keyframes dj-blink{0%,91%{opacity:1}94%{opacity:.12}97%,100%{opacity:1}}
+.dj-mascot[data-mood='happy']{animation-duration:2.4s;}
+.dj-mascot-note{font-family:'Ma Shan Zheng',cursive;font-size:17px;color:var(--blue-ink);line-height:1.6;margin-top:8px;white-space:pre-line;}
+
+.dj-stamp-card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:20px 18px 14px;
+  box-shadow:3px 4px 0 rgba(201,79,61,.08);}
+.dj-stamp-card h3{font-family:'Ma Shan Zheng',cursive;font-weight:400;font-size:19px;
+  border-bottom:2px dashed var(--line);padding-bottom:8px;margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:center;letter-spacing:.02em;}
+.dj-stamp-card b{color:var(--red);font-weight:400;}
+.dj-reset{font-family:'Noto Sans SC';font-size:11px;color:#9aa8b6;background:none;border:none;
+  cursor:pointer;text-decoration:underline dotted;transition:.15s;}
+.dj-reset:hover{color:var(--red);}
+.dj-stamp-list{list-style:none;padding:0;margin:0;}
+.dj-stamp-list li{display:flex;align-items:center;gap:12px;padding:6px 0;}
+.dj-stamp-btn{flex:0 0 46px;width:46px;height:46px;border-radius:50%;cursor:pointer;
+  border:2px dashed #cdbfa4;background:none;color:#b3a587;
+  font-family:'Noto Sans SC';font-size:13px;font-weight:700;transition:.18s;}
+.dj-stamp-btn:hover{border-color:var(--red);color:var(--red);transform:scale(1.06);}
+.dj-stamp-btn.dj-on{border:2.5px solid var(--red);background:rgba(201,79,61,.07);color:var(--red);
+  transform:rotate(-12deg);animation:dj-stamp-in .22s ease-out;font-size:12.5px;}
+@keyframes dj-stamp-in{from{transform:scale(1.9) rotate(8deg);opacity:0}to{transform:scale(1) rotate(-12deg);opacity:1}}
+.dj-stamp-label{font-size:15px;line-height:1.5;}
+.dj-stamp-label a{color:inherit;text-decoration:none;border-bottom:1.5px solid transparent;transition:.15s;}
+.dj-stamp-label a:hover{color:var(--blue-ink);border-color:var(--tape-sky);}
+.dj-stamp-label small{display:block;font-size:12px;color:var(--ink-soft);}
+li.dj-done .dj-stamp-label{text-decoration:line-through solid rgba(90,110,133,.55);}
+
+.dj-toc{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;}
+.dj-toc h3{font-family:'Ma Shan Zheng',cursive;font-weight:400;font-size:17px;margin-bottom:6px;}
+.dj-toc button{display:block;width:100%;background:none;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:14.5px;color:var(--ink-soft);
+  padding:5px 2px;border-bottom:1px dashed var(--line);transition:.15s;text-align:left;}
+.dj-toc button:last-child{border-bottom:none;}
+.dj-toc button::before{content:'› ';color:var(--tape-coral);font-weight:700;}
+.dj-toc button:hover,.dj-toc button[aria-current='true']{color:var(--blue-ink);padding-left:8px;}
+
+.dj-tabs{display:flex;gap:6px;margin:0 0 -1px;padding-left:10px;position:relative;z-index:2;}
+.dj-tabs button{font-family:'Noto Serif SC',serif;font-size:14.5px;font-weight:600;color:var(--ink-soft);
+  background:var(--tape-sky);border:none;cursor:pointer;padding:8px 26px 9px;
+  transform:rotate(-1.2deg) translateY(3px);box-shadow:0 1px 3px rgba(34,54,79,.14);
+  transition:.18s;opacity:.72;}
+.dj-tabs button:nth-child(2){background:var(--tape-butter);transform:rotate(.8deg) translateY(3px);}
+.dj-tabs button:nth-child(3){background:var(--tape-coral);transform:rotate(-.6deg) translateY(3px);}
+.dj-tabs button[aria-selected='true']{opacity:1;transform:rotate(0) translateY(0);
+  outline:2px solid rgba(255,255,255,.65);outline-offset:-4px;}
+
+.dj-sheet{background:var(--card);border:1px solid var(--line);border-radius:6px;
+  box-shadow:4px 5px 0 rgba(43,90,166,.08);padding:28px 30px;min-height:420px;}
+.dj-sheet{animation:dj-fade-up .22s ease-out;}
+.dj-main{min-width:0;}
+@keyframes dj-fade-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.dj-entry{position:relative;border:1.5px solid var(--line);border-radius:6px;background:#fefcf6;
+  padding:20px 22px 16px;margin-bottom:20px;transform:rotate(-.5deg);transition:.2s;}
+.dj-entry:nth-of-type(2n){transform:rotate(.55deg);}
+.dj-entry:hover{transform:rotate(0);box-shadow:3px 4px 0 rgba(43,90,166,.09);}
+.dj-entry-first{border-color:#d8b98a;}
+.dj-start-badge{position:absolute;top:-11px;right:18px;background:var(--tape-butter);
+  font-family:'Ma Shan Zheng',cursive;font-size:14px;color:#8a6a2f;padding:2px 12px;transform:rotate(2deg);}
+.dj-no{font-family:'Ma Shan Zheng',cursive;font-size:26px;color:var(--blue-ink);margin-right:10px;}
+.dj-entry h3{display:inline;font-size:18px;font-weight:700;border:none;padding:0;margin:0;}
+.dj-entry p{font-size:14.5px;color:var(--ink-soft);margin:8px 0 4px;line-height:1.9;}
+.dj-entry p strong{color:var(--ink);}
+.dj-note{font-family:'Ma Shan Zheng',cursive;font-size:16.5px;color:var(--red);margin-top:6px;}
+.dj-note::before{content:'↳ ';color:var(--ink-soft);}
+.dj-entry a:not([class]){font-family:'Noto Sans SC';display:inline-block;margin-top:6px;font-size:13.5px;
+  font-weight:700;color:var(--blue-ink);text-decoration:none;
+  border-bottom:2px solid var(--tape-sky);transition:.18s;}
+.dj-entry a:not([class]):hover{border-color:var(--blue-ink);}
+
+.dj-course-map{margin-top:28px;border-top:2px dashed var(--line);padding-top:20px;}
+.dj-course-map h4{font-family:'Ma Shan Zheng',cursive;font-weight:400;font-size:20px;margin-bottom:12px;}
+.dj-stage-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dj-stage{border:1.5px solid var(--line);border-radius:6px;padding:12px 14px;background:#fefcf6;}
+.dj-stage b{font-size:14.5px;display:block;margin-bottom:4px;}
+.dj-stage p{font-family:'Noto Sans SC';font-size:12.5px;color:var(--ink-soft);line-height:1.8;margin:0;}
+.dj-stage a{color:var(--blue-ink);text-decoration:none;border-bottom:1.5px solid var(--tape-sky);}
+.dj-stage a:hover{border-color:var(--blue-ink);}
+
+.dj-lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.dj-lab-chip{border:1.5px solid var(--line);border-radius:6px;background:#fefcf6;
+  padding:13px 16px;text-decoration:none;color:inherit;transition:.2s;display:block;}
+.dj-lab-chip:hover{box-shadow:3px 4px 0 rgba(201,79,61,.10);transform:translateY(-2px);}
+.dj-lab-chip b{font-size:15px;display:block;}
+.dj-lab-chip b i{font-style:normal;font-family:'Ma Shan Zheng',cursive;color:var(--red);margin-right:7px;font-weight:400;}
+.dj-lab-chip span{font-size:12.5px;color:var(--ink-soft);display:block;margin-top:3px;line-height:1.65;}
+.dj-lab-hint{font-family:'Ma Shan Zheng',cursive;font-size:17px;color:var(--blue-ink);margin-top:18px;}
+
+.dj-polaroid-row{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:26px;}
+.dj-polaroid{background:#fff;border:1px solid var(--line);padding:12px 12px 10px;
+  box-shadow:3px 5px 10px rgba(34,54,79,.12);width:172px;text-align:center;
+  transform:rotate(-2deg);transition:.2s;}
+.dj-polaroid:nth-child(2){transform:rotate(1.4deg);}
+.dj-polaroid:nth-child(3){transform:rotate(-.8deg);}
+.dj-polaroid:hover{transform:rotate(0) scale(1.03);}
+.dj-photo{height:104px;border:1px solid #eef0f2;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(circle at 68% 30%,#ffe9c9 0 26%,transparent 27%),
+    linear-gradient(160deg,#dff0ff,#bcdcff 62%,#9fc8f2);}
+.dj-photo b{font-size:34px;font-weight:700;color:#1d4477;}
+.dj-polaroid figcaption{font-family:'Ma Shan Zheng',cursive;font-size:16px;color:var(--ink-soft);margin-top:8px;}
+.dj-memo{position:relative;border:1px solid #ecd9b0;background:#fff9ec;padding:18px 22px;
+  font-size:14px;color:#6b543a;transform:rotate(-.7deg);line-height:1.95;}
+.dj-memo::before{content:'';position:absolute;top:-12px;left:50%;margin-left:-45px;width:90px;height:24px;
+  background:var(--tape-butter);opacity:.9;transform:rotate(-2deg);}
+.dj-memo b{color:var(--red);}
+
+.dj-feedback{margin-top:30px;}
+.dj-feedback h4{font-family:'Ma Shan Zheng',cursive;font-weight:400;font-size:20px;margin-bottom:12px;}
+.dj-note-row{display:flex;gap:14px;flex-wrap:wrap;}
+.dj-sticky{display:block;flex:1 1 180px;max-width:240px;text-decoration:none;color:#5a4a35;
+  background:#fff9d6;border:1px solid #ecd98a;padding:14px 16px 12px;
+  transform:rotate(-1.4deg);transition:.2s;line-height:1.7;}
+.dj-sticky:nth-child(2){background:#e8f6ef;border-color:#bfe0cd;transform:rotate(.9deg);}
+.dj-sticky:nth-child(3){background:#fdeae6;border-color:#f0c0b6;transform:rotate(-.7deg);}
+.dj-sticky:nth-child(4){background:#e9f1fd;border-color:#bcd2f0;transform:rotate(1.2deg);}
+.dj-sticky:hover{transform:rotate(0) translateY(-3px);}
+.dj-sticky b{font-size:14.5px;display:block;color:var(--ink);}
+.dj-sticky i{font-style:normal;font-size:12px;display:block;margin-top:4px;color:#8a7a5a;}
+
+.dj-footer{max-width:1080px;margin:40px auto 0;padding:24px 4px 40px;border-top:2px dashed var(--line);
+  font-family:'Noto Sans SC';text-align:center;font-size:12.5px;color:#93a1ad;line-height:2;}
+
+@media (prefers-reduced-motion:reduce){
+  .dj-mascot,.dj-eye{animation:none;}
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important;}
+}
+@media (max-width:880px){
+  .dj-grid{grid-template-columns:1fr;}
+  .dj-side{position:static;flex-direction:row;flex-wrap:wrap;}
+  .dj-mascot-card,.dj-stamp-card,.dj-toc{flex:1 1 250px;}
+  .dj-lab-grid,.dj-stage-grid{grid-template-columns:1fr;}
+  .dj-sheet{padding:22px 18px;}
+  .dj-page{margin:-24px -16px 0;padding-left:16px;padding-right:16px;}
+}
+:focus-visible{outline:3px solid var(--blue-ink);outline-offset:2px;border-radius:4px;}
+</style>

@@ -15,7 +15,7 @@
  */
 
 /** 已知实验页名单：最后一段形如 <id>-lab 的页面按 'lab:<id>' 计入进度。 */
-export const LAB_PAGE_IDS = ['turn-flow', 'package-graph', 'profile-loader', 'session-log', 'tool-visibility', 'code-mode-evidence', 'compaction', 'plugin-flow', 'llm-stream', 'hook-flow']
+export const LAB_PAGE_IDS = ['turn-flow', 'package-graph', 'profile-loader', 'session-log', 'tool-visibility', 'code-mode-evidence', 'compaction', 'plugin-flow', 'llm-stream', 'hook-flow', 'approval-flow', 'session-fork', 'subagent-delegate', 'guard-loop']
 
 export const PROGRESS_VERSION = 2
 

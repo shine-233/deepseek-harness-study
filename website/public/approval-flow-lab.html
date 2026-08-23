@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="ask 的完整生命周期与无应答者的退化拒绝：可交互的审批流实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>审批流实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./approval-flow-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#af-main">跳到实验</a>
+  <main class="lab-shell" id="af-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 审批与权限</p>
+        <h1>没人能批准的时候，批准通道自己变成拒绝。</h1>
+        <p class="hero-lead">一次 ask 要经过三层：工具主体发起请求，审批服务路由给应答者，人给出这一次的裁决。把应答者拿走会发生什么？规则只有一句——询问退化为拒绝，工具主体不运行。切切换开关，看 allow 的一次性语义和统一的结果分类。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./hook-flow-lab.html">打开 Hook 瀑布实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 08</span>
+        <strong>纵轴是参与方，横轴是步骤序号。</strong>
+        <p>页面不连接宿主，不弹出真实审批；时间线来自固定教学常量。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：把「应答者」切到「无」，无论裁决选什么——「工具主体」还会运行吗？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="runs-anyway">
+            <span>会——审批只是形式，「工具主体」照常执行</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="fail-closed">
+            <span>不会——询问退化为拒绝，「工具主体」不运行</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="hangs">
+            <span>会一直等待，直到有应答者出现</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="af-form">
+          <label>
+            <span>应答者</span>
+            <select id="responder" name="responder">
+              <option value="ui-answerer">已注册的应答者（界面）</option>
+              <option value="none">无——没有可用的 approval service 或 answerer</option>
+            </select>
+            <small>这一项决定整条链的命运：缺席即拒绝。</small>
+          </label>
+          <label>
+            <span>用户裁决</span>
+            <select id="decision" name="decision">
+              <option value="allow">允许（仅这一次）</option>
+              <option value="deny">拒绝</option>
+            </select>
+            <small>裁决只在有应答者时生效；它不产生任何持久授权。</small>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
+        </form>
+        <p class="feedback" id="af-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="审批观测值">
+          <div><dt>主体是否运行</dt><dd id="metric-ran">—</dd></div>
+          <div><dt>执行次数</dt><dd id="metric-runs">—</dd></div>
+          <div><dt>最终结局</dt><dd id="metric-outcome">—</dd></div>
+          <div><dt>应答者泳道</dt><dd id="metric-lane">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="af-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">有序时间线</p>
+          <h2 id="af-title">四条泳道上的一次 ask</h2>
+        </div>
+        <span class="schema-pill">步骤 × 参与方</span>
+      </div>
+      <p class="section-intro">纵轴是参与方，横轴是步骤序号。裁决点落在应答者泳道；最后一格写在结果上，注明主体是否运行、以哪种分类收束。</p>
+      <div class="plot-scroll" id="af-plot"></div>
+      <p class="chart-note" id="af-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>四条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验自己重推一遍时间线，再核对退化拒绝、allow 的一次性、拒绝不执行和确定性；它不读渲染层的任何中间量。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="af-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="af-table-title">完整步骤表</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">图里的每一步，这张表都逐行给出：属于哪条泳道、做了什么、主体是否因此运行。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="af-table-caption">当前输入的全部步骤</caption>
+          <thead>
+            <tr>
+              <th scope="col">步</th>
+              <th scope="col">泳道</th>
+              <th scope="col">阶段</th>
+              <th scope="col">说明</th>
+              <th scope="col">主体运行</th>
+            </tr>
+          </thead>
+          <tbody id="af-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/13-官方工具插件完整契约.html">继续读官方工具插件完整契约</a>
+    </footer>
+  </main>
+  <script type="module" src="./approval-flow-lab.js"></script>
+</body>
+</html>

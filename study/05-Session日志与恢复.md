@@ -75,6 +75,20 @@
 - **修复**：如果进程在工具或 Turn 中间崩溃，恢复阶段可以根据日志中的未闭合事实补出 interrupted 状态；这不等于假装工具成功。
 - **版本**：`SESSION_FORMAT_VERSION` 保护磁盘格式。读取器不能因为“能解析 JSON”就默默忽略会影响重建的字段。
 
+下面的组件把这三条规则做成可以亲手触发的实验：切崩溃点、开关 fork，看子会话继承哪段前缀、恢复阶段怎样把没有结果的工具补成 interrupted 加 unknown。
+
+<LessonWidget
+  id="session-fork-lab"
+  url="/session-fork-lab.html"
+  title="Session fork 与崩溃修复实验"
+  :height="880"
+  fallback-href="#亲手把状态从日志折叠出来"
+>
+
+时间线是固定教学模型：三种路径（完整一轮、崩溃后仅恢复、崩溃后恢复再 fork）、一份确定性步骤表。它不读写真实 Session 文件，也不模拟真实进程信号；不打开组件也能继续读本节清单得到同样结论。
+
+</LessonWidget>
+
 ## 相关源码和测试
 
 推荐顺序是 `packages/core/session/src/types.ts`、`packages/core/session/src/index.ts`、`packages/core/session/src/preparation.ts`、`packages/core/session/src/surface.ts`，然后读：

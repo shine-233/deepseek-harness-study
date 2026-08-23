@@ -1,0 +1,33 @@
+/*
+ * subagent 委派实验页的页面专用样式。其余布局来自 study-lab-shell.css。
+ */
+
+/* 每条泳道一种状态色类：颜色只编码参与方与阶段，不编码数值。
+ * 全部走 token 组合，文字一律 -ink 色阶；marks 只允许出现在圆点上。 */
+.sd-dot {
+  fill: var(--brand);
+  stroke: var(--surface-strong);
+  stroke-width: 2;
+  transition: r 120ms ease;
+}
+.sd-dot:hover { r: 11; }
+.sd-dot.is-reject {
+  fill: var(--surface-strong);
+  stroke: var(--muted);
+  stroke-dasharray: 3 2;
+}
+.sd-dot.is-accept { fill: var(--signal); }
+.sd-dot.is-run {
+  fill: var(--allow);
+}
+.sd-dot.is-final {
+  fill: var(--signal);
+  stroke: var(--line-strong);
+}
+
+tbody tr[data-state="skip"] td:nth-child(5) { color: var(--muted); }
+tbody tr[data-state="final"] td { font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sd-dot { transition: none; }
+}
