@@ -10,13 +10,13 @@ import {
   REQUIRED_PUBLISHED_PAGES,
 } from './verify-built-study-site.mjs'
 
-test('the default home contract keeps a visible recovery lane for beginners', () => {
+test('the default home contract keeps the reading layer a beginner needs', () => {
   const home = REQUIRED_PUBLISHED_PAGES.find(page => page.file === 'index.html')
   assert.ok(home)
-  // 迁移到 JournalHome 后，新手的“卡住了怎么办”由丑话备忘 + 按类型递条子
-  // 的 issue 入口承载；两个标记都必须留在契约里。
-  assert.ok(home.markers.includes('丑话备忘'))
-  assert.ok(home.markers.includes('doc-fact-error'))
+  // JournalHome 在客户端挂载，构建产物只保证阅读层资产与进度条存在；
+  // 首屏文案与拍立得数字的契约由组件源侧的门禁负责。
+  assert.ok(home.markers.includes('dsh-reading-progress'))
+  assert.ok(home.markers.includes('reading.css'))
 })
 
 test('the built-study contract accepts pages with all required markers', () => {

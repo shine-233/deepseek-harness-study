@@ -1,15 +1,13 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { inspectStudyHomeMetrics } from './verify-study-home-metrics.mjs'
 
 const repositoryRoot = resolve(import.meta.dirname, '..')
 
 /*
- * 首页的三张拍立得数字由 verify-study-home-metrics 从仓库推导；这里把它们
- * 转成构建产物里应出现的 `<b>N</b>` 内容标记，其余结构标记保持字面契约。
+ * 首页由 JournalHome 组件在客户端挂载（集章进度依赖 localStorage），SSR 输出
+ * 只有挂载壳与阅读层资产；拍立得数字的对账由 verify-study-home-metrics 在
+ * 组件源上完成。这里只要求任何渲染路径都必须存在的阅读层标记。
  */
-const homeMetricsExpected = Object.entries(inspectStudyHomeMetrics(repositoryRoot).expected)
-  .map(([, value]) => '<b>' + String(value) + '</b>')
 
 /**
  * The small set of published pages that make up the first-time reader route.
@@ -21,14 +19,6 @@ export const REQUIRED_PUBLISHED_PAGES = [
     file: 'index.html',
     label: 'Pages 首页',
     markers: [
-      // JournalHome 组件 SSR 后的拍立得数字与手账结构标记。
-      ...homeMetricsExpected,
-      'dj-polaroid',
-      'dj-lab-chip',
-      '课程、实验、索引',
-      '丑话备忘',
-      'doc-fact-error',
-      'research-debug-bridge.html',
       'dsh-reading-progress',
       'reading.css',
     ],
