@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 四个学习实验页共用的渲染工具。
  *
  * 只放渲染辅助：SVG 构造、文本写入、列表替换、oracle 列表和证据边界的渲染。
@@ -180,6 +180,58 @@ export function nextPlayValue(value, min, max, step = 1) {
 }
 
 /**
+ * 图形即控制器：在时间线图上按下并横向拖动，播放头跟随最近的步骤圆点。
+ *
+ * 监听绑在图容器上（容器常驻、SVG 每次重建），所以重绘不丢事件。最近点按
+ * 客户端坐标的水平距离判定；容器宽度为零（无头环境、隐藏面板）时直接忽略。
+ * 可达性由旁边的滑杆承担：这里只是多一条路，不替代键盘与读屏路径。
+ *
+ * @param plot - 包含带 data-step 圆点的图容器元素。
+ * @param slider - 联动的步进滑杆；赋值后派发 input 交给既有同步逻辑。
+ */
+export function bindPlotScrub(plot, slider) {
+  if (!plot || !slider) return
+  let active = false
+  const nearestStep = clientX => {
+    const marks = plot.querySelectorAll('[data-step]')
+    if (marks.length === 0) return null
+    const bounds = plot.getBoundingClientRect()
+    if (bounds.width === 0) return null
+    let best = null
+    let bestDistance = Number.POSITIVE_INFINITY
+    for (const mark of marks) {
+      const box = mark.getBoundingClientRect()
+      const distance = Math.abs(box.left + box.width / 2 - clientX)
+      if (distance < bestDistance) {
+        bestDistance = distance
+        best = Number(mark.getAttribute('data-step'))
+      }
+    }
+    return best
+  }
+  const apply = index => {
+    if (index === null) return
+    if (index < Number(slider.min) || index > Number(slider.max)) return
+    slider.value = String(index)
+    slider.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+  plot.addEventListener('pointerdown', event => {
+    active = true
+    try {
+      plot.setPointerCapture(event.pointerId)
+    } catch {
+      // 某些合成事件的 pointerId 无法捕获；拖动仍在本元素内工作。
+    }
+    apply(nearestStep(event.clientX))
+  })
+  plot.addEventListener('pointermove', event => {
+    if (active) apply(nearestStep(event.clientX))
+  })
+  plot.addEventListener('pointerup', () => { active = false })
+  plot.addEventListener('pointercancel', () => { active = false })
+}
+
+/**
  * 给时间轴滑块配一个播放按钮：点击在末帧之外连续逐帧推进，再点暂停；
  * 到末帧自动停；用户手动拖动（可信 input 事件）立即暂停。
  * 减少动态效果时不做连续推进，一次点击只走一帧，帧控件保持可用。
@@ -279,4 +331,20 @@ export function installInputReset(button, form, { onReset } = {}) {
     if (onReset) onReset()
     clearStateFromUrl()
   })
+}
+/*
+ * 卡片聚光（Linear 式微交互的纸面译版）：
+ * 指针划过 .card 时把相对坐标写进 --mx/--my，CSS 用 radial-gradient
+ * 画一团暖光跟随。事件委托挂在 document 上，全部实验室页一处生效；
+ * 无 DOM 的导入环境（纯 Node 测试）不安装。
+ */
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+  document.addEventListener('pointermove', (event) => {
+    if (!(event.target instanceof Element)) return
+    const card = event.target.closest('.card')
+    if (card === null) return
+    const box = card.getBoundingClientRect()
+    card.style.setProperty('--mx', `${Math.round(event.clientX - box.left)}px`)
+    card.style.setProperty('--my', `${Math.round(event.clientY - box.top)}px`)
+  }, { passive: true })
 }

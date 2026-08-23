@@ -5,7 +5,7 @@ import {
   makeFeedback, renderBoundary, renderOracle, renderRows,
   requireElements, svgElement, writeText, animateNumber,
   installDeclaredIcons, installScrollProgress, installInputReset,
-  bindRangeKeys,
+  bindRangeKeys, bindPlotScrub,
 } from './study-lab-kit.js'
 import { buildGuardLoopModel, buildKeySandboxModel, evaluateGuardLoopOracle } from './guard-loop-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
@@ -236,6 +236,7 @@ function initializePage() {
   el.stepPrev.addEventListener('click', () => nudgeStep(-1))
   el.stepNext.addEventListener('click', () => nudgeStep(1))
   bindRangeKeys(el.step)
+  bindPlotScrub(el.flow, el.step)
 
   const r = readStateFromHash(location.hash, SCHEMA)
   const hasRestoredStep = r !== null && r.ok

@@ -72,6 +72,18 @@
   outline-offset: 2px;
 }
 
+/* 图形即控制器：时间线图可按住横向拖动，播放头跟随最近圆点。
+   pan-y 保住纵向滚动；拖动中用抓取光标。 */
+.lab-shell .plot-scroll {
+  touch-action: pan-y;
+}
+.lab-shell .plot-scroll svg {
+  cursor: grab;
+}
+.lab-shell .plot-scroll svg:active {
+  cursor: grabbing;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lab-shell .metric-grid > div,
   .lab-shell .oracle-list > li,
