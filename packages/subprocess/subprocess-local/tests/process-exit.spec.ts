@@ -31,8 +31,8 @@ async function readTree(path: string): Promise<TreeState> {
     // missing file or a torn final write are not-yet states, not failures: keep
     // vi.waitFor retrying with a message that names the file instead of letting
     // ENOENT or SyntaxError become the timeout error.
-    const text = await readFile(path, 'utf8').catch((error: NodeJS.ErrnoException) => {
-      if (error.code === 'ENOENT') return ''
+    const text = await readFile(path, 'utf8').catch((error: unknown) => {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return ''
       throw error
     })
     if (text === '') throw new Error(`managed-tree state is not written yet: ${path}`)
@@ -121,8 +121,8 @@ async function runScenario(kind: ManagedKind, trigger: ExitTrigger) {
   try {
     state = await readTree(join(root, 'tree.json'))
     await vi.waitFor(async () => {
-      const ready = await readFile(join(root, 'ready'), 'utf8').catch((error: NodeJS.ErrnoException) => {
-        if (error.code === 'ENOENT') return ''
+      const ready = await readFile(join(root, 'ready'), 'utf8').catch((error: unknown) => {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return ''
         throw error
       })
       if (ready === '') throw new Error(`host ready marker is not written yet: ${join(root, 'ready')}`)
