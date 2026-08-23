@@ -46,3 +46,19 @@ node --test across study-tools (388 passing), node --check on changed scripts, e
 ## Environment note
 
 The earlier host-wide ESM segfault (0xC0000005) resolved itself before this round; pre-commit hooks were exercised normally here.
+
+## Decision
+
+- The progress observer keys rebuilds off the normalized lesson id: same id plus an existing widget means "do nothing", so quiz submits and the widget's own insertions no longer trigger teardown cycles.
+- Guard-loop adopts the approval-flow stepper contract wholesale (`data-step` dots, `step` in the hash schema, enum change rebuilds then jumps to the last step) instead of inventing a third variant.
+- sqlite-row stays a faithful port: the non-first varint bound moves to MAX_SAFE_INTEGER * 2n, and only trailing-zero groups are rejected as non-canonical. Interior zero groups remain legal because large deltas legitimately produce them.
+- Subagent capability wording splits by layer (service start() per-request rejection vs tool-plugin mount-time Error) in both the header comment and canProve; MONOTONE_HEADER checks hand-computed expectations rather than re-deriving the formula under test.
+- Dark-mode fixes stay CSS-only: one higher-specificity override for the Turn active step, one invert + hue-rotate rule for mermaid under html.dark. No client-side theme switching machinery.
+- The mascot done lines are rewritten to match real behavior; bridging progress storage to the homepage stamp card is deferred, not faked.
+
+## Alternatives considered
+
+- Debounce the observer harder or observe only .vp-doc childList: rejected, because any unconditional rebuild still loses quiz answers mid-session; identity comparison is the only correct gate.
+- Downgrade the sqlite comment to "teaching approximation" instead of fixing decode: rejected, the two-line fix makes the stronger claim true.
+- Ship mermaid theme switching through the plugin config: rejected, vitepress-plugin-mermaid takes one static MermaidConfig and per-appearance switching would need a client re-render wrapper; CSS inversion covers the single repo-map diagram at near-zero risk.
+- Bridge dsh-study-progress-v2 into am-stamps-home so the mascot line becomes true: deferred, cross-key migration touches user data semantics and deserves its own change.

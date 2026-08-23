@@ -46,3 +46,19 @@ study-tools 全量 node --test（388 通过）、改动脚本的 node --check、
 ## 环境备注
 
 上一轮的全机 ESM 段错误（0xC0000005）在本轮开始前自行恢复；本次 pre-commit 钩子正常执行。
+
+## Decision
+
+- 进度观察器以归一化课程 id 为重建开关：id 没变且组件还在就什么都不做，判分提交和组件自身插入不再触发拆建循环。
+- guard-loop 整套照搬 approval-flow 的步进器契约（data-step 圆点、hash schema 收入 step、换枚举先重建再跳到末步），不再发明第三种变体。
+- sqlite-row 维持忠实移植口径：非首值 varint 上限改为 MAX_SAFE_INTEGER * 2n，只把结尾补零组按非规范拒绝；中间全零组保持合法，大跳差分本就会产生它们。
+- subagent 的能力错误措辞按层拆开（service 层 start() 逐请求拒绝 vs tool 插件挂载期普通 Error），顶注与 canProve 同步；MONOTONE_HEADER 改查手工期望值，不再拿被测函数自证。
+- 深色修复只动 CSS：Turn 活动步一条更高特异性的覆写，mermaid 在 html.dark 下反相一次，不引入客户端主题切换机制。
+- 吉祥物完成台词改写为与真实行为一致；进度存储与首页集章卡的打通推迟，而不是假装已联通。
+
+## Alternatives considered
+
+- 加大观察器防抖或只盯 .vp-doc：否——任何无条件重建仍会在会话中途丢答题状态，身份比对才是正确的闸门。
+- 把 sqlite 注释降级成「教学近似」而不修 decode：否——两行的修复能让更强的声明为真。
+- 用插件配置实现 mermaid 主题切换：否——vitepress-plugin-mermaid 只收一份静态 MermaidConfig，随外观切换需要客户端重渲染包装；CSS 反相对唯一一张仓库地图图是近零风险解。
+- 打通 dsh-study-progress-v2 与 am-stamps-home 让吉祥物台词成真：推迟——跨键迁移涉及用户数据语义，值得独立一个变更来做。
