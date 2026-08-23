@@ -3,7 +3,7 @@
  */
 import {
   makeFeedback, renderBoundary, renderOracle, renderRows,
-  requireElements, svgElement, writeText,
+  requireElements, svgElement, writeText, animateNumber,
   installDeclaredIcons, installScrollProgress, installInputReset,
   bindRangeKeys,
 } from './study-lab-kit.js'
@@ -18,6 +18,8 @@ const SCHEMA = {
   attempts: { integerRange: [1, 12] },
   guard: { enum: ['on', 'off'] },
   resetMode: { enum: ['none', 'user-interjection', 'key-reorder', 'value-change'] },
+  // 这里只卡整数下界，越界值在恢复时被拉回当前输入的末步。
+  step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 const LANES = ['Agent 循环', 'repeat-tool-reminder', '模型上下文']
 
@@ -46,7 +48,7 @@ function renderFlow(model, target, note) {
     if (s.phase === 'remind') cls.push('is-remind')
     if (s.phase === 'receive') cls.push('is-receive')
     if (s.resets === true) cls.push('is-reset')
-    const c = svgElement('circle', { 'data-reveal': '', cx: xf(s.index), cy: yf(s.lane), r: 9, class: cls.join(' ') })
+    const c = svgElement('circle', { 'data-reveal': '', 'data-step': String(s.index), cx: xf(s.index), cy: yf(s.lane), r: 9, class: cls.join(' ') })
     c.append(svgElement('title', {}, `${s.index} ${s.phase}: ${s.detail}`))
     svg.append(c)
   }
@@ -158,6 +160,11 @@ function initializePage() {
     const entry = currentModel.steps[index]
     writeText(el.stepCaption, '第 ' + String(entry.index) + ' 步 · ' + entry.lane
       + ' · ' + entry.phase + '：' + entry.detail)
+    for (const dot of el.flow.querySelectorAll('[data-step]')) {
+      const at = Number(dot.getAttribute('data-step'))
+      dot.classList.toggle('is-current', at === index)
+      dot.classList.toggle('is-future', at > index)
+    }
     el.stepPrev.disabled = index <= 0
     el.stepNext.disabled = index >= total - 1
   }
@@ -181,8 +188,8 @@ function initializePage() {
       })))
       writeText(el.tableCaption, `当前输入的全部 ${model.steps.length} 步`)
       writeText(el.mAttempts, String(model.observations.attempts))
-      writeText(el.mExecuted, String(model.observations.executedCount))
-      writeText(el.mReminders, String(model.observations.reminderCount))
+      animateNumber(el.mExecuted, model.observations.executedCount)
+      animateNumber(el.mReminders, model.observations.reminderCount)
       writeText(el.mTiers, `${model.observations.gentleCount} · ${model.observations.detailedCount}`)
       fb(`已推演：${model.observations.reminderCount} 条提醒、${model.observations.attempts} 次调用全部执行。`, 'success')
       syncStep()
@@ -199,6 +206,7 @@ function initializePage() {
         attempts: Number(el.attempts.value),
         guard: el.guard.value,
         resetMode: el.resetMode.value,
+        step: Number(el.step.value),
       }, SCHEMA))
     } catch {}
   }
@@ -206,9 +214,15 @@ function initializePage() {
   // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
   installInputReset(el.resetInputs, el.form, { onReset: rebuild })
   el.form.addEventListener('submit', e => { e.preventDefault(); rebuild() })
-  for (const c of [el.attempts, el.guard, el.resetMode]) c.addEventListener('input', () => {
-    if (c === el.attempts) writeText(el.attemptsOutput, c.value)
+  el.attempts.addEventListener('input', () => {
+    writeText(el.attemptsOutput, el.attempts.value)
     rebuild()
+  })
+  for (const c of [el.guard, el.resetMode]) c.addEventListener('change', () => {
+    // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
+    rebuild()
+    el.step.value = el.step.max
+    el.step.dispatchEvent(new Event('input', { bubbles: true }))
   })
 
   // 时间轴步进：只改高亮和读数，不改推演结果。
@@ -224,14 +238,19 @@ function initializePage() {
   bindRangeKeys(el.step)
 
   const r = readStateFromHash(location.hash, SCHEMA)
-  if (r !== null && r.ok) {
+  const hasRestoredStep = r !== null && r.ok
+  if (hasRestoredStep) {
     el.attempts.value = String(r.value.attempts)
     el.guard.value = r.value.guard
     el.resetMode.value = r.value.resetMode
+    // 恢复前滑杆上界已放宽到 MAX_SAFE_INTEGER，这里的赋值不会被浏览器钳掉。
+    el.step.value = String(r.value.step)
   }
   writeText(el.attemptsOutput, el.attempts.value)
   rebuild()
-  el.step.value = el.step.max
+  if (!hasRestoredStep || Number(el.step.value) > Number(el.step.max)) {
+    el.step.value = el.step.max
+  }
   syncStep()
 
   el.copyLink.addEventListener('click', async () => {

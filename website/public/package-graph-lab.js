@@ -906,7 +906,30 @@ function installScene(model) {
   const edges = document.getElementById('scene-edges')
   const spin = document.getElementById('scene-spin')
   const stop = document.getElementById('scene-stop')
+  const hotspotLayer = document.getElementById('scene-hotspots')
+  const hotspotNote = document.getElementById('scene-hotspot-note')
   if (launch === null || stage === null || canvas === null) return
+
+  // model-viewer 式的锚定标签：DOM 按钮钉在分组柱顶的三维投影上，
+  // 每帧跟随旋转平移；点击或聚焦给出该组的规模说明。
+  const describeGroup = spot => {
+    writeText(hotspotNote, `${spot.group} 分组：${spot.count} 个包、合计 ${spot.lines} 行 src。`
+      + ' 柱高就是行数；精确数字看上方表格，3D 只负责形状与透视。')
+  }
+
+  const positionHotspots = anchors => {
+    if (hotspotLayer === null) return
+    for (const button of hotspotLayer.querySelectorAll('button[data-group]')) {
+      const anchor = anchors.find(item => item.group === button.dataset.group)
+      if (anchor === undefined) {
+        button.hidden = true
+        continue
+      }
+      button.hidden = false
+      button.style.left = `${Math.round(anchor.x)}px`
+      button.style.top = `${Math.round(anchor.y)}px`
+    }
+  }
 
   const reducedMotion = typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -923,13 +946,39 @@ function installScene(model) {
 
   launch.addEventListener('click', () => {
     if (scene === null) {
-      scene = createPackageScene(canvas, model, { reducedMotion })
+      scene = createPackageScene(canvas, model, {
+        reducedMotion,
+        onFrame: positionHotspots,
+      })
       if (scene === null) {
-        // canvas 不可用时保持二维视图，而不是留下一个空框。
-        writeText(launch, '这个浏览器不支持 canvas，二维图和表格仍然完整')
+        // canvas 不可用时手动二维地图和表格仍然完整可用
+        writeText(launch, '浏览器不支持 canvas，三维图和表格仍然可用')
         launch.disabled = true
         return
       }
+      if (hotspotLayer !== null) {
+        const totals = new Map()
+        for (const node of model.nodes) {
+          const current = totals.get(node.group) ?? { group: node.group, count: 0, lines: 0 }
+          current.count += 1
+          current.lines += node.srcLines
+          totals.set(node.group, current)
+        }
+        for (const spot of [...totals.values()].sort((a, b) => b.lines - a.lines).slice(0, 5)) {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.className = 'dsh3d-hotspot'
+          button.dataset.group = spot.group
+          button.hidden = true
+          button.textContent = `${spot.group} · ${spot.count}`
+          button.setAttribute('aria-label',
+            `聚焦 ${spot.group} 分组：${spot.count} 个包，合计 ${spot.lines} 行源码`)
+          button.addEventListener('click', () => describeGroup(spot))
+          button.addEventListener('focus', () => describeGroup(spot))
+          hotspotLayer.append(button)
+        }
+      }
+    }
     }
     stage.hidden = false
     launch.hidden = true

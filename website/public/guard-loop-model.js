@@ -109,7 +109,8 @@ export function detailedReminderText(count, canonicalArguments, previewChars = G
     + `- consecutive_calls: ${count}\n`
     + `- arguments: ${preview}\n`
     + 'The repeated calls are not making progress. Do not call this tool with '
-    + 'these exact arguments again.'
+    + 'these exact arguments again. Inspect the latest result and choose a '
+    + 'different action or different arguments before calling again.'
 }
 
 function buildSteps(input) {

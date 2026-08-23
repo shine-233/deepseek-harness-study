@@ -11,7 +11,7 @@ import {
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
-import { installInputReset } from './study-lab-kit.js'
+import { installInputReset, animateNumber } from './study-lab-kit.js'
 import {
   DELEGATE_LANES,
   buildSubagentDelegateModel,
@@ -185,7 +185,7 @@ function initializePage() {
       })))
       writeText(elements.tableCaption, '当前输入的全部 ' + String(model.steps.length) + ' 步')
 
-      writeText(elements.childdepth, String(model.observations.childDepth))
+      animateNumber(elements.childdepth, model.observations.childDepth)
       writeText(elements.depthMetric, model.observations.depthAccepted ? '通过' : '拒绝')
       writeText(elements.report, model.observations.reportKind ?? '—')
       setFeedback('已推演：边界' + (model.observations.depthAccepted ? '放行' : '拒绝')

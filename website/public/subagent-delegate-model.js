@@ -15,8 +15,9 @@
  *   origin: 'subagent' 创建，header 落 delegation_depth；被委派的孩子把审批
  *   策略钉在 'never'——委托出去的工作不允许再向用户弹审批。
  * - packages/subagent/tool-subagent/src/index.ts：数字上限要求 provider 声明
- *   depthLimit 能力，否则挂载即失败（UNSUPPORTED_CAPABILITY）；把预算交给
- *   provider 时配置 'provider-managed'。
+ *   depthLimit 能力，service 层 start() 的逐请求拒绝报 UNSUPPORTED_CAPABILITY，
+ *   tool 插件挂载期的检查失败则抛普通 Error；把预算交给 provider 时配置
+ *   'provider-managed'。
  *
  * 教学约定：被拒绝的委派不产生任何子工作；启动的子工作恰好回报一次，
  * 成功摘要与失败原因都是完整结算；父子工作严格分泳道。
@@ -105,7 +106,7 @@ export function buildSubagentDelegateModel(input) {
       '被拒的委派不创建子 Session：子泳道完全为空',
       '深度记在 Session header 上并单调取最大：恢复出的子代理不能靠新鲜 options 把自己算回顶层',
       '子 Session 以 origin=\'subagent\' 创建，且审批策略被钉在 \'never\'：委派链上不再向用户弹审批',
-      "数字 maxDepth 要求 provider 声明 depthLimit 能力，否则挂载即报 UNSUPPORTED_CAPABILITY；'provider-managed' 才是把预算交给 provider",
+      "数字 maxDepth 要求 provider 声明 depthLimit 能力：service 层 start() 逐请求拒绝时报 UNSUPPORTED_CAPABILITY，tool 插件挂载期检查失败则抛普通 Error；'provider-managed' 才是把预算交给 provider",
       '启动的子工作恰好回报一次，成功摘要与失败原因都算完整结算',
       '同一输入重建时间线得到完全相同的步骤序列（确定性）',
     ]),
@@ -135,8 +136,7 @@ export function evaluateSubagentDelegateOracle(model) {
     pass: sameSteps,
   })
 
-  const arithmeticOk = model.steps.every(step => true)
-    && model.observations.childDepth === model.observations.parentDepth + 1
+  const arithmeticOk = model.observations.childDepth === model.observations.parentDepth + 1
   checks.push({
     id: 'DEPTH_ARITHMETIC',
     label: '子深度恰好是父深度加一',
@@ -161,8 +161,9 @@ export function evaluateSubagentDelegateOracle(model) {
     [1, 2, 2],
     [0, 0, 0],
   ]
-  const monotoneBad = monotoneCases.filter(([header, runtime]) =>
-    effectiveDelegationDepth(header, runtime) !== Math.max(header ?? 0, runtime ?? 0))
+  // 第三列是手工算出的期望值，不经过被测函数——否则校验就是同义反复。
+  const monotoneBad = monotoneCases.filter(([header, runtime, expected]) =>
+    effectiveDelegationDepth(header, runtime) !== expected)
   checks.push({
     id: 'MONOTONE_HEADER',
     label: '生效深度取 max(header, 运行时)：恢复不能把深度变浅',

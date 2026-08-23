@@ -117,6 +117,19 @@ export function createPackageScene(canvas, model, options = {}) {
   let showEdges = false
   let raf = 0
   let spinning = false
+  let cssRatio = 1
+
+  /** 热点锚定的分组：按组内 src 总行数取前五，其余组交给图例和表格。 */
+  const hotspotGroups = (() => {
+    const totals = new Map()
+    for (const entry of placed) {
+      const current = totals.get(entry.group) ?? { group: entry.group, count: 0, lines: 0 }
+      current.count += 1
+      current.lines += entry.node.srcLines
+      totals.set(entry.group, current)
+    }
+    return [...totals.values()].sort((a, b) => b.lines - a.lines).slice(0, 5)
+  })()
 
   const styles = () => {
     const root = getComputedStyle(canvas)
@@ -203,6 +216,32 @@ export function createPackageScene(canvas, model, options = {}) {
       context.stroke()
     }
     context.globalAlpha = 1
+
+    // 热点锚定：把前五组的柱顶均值投影回 CSS 像素，交给页面上的 DOM 标签。
+    if (typeof options.onFrame === 'function') {
+      const byGroup = new Map()
+      for (const bar of bars) {
+        const current = byGroup.get(bar.entry.group) ?? { sumX: 0, sumY: 0, n: 0 }
+        current.sumX += bar.top.sx
+        current.sumY += bar.top.sy
+        current.n += 1
+        byGroup.set(bar.entry.group, current)
+      }
+      const anchors = []
+      for (const spot of hotspotGroups) {
+        const summed = byGroup.get(spot.group)
+        if (summed === undefined) continue
+        anchors.push({
+          group: spot.group,
+          count: spot.count,
+          lines: spot.lines,
+          x: summed.sumX / summed.n / cssRatio,
+          y: summed.sumY / summed.n / cssRatio,
+        })
+      }
+      options.onFrame(anchors)
+    }
+
     return bars.length
   }
 
@@ -211,6 +250,7 @@ export function createPackageScene(canvas, model, options = {}) {
     const box = canvas.getBoundingClientRect()
     canvas.width = Math.max(320, Math.round(box.width * ratio))
     canvas.height = Math.max(240, Math.round(box.height * ratio))
+    cssRatio = box.width > 0 ? canvas.width / box.width : 1
     render()
   }
 
