@@ -22,9 +22,15 @@ const repositoryRoot = resolve(import.meta.dirname, '..')
  */
 export const BEGINNER_LEARNING_CONTRACTS = [
   {
-    source: 'SITE-HOME.md',
+    source: 'website/.vitepress/theme/JournalHome.vue',
     label: 'Pages 首页',
-    markers: ['先选一条', 'dsh-route-grid', 'dsh-stuck-card', '证据边界', '不用下载'],
+    markers: [
+      '课程、实验、索引',
+      '全部离线可复现',
+      '丑话备忘',
+      '集章进度',
+      '防止有人把「读了」写成「验证了」',
+    ],
   },
   {
     source: 'START-HERE.md',

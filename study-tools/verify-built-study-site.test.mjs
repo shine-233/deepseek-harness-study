@@ -13,8 +13,10 @@ import {
 test('the default home contract keeps a visible recovery lane for beginners', () => {
   const home = REQUIRED_PUBLISHED_PAGES.find(page => page.file === 'index.html')
   assert.ok(home)
-  assert.ok(home.markers.includes('dsh-stuck-card'))
-  assert.ok(home.markers.includes('卡住时'))
+  // 迁移到 JournalHome 后，新手的“卡住了怎么办”由丑话备忘 + 按类型递条子
+  // 的 issue 入口承载；两个标记都必须留在契约里。
+  assert.ok(home.markers.includes('丑话备忘'))
+  assert.ok(home.markers.includes('doc-fact-error'))
 })
 
 test('the built-study contract accepts pages with all required markers', () => {
