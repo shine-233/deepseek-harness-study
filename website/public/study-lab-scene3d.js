@@ -122,6 +122,121 @@ export function createPackageScene(canvas, model, options = {}) {
   let focusedGroup = null
   let resumeSpinOnFocusEnd = false
   let focusRaf = 0
+  const flowParticles = []
+  let flowRaf = 0
+  let lastFrameTime = 0
+  // 惯性滑行（tldraw/excalidraw 手感）：拖放后的速度按帧衰减，直到低于阈值。
+  let inertiaRaf = 0
+  let inertiaLast = 0
+  let inertiaVYaw = 0
+  let inertiaVPitch = 0
+  // 离屏挂起：场景滚出视口时停掉自转与惯性，回到视口再恢复自转。
+  let sceneVisible = true
+  let suspendSpinOnHide = false
+  let inertiaSuspended = false
+  let visibilityObserver = null
+
+  function stopInertia() {
+    if (inertiaRaf !== 0) cancelAnimationFrame(inertiaRaf)
+    inertiaRaf = 0
+    inertiaLast = 0
+    inertiaVYaw = 0
+    inertiaVPitch = 0
+    inertiaSuspended = false
+    syncFlowLoop()
+  }
+
+  /**
+   * 流粒子循环的单一仲裁点：只在「边开着、允许动效、场景可见、且没有别的
+   * 帧驱动源（自转/惯性/聚焦动画）」时才自己跑帧；任何状态变化后调一次即可。
+   */
+  function syncFlowLoop() {
+    const need = showEdges && options.reducedMotion !== true && sceneVisible
+      && !spinning && inertiaRaf === 0 && focusRaf === 0
+    if (need && flowRaf === 0) {
+      lastFrameTime = 0
+      flowRaf = requestAnimationFrame(flowTick)
+    } else if (!need && flowRaf !== 0) {
+      cancelAnimationFrame(flowRaf)
+      flowRaf = 0
+      lastFrameTime = 0
+    }
+  }
+
+  function flowTick() {
+    if (!showEdges || spinning || inertiaRaf !== 0 || focusRaf !== 0 || !sceneVisible) {
+      flowRaf = 0
+      lastFrameTime = 0
+      return
+    }
+    render()
+    flowRaf = requestAnimationFrame(flowTick)
+  }
+
+  function fling(vYaw, vPitch) {
+    if (options.reducedMotion === true || !sceneVisible) return
+    stopInertia()
+    inertiaVYaw = vYaw
+    inertiaVPitch = vPitch
+    if (Math.abs(inertiaVYaw) < 1e-4 && Math.abs(inertiaVPitch) < 1e-4) return
+    inertiaLast = 0
+    const tick = (now) => {
+      if (!sceneVisible) { inertiaSuspended = true; inertiaRaf = 0; return }
+      if (inertiaLast === 0) inertiaLast = now
+      const dt = Math.min(64, now - inertiaLast)
+      inertiaLast = now
+      syncFlowLoop()
+      camera.yaw = (camera.yaw + inertiaVYaw * dt / 16.7 + TAU) % TAU
+      camera.pitch = Math.max(0.05, Math.min(1.35, camera.pitch + inertiaVPitch * dt / 16.7))
+      const decay = Math.pow(0.9, dt / 16.7)
+      inertiaVYaw *= decay
+      inertiaVPitch *= decay
+      render()
+      if (Math.abs(inertiaVYaw) < 1e-4 && Math.abs(inertiaVPitch) < 1e-4) { stopInertia(); return }
+      inertiaRaf = requestAnimationFrame(tick)
+    }
+    inertiaRaf = requestAnimationFrame(tick)
+  }
+
+  if (typeof IntersectionObserver === 'function') {
+    visibilityObserver = new IntersectionObserver((entries) => {
+      sceneVisible = entries.some(entry => entry.isIntersecting)
+      if (!sceneVisible) {
+        if (spinning) { spinning = false; cancelAnimationFrame(raf); raf = 0; suspendSpinOnHide = true }
+        syncFlowLoop()
+        if (inertiaRaf !== 0) { cancelAnimationFrame(inertiaRaf); inertiaRaf = 0; inertiaSuspended = true }
+        return
+      }
+      syncFlowLoop()
+      if (suspendSpinOnHide && !spinning && focusedGroup === null) {
+        suspendSpinOnHide = false
+        spinning = true
+        raf = requestAnimationFrame(step)
+      }
+      if (inertiaSuspended) {
+        inertiaSuspended = false
+        if (Math.abs(inertiaVYaw) >= 1e-4 || Math.abs(inertiaVPitch) >= 1e-4) {
+          inertiaLast = 0
+          inertiaRaf = requestAnimationFrame(function resumeTick(now) {
+            if (!sceneVisible) { inertiaSuspended = true; inertiaRaf = 0; return }
+            if (inertiaLast === 0) inertiaLast = now
+            const dt = Math.min(64, now - inertiaLast)
+            inertiaLast = now
+            syncFlowLoop()
+      camera.yaw = (camera.yaw + inertiaVYaw * dt / 16.7 + TAU) % TAU
+            camera.pitch = Math.max(0.05, Math.min(1.35, camera.pitch + inertiaVPitch * dt / 16.7))
+            const decay = Math.pow(0.9, dt / 16.7)
+            inertiaVYaw *= decay
+            inertiaVPitch *= decay
+            render()
+            if (Math.abs(inertiaVYaw) < 1e-4 && Math.abs(inertiaVPitch) < 1e-4) { stopInertia(); return }
+            inertiaRaf = requestAnimationFrame(resumeTick)
+          })
+        }
+      }
+    })
+    visibilityObserver.observe(canvas)
+  }
 
   /** 热点锚定的分组：按组内 src 总行数取前五，其余组交给图例和表格。 */
   const hotspotGroups = (() => {
@@ -171,6 +286,7 @@ export function createPackageScene(canvas, model, options = {}) {
       .sort((left, right) => right.weight - left.weight)
       .slice(0, 120)
     context.strokeStyle = palette.edge
+    const flowPairs = []
     for (const { edge, weight } of ranked) {
       const from = positions.get(edge.from)
       const to = positions.get(edge.to)
@@ -184,9 +300,38 @@ export function createPackageScene(canvas, model, options = {}) {
       context.moveTo(a.sx, a.sy)
       context.lineTo(b.sx, b.sy)
       context.stroke()
+      if (flowPairs.length < 48) flowPairs.push([a.sx, a.sy, b.sx, b.sy])
     }
     context.globalAlpha = 1
-    return ranked.length
+    return flowPairs
+  }
+
+  /**
+   * 方向流粒子（vasturiano directional-particles 模式）：在最重的边上各放一粒，
+   * 沿依赖方向匀速前进。时间用墙钟差分推进——render 可能被自转、聚焦动画和
+   * 常驻流循环多个驱动源调用，按 dt 走保证速度一致；reduced-motion 下完全不画。
+   */
+  function drawFlow(pairs, width, height, palette) {
+    if (options.reducedMotion === true || pairs.length === 0) return
+    const now = performance.now()
+    let dt = lastFrameTime === 0 ? 16 : now - lastFrameTime
+    lastFrameTime = now
+    if (dt > 50) dt = 50
+    const radius = Math.max(1.4, Math.min(width, height) / 620)
+    for (let i = 0; i < pairs.length; i += 1) {
+      if (flowParticles.length <= i) flowParticles.push({ t: Math.random() })
+      const dot = flowParticles[i]
+      dot.t = (dot.t + dt / 1400) % 1
+      const [ax, ay, bx, by] = pairs[i]
+      const x = ax + (bx - ax) * dot.t
+      const y = ay + (by - ay) * dot.t
+      context.globalAlpha = Math.sin(Math.PI * dot.t) * 0.85
+      context.fillStyle = palette.edge
+      context.beginPath()
+      context.arc(x, y, radius, 0, TAU)
+      context.fill()
+    }
+    context.globalAlpha = 1
   }
 
   function render() {
@@ -195,7 +340,8 @@ export function createPackageScene(canvas, model, options = {}) {
     const palette = styles()
     context.clearRect(0, 0, width, height)
     drawGround(width, height, palette)
-    if (showEdges) drawEdges(width, height, palette)
+    const flowPairs = showEdges ? drawEdges(width, height, palette) : []
+    drawFlow(flowPairs, width, height, palette)
 
     // 远的先画：canvas 没有深度缓冲，画家算法是唯一的遮挡来源。
     const bars = placed
@@ -279,6 +425,7 @@ export function createPackageScene(canvas, model, options = {}) {
   function cancelFocusAnimation() {
     if (focusRaf !== 0) cancelAnimationFrame(focusRaf)
     focusRaf = 0
+    stopInertia()
   }
 
   /**
@@ -309,7 +456,7 @@ export function createPackageScene(canvas, model, options = {}) {
       camera.distance = from.distance + (target.distance - from.distance) * ease
       render()
       if (t < 1) focusRaf = requestAnimationFrame(tick)
-      else { focusRaf = 0; if (typeof onDone === 'function') onDone() }
+      else { focusRaf = 0; syncFlowLoop(); if (typeof onDone === 'function') onDone() }
     }
     focusRaf = requestAnimationFrame(tick)
   }
@@ -330,6 +477,7 @@ export function createPackageScene(canvas, model, options = {}) {
         resumeSpinOnFocusEnd = options.reducedMotion !== true
       }
       focusedGroup = group
+      syncFlowLoop()
       animateCameraTo({
         yaw: (Math.PI / 2 - groupAngle(group) + TAU) % TAU,
         pitch: 0.55,
@@ -341,8 +489,10 @@ export function createPackageScene(canvas, model, options = {}) {
       focusedGroup = null
       const resume = resumeSpinOnFocusEnd && !spinning
       resumeSpinOnFocusEnd = false
+      syncFlowLoop()
       animateCameraTo(HOME_VIEW, () => {
         if (resume) this.startSpin()
+        else syncFlowLoop()
       })
     },
     setYaw(value) { camera.yaw = value; render() },
@@ -352,23 +502,32 @@ export function createPackageScene(canvas, model, options = {}) {
       camera.pitch = Math.max(0.05, Math.min(1.35, camera.pitch + dPitch))
       render()
     },
-    setEdges(value) { showEdges = Boolean(value); render() },
+    setEdges(value) { showEdges = Boolean(value); render(); syncFlowLoop() },
     get edgesVisible() { return showEdges },
     /** 自动旋转只在用户没要求减少动态效果时才可用。 */
     startSpin() {
       if (options.reducedMotion === true || spinning) return
+      stopInertia()
       spinning = true
       raf = requestAnimationFrame(step)
+      syncFlowLoop()
     },
     stopSpin() {
       spinning = false
       if (raf !== 0) cancelAnimationFrame(raf)
       raf = 0
+      syncFlowLoop()
     },
     get spinning() { return spinning },
+    /** 拖放后的惯性滑行；reduced-motion 与离屏状态下不启动。 */
+    fling(vYaw, vPitch) { fling(vYaw, vPitch) },
+    stopInertia() { stopInertia() },
     dispose() {
       this.stopSpin()
+      if (flowRaf !== 0) cancelAnimationFrame(flowRaf)
+      flowRaf = 0
       cancelFocusAnimation()
+      if (visibilityObserver !== null) visibilityObserver.disconnect()
     },
   }
 }
