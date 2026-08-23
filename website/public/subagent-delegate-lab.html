@@ -20,7 +20,7 @@
       <div class="hero-copy">
         <p class="eyebrow">DSH 学习 · 委派与隔离</p>
         <h1>边界不放行，子会话就不存在。</h1>
-        <p class="hero-lead">一次委派要过一道深度检查：没到上限，子 Agent 在自己的 Session 里执行任务并恰好回报一次——成功摘要或失败原因都算完整结算；到了上限，委派在边界处被拒，本轮不产生任何子工作。父子工作分泳道，隔离就是这条链的意义。</p>
+        <p class="hero-lead">一次委派要过一道深度检查：子深度恒为父深度加一，默认上限是 3——超了就抛 SubagentDepthError，子会话根本不会被创建。没超，子 Agent 在自己的 Session 里执行任务并恰好回报一次，成功摘要或失败原因都算完整结算。深度记在 Session header 上单调取最大：恢复出来的子代理没法把自己算回顶层。</p>
         <div class="hero-actions">
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/03-核心文件精读.html">阅读配套课程</a>
@@ -30,13 +30,13 @@
       <aside class="model-warning" aria-label="证据边界">
         <span class="warning-index">MODEL / 10</span>
         <strong>纵轴是参与方，横轴是步骤序号。</strong>
-        <p>页面不启动真实子进程或 worker；时间线来自固定教学常量。</p>
+        <p>深度规则取自上游 subagent 源码；页面不启动真实子进程或 worker。</p>
       </aside>
     </header>
 
     <section class="control-strip card" aria-label="先预测，再改参数">
       <form id="prediction-gate" class="prediction-gate">
-        <p class="gate-question" id="gate-question">先押一个注：把「委派边界」切到「深度上限」，无论子任务的结局是什么——「子 Agent」的 Session 还会启动吗？</p>
+        <p class="gate-question" id="gate-question">先押一个注：把「父代理深度」切到 3——子 Agent 的 Session 还会启动吗？</p>
         <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
           <label class="gate-option">
             <input type="radio" name="prediction" value="spawns-anyway">
@@ -61,12 +61,14 @@
       <div id="gated-controls">
         <form class="lab-form" id="sd-form">
           <label>
-            <span>当前深度</span>
+            <span>父代理深度</span>
             <select id="depth" name="depth">
-              <option value="within-limit">低于上限（可委派）</option>
-              <option value="beyond-limit">已达深度上限</option>
+              <option value="0">0——顶层代理</option>
+              <option value="1">1——第一层子代理</option>
+              <option value="2">2——第二层子代理</option>
+              <option value="3">3——第三层子代理（再委派就超限）</option>
             </select>
-            <small>深度上限来自 persona 与工具过滤的同一族设计。</small>
+            <small>子深度 = 父深度 + 1；默认上限 3 来自上游 tool-subagent 配置的 default(3)。</small>
           </label>
           <label>
             <span>子任务结局</span>
@@ -95,7 +97,7 @@
           <p class="step-caption" id="sd-step-caption" role="status" aria-live="polite"></p>
         </div>
         <dl class="metric-grid" aria-label="委派观测值">
-          <div><dt>子是否启动</dt><dd id="metric-childran">—</dd></div>
+          <div><dt>子深度</dt><dd id="metric-childdepth">—</dd></div>
           <div><dt>边界结论</dt><dd id="metric-depth">—</dd></div>
           <div><dt>回报类型</dt><dd id="metric-report">—</dd></div>
           <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
@@ -111,7 +113,7 @@
         </div>
         <span class="schema-pill">步骤 × 参与方</span>
       </div>
-      <p class="section-intro">纵轴是参与方，横轴是步骤序号。虚线圆环是边界拒绝；被接受的委派里，子的执行永远只落在自己的泳道，回报单独成格。</p>
+      <p class="section-intro">纵轴是参与方，横轴是步骤序号。虚线圆环是边界拒绝（附上游原文的报错文案）；被接受的委派里，子的执行永远只落在自己的泳道，回报单独成格。</p>
       <div class="plot-scroll" id="sd-plot"></div>
       <p class="chart-note" id="sd-note"></p>
     </section>
@@ -121,11 +123,11 @@
         <div class="section-heading">
           <div>
             <p class="section-label" data-icon="beaker">独立校验</p>
-            <h2>四条规则逐条重算</h2>
+            <h2>六条规则逐条重算</h2>
           </div>
           <span class="schema-pill schema-oracle">流程校验</span>
         </div>
-        <p class="section-intro">独立校验自己重推一遍时间线，再核对深度限制、泳道隔离、回报账目和确定性；它不读渲染层的任何中间量。</p>
+        <p class="section-intro">独立校验自己重推一遍时间线，再核对深度算术、拒绝规则、header 单调性、泳道隔离、回报账目和确定性；它不读渲染层的任何中间量。</p>
         <ul class="oracle-list" id="oracle-list"></ul>
       </article>
 

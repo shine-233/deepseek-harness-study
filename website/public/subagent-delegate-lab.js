@@ -26,7 +26,7 @@ import { installThemeToggle } from './study-lab-theme.js'
 // 状态链接的输入契约：两个维度都是受控枚举；步进位置的上界由模型按步骤数给出，
 // 这里只卡整数下界，越界值在恢复时被拉回当前输入的末步。
 const DELEGATE_STATE_SCHEMA = {
-  depth: { enum: ['within-limit', 'beyond-limit'] },
+  depth: { enum: ['0', '1', '2', '3'] },
   outcome: { enum: ['report', 'fail'] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
@@ -85,7 +85,9 @@ function renderFlow(model, target, note) {
   target.append(svg)
   revealOnScroll(target)
 
-  let message = '这条时间线共 ' + String(model.observations.steps) + ' 步：边界'
+  let message = '这条时间线共 ' + String(model.observations.steps) + ' 步：子深度 '
+    + String(model.observations.childDepth) + '（上限 '
+    + String(model.observations.maxDepth) + '），边界'
     + (model.observations.depthAccepted ? '放行' : '拒绝') + '，'
     + (model.observations.childRan ? '子在会话里执行并' + model.observations.reportKind + '。'
       : '本轮没有产生任何子工作。')
@@ -108,7 +110,7 @@ function initializePage() {
     oracleList: document.querySelector('#oracle-list'),
     canProve: document.querySelector('#can-prove-list'),
     cannotProve: document.querySelector('#cannot-prove-list'),
-    childran: document.querySelector('#metric-childran'),
+    childdepth: document.querySelector('#metric-childdepth'),
     depthMetric: document.querySelector('#metric-depth'),
     report: document.querySelector('#metric-report'),
     oracle: document.querySelector('#metric-oracle'),
@@ -160,7 +162,7 @@ function initializePage() {
         depth: elements.depth.value,
         outcome: elements.outcome.value,
       }
-      const model = buildSubagentDelegateModel(input)
+      const model = buildSubagentDelegateModel({ parentDepth: Number(input.depth), outcome: input.outcome })
       const verdict = evaluateSubagentDelegateOracle(model)
       currentModel = model
 
@@ -183,11 +185,11 @@ function initializePage() {
       })))
       writeText(elements.tableCaption, '当前输入的全部 ' + String(model.steps.length) + ' 步')
 
-      writeText(elements.childran, model.observations.childRan ? '是' : '否')
+      writeText(elements.childdepth, String(model.observations.childDepth))
       writeText(elements.depthMetric, model.observations.depthAccepted ? '通过' : '拒绝')
       writeText(elements.report, model.observations.reportKind ?? '—')
       setFeedback('已推演：边界' + (model.observations.depthAccepted ? '放行' : '拒绝')
-        + '，子' + (model.observations.childRan ? '已启动' : '未启动') + '。', 'success')
+        + '，子' + (model.observations.childRan ? '已启动（深度 ' + String(model.observations.childDepth) + '）' : '未启动') + '。', 'success')
       syncStep()
       persistState()
     } catch (error) {
@@ -281,7 +283,7 @@ if (typeof document !== 'undefined') {
     feedback: document.getElementById('gate-feedback'),
     correct: 'rejected-at-boundary',
     explain: {
-      'spawns-anyway': 'DEPTH_LIMIT_ENFORCED 不允许它发生：上限是拦截，不是记录。',
+      'spawns-anyway': 'REJECTION_RULE 不允许它发生：子深度超过上限就抛 SubagentDepthError，不是记一笔了事。',
       'rejected-at-boundary': '正确。超限委派在边界处被拒，LANE_ISOLATION 同时确认子泳道完全为空。',
       'spawns-silent': 'REPORT_SETTLES 要求启动过的子工作恰好回报一次——但这里根本不会启动。',
     },

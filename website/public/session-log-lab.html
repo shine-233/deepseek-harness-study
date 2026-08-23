@@ -174,6 +174,63 @@
       </div>
     </section>
 
+    <section class="table-card card" aria-labelledby="sqlite-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="disc">物理行布局</p>
+          <h2 id="sqlite-title">同一段流在 SQLite 里的样子</h2>
+        </div>
+        <span class="schema-pill">schema 17 · 应用 id DSHP</span>
+      </div>
+      <p class="section-intro">上游的 SQLite 会话库把连续的流式增量打包成一条物理行：信封只存首序号和首时间戳，其余时间用增量数组还原；data 不足 4096 字节直接存文本，达到阈值才进 zstd 分支。打包行的 source_event_seqs 列按「排序差分 + zigzag + base-128 varint」逐字节编码，表里给的就是真实字节，可解码还原。切一下开关，看同一条流怎么落库。</p>
+      <form class="lab-form" id="sqlite-form">
+        <label>
+          <span>打包</span>
+          <select id="sqlite-packing" name="packing">
+            <option value="on">开启——连续增量折成一条打包行</option>
+            <option value="off">关闭——一条事件一行</option>
+          </select>
+          <small>打包行最少 3 个成员、至多 1024 个，data 不超过 1048576 字节。</small>
+        </label>
+        <label>
+          <span>单条增量大小</span>
+          <select id="sqlite-payload" name="payload">
+            <option value="small">小（13 字节文本）</option>
+            <option value="large">大（5200 字节文本）</option>
+          </select>
+          <small>只有 data 达到 4096 字节的行才进入压缩分支。</small>
+        </label>
+        <button class="button button-primary" type="submit">重新布局</button>
+      </form>
+      <dl class="metric-grid" aria-label="物理行观测值">
+        <div><dt>逻辑事件</dt><dd id="sqlite-metric-logical">—</dd></div>
+        <div><dt>物理行</dt><dd id="sqlite-metric-physical">—</dd></div>
+        <div><dt>data 总字节</dt><dd id="sqlite-metric-bytes">—</dd></div>
+        <div><dt>进入压缩分支</dt><dd id="sqlite-metric-zstd">—</dd></div>
+        <div class="metric-oracle"><dt>独立校验</dt><dd id="sqlite-metric-oracle">—</dd></div>
+      </dl>
+      <ul class="oracle-list" id="sqlite-oracle-list"></ul>
+      <div class="table-scroll">
+        <table>
+          <caption id="sqlite-table-caption">当前输入下的物理行布局</caption>
+          <thead>
+            <tr>
+              <th scope="col">行</th>
+              <th scope="col">覆盖序号</th>
+              <th scope="col">类型标记</th>
+              <th scope="col">成员数</th>
+              <th scope="col">dt 增量数</th>
+              <th scope="col">data 字节</th>
+              <th scope="col">≥4096 走压缩</th>
+              <th scope="col">ignorable 标记</th>
+              <th scope="col">source_event_seqs 编码</th>
+            </tr>
+          </thead>
+          <tbody id="sqlite-row-body"></tbody>
+        </table>
+      </div>
+    </section>
+
     <footer class="page-footer">
       <span>纯函数折叠 · 独立 oracle 校验 · 完整表格替代 · 不读写真实 Session</span>
       <a href="./study/lessons/15-BundleProfileLoader与发布安装.html">继续读 Bundle、Profile 与 Loader</a>

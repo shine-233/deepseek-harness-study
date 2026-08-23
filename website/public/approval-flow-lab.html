@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="ask 的完整生命周期与无应答者的退化拒绝：可交互的审批流实验">
+  <meta name="description" content="ask 的完整生命周期与四种真实结局 allowed-once、rejected、cancelled、unavailable：可交互的审批流实验">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>审批流实验室</title>
   <link rel="stylesheet" href="./study-tokens.css">
@@ -20,7 +20,7 @@
       <div class="hero-copy">
         <p class="eyebrow">DSH 学习 · 审批与权限</p>
         <h1>没人能批准的时候，批准通道自己变成拒绝。</h1>
-        <p class="hero-lead">一次 ask 要经过三层：工具主体发起请求，审批服务路由给应答者，人给出这一次的裁决。把应答者拿走会发生什么？规则只有一句——询问退化为拒绝，工具主体不运行。切换开关，看 allow 的一次性语义和统一的结果分类。</p>
+        <p class="hero-lead">一次 ask 要经过三层：工具主体发起请求，审批服务按会话策略路由，应答者给出裁决。结局只有四个词——allowed-once、rejected、cancelled、unavailable。策略切到 never 时服务在派发前直接拒绝；请求先一步中止就结算 cancelled；链上没人接住就是 unavailable。每次询问都在 Session 日志里留下一对审计事件。</p>
         <div class="hero-actions">
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
@@ -30,13 +30,13 @@
       <aside class="model-warning" aria-label="证据边界">
         <span class="warning-index">MODEL / 08</span>
         <strong>纵轴是参与方，横轴是步骤序号。</strong>
-        <p>页面不连接宿主，不弹出真实审批；时间线来自固定教学常量。</p>
+        <p>规则取自上游 user-approval 源码；页面不连接宿主，不弹出真实审批。</p>
       </aside>
     </header>
 
     <section class="control-strip card" aria-label="先预测，再改参数">
       <form id="prediction-gate" class="prediction-gate">
-        <p class="gate-question" id="gate-question">先押一个注：把「应答者」切到「无」，无论裁决选什么——「工具主体」还会运行吗？</p>
+        <p class="gate-question" id="gate-question">先押一个注：把「应答者」切到「无」，策略保持 ask——「工具主体」还会运行吗？</p>
         <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
           <label class="gate-option">
             <input type="radio" name="prediction" value="runs-anyway">
@@ -61,20 +61,36 @@
       <div id="gated-controls">
         <form class="lab-form" id="af-form">
           <label>
+            <span>会话策略</span>
+            <select id="policy" name="policy">
+              <option value="ask">ask——交给应答者瀑布（默认）</option>
+              <option value="never">never——派发前直接拒绝</option>
+            </select>
+            <small>never 由服务自己裁决，先注册的监听器也改写不了。</small>
+          </label>
+          <label>
             <span>应答者</span>
             <select id="responder" name="responder">
               <option value="ui-answerer">已注册的应答者（界面）</option>
-              <option value="none">无——没有可用的 approval service 或 answerer</option>
+              <option value="none">无——瀑布链上没有 answerer</option>
             </select>
-            <small>这一项决定整条链的命运：缺席即拒绝。</small>
+            <small>这一项决定整条链的命运：缺席即 unavailable。</small>
           </label>
           <label>
             <span>用户裁决</span>
             <select id="decision" name="decision">
-              <option value="allow">允许（仅这一次）</option>
-              <option value="deny">拒绝</option>
+              <option value="allow">允许这一次（allowed-once）</option>
+              <option value="deny">拒绝这一次（rejected）</option>
             </select>
-            <small>裁决只在有应答者时生效；它不产生任何持久授权。</small>
+            <small>只在策略 ask、有应答者且信号存活时生效；许可不跨调用。</small>
+          </label>
+          <label>
+            <span>中止信号</span>
+            <select id="abort" name="abort">
+              <option value="live">存活——正常等待裁决</option>
+              <option value="pre-aborted">已中止——结算 cancelled</option>
+            </select>
+            <small>取消赢得竞速后，迟到的应答按构造作废。</small>
           </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
@@ -98,7 +114,7 @@
           <div><dt>主体是否运行</dt><dd id="metric-ran">—</dd></div>
           <div><dt>执行次数</dt><dd id="metric-runs">—</dd></div>
           <div><dt>最终结局</dt><dd id="metric-outcome">—</dd></div>
-          <div><dt>应答者泳道</dt><dd id="metric-lane">—</dd></div>
+          <div><dt>审计对</dt><dd id="metric-audit">—</dd></div>
           <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
         </dl>
       </div>
@@ -112,7 +128,7 @@
         </div>
         <span class="schema-pill">步骤 × 参与方</span>
       </div>
-      <p class="section-intro">纵轴是参与方，横轴是步骤序号。裁决点落在应答者泳道；最后一格写在结果上，注明主体是否运行、以哪种分类收束。</p>
+      <p class="section-intro">纵轴是参与方，横轴是步骤序号。Session 日志泳道上永远有一对审计事件：approval/asked 先入册，approval/decided 记录最终结局；最后一格写在结果上，注明主体是否运行、以哪个词收束。</p>
       <div class="plot-scroll" id="af-plot"></div>
       <p class="chart-note" id="af-note"></p>
     </section>
@@ -122,11 +138,11 @@
         <div class="section-heading">
           <div>
             <p class="section-label" data-icon="beaker">独立校验</p>
-            <h2>四条规则逐条重算</h2>
+            <h2>七条规则逐条重算</h2>
           </div>
           <span class="schema-pill schema-oracle">流程校验</span>
         </div>
-        <p class="section-intro">独立校验自己重推一遍时间线，再核对退化拒绝、allow 的一次性、拒绝不执行和确定性；它不读渲染层的任何中间量。</p>
+        <p class="section-intro">独立校验自己重推一遍时间线，再核对结局词表、never 前置闸、fail-closed、取消竞速、一次性许可和审计对的完整性；它不读渲染层的任何中间量。</p>
         <ul class="oracle-list" id="oracle-list"></ul>
       </article>
 

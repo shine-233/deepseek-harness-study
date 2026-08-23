@@ -1,9 +1,7 @@
-/*
- * 循环卫生实验页的页面专用样式。其余布局来自 study-lab-shell.css。
- */
+﻿/*
+ * 寰幆鍗敓瀹為獙椤电殑椤甸潰涓撶敤鏍峰紡銆傚叾浣欏竷灞€鏉ヨ嚜 study-lab-shell.css銆? */
 
-/* 每条泳道一种状态色类：颜色只编码参与方与阶段，不编码数值。
- * 全部走 token 组合，文字一律 -ink 色阶；marks 只允许出现在圆点上。 */
+/* 姣忔潯娉抽亾涓€绉嶇姸鎬佽壊绫伙細棰滆壊鍙紪鐮佸弬涓庢柟涓庨樁娈碉紝涓嶇紪鐮佹暟鍊笺€? * 鍏ㄩ儴璧?token 缁勫悎锛屾枃瀛椾竴寰?-ink 鑹查樁锛沵arks 鍙厑璁稿嚭鐜板湪鍦嗙偣涓娿€?*/
 .gl-dot {
   fill: var(--brand);
   stroke: var(--surface-strong);
@@ -11,19 +9,95 @@
   transition: r 120ms ease;
 }
 .gl-dot:hover { r: 11; }
-.gl-dot.is-block { fill: var(--signal); }
-.gl-dot.is-undo {
-  fill: var(--surface-strong);
-  stroke: var(--muted);
-  stroke-dasharray: 3 2;
-}
-.gl-dot.is-exec {
+.gl-dot.is-remind { fill: var(--signal); }
+.gl-dot.is-receive {
   fill: var(--allow);
 }
+.gl-dot.is-reset {
+  fill: var(--surface-strong);
+  stroke: var(--signal);
+  stroke-dasharray: 3 2;
+}
 
-tbody tr[data-state="block"] td:nth-child(4) { font-weight: 700; }
-tbody tr[data-state="undo"] td { color: var(--muted); }
+tbody tr[data-state="remind"] td:nth-child(4) { font-weight: 700; }
+
+/* 閿鑼冨寲娌欑洅锛氶鑹插彧缂栫爜銆屽悓涓€閿?/ 鏂伴敭 / 寰呬慨銆嶄笌娓╁拰 / 璇︾粏涓ゆ。銆?*/
+.sandbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-md);
+}
+.sandbox-field { display: grid; gap: 0.35rem; }
+.sandbox-field textarea {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 3.6rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.65rem;
+}
+.sandbox-field textarea:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+.sandbox-field code {
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+.sandbox-verdict {
+  margin: 0.9rem 0 0.6rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid var(--brand);
+  background: var(--brand-soft, var(--surface));
+  color: var(--ink);
+}
+.sandbox-verdict[data-verdict="new-key"] {
+  border-left-color: var(--signal);
+  background: color-mix(in srgb, var(--signal-soft) 78%, var(--surface));
+}
+.sandbox-verdict[data-verdict="invalid"] {
+  border-left-color: var(--warning);
+  background: color-mix(in srgb, var(--warning-soft) 78%, var(--surface));
+}
+.sandbox-meter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.sandbox-cell {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.45rem;
+  border: 1px dashed var(--surface-strong);
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.sandbox-cell.is-gentle {
+  border-style: solid;
+  border-color: var(--brand);
+  background: var(--brand-soft, transparent);
+}
+.sandbox-cell.is-detailed {
+  border-style: solid;
+  border-color: var(--signal);
+  background: color-mix(in srgb, var(--signal-soft) 78%, var(--surface));
+}
+@keyframes sandbox-fire {
+  from { transform: scale(0.72); }
+  to { transform: scale(1); }
+}
+.sandbox-cell.fires { animation: sandbox-fire 260ms ease-out; }
 
 @media (prefers-reduced-motion: reduce) {
   .gl-dot { transition: none; }
+  .sandbox-cell.fires { animation: none; }
 }

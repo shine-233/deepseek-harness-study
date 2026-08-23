@@ -23,11 +23,13 @@ import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
-// 状态链接的输入契约：两个维度都是受控枚举；步进位置的上界由模型按步骤数给出，
+// 状态链接的输入契约：四个维度都是受控枚举；步进位置的上界由模型按步骤数给出，
 // 这里只卡整数下界，越界值在恢复时被拉回当前输入的末步。
 const APPROVAL_STATE_SCHEMA = {
+  policy: { enum: ['ask', 'never'] },
   responder: { enum: ['ui-answerer', 'none'] },
   decision: { enum: ['allow', 'deny'] },
+  abort: { enum: ['live', 'pre-aborted'] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
@@ -50,8 +52,8 @@ function renderFlow(model, target, note) {
   svg.append(
     svgElement('title', { id: 'af-svg-title' }, '一次 ask 的有序步骤'),
     svgElement('desc', { id: 'af-svg-desc' },
-      '纵轴是参与方：工具主体、审批服务、应答者和结果；横轴是步骤序号。'
-      + '裁决点落在应答者泳道，最后一格注明主体是否运行与结局分类。'),
+      '纵轴是参与方：工具主体、审批服务、应答者、Session 日志和结果；横轴是步骤序号。'
+      + 'Session 日志泳道上有一对审计事件，最后一格注明主体是否运行与结局词汇。'),
   )
 
   for (const lane of APPROVAL_LANES) {
@@ -87,13 +89,18 @@ function renderFlow(model, target, note) {
 
   let message = '这条时间线共 ' + String(model.observations.steps) + ' 步：主体'
     + (model.observations.toolBodyRan ? '执行了这一次调用' : '没有运行') + '，结局「'
-    + model.observations.finalOutcome + '」。'
-  if (model.input.responder === 'none') {
-    message += '应答者缺席：审批通道自己变成了拒绝，这就是 fail closed。'
+    + model.observations.finalOutcome + '」。审计对'
+    + (model.observations.auditPairComplete ? '完整成对。' : '不完整——这不该发生。')
+  if (model.input.policy === 'never') {
+    message += '策略 never 在派发之前就给出了结论：应答者根本没被问到。'
+  } else if (model.input.abort === 'pre-aborted') {
+    message += '取消赢得竞速：结算 cancelled，迟到的应答按构造丢弃。'
+  } else if (model.input.responder === 'none') {
+    message += '应答者缺席：结局是 unavailable 而不是某个自造的错误码，这就是 fail closed。'
   } else if (model.input.decision === 'allow') {
-    message += 'allow 只覆盖这一次——它不是持久授权。'
+    message += 'allowed-once 只覆盖这一次——它不是持久授权。'
   } else {
-    message += '拒绝收敛进统一的结果分类，工具不需要自定义失败协议。'
+    message += 'rejected 收敛进统一的结果分类，工具不需要自定义失败协议。'
   }
   writeText(note, message)
 }
@@ -101,8 +108,10 @@ function renderFlow(model, target, note) {
 function initializePage() {
   const elements = {
     form: document.querySelector('#af-form'),
+    policy: document.querySelector('#policy'),
     responder: document.querySelector('#responder'),
     decision: document.querySelector('#decision'),
+    abort: document.querySelector('#abort'),
     feedback: document.querySelector('#af-feedback'),
     flow: document.querySelector('#af-plot'),
     flowNote: document.querySelector('#af-note'),
@@ -114,7 +123,7 @@ function initializePage() {
     ran: document.querySelector('#metric-ran'),
     runs: document.querySelector('#metric-runs'),
     outcome: document.querySelector('#metric-outcome'),
-    lane: document.querySelector('#metric-lane'),
+    audit: document.querySelector('#metric-audit'),
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
     resetInputs: document.querySelector('#reset-inputs'),
@@ -161,8 +170,10 @@ function initializePage() {
   const rebuild = () => {
     try {
       const input = {
+        policy: elements.policy.value,
         responder: elements.responder.value,
         decision: elements.decision.value,
+        abort: elements.abort.value,
       }
       const model = buildApprovalFlowModel(input)
       const verdict = evaluateApprovalFlowOracle(model)
@@ -191,7 +202,7 @@ function initializePage() {
       writeText(elements.ran, model.observations.toolBodyRan ? '是' : '否')
       writeText(elements.runs, String(bodyRuns))
       writeText(elements.outcome, model.observations.finalOutcome)
-      writeText(elements.lane, model.observations.responderLaneUsed ? '用到' : '空置')
+      writeText(elements.audit, model.observations.auditPairComplete ? '完整成对' : '不完整')
       setFeedback('已推演：主体运行=' + (model.observations.toolBodyRan ? '是' : '否')
         + '，结局「' + model.observations.finalOutcome + '」。', 'success')
       syncStep()
@@ -206,8 +217,10 @@ function initializePage() {
   const persistState = () => {
     try {
       const nextHash = writeStateToHash(location.hash, {
+        policy: elements.policy.value,
         responder: elements.responder.value,
         decision: elements.decision.value,
+        abort: elements.abort.value,
         step: Number(elements.step.value),
       }, APPROVAL_STATE_SCHEMA)
       history.replaceState(null, '', nextHash)
@@ -223,7 +236,7 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  for (const control of [elements.responder, elements.decision]) {
+  for (const control of [elements.policy, elements.responder, elements.decision, elements.abort]) {
     control.addEventListener('change', () => {
       // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
       rebuild()
@@ -254,8 +267,10 @@ function initializePage() {
   const restored = readStateFromHash(location.hash, APPROVAL_STATE_SCHEMA)
   const hasRestoredStep = restored !== null && restored.ok
   if (restored !== null && restored.ok) {
+    elements.policy.value = restored.value.policy
     elements.responder.value = restored.value.responder
     elements.decision.value = restored.value.decision
+    elements.abort.value = restored.value.abort
     elements.step.value = String(restored.value.step)
   }
 
@@ -287,9 +302,9 @@ if (typeof document !== 'undefined') {
     feedback: document.getElementById('gate-feedback'),
     correct: 'fail-closed',
     explain: {
-      'runs-anyway': 'FAIL_CLOSED 这条校验不允许它发生：没有可用 approval service 或 answerer 时，询问退化为拒绝。',
-      'fail-closed': '正确。FAIL_CLOSED 与 DENY_NO_EXECUTION 一起固定了这条规则：缺席即拒绝，工具主体不运行。',
-      'hangs': '链上没有等待这回事——路由层发现无人可问时直接给出结论，SINGLE_USE_ALLOW 的计数保持为零。',
+      'runs-anyway': 'FAIL_CLOSED_UNAVAILABLE 这条校验不允许它发生：瀑布链上没有 answerer 时，结局是 unavailable，工具主体不运行。',
+      'fail-closed': '正确。结局是 unavailable 而不是自造错误码；ALLOWED_ONCE_SINGLE_RUN 的执行计数保持为零。',
+      'hangs': '链上没有等待这回事——瀑布走完无人接住就直接结算 unavailable，审计对照样成对落册。',
     },
   })
 }

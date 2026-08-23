@@ -19,6 +19,10 @@ import {
   buildSessionLogModel,
   evaluateSessionLogOracle,
 } from './session-log-model.js'
+import {
+  buildSqliteRowModel,
+  evaluateSqliteRowOracle,
+} from './sqlite-row-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
@@ -27,7 +31,16 @@ import { installThemeToggle } from './study-lab-theme.js'
 
 // 状态链接的输入契约：场景是枚举；重放位置的上界由模型按日志长度给出，
 // 这里只卡整数下界，越界值在恢复时被拉回当前场景的末尾。
+// SQLite 面板的两个开关和重放输入共用同一段 #state=，所以放进同一张 schema。
 const SESSION_STATE_SCHEMA = {
+  scenario: { enum: LOG_SCENARIOS.map(scenario => scenario.id) },
+  upTo: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
+  sqlitePacking: { enum: ['on', 'off'] },
+  sqlitePayload: { enum: ['small', 'large'] },
+}
+
+// 只含重放输入的旧版链接：整表校验失败时按它兜底，老书签不至于整页回默认。
+const LEGACY_REPLAY_SCHEMA = {
   scenario: { enum: LOG_SCENARIOS.map(scenario => scenario.id) },
   upTo: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
@@ -135,6 +148,54 @@ function renderState(model, grid, messageList) {
   }
 }
 
+function renderSqlitePanel(elements, persistState = () => {}) {
+  const rebuildSqlite = () => {
+    try {
+      const model = buildSqliteRowModel({
+        packing: elements.sqlitePacking.value,
+        payload: elements.sqlitePayload.value,
+      })
+      const verdict = evaluateSqliteRowOracle(model)
+      renderOracle(verdict, elements.sqliteOracleList, elements.sqliteOracle)
+      renderRows(elements.sqliteRowBody, model.rows.map(row => ({
+        key: String(row.position),
+        state: row.kind === 'packed' ? 'final' : 'plain',
+        cells: [
+          String(row.position),
+          row.seqLabel,
+          row.tag,
+          String(row.memberCount),
+          String(row.dtCount),
+          String(row.dataBytes),
+          row.entersCompressionBranch ? '是' : '否',
+          row.ignorable === 0 ? '0（打包行）' : 'NULL',
+          row.sourceEventSeqsHex ?? '—',
+        ],
+      })))
+      writeText(elements.sqliteTableCaption, (model.input.packing === 'on' ? '打包开启' : '打包关闭')
+        + '、单条增量 ' + (model.input.payload === 'large' ? '大' : '小')
+        + ' 时的物理行布局（schema ' + String(model.schemaVersion)
+        + '，应用 id ' + model.applicationIdAscii + '）')
+      writeText(elements.sqliteLogical, String(model.observations.logicalEvents))
+      writeText(elements.sqlitePhysical, String(model.observations.physicalRowCount))
+      writeText(elements.sqliteBytes, String(model.observations.totalDataBytes))
+      writeText(elements.sqliteZstd, String(model.observations.compressionCandidates))
+      persistState()
+    } catch (error) {
+      console.error('[sqlite-panel] rebuild failed', error)
+    }
+  }
+
+  elements.sqliteForm.addEventListener('submit', (event) => {
+    event.preventDefault()
+    rebuildSqlite()
+  })
+  for (const control of [elements.sqlitePacking, elements.sqlitePayload]) {
+    control.addEventListener('change', rebuildSqlite)
+  }
+  rebuildSqlite()
+}
+
 function initializePage() {
   const elements = {
     form: document.querySelector('#session-form'),
@@ -160,6 +221,17 @@ function initializePage() {
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
     resetInputs: document.querySelector('#reset-inputs'),
+    sqliteForm: document.querySelector('#sqlite-form'),
+    sqlitePacking: document.querySelector('#sqlite-packing'),
+    sqlitePayload: document.querySelector('#sqlite-payload'),
+    sqliteOracleList: document.querySelector('#sqlite-oracle-list'),
+    sqliteOracle: document.querySelector('#sqlite-metric-oracle'),
+    sqliteRowBody: document.querySelector('#sqlite-row-body'),
+    sqliteTableCaption: document.querySelector('#sqlite-table-caption'),
+    sqliteLogical: document.querySelector('#sqlite-metric-logical'),
+    sqlitePhysical: document.querySelector('#sqlite-metric-physical'),
+    sqliteBytes: document.querySelector('#sqlite-metric-bytes'),
+    sqliteZstd: document.querySelector('#sqlite-metric-zstd'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -219,11 +291,14 @@ function initializePage() {
 
   // 状态进 URL hash：刷新或把链接发给别人，打开的就是同一份输入。
   // replaceState 在 file:// 或沙箱环境下可能被拒；状态链接是增强，不是前提。
+  // 重放输入和 SQLite 面板的开关写同一段 #state=，一次全量写入避免互相覆盖。
   const persistState = () => {
     try {
       history.replaceState(null, '', writeStateToHash(location.hash, {
         scenario: elements.scenario.value,
         upTo: Number(elements.upTo.value),
+        sqlitePacking: elements.sqlitePacking.value,
+        sqlitePayload: elements.sqlitePayload.value,
       }, SESSION_STATE_SCHEMA))
     } catch {
       // 保持安静：hash 写不进去时页面行为不变。
@@ -248,12 +323,22 @@ function initializePage() {
   const playButton = document.querySelector('#frame-play')
   if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.upTo, { stepMs: 450 })
 
-  // 从状态链接恢复输入；链接缺失或损坏时保持默认场景，不报错打断阅读。
+  // 从状态链接恢复输入；链接缺失时保持默认场景。新版链接带 SQLite 开关；
+  // 只有旧版两个字段的老书签也能恢复重放输入，SQLite 面板留在默认值。
   const restored = readStateFromHash(location.hash, SESSION_STATE_SCHEMA)
-  const hasRestoredUpTo = restored !== null && restored.ok
+  const legacy = restored !== null && !restored.ok
+    ? readStateFromHash(location.hash, LEGACY_REPLAY_SCHEMA)
+    : null
+  const hasRestoredUpTo = (restored !== null && restored.ok)
+    || (legacy !== null && legacy.ok)
   if (restored !== null && restored.ok) {
     elements.scenario.value = restored.value.scenario
     elements.upTo.value = String(restored.value.upTo)
+    elements.sqlitePacking.value = restored.value.sqlitePacking
+    elements.sqlitePayload.value = restored.value.sqlitePayload
+  } else if (legacy !== null && legacy.ok) {
+    elements.scenario.value = legacy.value.scenario
+    elements.upTo.value = String(legacy.value.upTo)
   }
 
   rebuild()
@@ -261,6 +346,7 @@ function initializePage() {
     elements.upTo.value = elements.upTo.max
     rebuild()
   }
+  renderSqlitePanel(elements, persistState)
 
   elements.copyLink.addEventListener('click', async () => {
     try {
