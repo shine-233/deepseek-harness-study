@@ -227,7 +227,37 @@ th[aria-sort="descending"] button.sort-key::after { content: "▼"; font-size: 9
   font-size: var(--text-xs);
 }
 
-.scene-stage { margin-top: var(--space-sm); }
+.scene-stage { margin-top: var(--space-sm); position: relative; }
+
+/*
+ * model-viewer 式锚定标签：按钮钉在分组柱顶的投影坐标上，
+ * 每帧由 onFrame 写 left/top；层本身不接指针，只有按钮可点。
+ */
+.dsh3d-hotspots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.dsh3d-hotspot {
+  pointer-events: auto;
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font: inherit;
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-strong);
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dsh3d-hotspot:hover { border-color: var(--brand); }
+.dsh3d-hotspot:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
 
 #scene-canvas {
   display: block;

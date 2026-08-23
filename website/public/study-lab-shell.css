@@ -69,6 +69,25 @@ a { color: var(--brand); }
   border-radius: var(--radius-lg);
 }
 
+/*
+ * 区块卡片的滚动入场：纯 CSS 滚动时间线（2026 Baseline），合成器线程执行。
+ * 双层降级——不支持的浏览器和减少动态偏好下，卡片保持自然静态，功能不变。
+ * 只动 opacity / transform；animation-duration 的 1ms 是 Firefox 的语法要求。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    main.lab-shell > section {
+      animation: lab-card-enter 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+    @keyframes lab-card-enter {
+      from { opacity: 0; transform: translateY(24px) scale(0.988); }
+      to { opacity: 1; transform: none; }
+    }
+  }
+}
+
 .hero-panel {
   position: relative;
   display: grid;

@@ -719,6 +719,8 @@ html.dark .dj-start-badge{color:#d9bc72;}
 html.dark .dj-turn-track li{color:#7f8fa5;}
 html.dark .dj-turn-track li:not(:last-child)::after{border-color:#41506a;}
 html.dark .dj-turn-track i{border-color:#57503f;background:#243247;color:#8d8471;}
+/* 活动步的特异性更高，深色下必须单独压回来，否则数字几乎不可读。 */
+html.dark .dj-turn-track li.dj-on i{background:#2e4059;color:#cfe0fa;border-color:#8fb5ee;}
 html.dark .dj-polaroid{background:#243247;box-shadow:3px 5px 10px rgba(0,0,0,.4);}
 html.dark .dj-memo{border-color:#65552e;background:#2c2618;color:#cdb489;}
 html.dark .dj-sticky{color:#cfc4ab;background:#33301c;border-color:#5a512e;}
@@ -746,4 +748,29 @@ html.dark .dj-tabs button[aria-selected='true']{outline-color:rgba(10,16,28,.5);
   .dj-page{margin:-24px -16px 0;padding-left:16px;padding-right:16px;}
 }
 :focus-visible{outline:3px solid var(--blue-ink);outline-offset:2px;border-radius:4px;}
+
+/*
+ * 滚动入场（纯 CSS 滚动时间线，2026 Baseline）。
+ * 双层降级：不支持 view() 的浏览器和减少动态偏好下完全静态；
+ * 只动 opacity/transform，合成器线程执行。集章卡的进度数字仍来自
+ * localStorage 的真实记录，滚动只负责入场，不参与任何数值。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .dj-stamp-card,.dj-mascot-card,.dj-toc{
+      animation:dj-enter 1ms linear both;
+      animation-timeline:view();
+      animation-range:entry 0% entry 55%;
+    }
+    .dj-lab-chip{
+      animation:dj-enter 1ms linear both;
+      animation-timeline:view();
+      animation-range:entry 5% entry 45%;
+    }
+    @keyframes dj-enter{
+      from{opacity:0;transform:translateY(20px)}
+      to{opacity:1;transform:none}
+    }
+  }
+}
 </style>

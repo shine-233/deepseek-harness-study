@@ -979,7 +979,6 @@ function installScene(model) {
         }
       }
     }
-    }
     stage.hidden = false
     launch.hidden = true
     scene.resize()
