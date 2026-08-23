@@ -67,6 +67,31 @@ a { color: var(--brand); }
   margin-top: 20px;
   padding: clamp(22px, 3vw, 38px);
   border-radius: var(--radius-lg);
+  position: relative;
+}
+
+/*
+ * 卡片聚光：指针位置由 study-lab-kit.js 的事件委托写入 --mx/--my，
+ * 一团品牌色暖光以大半径径向渐变跟随——Linear 式微交互的纸面译版，
+ * 刻意压到 22% 透明度，只做「纸面被台灯照亮」的暗示，不抢数据可读性。
+ */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease);
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--brand-soft) 22%, transparent),
+    transparent 70%
+  );
+}
+.card:hover::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .card::after { transition: none; }
 }
 
 /*
@@ -132,7 +157,7 @@ h3 { margin: 0 0 8px; font-size: 0.94rem; }
   cursor: pointer;
   font-weight: 750;
   text-decoration: none;
-  transition: transform 160ms ease, background 160ms ease;
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
 }
 
 .button:hover { transform: translateY(-2px); }
@@ -392,6 +417,24 @@ button[aria-pressed="true"] {
 }
 
 /*
+ * 弹簧缓动升级：study-lab-motion.css 已在 .lab-shell 上定义了
+ * cubic-bezier 近似的 --ease-spring；linear() 能表达真正的欠阻尼振荡
+ * （过冲 1.16 后衰减），本文件加载在后，支持的浏览器自动取用这条升级，
+ * 不支持的继续用 motion.css 的 bezier 近似。采样点来自
+ * linear-easing-generator 的弹簧预设（刚度 235 / 阻尼 10）。
+ */
+@supports (animation-timing-function: linear(0, 1)) {
+  .lab-shell {
+    --ease-spring: linear(
+      0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%,
+      1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161,
+      1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991,
+      0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1
+    );
+  }
+}
+
+/*
  * 主题切换的圆形扩散：View Transitions 快照 + clip-path 揭示。
  * 旧快照保持不动，新快照从点击点（--vt-x/--vt-y，JS 写入；键盘激活时
  * 回落屏幕中心）以 150% 半径扫开——角落按钮到对角需要约 142%，取整留裕量。
@@ -405,7 +448,7 @@ button[aria-pressed="true"] {
       mix-blend-mode: normal;
     }
     ::view-transition-new(root) {
-      animation: dsh-vt-reveal 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      animation: dsh-vt-reveal var(--dur-enter) var(--ease) forwards;
       mix-blend-mode: normal;
       z-index: 1;
     }

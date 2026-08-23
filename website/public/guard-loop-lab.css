@@ -6,7 +6,7 @@
   fill: var(--brand);
   stroke: var(--surface-strong);
   stroke-width: 2;
-  transition: r 120ms ease;
+  transition: r 320ms var(--ease-spring);
 }
 .gl-dot:hover { r: 11; }
 .gl-dot.is-remind { fill: var(--signal); }
@@ -95,7 +95,9 @@ tbody tr[data-state="remind"] td:nth-child(4) { font-weight: 700; }
   from { transform: scale(0.72); }
   to { transform: scale(1); }
 }
-.sandbox-cell.fires { animation: sandbox-fire 260ms ease-out; }
+.sandbox-cell.fires {
+  animation: sandbox-fire 420ms var(--ease-spring);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .gl-dot { transition: none; }
