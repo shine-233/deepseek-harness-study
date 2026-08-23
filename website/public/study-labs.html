@@ -111,11 +111,11 @@
           </svg>
           <div class="lab-card-body">
             <h3>Session 日志重放</h3>
-            <p class="lab-card-question">拖动重放位置，看状态怎么从日志逐条折叠出来。切到含未知事件的场景：必需事件会让加载停下，标了 ignorable 的才能跳过。</p>
+            <p class="lab-card-question">拖动重放位置，看状态怎么从日志逐条折叠出来。往下还有 SQLite 物理行面板：连续增量怎么折成一条打包行，多大的 data 才走压缩？</p>
             <p class="lab-card-progress" hidden></p>
             <ul class="lab-card-tags" role="list">
               <li class="schema-pill">重放拖杆</li>
-              <li class="schema-pill">未知事件场景</li>
+              <li class="schema-pill">SQLite 行布局</li>
             </ul>
             <p class="lab-card-links">
               <a class="button button-primary" href="./session-log-lab.html">打开实验</a>
@@ -237,7 +237,7 @@
             <p class="lab-card-question">同一组 Bundle，把「严格上限」拖到前面，maxTurns 就从 4 变 12：决定结果的是最后一个写它的步骤。overlay 永远叠在最后。</p>
             <p class="lab-card-progress" hidden></p>
             <ul class="lab-card-tags" role="list">
-              <li class="schema-pill">顺序拖拽</li>
+              <li class="schema-pill">上下移排序</li>
               <li class="schema-pill">装配对照</li>
             </ul>
             <p class="lab-card-links">
@@ -355,11 +355,11 @@
           </svg>
           <div class="lab-card-body">
             <h3>审批流</h3>
-            <p class="lab-card-question">一次 ask 走过审批服务与应答者。把应答者拿走会发生什么？allow 的授权范围到底有多大？</p>
+            <p class="lab-card-question">一次 ask 只有四种结局：allowed-once、rejected、cancelled、unavailable。把应答者拿走会落到哪个词？策略 never 又由谁裁决？</p>
             <p class="lab-card-progress" hidden></p>
             <ul class="lab-card-tags" role="list">
               <li class="schema-pill">预测门控</li>
-              <li class="schema-pill">退化拒绝</li>
+              <li class="schema-pill">fail closed</li>
             </ul>
             <p class="lab-card-links">
               <a class="button button-primary" href="./approval-flow-lab.html">进实验室</a>
@@ -378,7 +378,7 @@
           </svg>
           <div class="lab-card-body">
             <h3>subagent 委派</h3>
-            <p class="lab-card-question">委派要过一道深度检查。到了上限，边界拦截的是任务还是整个子会话？失败回报算不算完整结算？</p>
+            <p class="lab-card-question">子深度是父深度加一，默认上限 3。超限的报错原文长什么样？被拒的委派会留下什么？失败回报算不算完整结算？</p>
             <p class="lab-card-progress" hidden></p>
             <ul class="lab-card-tags" role="list">
               <li class="schema-pill">深度上限</li>
@@ -402,11 +402,11 @@
           </svg>
           <div class="lab-card-body">
             <h3>循环卫生</h3>
-            <p class="lab-card-question">同一个调用被连续发出：守卫从第几次开始拦？后置结算能不能把拦截改写回已执行？执行账目还平衡吗？</p>
+            <p class="lab-card-question">同一个调用被连续发出：提醒在第几次出现？只换参数键序算不算新调用？用户插一句嘴之后，链条从几重新数起？</p>
             <p class="lab-card-progress" hidden></p>
             <ul class="lab-card-tags" role="list">
-              <li class="schema-pill">阈值拦截</li>
-              <li class="schema-pill">单调拒绝</li>
+              <li class="schema-pill">阈值 [3, 5, 8]</li>
+              <li class="schema-pill">只提醒不拦截</li>
             </ul>
             <p class="lab-card-links">
               <a class="button button-primary" href="./guard-loop-lab.html">进实验室</a>
@@ -415,7 +415,7 @@
           </div>
         </li>
 
-        <li class="lab-card" data-group="evidence" data-lab="research-debug-bridge" data-lesson="29-研究与-Debug-协作">
+        <li class="lab-card" data-group="evidence" data-lab="research-debug-bridge" data-lesson="36-研究与-Debug-协作">
           <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
             <rect class="lm-box" x="6" y="18" width="36" height="30" rx="4"/>
             <rect class="lm-box lm-accent" x="78" y="18" width="36" height="30" rx="4"/>
@@ -434,7 +434,7 @@
             </ul>
             <p class="lab-card-links">
               <a class="button button-primary" href="./research-debug-bridge.html">打开实验</a>
-              <a class="lab-lesson-link" href="./study/lessons/29-研究与-Debug-协作.html">配套课 · 研究与 Debug 协作</a>
+              <a class="lab-lesson-link" href="./study/lessons/36-研究与-Debug-协作.html">配套课 · 研究与 Debug 协作</a>
             </p>
           </div>
         </li>
