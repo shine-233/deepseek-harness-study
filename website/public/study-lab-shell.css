@@ -392,6 +392,31 @@ button[aria-pressed="true"] {
 }
 
 /*
+ * 主题切换的圆形扩散：View Transitions 快照 + clip-path 揭示。
+ * 旧快照保持不动，新快照从点击点（--vt-x/--vt-y，JS 写入；键盘激活时
+ * 回落屏幕中心）以 150% 半径扫开——角落按钮到对角需要约 142%，取整留裕量。
+ * 双层降级：不支持 VT 的浏览器与减少动态偏好下，JS 侧直接切换主题。
+ * mix-blend-mode: normal 是浏览器默认混合模式在实色底上会产生伪影的已知修正。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (view-transition-name: root) {
+    ::view-transition-old(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+    ::view-transition-new(root) {
+      animation: dsh-vt-reveal 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      mix-blend-mode: normal;
+      z-index: 1;
+    }
+    @keyframes dsh-vt-reveal {
+      from { clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+      to { clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+    }
+  }
+}
+
+/*
  * 时间轴步进控件：滑杆、上一步/下一步和当前步骤说明。
  * 状态切换不做动画：is-current / is-future 只换外观，reduced-motion 与否都一样。
  */

@@ -86,11 +86,28 @@ export function installThemeToggle(button, renderIcon = null) {
     }
   }
 
-  button.addEventListener('click', () => {
+  button.addEventListener('click', (event) => {
     mode = MODES[(MODES.indexOf(mode) + 1) % MODES.length]
-    applyMode(mode)
-    persist(mode)
-    paint()
+    const apply = () => {
+      applyMode(mode)
+      persist(mode)
+      paint()
+    }
+    // 主题切换的圆形扩散（View Transitions，2026 广泛支持）：
+    // 新主题快照以点击点为圆心 clip-path 揭示；双层降级——
+    // 减少动态偏好或 API 缺失时直接切换，视觉与从前一致。
+    const reduced = typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced || typeof document.startViewTransition !== 'function') {
+      apply()
+      return
+    }
+    const root = document.documentElement
+    if (event.detail > 0 && typeof event.clientX === 'number') {
+      root.style.setProperty('--vt-x', `${event.clientX}px`)
+      root.style.setProperty('--vt-y', `${event.clientY}px`)
+    }
+    document.startViewTransition(apply)
   })
 
   // 跟随系统时，系统切换要更新按钮上写的「当前为深色/浅色」。
