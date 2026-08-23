@@ -931,7 +931,7 @@ function designEvidenceFor(file, meta = {}, graph = {}, sourceRead = false) {
   if (parts.length === 1) {
     parts.unshift('本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索')
   }
-  return `${parts.join('；')}。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。`
+  return `${parts.join('；')}。`
 }
 
 function sourceFilePath(file, sourceRoot) {
@@ -1317,49 +1317,49 @@ function readingOrderFor(file, role, relation, graph, pathSet) {
   const importerHint = pathList(importers, '所在包的入口或服务')
   const importHint = pathList(imports, '相关类型、协议或实现')
   const readmeHint = readmeInstructionFor(file, pathSet)
-  const manualHint = MANUAL_FILES.has(file)
-    ? '本文件另有人工精读，可继续看 [核心文件精读](../03-核心文件精读.md)；自动索引只提供定位线索，复杂行为需要回到源码和测试确认。'
-    : '自动索引只提供定位线索，复杂行为需要回到源码和测试确认。'
+  const manualNote = MANUAL_FILES.has(file)
+    ? '本文件另有人工精读，可继续看 [核心文件精读](../03-核心文件精读.md)。'
+    : ''
 
   if (isTestCase(file)) {
     const productionImports = imports.filter(candidate => !isTestFile(candidate))
     const supportImports = imports.filter(candidate => isTestSupportFile(candidate))
     if (productionImports.length > 0) {
-      return `先看它直接导入的被测实现 ${pathList(productionImports, importHint)}，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。${manualHint}`
+      return `先看它直接导入的被测实现 ${pathList(productionImports, importHint)}，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。${manualNote}`
     }
     if (supportImports.length > 0) {
-      return `先看它直接使用的测试支持 ${pathList(supportImports, importHint)}，再读本文件的测试主题、输入和断言；最后回到被测表面和失败输出。${manualHint}`
+      return `先看它直接使用的测试支持 ${pathList(supportImports, importHint)}，再读本文件的测试主题、输入和断言；最后回到被测表面和失败输出。${manualNote}`
     }
-    return `先看源码中与它对应的被测实现或契约 ${importHint}，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。${manualHint}`
+    return `先看源码中与它对应的被测实现或契约 ${importHint}，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。${manualNote}`
   }
   if (role === '测试夹具' || role === '测试支持' || role === '测试工具' || role === '测试服务器') {
-    return `先看它提供的固定输入或环境，再跳到实际使用它的测试 ${testHint}，最后回看被测实现和清理路径。${manualHint}`
+    return `先看它提供的固定输入或环境，再跳到实际使用它的测试 ${testHint}，最后回看被测实现和清理路径。${manualNote}`
   }
   if (role === 'Windows ABI 探针') {
-    return `${readmeHint}、Node/Koffi FFI 定义和实际头文件，再读当前探针，最后对照 ${testHint}，确认打印出来的布局和枚举值确实被交叉核对。${manualHint}`
+    return `${readmeHint}、Node/Koffi FFI 定义和实际头文件，再读当前探针，最后对照 ${testHint}，确认打印出来的布局和枚举值确实被交叉核对。${manualNote}`
   }
   if (/构建或测试配置|配置与数据形状|Profile 配置解析|文档网站构建配置|文档发布清单|.*构建器|.*发布构建器|.*门禁|.*验证器/.test(role)) {
-    return `${readmeHint}，再读本配置/脚本，沿着 ${importerHint} 确认它如何影响入口和产物，最后对照对应 gate 或快照测试。${manualHint}`
+    return `${readmeHint}，再读本配置/脚本，沿着 ${importerHint} 确认它如何影响入口和产物，最后对照对应 gate 或快照测试。${manualNote}`
   }
   if (/程序入口|HTML 页面壳|页面模板|启动入口|启动服务|Bundle 组合/.test(role)) {
-    return `${readmeHint} 和组合清单，再读当前入口，沿着它交给的应用或 ${importerHint} 继续，最后对照启动、配置和 E2E 测试。${manualHint}`
+    return `${readmeHint} 和组合清单，再读当前入口，沿着它交给的应用或 ${importerHint} 继续，最后对照启动、配置和 E2E 测试。${manualNote}`
   }
   if (/模块入口|类型契约|类型声明|数据规格|配置与数据形状|事件契约|协议边界|JSON Schema|JSON 边界|扩展槽位契约|品牌类型|消息模型/.test(role)) {
-    return `${readmeHint}、入口和消费者，再读当前契约，沿着 ${importerHint} 看它怎样约束运行时，最后对照 ${testHint}。${manualHint}`
+    return `${readmeHint}、入口和消费者，再读当前契约，沿着 ${importerHint} 看它怎样约束运行时，最后对照 ${testHint}。${manualNote}`
   }
   if (/持久化|会话|状态投影|状态存储|不变量|故障修复|查询|队列|状态管理器|领域模型/.test(role)) {
-    return `先读相关类型和事件，再读当前状态或存储实现，沿着 ${importHint} 和 ${importerHint} 理解状态变化，最后对照 ${testHint}。${manualHint}`
+    return `先读相关类型和事件，再读当前状态或存储实现，沿着 ${importHint} 和 ${importerHint} 理解状态变化，最后对照 ${testHint}。${manualNote}`
   }
   if (/界面|React|Web 宿主|呈现|本地化|客户端/.test(role)) {
-    return `先读客户端运行时契约或呈现模型，再读当前界面文件，沿着 ${importerHint} 确认状态如何进入 UI，最后对照 ${testHint}。${manualHint}`
+    return `先读客户端运行时契约或呈现模型，再读当前界面文件，沿着 ${importerHint} 确认状态如何进入 UI，最后对照 ${testHint}。${manualNote}`
   }
   if (/脚本|生成器|发布|清理|清单|翻译|Wine/.test(role) || file.startsWith('scripts/')) {
-    return `${readmeHint} 和贡献/发布配置，再读当前脚本，沿它调用的配置、命令和 ${importHint} 确认输入输出，最后对照同目录的门禁或发布测试。${manualHint}`
+    return `${readmeHint} 和贡献/发布配置，再读当前脚本，沿它调用的配置、命令和 ${importHint} 确认输入输出，最后对照同目录的门禁或发布测试。${manualNote}`
   }
   if (file.startsWith('vendor/') || file.startsWith('native/')) {
-    return `${readmeHint}、上游 Manifest 和平台说明，再读当前边界，沿 wrapper 和 ${importerHint} 确认平台影响，最后对照原生或兼容性测试。${manualHint}`
+    return `${readmeHint}、上游 Manifest 和平台说明，再读当前边界，沿 wrapper 和 ${importerHint} 确认平台影响，最后对照原生或兼容性测试。${manualNote}`
   }
-  return `${readmeHint} 和入口，再读当前实现，沿着 ${importHint} 和 ${importerHint} 确认输入输出，最后对照 ${testHint}。${manualHint}`
+  return `${readmeHint} 和入口，再读当前实现，沿着 ${importHint} 和 ${importerHint} 确认输入输出，最后对照 ${testHint}。${manualNote}`
 }
 
 function markdownLink(file, commit) {
@@ -1404,6 +1404,14 @@ function main() {
       `# 源文件索引：${titleForBucket(bucket)}`,
       '',
       `本页由 \`study-tools/generate-source-index.mjs\` 根据官方提交 \`${commit}\` 生成，共 ${files.length} 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。`,
+      '',
+      '## 图例',
+      '',
+      '本页所有条目共用以下说明：',
+      '',
+      '- 自动索引只提供定位线索，复杂行为需要回到源码和测试确认。',
+      '- 条目中的行数、声明、结构线索和静态 import 数字是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们用于定位，不替代人工源码阅读。',
+      '- 源码链接固定到官方提交；如果当前条目与运行版本不同，应先重新生成索引再下结论。',
       '',
     ]
     if (useGroups) {
@@ -1450,8 +1458,8 @@ function main() {
         lines.push(`- 测试支持：${testSupport.map(test => markdownLink(test, commit)).join('、')}`)
       }
       lines.push(`- 阅读顺序：${cleanChineseSpacing(readingOrderFor(file, role.role, relation, importGraph, pathSet))}`)
-      lines.push(`- 代码证据：${details.length > 0 ? `固定提交归档实际读取结果：${details.join('；')}。` : '本次索引只读取了固定提交的 Git tree；没有把未经读取的实现细节写成确定事实。'} 这些数字和声明用于定位，不替代源码阅读。`)
-      lines.push(`- 固定版本：源码链接固定到官方提交 \`${commit}\`；如果当前条目与运行版本不同，应先重新生成索引再下结论。`)
+      lines.push(`- 代码证据：${details.length > 0 ? `固定提交归档实际读取结果：${details.join('；')}。` : '本次索引只读取了固定提交的 Git tree；没有把未经读取的实现细节写成确定事实。'}`)
+      lines.push(`- 固定版本：源码链接固定到官方提交 \`${commit}\`。`)
       lines.push('')
     }
     while (lines.at(-1) === '') lines.pop()

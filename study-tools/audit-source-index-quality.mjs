@@ -81,6 +81,7 @@ function parseIndexPages() {
   for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).sort()) {
     const full = join(indexDir, name)
     const text = readFileSync(full, 'utf8')
+    const pageHasLegendBoundary = /^## 图例\s*$/m.test(text) && text.includes('不替代人工源码阅读')
     for (const match of text.matchAll(headingPattern)) {
       const path = match[1]
       const commit = match[3]
@@ -88,7 +89,7 @@ function parseIndexPages() {
       const nextHeading = text.indexOf('\n### ', blockStart)
       const block = text.slice(blockStart, nextHeading === -1 ? text.length : nextHeading)
       const fields = Object.fromEntries(requiredLabels.map(label => [label, valueOf(block, label)]))
-      entries.push({ name, path, commit, block, fields })
+      entries.push({ name, path, commit, block, fields, pageHasLegendBoundary })
     }
   }
 }
@@ -121,8 +122,10 @@ function auditStructure() {
 
     if (purpose.length < 18) addWarning(`${entry.name}: ${entry.path} 的用途说明过短（${purpose.length} 字）`)
     if (design.length < 24) addWarning(`${entry.name}: ${entry.path} 的设计说明过短（${design.length} 字）`)
-    if ((!designEvidence.includes('文件级定位证据') && !designEvidence.includes('证据不可用')) || !designEvidence.includes('不替代人工源码阅读')) {
-      addError(`${entry.name}: ${entry.path} 的文件级设计证据缺少静态证据边界提醒`)
+    if (!entry.pageHasLegendBoundary) {
+      if ((!designEvidence.includes('文件级定位证据') && !designEvidence.includes('证据不可用')) || !designEvidence.includes('不替代人工源码阅读')) {
+        addError(`${entry.name}: ${entry.path} 的文件级设计证据缺少静态证据边界提醒`)
+      }
     }
     if (designFingerprint(design) === design && /把“[^”]+”作为独立边界/.test(design)) {
       addError(`${entry.name}: ${entry.path} 使用旧的统一独立边界设计模板`)
@@ -130,7 +133,7 @@ function auditStructure() {
     if (/^先看所在层的说明，再看包 README 和入口，然后读本文件/.test(entry.fields['阅读顺序'])) {
       addError(`${entry.name}: ${entry.path} 使用旧的统一阅读顺序模板`)
     }
-    if (!evidence.includes('不替代源码阅读')) {
+    if (!evidence.includes('不替代源码阅读') && !entry.pageHasLegendBoundary) {
       addError(`${entry.name}: ${entry.path} 缺少“代码证据不替代源码阅读”的边界提醒`)
     }
 

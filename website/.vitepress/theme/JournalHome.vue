@@ -143,8 +143,8 @@ interface StampLesson {
   href: string
 }
 const LESSONS: StampLesson[] = [
-  { id: 'l00', num: '00', title: '开始这里', hint: '六个词 + 心智模型', href: withBase('/study/') },
-  { id: 'l01', num: '01', title: '仓库地图', hint: '输入从哪里进来', href: withBase('/study/') },
+  { id: 'l00', num: '00', title: '开始这里', hint: '六个词 + 心智模型', href: withBase('/study/lessons/00-开始这里') },
+  { id: 'l01', num: '01', title: '仓库地图', hint: '输入从哪里进来', href: withBase('/study/lessons/01-仓库地图') },
   { id: 'l04', num: '04', title: 'Agent 与 Turn', hint: '主链路怎么跑', href: withBase('/study/lessons/04-Agent与Turn流程') },
   { id: 'l11', num: '11', title: '写一个合规插件', hint: '注册到卸载全程', href: withBase('/study/lessons/11-如何写一个合规插件') },
   { id: 'l25', num: '25', title: '十五分钟任务单', hint: '第一条学习记录', href: withBase('/study/lessons/25-从首页到第一次产出的动手任务单') },
@@ -270,9 +270,12 @@ watchEffect(() => {
             class="dj-mascot"
             :viewBox="`0 0 ${GRID_W} ${SPRITE.length}`"
             shape-rendering="crispEdges"
-            role="img"
-            aria-label="吉祥物阿溟：像素画风鲸鱼娘"
+            role="button"
+            tabindex="0"
+            aria-label="吉祥物阿溟：戳一下换一句台词"
             @click="poke"
+            @keydown.enter.prevent="poke"
+            @keydown.space.prevent="poke"
           >
             <g v-for="rect in BASE_RECTS" :key="`p${rect.x}-${rect.y}`">
               <rect :class="{ 'dj-eye': rect.eye }" :x="rect.x" :y="rect.y" width="1" height="1" :fill="rect.fill" />
@@ -466,7 +469,7 @@ watchEffect(() => {
         <section v-show="view === 'index'" id="dj-view-index" role="tabpanel" aria-labelledby="dj-tab-index" class="dj-sheet">
           <div class="dj-polaroid-row">
             <figure class="dj-polaroid">
-              <div class="dj-photo"><b>108</b></div>
+              <div class="dj-photo"><b>119</b></div>
               <figcaption>页中文教材</figcaption>
             </figure>
             <figure class="dj-polaroid">
@@ -697,6 +700,35 @@ li.dj-done .dj-stamp-label{text-decoration:line-through solid rgba(90,110,133,.5
 
 .dj-footer{max-width:1080px;margin:40px auto 0;padding:24px 4px 40px;border-top:2px dashed var(--line);
   font-family:'Noto Sans SC';text-align:center;font-size:12.5px;color:#93a1ad;line-height:2;}
+
+/* 深色模式：同一套手账版式换成夜读纸色，只动颜色不动布局。 */
+html.dark .dj-page{
+  --paper:#161d29; --card:#202b3d;
+  --ink:#dbe4f0; --ink-soft:#9fb0c6; --line:#3a4a63;
+  --red:#e08a7a; --blue-ink:#8fb5ee;
+  --tape-mint:#28483d; --tape-butter:#4d4324; --tape-coral:#5a3a31; --tape-sky:#2e4059;
+}
+html.dark .dj-page{background-image:radial-gradient(rgba(255,255,255,.05) 1.1px,transparent 1.1px);}
+html.dark .dj-cover,html.dark .dj-sheet,html.dark .dj-mascot-card,html.dark .dj-stamp-card{box-shadow:4px 5px 0 rgba(0,0,0,.32);}
+html.dark .dj-date i{background:rgba(255,255,255,.04);}
+html.dark .dj-wavebar{background:#182233;}
+html.dark .dj-reset{color:#7f8fa5;}
+html.dark .dj-stamp-btn{border-color:#57503f;color:#8d8471;}
+html.dark .dj-entry,html.dark .dj-stage,html.dark .dj-turn-stage,html.dark .dj-lab-chip{background:#243247;}
+html.dark .dj-start-badge{color:#d9bc72;}
+html.dark .dj-turn-track li{color:#7f8fa5;}
+html.dark .dj-turn-track li:not(:last-child)::after{border-color:#41506a;}
+html.dark .dj-turn-track i{border-color:#57503f;background:#243247;color:#8d8471;}
+html.dark .dj-polaroid{background:#243247;box-shadow:3px 5px 10px rgba(0,0,0,.4);}
+html.dark .dj-memo{border-color:#65552e;background:#2c2618;color:#cdb489;}
+html.dark .dj-sticky{color:#cfc4ab;background:#33301c;border-color:#5a512e;}
+html.dark .dj-sticky:nth-child(2){background:#1f3328;border-color:#31553f;}
+html.dark .dj-sticky:nth-child(3){background:#38221e;border-color:#5f3a32;}
+html.dark .dj-sticky:nth-child(4){background:#1e2b40;border-color:#31486b;}
+html.dark .dj-sticky b{color:var(--ink);}
+html.dark .dj-sticky i{color:#9a8f74;}
+html.dark .dj-footer{color:#76879d;}
+html.dark .dj-tabs button[aria-selected='true']{outline-color:rgba(10,16,28,.5);}
 
 @media (prefers-reduced-motion:reduce){
   .dj-mascot,.dj-eye{animation:none;}

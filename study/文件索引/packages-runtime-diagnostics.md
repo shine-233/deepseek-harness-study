@@ -2,19 +2,27 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 3 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+## 图例
+
+本页所有条目共用以下说明：
+
+- 自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
+- 条目中的行数、声明、结构线索和静态 import 数字是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们用于定位，不替代人工源码阅读。
+- 源码链接固定到官方提交；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
 ### [packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)
 
 - 所属层：packages/runtime-diagnostics：可复用的 Harness 功能包
 - 文件角色：模块入口
 - 这个文件有什么用：它把运行时相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
 - 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
-- 文件级设计证据：源码顶部注释把它定位为“Configurable registry for package-owned runtime invariant contributions. Every workspace package registers checks from a ./invariant companion; ordinary package entrypoints stay independent of diagnostics. @module @deepseek-ai/dsh-invariants”；固定提交中扫描到的声明包括 `Config`、`InvariantFailure`、`InvariantInstaller`、`InvariantError`、`InvariantRegistry`；本地静态 import 图显示它直接依赖 2 个源文件，并被 307 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
+- 文件级设计证据：源码顶部注释把它定位为“Configurable registry for package-owned runtime invariant contributions. Every workspace package registers checks from a ./invariant companion; ordinary package entrypoints stay independent of diagnostics. @module @deepseek-ai/dsh-invariants”；固定提交中扫描到的声明包括 `Config`、`InvariantFailure`、`InvariantInstaller`、`InvariantError`、`InvariantRegistry`；本地静态 import 图显示它直接依赖 2 个源文件，并被 307 个源文件直接引用。
 - 直接协作者：[packages/runtime-diagnostics/invariants/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/README.md)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)、[vendor/schemastery/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/schemastery/src/index.ts)、[packages/acp/acp/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/acp/acp/src/invariant.ts)、[packages/api/gateway/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/api/gateway/src/invariant.ts)
 - 对应测试：[packages/client/locale/tests/invariant.client.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/locale/tests/invariant.client.spec.ts)、[packages/client/runtime/tests/invariant.client.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/runtime/tests/invariant.client.spec.ts)、[packages/client/ui-agent-preset/tests/invariant.client.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-agent-preset/tests/invariant.client.spec.ts)、[packages/client/ui-attachment/tests/invariant.client.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-attachment/tests/invariant.client.spec.ts)、[packages/client/ui-brand-official/tests/invariant.client.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-brand-official/tests/invariant.client.spec.ts)、[packages/client/ui-jobs/tests/browser-plugin.client.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-jobs/tests/browser-plugin.client.spec.ts)
 - 测试关联依据：固定提交源码中的本地静态 import 直接引用；测试用例直接导入了这个源文件。
-- 阅读顺序：先读 `packages/runtime-diagnostics/invariants/README.md`、入口和消费者，再读当前契约，沿着 `packages/acp/acp/src/invariant.ts`、`packages/api/gateway/src/invariant.ts`、`packages/api/remotes/src/invariant.ts` 看它怎样约束运行时，最后对照 `packages/client/locale/tests/invariant.client.spec.ts`、`packages/client/runtime/tests/invariant.client.spec.ts`、`packages/client/ui-agent-preset/tests/invariant.client.spec.ts`。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
-- 代码证据：固定提交归档实际读取结果：约 200 行；扫描到的声明包括 `Config`、`InvariantFailure`、`InvariantInstaller`、`InvariantError`、`InvariantRegistry`、`compilePatterns`；源码顶部原注释（英文，仅作回查线索）：Configurable registry for package-owned runtime invariant contributions. Every workspace package registers checks from a ./invariant companion; ordinary package entrypoints stay independent of diagnostics. @module @deepseek-ai/dsh-invariants。 这些数字和声明用于定位，不替代源码阅读。
-- 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+- 阅读顺序：先读 `packages/runtime-diagnostics/invariants/README.md`、入口和消费者，再读当前契约，沿着 `packages/acp/acp/src/invariant.ts`、`packages/api/gateway/src/invariant.ts`、`packages/api/remotes/src/invariant.ts` 看它怎样约束运行时，最后对照 `packages/client/locale/tests/invariant.client.spec.ts`、`packages/client/runtime/tests/invariant.client.spec.ts`、`packages/client/ui-agent-preset/tests/invariant.client.spec.ts`。
+- 代码证据：固定提交归档实际读取结果：约 200 行；扫描到的声明包括 `Config`、`InvariantFailure`、`InvariantInstaller`、`InvariantError`、`InvariantRegistry`、`compilePatterns`；源码顶部原注释（英文，仅作回查线索）：Configurable registry for package-owned runtime invariant contributions. Every workspace package registers checks from a ./invariant companion; ordinary package entrypoints stay independent of diagnostics. @module @deepseek-ai/dsh-invariants。
+- 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`。
 
 ### [packages/runtime-diagnostics/invariants/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/invariant.ts)
 
@@ -22,13 +30,13 @@
 - 文件角色：运行时不变量
 - 这个文件有什么用：它检查运行时必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
 - 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
-- 文件级设计证据：源码顶部注释把它定位为“Package-owned invariant companion for @deepseek-ai/dsh-invariants. @module @deepseek-ai/dsh-invariants/invariant”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
+- 文件级设计证据：源码顶部注释把它定位为“Package-owned invariant companion for @deepseek-ai/dsh-invariants. @module @deepseek-ai/dsh-invariants/invariant”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/runtime-diagnostics/invariants/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
 - 对应测试：没有确认到直接测试；公共入口可能仍有间接覆盖。
 - 测试关联依据：固定提交中没有找到直接或传递的本地静态 import，也没有找到明显的同包同名测试；公共入口可能仍有间接覆盖。
-- 阅读顺序：先读相关类型和事件，再读当前状态或存储实现，沿着 `packages/runtime-diagnostics/invariants/src/index.ts`、`vendor/cordis/src/index.ts` 和所在包的入口或服务理解状态变化，最后对照同包中与它同名或覆盖相近场景的测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
-- 代码证据：固定提交归档实际读取结果：约 30 行；扫描到的声明包括 `name`、`inject`、`apply`；源码顶部原注释（英文，仅作回查线索）：Package-owned invariant companion for @deepseek-ai/dsh-invariants. @module @deepseek-ai/dsh-invariants/invariant。 这些数字和声明用于定位，不替代源码阅读。
-- 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+- 阅读顺序：先读相关类型和事件，再读当前状态或存储实现，沿着 `packages/runtime-diagnostics/invariants/src/index.ts`、`vendor/cordis/src/index.ts` 和所在包的入口或服务理解状态变化，最后对照同包中与它同名或覆盖相近场景的测试。
+- 代码证据：固定提交归档实际读取结果：约 30 行；扫描到的声明包括 `name`、`inject`、`apply`；源码顶部原注释（英文，仅作回查线索）：Package-owned invariant companion for @deepseek-ai/dsh-invariants. @module @deepseek-ai/dsh-invariants/invariant。
+- 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`。
 
 ### [packages/runtime-diagnostics/invariants/tests/service.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/tests/service.spec.ts)
 
@@ -36,10 +44,10 @@
 - 文件角色：测试用例
 - 这个文件有什么用：它用自动化测试检查运行时的具体场景，包括“InvariantRegistry selection”、“applies defaults when constructed directly without schema normalization”、“enables registrations by default and treats empty lists as admit-all and exclude-none”、“disables every installer while still reserving package ownership”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“InvariantRegistry selection”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
-- 文件级设计证据：固定提交中扫描到的声明包括 `InvariantProbeService`、`runtimeRegistration`、`setup`、`registerProbe`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
+- 文件级设计证据：固定提交中扫描到的声明包括 `InvariantProbeService`、`runtimeRegistration`、`setup`、`registerProbe`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/runtime-diagnostics/invariants/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
 - 对应测试：本文件本身就是测试用例。
 - 测试关联依据：本文件本身就是测试用例，不把同目录的其他测试冒充成它的“对应测试”。
-- 阅读顺序：先看它直接导入的被测实现 `packages/runtime-diagnostics/invariants/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
-- 代码证据：固定提交归档实际读取结果：约 310 行；扫描到的声明包括 `InvariantProbeService`、`runtimeRegistration`、`setup`、`registerProbe`；扫描到的测试主题包括 “InvariantRegistry selection”、“applies defaults when constructed directly without schema normalization”、“enables registrations by default and treats empty lists as admit-all and exclude-none”、“disables every installer while still reserving package ownership”、“uses unanchored, case-sensitive JavaScript regex sources”、“lets the blocklist override an allowlist match”。 这些数字和声明用于定位，不替代源码阅读。
-- 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+- 阅读顺序：先看它直接导入的被测实现 `packages/runtime-diagnostics/invariants/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。
+- 代码证据：固定提交归档实际读取结果：约 310 行；扫描到的声明包括 `InvariantProbeService`、`runtimeRegistration`、`setup`、`registerProbe`；扫描到的测试主题包括 “InvariantRegistry selection”、“applies defaults when constructed directly without schema normalization”、“enables registrations by default and treats empty lists as admit-all and exclude-none”、“disables every installer while still reserving package ownership”、“uses unanchored, case-sensitive JavaScript regex sources”、“lets the blocklist override an allowlist match”。
+- 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`。

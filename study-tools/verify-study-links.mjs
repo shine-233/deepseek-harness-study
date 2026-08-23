@@ -52,6 +52,40 @@ function pathExists(path, kind = 'blob') {
   return treeSet.has(path)
 }
 
+/**
+ * VitePress 会把标题文本转成 slug（空格变连字符、去掉标点、小写化），而
+ * fallback-href 里两种写法都出现过。比较时只保留字母、数字和汉字，两边
+ * 都忽略空白、连字符和标点，兼容 `#先记住一张图` 与 `#surface-和历史不是一回事`。
+ */
+function anchorKey(value) {
+  let decoded = value
+  try {
+    decoded = decodeURIComponent(value)
+  } catch {
+    // 解析不了的编码保留原值比较；它只会导致锚点未命中，不会误报通过。
+  }
+  return decoded.replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase()
+}
+
+function collectHeadingsAndFallbacks(text) {
+  const headings = new Set()
+  const fallbackHrefs = []
+  const strippedLines = []
+  let inFence = false
+  for (const line of text.split(/\r?\n/)) {
+    if (/^\s*(?:```|~~~)/.test(line)) inFence = !inFence
+    if (!inFence) strippedLines.push(line)
+    const heading = !inFence && /^#{1,6}\s+(.+?)\s*#*\s*$/.exec(line)
+    if (heading) headings.add(anchorKey(heading[1]))
+  }
+  const widgetPattern = /<LessonWidget\b([^>]*)>/g
+  for (const match of strippedLines.join('\n').matchAll(widgetPattern)) {
+    const href = /fallback-href\s*=\s*(?:"([^"]*)"|'([^']*)')/.exec(match[1])
+    if (href) fallbackHrefs.push(href[1] ?? href[2])
+  }
+  return { headings, fallbackHrefs }
+}
+
 function check(path, file, source) {
   const normalized = path.replace(/[.,;:，。；：）)]+$/u, '').replace(/\/+$/u, '')
   if (isPlaceholder(normalized) || isLocalStudyPath(normalized) || seen.has(`${file}:${normalized}`)) return
@@ -77,6 +111,16 @@ for (const file of manualFiles) {
   for (const match of text.matchAll(linkPattern)) {
     const path = decodeURIComponent(match[2])
     if (!pathExists(path, match[1])) errors.push(`${file}: 固定提交链接指向不存在路径 ${path}（官方 ${match[1]} 链接）`)
+  }
+  const { headings, fallbackHrefs } = collectHeadingsAndFallbacks(text)
+  for (const raw of fallbackHrefs) {
+    if (!raw.startsWith('#')) {
+      errors.push(`${file}: LessonWidget fallback-href 只支持同页锚点，得到 ${raw}`)
+      continue
+    }
+    if (!headings.has(anchorKey(raw.slice(1)))) {
+      errors.push(`${file}: LessonWidget fallback-href 锚点没有命中本页标题：${raw}`)
+    }
   }
 }
 

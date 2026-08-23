@@ -1,6 +1,6 @@
 # 逐文件索引导航
 
-`study/文件索引/` 保存按目录分片的源码索引。当前已有 67 页生成索引，覆盖固定提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 的 2,973 个代码或界面源文件；本 README 是人工导航页，不计入这 67 页，也不增加源文件条目。
+`study/文件索引/` 保存按目录分片的源码索引。当前已有 78 页生成索引，覆盖固定提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 的 2,973 个代码或界面源文件；本 README 是人工导航页，不计入这 67 页，也不增加源文件条目。
 
 每个索引页把真实源文件整理成一张张中文卡片，卡片包含路径、文件角色、用途、设计证据、协作者、测试线索、阅读顺序和固定版本链接。先用本页选择目录，再打开对应索引页中的具体路径；需要理解行为时，回到源码和测试，不要把卡片当成完整代码审查。
 
@@ -33,7 +33,7 @@
 - [05-Session日志与恢复](../05-Session日志与恢复.md)：从 Session 事件和恢复流程跳到 [packages-core.md](./packages-core.md)、[packages-session.md](./packages-session.md)、[packages-session-query.md](./packages-session-query.md)、[packages-storage.md](./packages-storage.md)、[packages-spill.md](./packages-spill.md) 和 [packages-settings.md](./packages-settings.md)。
 - [06-LLM与工具执行](../06-LLM与工具执行.md)：从模型适配、流式响应、工具 schema 和结果展示跳到 [packages-llm.md](./packages-llm.md)、[packages-core.md](./packages-core.md)、[packages-web.md](./packages-web.md)、[packages-shell.md](./packages-shell.md)、[packages-fs.md](./packages-fs.md)、[packages-subprocess.md](./packages-subprocess.md) 和 [packages-sandbox.md](./packages-sandbox.md)。
 - [07-HostClient示例测试发布](../07-HostClient示例测试发布.md)：从 Host、Client、示例、测试和发布边界跳到 [apps.md](./apps.md)、[packages-host.md](./packages-host.md)、[packages-client.md](./packages-client.md)、[packages-examples.md](./packages-examples.md)、[packages-test-support.md](./packages-test-support.md)、[packages-sdk.md](./packages-sdk.md)、[packages-bundle.md](./packages-bundle.md) 和 [vendor.md](./vendor.md)。
-- [08-逐文件索引怎么读](../08-逐文件索引怎么读.md)：这是索引的使用说明，定义卡片字段、自动索引与人工精读的区别、覆盖检查方法和继续追代码的顺序；读完后可从下表进入全部 66 页。
+- [08-逐文件索引怎么读](../08-逐文件索引怎么读.md)：这是索引的使用说明，定义卡片字段、自动索引与人工精读的区别、覆盖检查方法和继续追代码的顺序；读完后可从下表进入全部 78 页。
 - [09-业界案例与写法](../09-业界案例与写法.md)：它讨论固定版本源码导读的写法和证据边界，适合回到 [08-逐文件索引怎么读](../08-逐文件索引怎么读.md) 查看索引规则，再看 [03-核心文件精读](../03-核心文件精读.md)、[10-社区生态与扩展边界](../10-社区生态与扩展边界.md) 和 [11-如何写一个合规插件](../11-如何写一个合规插件.md)。
 - [10-社区生态与扩展边界](../10-社区生态与扩展边界.md)：按公开扩展点、Bundle、Hook bridge、Skill、MCP 和运行时注入的区别，转到 [packages-core.md](./packages-core.md)、[packages-bundle.md](./packages-bundle.md)、[packages-hooks.md](./packages-hooks.md)、[packages-skill.md](./packages-skill.md)、[packages-mcp.md](./packages-mcp.md)、[packages-host.md](./packages-host.md) 和 [packages-client.md](./packages-client.md)。
 - [11-如何写一个合规插件](../11-如何写一个合规插件.md)：按公开事件、工具、服务、Bundle、Profile 和卸载测试的顺序，转到 [packages-core.md](./packages-core.md)、[packages-bundle.md](./packages-bundle.md)、[packages-hooks.md](./packages-hooks.md)、[packages-host.md](./packages-host.md)、[packages-client.md](./packages-client.md) 和 [packages-test-support.md](./packages-test-support.md)。
@@ -47,7 +47,7 @@
 - [19-插件测试卸载与版本证据](../19-插件测试卸载与版本证据.md)：按单元、Context、Loader、构建产物、快照、E2E、真实 API 和资源清理追到 [packages-test-support.md](./packages-test-support.md)、[packages-bundle.md](./packages-bundle.md)、[packages-hooks.md](./packages-hooks.md) 和 [apps.md](./apps.md)。
 - [20-学习仓库实际使用手册](../20-学习仓库实际使用手册.md)：按阅读目标、逐文件追踪、插件开发、社区审核、固定源码和文档门禁选择索引页与下一步实验。
 
-## 66 页索引清单
+## 78 页索引清单
 
 括号内是当前索引页页头声明的源文件条数。页面名和覆盖路径不是一一按文件名直译的规则：`packages-foo.md` 覆盖 `packages/foo/`，而 `vitest-*.md` 和 `tsdown.config.ts.md` 覆盖仓库根部对应的单个配置文件。
 
@@ -82,7 +82,18 @@
 | [packages-attachment.md](./packages-attachment.md)（12 条） | `packages/attachment/` | 本地附件和图像处理；适合查格式、尺寸、像素限制和存储前的校验。 |
 | [packages-boot.md](./packages-boot.md)（13 条） | `packages/boot/` | 启动 glue、命令行装配、Profile 读取和启动生命周期。 |
 | [packages-bundle.md](./packages-bundle.md)（14 条） | `packages/bundle/` | Base、headless、Web 等可安装 Bundle；适合查插件树怎样被组合。 |
-| [packages-client.md](./packages-client.md)（892 条） | `packages/client/` | 浏览器运行时、React/UI 组件、会话界面、工具卡片和客户端连接；这是最大的界面索引页。 |
+| [packages-client.md](./packages-client.md)（总览） | `packages/client/` | 浏览器运行时、React/UI 组件、会话界面、工具卡片和客户端连接的分页目录；条目分布在下面 11 页。 |
+| [packages-client-01.md](./packages-client-01.md)（62 条） | connection、hmr、locale、modules | 客户端连接、热更新、语言包与模块装配。 |
+| [packages-client-02.md](./packages-client-02.md)（96 条） | runtime、tsdown.client.ts、ui-agent-preset | 客户端运行时与 Agent 预设界面。 |
+| [packages-client-03.md](./packages-client-03.md)（48 条） | ui-attachment、ui-brand-official、ui-commands | 附件、官方品牌与命令面板界面。 |
+| [packages-client-04.md](./packages-client-04.md)（124 条） | ui-conversation | 会话主界面，全库最大的单组件组。 |
+| [packages-client-05.md](./packages-client-05.md)（117 条） | ui-deliverables 至 ui-model-selection 十组 | 交付物、目录选择、目标、输入、任务、布局、反馈、模型选择等界面。 |
+| [packages-client-06.md](./packages-client-06.md)（23 条） | ui-permission-presets、ui-plan | 权限预设与计划模式界面。 |
+| [packages-client-07.md](./packages-client-07.md)（98 条） | ui-primitives、ui-reference | 界面基础件与引用展示。 |
+| [packages-client-08.md](./packages-client-08.md)（115 条） | ui-renderer 与四组 settings 界面 | 渲染器与通用/模型/插件清单/插件设置界面。 |
+| [packages-client-09.md](./packages-client-09.md)（87 条） | ui-settings、ui-sidebar、ui-skill、ui-slots、ui-subagent、ui-theme | 设置入口、侧栏、技能、插槽、子代理与主题界面。 |
+| [packages-client-10.md](./packages-client-10.md)（116 条） | ui-tool、ui-trajectory、ui-user-questions、ui-workflow-run | 工具卡片、轨迹、用户提问与工作流界面。 |
+| [packages-client-11.md](./packages-client-11.md)（37 条） | ui-workspace、web | 工作区界面与 Web 能力消费端。 |
 | [packages-code-runtime.md](./packages-code-runtime.md)（19 条） | `packages/code-runtime/` | Worker 中的代码执行、日志捕获和结果预算；适合查用户代码如何被隔离运行。 |
 | [packages-compaction.md](./packages-compaction.md)（31 条） | `packages/compaction/` | Session 上下文压缩、compact 命令和压缩服务。 |
 | [packages-context.md](./packages-context.md)（29 条） | `packages/context/` | 请求上下文、Agent instructions、时间等上下文提供器。 |

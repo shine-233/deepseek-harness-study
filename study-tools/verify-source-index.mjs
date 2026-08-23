@@ -43,6 +43,8 @@ if (manifest.upstreamRepository !== 'https://github.com/deepseek-ai/deepseek-har
 for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).sort()) {
   const full = join(indexDir, name)
   const text = readFileSync(full, 'utf8')
+  const pageHasLegend = /^## 图例\s*$/m.test(text)
+  let pageStatesAutoIndexBoundary = pageHasLegend && text.includes('复杂行为需要回到源码和测试确认')
   const headingPattern = /^### \[([^\]]+)\]\((https:\/\/github\.com\/deepseek-ai\/deepseek-harness\/blob\/([^/]+)\/([^\)]+))\)$/gm
   const matches = [...text.matchAll(headingPattern)]
   const headingLikeCount = text.split(/\r?\n/).filter(line => line.startsWith('### [')).length
@@ -105,9 +107,14 @@ for (const name of readdirSync(indexDir).filter(file => file.endsWith('.md')).so
     if (/[㐀-鿿] +[㐀-鿿]/.test(purpose)) {
       errors.push(`${name}: ${path} 的中文用途存在多余粒子空格`)
     }
-    if (block.includes('自动索引') && !block.includes('复杂行为需要回到源码和测试确认')) {
+    if (block.includes('复杂行为需要回到源码和测试确认')) {
+      pageStatesAutoIndexBoundary = true
+    } else if (block.includes('自动索引') && !pageHasLegend) {
       warnings.push(`${name}: ${path} 没有明显的自动索引边界提醒`)
     }
+  }
+  if (!pageStatesAutoIndexBoundary && matches.length > 0) {
+    warnings.push(`${name}: 页面既没有图例区，也没有条目级自动索引边界提醒`)
   }
 }
 
