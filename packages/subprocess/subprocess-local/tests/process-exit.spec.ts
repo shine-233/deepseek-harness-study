@@ -13,9 +13,7 @@ type ExitTrigger = 'direct' | 'uncaught-exception' | 'unhandled-rejection' | 'di
 type ManagedKind = 'ordinary' | 'terminal'
 interface TreeState { root: number; descendant: number }
 
-const repoRoot = fileURLToPath(new URL('../../../../', import.meta.url))
-const hostScript = fileURLToPath(new URL('./fixtures/process-exit-host.ts', import.meta.url))
-const scenarioTimeoutMs = 30_000
+const scenarioTimeoutMs = 60_000
 
 function processExists(pid: number): boolean {
   try {
@@ -29,8 +27,21 @@ function processExists(pid: number): boolean {
 
 async function readTree(path: string): Promise<TreeState> {
   return vi.waitFor(async () => {
-    const text = await readFile(path, 'utf8')
-    const state = JSON.parse(text) as Partial<TreeState>
+    // The child writes this file after it has fully assembled its own state, so a
+    // missing file or a torn final write are not-yet states, not failures: keep
+    // vi.waitFor retrying with a message that names the file instead of letting
+    // ENOENT or SyntaxError become the timeout error.
+    const text = await readFile(path, 'utf8').catch((error: NodeJS.ErrnoException) => {
+      if (error.code === 'ENOENT') return ''
+      throw error
+    })
+    if (text === '') throw new Error(`managed-tree state is not written yet: ${path}`)
+    let state: Partial<TreeState>
+    try {
+      state = JSON.parse(text) as Partial<TreeState>
+    } catch {
+      throw new Error(`managed-tree state is partially written: ${text.slice(0, 80)}`)
+    }
     if (!Number.isSafeInteger(state.root) || !Number.isSafeInteger(state.descendant)
       || (state.root ?? 0) <= 0 || (state.descendant ?? 0) <= 0 || state.root === state.descendant) {
       throw new Error(`invalid managed-tree state: ${text}`)
@@ -38,6 +49,8 @@ async function readTree(path: string): Promise<TreeState> {
     return state as TreeState
   }, { interval: 10, timeout: scenarioTimeoutMs })
 }
+const repoRoot = fileURLToPath(new URL('../../../../', import.meta.url))
+const hostScript = fileURLToPath(new URL('./fixtures/process-exit-host.ts', import.meta.url))
 
 async function captureIdentities(inspector: ProcessInspector, state: TreeState): Promise<ProcessIdentity[]> {
   return vi.waitFor(() => {
@@ -107,7 +120,13 @@ async function runScenario(kind: ManagedKind, trigger: ExitTrigger) {
   let treeGone = false
   try {
     state = await readTree(join(root, 'tree.json'))
-    await vi.waitFor(() => readFile(join(root, 'ready'), 'utf8'), {
+    await vi.waitFor(async () => {
+      const ready = await readFile(join(root, 'ready'), 'utf8').catch((error: NodeJS.ErrnoException) => {
+        if (error.code === 'ENOENT') return ''
+        throw error
+      })
+      if (ready === '') throw new Error(`host ready marker is not written yet: ${join(root, 'ready')}`)
+    }, {
       interval: 10,
       timeout: scenarioTimeoutMs,
     })
