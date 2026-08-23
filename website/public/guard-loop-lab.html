@@ -36,19 +36,19 @@
 
     <section class="control-strip card" aria-label="先预测，再改参数">
       <form id="prediction-gate" class="prediction-gate">
-        <p class="gate-question" id="gate-question">先押一个注：开启「循环卫生 guard」并把「同一调用」推到第 4 次——「后置结算」能把第 3 次起的拒绝撤回吗？</p>
+        <p class="gate-question" id="gate-question">先押一个注：开启「循环卫生 guard」并把「同一调用」推到第 4 次——工具主体还会运行吗？</p>
         <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
           <label class="gate-option">
-            <input type="radio" name="prediction" value="undo-works">
-            <span>能——结算阶段的权限更高，可以把拒绝改写为已执行</span>
+            <input type="radio" name="prediction" value="advisory">
+            <span>会——repeat-tool-reminder 是建议性的，只注入提醒，不拦截</span>
           </label>
           <label class="gate-option">
-            <input type="radio" name="prediction" value="monotonic">
-            <span>不能——guard 的拒绝是单调的，撤回永远无效</span>
+            <input type="radio" name="prediction" value="blocking">
+            <span>不会——守卫在主体执行前拦截了这次调用</span>
           </label>
           <label class="gate-option">
-            <input type="radio" name="prediction" value="retry-passes">
-            <span>能——第 4 次会作为一次新调用直接放行</span>
+            <input type="radio" name="prediction" value="model-stops">
+            <span>会执行但模型自己停了——看到提醒后不再调</span>
           </label>
         </div>
         <div class="gate-actions">
@@ -78,11 +78,23 @@
           <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
         </form>
         <p class="feedback" id="gl-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="时间轴步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="gl-step-output">0</output> 步</span>
+            <input id="gl-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数，不改变推演结果；之后的步骤淡出显示。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
+          </label>
+          <div class="stepper-buttons">
+            <button class="button button-quiet" id="gl-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="gl-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="gl-step-caption" role="status" aria-live="polite"></p>
+        </div>
         <dl class="metric-grid" aria-label="循环观测值">
           <div><dt>发出次数</dt><dd id="metric-attempts">—</dd></div>
           <div><dt>执行次数</dt><dd id="metric-executed">—</dd></div>
-          <div><dt>拦截次数</dt><dd id="metric-blocked">—</dd></div>
-          <div><dt>撤销生效</dt><dd id="metric-undo">—</dd></div>
+          <div><dt>提醒条数</dt><dd id="metric-reminders">—</dd></div>
+          <div><dt>执行次数</dt><dd id="metric-executed">—</dd></div>
           <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
         </dl>
       </div>

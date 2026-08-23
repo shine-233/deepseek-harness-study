@@ -1,224 +1,137 @@
 /**
- * 循环卫生实验页的渲染层。模型在 guard-loop-model.js；本文件只画返回值。
- * 时间线、步骤表和读数读的是同一个 steps 数组。
+ * 循环卫生提醒实验页的渲染层。模型在 guard-loop-model.js。
  */
-
 import {
-  makeFeedback,
-  renderBoundary,
-  renderOracle,
-  renderRows,
-  requireElements,
-  svgElement,
-  writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
-import {
-  GUARD_LANES,
-  buildGuardLoopModel,
-  evaluateGuardLoopOracle,
-} from './guard-loop-model.js'
+  makeFeedback, renderBoundary, renderOracle, renderRows,
+  requireElements, svgElement, writeText,
+  installDeclaredIcons, installScrollProgress,
+} from './study-lab-kit.js'
+import { buildGuardLoopModel, evaluateGuardLoopOracle } from './guard-loop-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
-// 状态链接的输入契约：次数是带上下界的整数，守卫是枚举；越界值在恢复时会被
-// 模型的校验拒绝并给出明确反馈。
-const GUARD_STATE_SCHEMA = {
-  attempts: { integerRange: [1, 5] },
-  guard: { enum: ['yes', 'no'] },
-}
+const SCHEMA = { attempts: { integerRange: [1, 9] }, guard: { enum: ['on', 'off'] } }
+const LANES = ['Agent 循环', 'repeat-tool-reminder', '模型上下文']
 
 function renderFlow(model, target, note) {
-  const slot = 64
-  const laneHeight = 58
-  const top = 34
-  const left = 110
-  const width = Math.max(900, left + model.steps.length * slot + 24)
-  const height = top + GUARD_LANES.length * laneHeight + 42
-  const xFor = index => left + index * slot + 30
-  const yFor = lane => top + GUARD_LANES.indexOf(lane) * laneHeight + laneHeight / 2
+  const slot = 64, lh = 58, top = 34, left = 110
+  const w = Math.max(900, left + model.steps.length * slot + 24)
+  const h = top + LANES.length * lh + 42
+  const xf = i => left + i * slot + 30
+  const yf = l => top + LANES.indexOf(l) * lh + lh / 2
 
   target.replaceChildren()
-  const svg = svgElement('svg', {
-    viewBox: '0 0 ' + String(width) + ' ' + String(height),
-    role: 'img',
-    'aria-labelledby': 'gl-svg-title gl-svg-desc',
-  })
+  const svg = svgElement('svg', { viewBox: `0 0 ${w} ${h}`, role: 'img', 'aria-labelledby': 'gl-st gl-ds' })
   svg.append(
-    svgElement('title', { id: 'gl-svg-title' }, '重复调用与拦截的有序步骤'),
-    svgElement('desc', { id: 'gl-svg-desc' },
-      '纵轴是参与方：Agent 循环、循环卫生 guard、工具主体和后置结算；横轴是步骤序号。'
-      + '实心点是放行的执行，信号色圆点是拦截，虚线圆环是注定无效的撤销尝试。'),
+    svgElement('title', { id: 'gl-st' }, '重复调用与提醒注入的有序步骤'),
+    svgElement('desc', { id: 'gl-ds' }, '纵轴是参与方，横轴是步骤序号。信号色圆点是提醒注入，实心圆是调用发出。'),
   )
-
-  for (const lane of GUARD_LANES) {
-    const y = yFor(lane)
+  for (const lane of LANES) {
+    const y = yf(lane)
     svg.append(
       svgElement('text', { x: left - 14, y: y + 5, class: 'axis', 'text-anchor': 'end' }, lane),
-      svgElement('line', { x1: left, y1: y, x2: width - 18, y2: y, class: 'grid' }),
+      svgElement('line', { x1: left, y1: y, x2: w - 18, y2: y, class: 'grid' }),
     )
   }
-
-  for (const step of model.steps) {
-    const x = xFor(step.index)
-    const y = yFor(step.lane)
-    const classes = ['gl-dot']
-    if (step.phase === 'block') classes.push('is-block')
-    if (step.phase === 'undo') classes.push('is-undo')
-    if (step.phase === 'execute') classes.push('is-exec')
-    const dot = svgElement('circle', {
-      'data-reveal': '',
-      cx: x, cy: y, r: 9, class: classes.join(' '), 'data-step': String(step.index),
-      'data-attempt': step.attempt === undefined ? '' : String(step.attempt),
-    })
-    dot.append(svgElement('title', {},
-      '第 ' + String(step.index) + ' 步 · ' + step.phase + '：' + step.detail))
-    svg.append(
-      dot,
-      svgElement('text', { x, y: height - 20, class: 'axis', 'text-anchor': 'middle' }, String(step.index)),
-    )
+  for (const s of model.steps) {
+    const cls = ['gl-dot']
+    if (s.phase === 'remind') cls.push('is-remind')
+    if (s.phase === 'receive') cls.push('is-receive')
+    const c = svgElement('circle', { 'data-reveal': '', cx: xf(s.index), cy: yf(s.lane), r: 9, class: cls.join(' ') })
+    c.append(svgElement('title', {}, `${s.index} ${s.phase}: ${s.detail}`))
+    svg.append(c)
   }
-
-  target.append(svg)
-  revealOnScroll(target)
-
-  let message = '这条时间线共 ' + String(model.observations.steps) + ' 步：发出 '
-    + String(model.observations.attempts) + ' 次，执行 '
-    + String(model.observations.executedCount) + ' 次，拦截 '
-    + String(model.observations.blockedCount) + ' 次。'
-  if (model.observations.undoAttempted) {
-    message += '后置结算试过撤销——MONOTONIC_UNDO 说它永远无效。'
-  } else if (!model.observations.guardOn) {
-    message += '守卫关闭：没有刹车，账目上全是执行。'
-  }
-  writeText(note, message)
+  target.append(svg); revealOnScroll(target)
+  writeText(note, `${model.observations.reminderCount} 条提醒注入，全部 ${model.observations.attempts} 次调用照常执行——建议性插件不拦截任何东西。`)
 }
 
 function initializePage() {
-  const elements = {
+  const el = {
     form: document.querySelector('#gl-form'),
     attempts: document.querySelector('#attempts'),
     attemptsOutput: document.querySelector('#attempts-output'),
     guard: document.querySelector('#guard'),
     feedback: document.querySelector('#gl-feedback'),
     flow: document.querySelector('#gl-plot'),
-    flowNote: document.querySelector('#gl-note'),
+    note: document.querySelector('#gl-note'),
     tableBody: document.querySelector('#gl-table-body'),
     tableCaption: document.querySelector('#gl-table-caption'),
     oracleList: document.querySelector('#oracle-list'),
     canProve: document.querySelector('#can-prove-list'),
     cannotProve: document.querySelector('#cannot-prove-list'),
-    attemptsMetric: document.querySelector('#metric-attempts'),
-    executed: document.querySelector('#metric-executed'),
-    blocked: document.querySelector('#metric-blocked'),
-    undo: document.querySelector('#metric-undo'),
+    mAttempts: document.querySelector('#metric-attempts'),
+    mReminders: document.querySelector('#metric-reminders'),
+    mExecuted: document.querySelector('#metric-executed'),
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
   }
-  if (!requireElements(elements)) return
-  const setFeedback = makeFeedback(elements.feedback)
+  if (!requireElements(el)) return
+  const fb = makeFeedback(el.feedback)
 
   const rebuild = () => {
     try {
-      const input = {
-        attempts: Number(elements.attempts.value),
-        guard: elements.guard.value,
-      }
-      const model = buildGuardLoopModel(input)
-      const verdict = evaluateGuardLoopOracle(model)
-
-      renderFlow(model, elements.flow, elements.flowNote)
-      renderOracle(verdict, elements.oracleList, elements.oracle)
-      renderBoundary(model, elements.canProve, elements.cannotProve)
-
-      renderRows(elements.tableBody, model.steps.map(step => ({
-        key: String(step.index),
-        state: step.phase === 'block' ? 'block'
-          : step.phase === 'undo' ? 'undo' : 'plain',
-        cells: [
-          String(step.index),
-          step.lane,
-          step.phase,
-          step.detail,
-          step.attempt === undefined ? '—' : String(step.attempt),
-        ],
+      const model = buildGuardLoopModel({ attempts: Number(el.attempts.value), guard: el.guard.value })
+      const v = evaluateGuardLoopOracle(model)
+      renderFlow(model, el.flow, el.note)
+      renderOracle(v, el.oracleList, el.oracle)
+      renderBoundary(model, el.canProve, el.cannotProve)
+      renderRows(el.tableBody, model.steps.map(s => ({
+        key: String(s.index),
+        state: s.phase === 'remind' ? 'remind' : s.phase === 'receive' ? 'receive' : 'plain',
+        cells: [String(s.index), s.lane, s.phase, s.detail, String(s.attempt ?? '—')],
       })))
-      writeText(elements.tableCaption, '当前输入的全部 ' + String(model.steps.length) + ' 步')
-
-      writeText(elements.attemptsMetric, String(model.observations.attempts))
-      writeText(elements.executed, String(model.observations.executedCount))
-      writeText(elements.blocked, String(model.observations.blockedCount))
-      writeText(elements.undo, model.observations.undoSucceeded ? '是' : '否')
-      setFeedback('已推演：执行 ' + String(model.observations.executedCount)
-        + ' 次、拦截 ' + String(model.observations.blockedCount) + ' 次，撤销生效='
-        + (model.observations.undoSucceeded ? '是' : '否') + '。', 'success')
-      persistState()
-    } catch (error) {
-      console.error('[guard-loop] rebuild failed', error)
-      setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
+      writeText(el.tableCaption, `当前输入的全部 ${model.steps.length} 步`)
+      writeText(el.mAttempts, String(model.observations.attempts))
+      writeText(el.mReminders, String(model.observations.reminderCount))
+      writeText(el.mExecuted, String(model.observations.executedCount))
+      fb(`已推演：${model.observations.reminderCount} 条提醒、${model.observations.attempts} 次调用全部执行。`, 'success')
+      persist()
+    } catch (e) {
+      console.error('[guard-loop]', e)
+      fb(e instanceof Error ? e.message : '输入无效。', 'error')
     }
   }
 
-  // 状态进 URL hash：刷新或把链接发给别人，打开的就是同一份输入。
-  const persistState = () => {
+  const persist = () => {
     try {
-      const nextHash = writeStateToHash(location.hash, {
-        attempts: Number(elements.attempts.value),
-        guard: elements.guard.value,
-      }, GUARD_STATE_SCHEMA)
-      history.replaceState(null, '', nextHash)
-    } catch {
-      // 保持安静：hash 写不进去时页面行为不变。
-    }
+      history.replaceState(null, '', writeStateToHash(location.hash, {
+        attempts: Number(el.attempts.value), guard: el.guard.value,
+      }, SCHEMA))
+    } catch {}
   }
 
-  elements.form.addEventListener('submit', (event) => {
-    event.preventDefault()
+  el.form.addEventListener('submit', e => { e.preventDefault(); rebuild() })
+  for (const c of [el.attempts, el.guard]) c.addEventListener('input', () => {
+    if (c === el.attempts) writeText(el.attemptsOutput, c.value)
     rebuild()
   })
-  for (const control of [elements.attempts, elements.guard]) {
-    control.addEventListener('input', () => {
-      if (control === elements.attempts) writeText(elements.attemptsOutput, control.value)
-      rebuild()
-    })
-  }
 
-  // 从状态链接恢复输入；链接缺失或损坏时保持默认输入，不报错打断阅读。
-  const restored = readStateFromHash(location.hash, GUARD_STATE_SCHEMA)
-  if (restored !== null && restored.ok) {
-    elements.attempts.value = String(restored.value.attempts)
-    elements.guard.value = restored.value.guard
-  }
-  writeText(elements.attemptsOutput, elements.attempts.value)
-
+  const r = readStateFromHash(location.hash, SCHEMA)
+  if (r !== null && r.ok) { el.attempts.value = String(r.value.attempts); el.guard.value = r.value.guard }
+  writeText(el.attemptsOutput, el.attempts.value)
   rebuild()
 
-  elements.copyLink.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(location.href)
-      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
-    } catch {
-      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
-    }
+  el.copyLink.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(location.href); fb('已复制链接。', 'success') }
+    catch { fb('复制失败：手动复制地址栏链接即可。', 'error') }
   })
 }
 
 if (typeof document !== 'undefined') {
-  initializePage()
-  installDeclaredIcons()
-  installScrollProgress()
-  installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
-
+  initializePage(); installDeclaredIcons(); installScrollProgress()
+  installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
-    correct: 'monotonic',
+    correct: 'advisory',
     explain: {
-      'undo-works': 'MONOTONIC_UNDO 这条校验钉住了相反的结论：撤销尝试存在，但它的 undoWorked 恒为 false。',
-      'monotonic': '正确。拒绝发生在主体执行前且不可改写——EXECUTION_ACCOUNT 里它始终计为拦截而非执行。',
-      'retry-passes': '第 4 次仍是同一调用：THRESHOLD_RULE 让它在第 3 步之后继续被拦，不会摇身变成新调用。',
+      advisory: 'ADVISORY_ONLY 校验钉住了它：repeat-tool-reminder 是建议性 post-execute 插件，不拦截任何调用。',
+      blocking: '那是另一个机制——Cordis 的 guard() 瀑布可以在 pre-execute 阶段拒绝；repeat-tool-reminder 不走那条路。',
+      'model-stops': '提醒只是注入上下文——模型可以忽略它继续调，EXECUTION_ACCOUNT 显示所有调用都执行了。',
     },
   })
 }
