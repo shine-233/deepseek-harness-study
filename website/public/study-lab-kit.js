@@ -232,6 +232,65 @@ export function bindPlotScrub(plot, slider) {
 }
 
 /**
+ * 读数拖柄的纯数学：横向像素位移换算成滑杆步数并夹紧到量程。
+ * 纯函数，在 Node 里单独测试；DOM 接线在 installNumberScrub。
+ */
+export function nextScrubValue(current, deltaPixels, { min, max, step = 1, pxPerStep = 6 } = {}) {
+  const lo = Number(min)
+  const hi = Number(max)
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return current
+  const numericStep = Number(step) > 0 ? Number(step) : 1
+  const pixelsPerStep = Number(pxPerStep) > 0 ? Number(pxPerStep) : 6
+  const steps = Math.round(deltaPixels / pixelsPerStep)
+  if (steps === 0) return Number(current)
+  return Math.min(hi, Math.max(lo, Number(current) + steps * numericStep))
+}
+
+/**
+ * 把一个数值读数变成 redblobgames 式的可拖对象：按住左右拖，等价于拨动它旁边的滑杆。
+ * 键盘路径不在这里——原生滑杆已有完整键盘支持；本函数只补鼠标/触控的精确操纵，
+ * 所以读数保持 <output> 本来的语义，不加 role/tabindex 去制造重复的焦点停靠。
+ * 派发的是普通 input 事件：bindAutoAdvance 会把它当作用户操作并暂停连播，符合直觉。
+ */
+export function installNumberScrub(target, slider) {
+  if (!target || !slider) return
+  let active = false
+  let startX = 0
+  let startValue = 0
+  const apply = value => {
+    if (String(value) === slider.value) return
+    slider.value = String(value)
+    slider.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+  target.classList.add('lab-scrub-number')
+  target.addEventListener('pointerdown', event => {
+    if (event.button !== undefined && event.button !== 0) return
+    active = true
+    startX = event.clientX
+    startValue = Number(slider.value)
+    try {
+      target.setPointerCapture(event.pointerId)
+    } catch {
+      // 某些合成事件的 pointerId 无法捕获；拖动仍在本元素内工作。
+    }
+    event.preventDefault()
+  })
+  target.addEventListener('pointermove', event => {
+    if (!active) return
+    apply(nextScrubValue(startValue, event.clientX - startX, {
+      min: slider.min,
+      max: slider.max,
+      step: slider.step,
+    }))
+  })
+  target.addEventListener('pointerup', () => { active = false })
+  target.addEventListener('pointercancel', () => { active = false })
+}
+
+/** 本页所有活跃连播的停机回调；总闸冻结动效时逐一调用。 */
+const AUTO_ADVANCE_STOPPERS = new Set()
+
+/**
  * 给时间轴滑块配一个播放按钮：点击在末帧之外连续逐帧推进，再点暂停；
  * 到末帧自动停；用户手动拖动（可信 input 事件）立即暂停。
  * 减少动态效果时不做连续推进，一次点击只走一帧，帧控件保持可用。
@@ -249,6 +308,8 @@ export function bindAutoAdvance(playButton, slider, { stepMs = 650 } = {}) {
     if (timer !== 0) { clearInterval(timer); timer = 0 }
     setPlaying(false)
   }
+  // 总闸（installMotionPauseToggle）冻结全页动效时，连播也一并停。
+  AUTO_ADVANCE_STOPPERS.add(stop)
   const atEnd = () => !(Number(slider.value) < Number(slider.max))
   // 自己派发的 input 不算用户操作；其余来源（拖动、键盘步进、其它模块）都暂停。
   let selfDispatch = false
@@ -346,5 +407,33 @@ if (typeof document !== 'undefined' && typeof document.addEventListener === 'fun
     const box = card.getBoundingClientRect()
     card.style.setProperty('--mx', `${Math.round(event.clientX - box.left)}px`)
     card.style.setProperty('--my', `${Math.round(event.clientY - box.top)}px`)
+  }, { passive: true })
+}
+/*
+ * 磁吸按钮（Apple/Linear 式微交互）：
+ * 指针进入按钮周边半径时，按钮向指针平移距离的 24%（半径线性衰减）；
+ * 离开半径即卸掉 translate，由 --ease-spring 弹簧回位。
+ * 只在「悬停且细指针」的设备上安装，减少动态偏好下直接跳过——
+ * 平移走 translate 属性，不与按钮自身的 transform/transition 打架。
+ */
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function'
+  && typeof window.matchMedia === 'function'
+  && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+  document.addEventListener('pointermove', (event) => {
+    if (reducedMotion.matches) return
+    for (const button of document.querySelectorAll('.button')) {
+      const box = button.getBoundingClientRect()
+      const dx = event.clientX - (box.left + box.width / 2)
+      const dy = event.clientY - (box.top + box.height / 2)
+      const distance = Math.hypot(dx, dy)
+      const radius = Math.max(box.width, box.height) / 2 + 42
+      if (distance < radius) {
+        const pull = (1 - distance / radius) * 0.24
+        button.style.translate = (dx * pull).toFixed(1) + 'px ' + (dy * pull).toFixed(1) + 'px'
+      } else if (button.style.translate !== '') {
+        button.style.removeProperty('translate')
+      }
+    }
   }, { passive: true })
 }

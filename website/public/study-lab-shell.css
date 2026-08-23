@@ -95,6 +95,18 @@ a { color: var(--brand); }
 }
 
 /*
+ * 磁吸按钮的回位弹簧：translate 由 study-lab-kit.js 的委托写入，
+ * 这里只负责让跟随与回弹带物理感。背景/边框的过渡在 tokens 里，互不覆盖。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .button {
+    transition: translate 260ms var(--ease-spring),
+      background var(--dur-fast) var(--ease),
+      border-color var(--dur-fast) var(--ease);
+  }
+}
+
+/*
  * 区块卡片的滚动入场：纯 CSS 滚动时间线（2026 Baseline），合成器线程执行。
  * 双层降级——不支持的浏览器和减少动态偏好下，卡片保持自然静态，功能不变。
  * 只动 opacity / transform；animation-duration 的 1ms 是 Firefox 的语法要求。
@@ -328,6 +340,16 @@ tbody tr:hover { background: color-mix(in srgb, var(--brand) 7%, transparent); }
 
 @media (max-width: 1080px) {
   .hero-panel, .evidence-grid, .boundary-columns { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* 读数拖柄：横向像素换算成滑杆步数；键盘路径仍走原生滑杆，这里只管指针手感。
+   touch-action 保留纵向滚动，只接管横向拖动；文本不可选中，避免拖动时拉蓝。
+   指针拖动本身不是动画，reduced-motion 下照常可用。 */
+.lab-scrub-number {
+  cursor: ew-resize;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
 }
 
 /* 这里的过渡只标记指针位置，不编码任何数值，去掉不损失信息。 */
