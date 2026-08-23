@@ -80,6 +80,11 @@ const legendLines = []
 const commitLine = headerLines.find(line => line.includes('generate-source-index.mjs')) ?? ''
 const fixedCommit = 'aa6c361a972c8369148dea7380bb5c21c24e07ec'
 
+function toPageText(lines) {
+  while (lines.length > 0 && lines.at(-1) === '') lines.pop()
+  return `${lines.join('\n')}\n`
+}
+
 const written = []
 parts.forEach((part, index) => {
   const number = String(index + 1).padStart(2, '0')
@@ -95,8 +100,8 @@ parts.forEach((part, index) => {
     `本页是 [packages-client.md](./packages-client.md) 总览的第 ${index + 1} 部分，覆盖：${groupSummary}。`,
     '',
   ]
-  const body = [...head, ...legendLines, '', ...part.sections.flatMap(s => s.lines), '']
-  writeFileSync(resolve(repositoryRoot, 'study/文件索引', name), body.join('\n'), 'utf8')
+  const body = [...head, ...legendLines, '', ...part.sections.flatMap(s => s.lines)]
+  writeFileSync(resolve(repositoryRoot, 'study/文件索引', name), toPageText(body), 'utf8')
   written.push({ name, entries: part.entries, groups: part.sections.map(s => s.title) })
 })
 
@@ -129,7 +134,7 @@ if (!overviewHead || !commitLine.includes(fixedCommit)) {
   process.exit()
 }
 
-writeFileSync(clientPage, [...overviewHead, ''].join('\n'), 'utf8')
+writeFileSync(clientPage, toPageText([...overviewHead]), 'utf8')
 
 console.log(`split-packages-client: 923 条拆为 ${parts.length} 页，合计条目 ${written.reduce((s, p) => s + p.entries, 0)}。`)
 for (const part of written) console.log(`  ${part.name}: ${part.entries} 条`)
