@@ -82,7 +82,7 @@ export default {
       source: 'study/27-工具预算与插件责任决策卡.md#社区生态有六层',
     },
   ],
-  '28-最小插件工作台': [
+  '35-最小插件工作台': [
     {
       id: 'q1',
       q: '工作台 verify 成功输出的 unload 部分，真正作为卸载断言重点的是哪组字段？',
@@ -93,7 +93,7 @@ export default {
       ],
       answer: 1,
       explain: '「运行真实 Loader 全流程」指出 serviceAbsent 和 entriesRemaining 才是卸载断言的重点；tickCount 只是插件定时器对实际生命周期的可观察信号，不是模型调用，也不是伪造的固定文本，卸载后应停止并被清理。',
-      source: 'study/28-最小插件工作台.md#最小插件工作台构建--注册--卸载',
+      source: 'study/35-最小插件工作台.md#最小插件工作台构建--注册--卸载',
     },
     {
       id: 'q2',
@@ -105,7 +105,7 @@ export default {
       ],
       answer: 0,
       explain: '「先安装和构建」写明构建命令只编译 src/minimal-plugin.ts 并在被忽略的 build-manifest.json 记录入口和 SHA-256；产物缺失说明构建链路有问题，手工补一个假产物会让运行证据失效。',
-      source: 'study/28-最小插件工作台.md#先安装和构建',
+      source: 'study/35-最小插件工作台.md#先安装和构建',
     },
     {
       id: 'q3',
@@ -117,7 +117,7 @@ export default {
       ],
       answer: 2,
       explain: '「证据边界」一节限定它是固定源码仓库中的最小运行证据：真实 Host/Web 端口、凭据、子进程、跨平台行为和生产发布门禁都不在其内，提升为可分发扩展还要按插件测试与卸载证据补齐更多层次。',
-      source: 'study/28-最小插件工作台.md#证据边界',
+      source: 'study/35-最小插件工作台.md#证据边界',
     },
   ],
   '28-最小插件示例与学习检查': [
@@ -158,7 +158,7 @@ export default {
       source: 'study/28-最小插件示例与学习检查.md#这套示例为什么比大而全-demo更适合第一步',
     },
   ],
-  '29-研究与-Debug-协作': [
+  '36-研究与-Debug-协作': [
     {
       id: 'q1',
       q: 'Debug 工具单独下载、用户没有提供任何 evidence 时，research-bridge 会发生什么？',
@@ -169,7 +169,7 @@ export default {
       ],
       answer: 1,
       explain: '「先记住边界」列出四条必须同时成立的事实：协作链只通过 diagnostic-request.json 和 diagnostic-result.json 两个文件交接，没有 loopback、HTTP、WebSocket、共享数据库或常驻 watcher，实时 RPC 需要另立设计而不是从这个协议推断。',
-      source: 'study/29-研究与-Debug-协作.md#先记住边界',
+      source: 'study/36-研究与-Debug-协作.md#先记住边界',
     },
     {
       id: 'q2',
@@ -181,7 +181,7 @@ export default {
       ],
       answer: 0,
       explain: '「第四步：回到网站导入 result」说明未知或重复 check 会 fail-closed；repro-export 旁没有 manifest.json 时显示 integrity=absent warning，而不是声称哈希已验证。',
-      source: 'study/29-研究与-Debug-协作.md#研究与-debug-协作一份-request另一份-result',
+      source: 'study/36-研究与-Debug-协作.md#研究与-debug-协作一份-request另一份-result',
     },
     {
       id: 'q3',
@@ -193,7 +193,7 @@ export default {
       ],
       answer: 2,
       explain: '「第四步：回到网站导入 result」强调 COMPLETE 不是「故障已修复」：trust 等于 declared-metadata-only 表示只对显式 artifact 负责，真实运行时事实仍需要 Host/Session 层的证据。',
-      source: 'study/29-研究与-Debug-协作.md#研究与-debug-协作一份-request另一份-result',
+      source: 'study/36-研究与-Debug-协作.md#研究与-debug-协作一份-request另一份-result',
     },
   ],
 }
