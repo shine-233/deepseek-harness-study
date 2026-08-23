@@ -1,4 +1,130 @@
 export default {
+  '00-开始这里': [
+    {
+      id: 'q1',
+      q: '一个 Turn 和一个 Step 是什么关系？',
+      options: [
+        '一个 Turn 固定就是一个 Step，二者可以互换使用',
+        '一次用户输入触发一个 Turn；一个 Turn 可以包含 0 个或多个 Step，每个 Step 是一次模型请求及其触发的工具调用',
+        'Step 先发生，多个 Step 攒成一个 Turn 提交给模型',
+      ],
+      answer: 1,
+      explain: '「先记住六个词」：Turn 与 Step 条目。若首次输入被拒绝或被改写为空，也可能记录一个没有 Step 的 Turn，所以“0 个”是真实存在的情况。',
+      source: 'study/00-开始这里.md#先记住六个词',
+    },
+    {
+      id: 'q2',
+      q: '贯穿示例里“还没有证明：真实 DSH Profile 已加载它”这句话，属于哪种证据边界？',
+      options: [
+        '源码和单元测试已经覆盖了运行时装配，只是读者还没自己跑过',
+        '源码和测试只证明插件订阅了事件、不改写结果；“真实 Profile 加载了它”和“模型因此收到更少 token”需要另外的运行证据',
+        '只要单元测试通过，就等于真实 DSH 已经加载了这个插件',
+      ],
+      answer: 1,
+      explain: '「先看一个贯穿示例」的四句话把证据分成两栏：已经能证明（源码与单测显示订阅且不改写）和还没有证明（Profile 装配、token 影响）。后面的最小插件示例把这四句话变成可运行的 Node 测试，但仍然不是真实安装证明。',
+      source: 'study/00-开始这里.md#先看一个贯穿示例',
+    },
+    {
+      id: 'q3',
+      q: '“一切皆插件”这句话应该怎样理解才不会用错？',
+      options: [
+        '每个插件注册的工具都会自动发给模型，让模型随便调用',
+        '它描述的是能力如何装配和卸载，不等于“所有插件都把工具发给模型”；工具还要经过作用域、呈现方式和执行策略',
+        '只有工具类插件才算插件，Session 和 Agent Loop 不算',
+      ],
+      answer: 1,
+      explain: '「先记住六个词」的关键提醒。已注册、模型可见、执行允许是三件事，第 22 课专门拆解这三层；DSH 里 Session、Agent Loop、Web 组件同样以插件方式装配，“模型”本身不等于插件。',
+      source: 'study/00-开始这里.md#先记住六个词',
+    },
+  ],
+  '01-仓库地图': [
+    {
+      id: 'q1',
+      q: '`vendor/` 目录里的代码应该按什么身份来读？',
+      options: [
+        '纯粹的第三方上游代码，和 DSH 官方写的没有区别',
+        '固定放进仓库的第三方基础库副本，带着 DSH 自己的重命名、构建配置和部分行为修改；要先读 vendor/README.md 的 Manifest 和 Local modifications',
+        'DSH 的核心业务逻辑所在目录，功能包都在这里',
+      ],
+      answer: 1,
+      explain: '「顶层目录」表格 vendor/ 行：不要把第三方设计和 DSH 修改混为一谈；README.md 也强调不能把每项实现都归因于上游或 DSH 原创。',
+      source: 'study/01-仓库地图.md#顶层目录',
+    },
+    {
+      id: 'q2',
+      q: '把 DeepSeek 的 HTTP/SSE 协议接到通用 LLM 接口的适配器在哪个包？',
+      options: [
+        'packages/llm/llm-deepseek',
+        'packages/core/tools',
+        'packages/boot/app-boot',
+      ],
+      answer: 0,
+      explain: '「`packages` 里面怎样找」：llm 定义模型消息和流式接口，llm-deepseek 把 DeepSeek HTTP/SSE 协议接到这个通用接口上。',
+      source: 'study/01-仓库地图.md#packages-里面怎样找',
+    },
+    {
+      id: 'q3',
+      q: '依赖方向“从抽象指向具体”在实际代码里的表现是什么？',
+      options: [
+        '具体包 import 核心接口，核心包反过来也要知道每个具体实现',
+        '所有包互相 import，靠 lint 保证不出循环',
+        '工具使用 ctx.tools 这类能力入口，而不是直接导入某个文件系统后端；换后端时工具本身不用重写',
+      ],
+      answer: 2,
+      explain: '「依赖方向」：核心包提供接口和事件，具体包提供实现，Bundle 决定组合，Apps 负责启动。这样换本地、远程或第三方后端时，调用方保持不变。',
+      source: 'study/01-仓库地图.md#依赖方向',
+    },
+  ],
+  '02-Cordis与插件树': [
+    {
+      id: 'q1',
+      q: '插件自己启动了一个定时器但没有用 `ctx.effect()` 登记，`fiber.dispose()` 之后会发生什么？',
+      options: [
+        'Fiber 会扫描进程并自动关掉这个定时器',
+        '定时器随 dispose 自动取消，因为 Fiber 记录了插件创建的一切资源',
+        'Fiber 只清理通过 Cordis 登记过的可撤销效果；私建的 timer、watcher 或连接不会被自动发现，dispose 完成不代表资源已消失',
+      ],
+      answer: 2,
+      explain: '「Fiber：一个插件实例的生命周期账本」：Fiber 记录的是已经登记的可撤销效果；谁创建外部资源，谁就必须把停止或关闭逻辑显式登记到自己的 Fiber。',
+      source: 'study/02-Cordis与插件树.md#fiber一个插件实例的生命周期账本',
+    },
+    {
+      id: 'q2',
+      q: 'LLM 例子里 Service Definition、Provider、Consumer 分别对应谁？',
+      options: [
+        'llm 包定义统一的流式接口；llm-deepseek 提供 HTTP/SSE 实现；Agent Loop 只使用 ctx.llm.stream()',
+        'DeepSeek 定义接口；llm 包提供实现；工具包负责消费',
+        '三者都在 llm-deepseek 一个包里，只是三个导出名',
+      ],
+      answer: 0,
+      explain: '「Service：把能力放进插座」：换掉 DeepSeek 适配器时，Agent Loop 不需要知道供应商 URL、SSE 字段或重试方式——这就是能力扩展边界的直观版本。',
+      source: 'study/02-Cordis与插件树.md#service把能力放进插座',
+    },
+    {
+      id: 'q3',
+      q: 'waterfall 派发中某个监听器直接 return 而不调用 next()，后果是什么？',
+      options: [
+        '跳过该监听器，后续处理照常进行',
+        '整条瀑布在这里短路，排在后面的监听器不再被调用',
+        'Cordis 会抛出类型错误，拒绝这次事件派发',
+      ],
+      answer: 1,
+      explain: '「Event：插件之间的通知和拦截点」：waterfall 要求监听器调用 next() 在委托前后检查或改写数据；不继续委托时，后面的处理停在这里。第 14 课的 Hook 瀑布实验能亲手复现这条规则。',
+      source: 'study/02-Cordis与插件树.md#event插件之间的通知和拦截点',
+    },
+    {
+      id: 'q4',
+      q: '哪些内容必须写入 Session 日志？',
+      options: [
+        '所有 live extension point 的每次触发都要落日志',
+        '必须恢复的事实（如用户消息、assistant chunk、tool call 和 tool result）进 Session 日志；只影响当前请求的拦截和策略更适合 live event',
+        '由每个插件自行决定，仓库没有统一约定',
+      ],
+      answer: 1,
+      explain: '「Event」区分两种事实：Session event 是持久事实，agent/capability event 是运行中的扩展点。“模型可见 ⟺ 能从 Session 日志重建”是 DSH 可恢复设计的核心不变量。',
+      source: 'study/02-Cordis与插件树.md#event插件之间的通知和拦截点',
+    },
+  ],
   '03-核心文件精读': [
     {
       id: 'q1',
