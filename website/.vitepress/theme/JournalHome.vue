@@ -2,8 +2,8 @@
 /**
  * DSH 学习手账首页（鲸落手账方向）。
  *
- * 吉祥物「阿溟」：像素画风原创演绎——字符网格逐行贪婪合并成 SVG rect，
- * shape-rendering="crispEdges" 保证像素锐利。形象致敬社区鲸鱼娘二创
+ * 吉祥物「阿溟」：像素画精灵数据来自 website/public/mascot-sprite.js（与课程页
+ * 伴侣共用同一份文件，构建期打包进本组件）。形象致敬社区鲸鱼娘二创
  * （原型：上善无形「溟月」、ZipZipPipe 女仆装版，CC BY-NC-SA 4.0，非商用）。
  *
  * 交互：分栏切换（课程 / 实验标本册 / 索引与数字）、集章卡（localStorage 持久化 + 进度水条，
@@ -11,54 +11,9 @@
  */
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { withBase } from 'vitepress'
+import { MASCOT_GRID_W, MASCOT_SPRITE, buildMascotRects } from '../../public/mascot-sprite.js'
 
 /* ---------- 像素画阿溟 ---------- */
-
-/** 字符调色板：一个字符对应一个颜色，'.' 为透明。 */
-const PALETTE: Record<string, string> = {
-  h: '#7db8ff', // 发丝高光
-  H: '#3b79f0', // 头发主色
-  d: '#2a5cc9', // 发侧深色
-  W: '#ffffff', // 女仆发带
-  S: '#fff6ed', // 脸部
-  s: '#f5ddc4', // 手
-  E: '#22315e', // 眼睛
-  w: '#ffffff', // 眼内高光
-  B: '#ffb9c6', // 腮红
-  D: '#2f63d6', // 裙身
-  r: '#2454b8', // 裙摆暗部
-  A: '#fffdf7', // 围裙
-  C: '#f07a5a', // 领结
-  T: '#5e9bff', // 鲸鳍
-}
-
-const GRID_W = 22
-
-/** 像素画本体：每行一个字符串；渲染器把行长补齐/裁齐到 GRID_W。 */
-const SPRITE = [
-  '..........hh..........',
-  '.........hHHh.........',
-  '........HHHHHHHH......',
-  '......WWWWWWWWWWWW....',
-  '.....hHHHHHHHHHHHHh...',
-  '.TT.hHHHHHHHHHHHHh.TT.',
-  '.TT.HHHHHHHHHHHHHH.TT.',
-  '..T.HHHHHHHHHHHHHH.T..',
-  '....HHhhhhhhhhhhHH....',
-  '...dHSSSSSSSSSSSSHd...',
-  '...dSSSSSSSSSSSSSSd...',
-  '...dSwEESSSSSwEESd....',
-  '...dSEEESSSSSEEESd....',
-  '...dBBSSSSSSSSSSBBd...',
-  '....SSSSSSSSSSSSSS....',
-  '......SSSSSSSSSS......',
-  '.......AAAAAAAA.......',
-  '.....DDDCCCCCCDDD.....',
-  '..DD.DDDDAAAADDDD.DD..',
-  '..DD.DDDDAAAADDDD.DD..',
-  '..ss.DDDDAAAADDDD.ss..',
-  '....rrrrrrrrrrrrrr....',
-]
 
 interface PixelRect {
   x: number
@@ -68,30 +23,7 @@ interface PixelRect {
   eye?: boolean
 }
 
-/** 同色横向贪婪合并成 rect；眼睛格单独标记以便做眨眼动画。 */
-function rowRects(row: string, y: number): PixelRect[] {
-  const cells = row.padEnd(GRID_W, '.').slice(0, GRID_W).split('')
-  const rects: PixelRect[] = []
-  let x = 0
-  while (x < cells.length) {
-    const ch = cells[x]
-    let w = 1
-    while (x + w < cells.length && cells[x + w] === ch) w++
-    if (ch !== '.') {
-      rects.push({
-        x,
-        y,
-        w,
-        fill: PALETTE[ch] ?? '#cccccc',
-        eye: [...Array(w)].every((_, i) => cells[x + i] === 'E' || cells[x + i] === 'w'),
-      })
-    }
-    x += w
-  }
-  return rects
-}
-
-const BASE_RECTS = SPRITE.flatMap((row, y) => rowRects(row, y))
+const BASE_RECTS = buildMascotRects() as PixelRect[]
 
 /** 表情切换的嘴部覆盖块（普通嘴 / 开心嘴）。 */
 const MOUTHS: Record<'normal' | 'happy', { x: number; y: number; w: number }[]> = {
@@ -150,6 +82,34 @@ const LESSONS: StampLesson[] = [
   { id: 'l25', num: '25', title: '十五分钟任务单', hint: '第一条学习记录', href: withBase('/study/lessons/25-从首页到第一次产出的动手任务单') },
   { id: 'l28', num: '28', title: '最小插件工作台', hint: '测试跑绿才算数', href: withBase('/study/examples/minimal-observer') },
 ]
+
+/**
+ * 确定性手绘边框：rough.js 的最小教学移植。
+ * 线性同余种子随机沿矩形周界抖动，双描边取不同种子——
+ * 种子固定，所以 SSR 与客户端、每次加载都逐字节一致，不破坏水合。
+ */
+function roughFramePath(seed: number, wobble = 1.1): string {
+  let state = seed >>> 0
+  const next = () => {
+    state = (state * 1664525 + 1013904223) >>> 0
+    return state / 4294967296
+  }
+  const jitter = () => (next() - 0.5) * 2 * wobble
+  const points: string[] = []
+  const walk = (x1: number, y1: number, x2: number, y2: number, steps: number) => {
+    for (let i = 0; i <= steps; i += 1) {
+      const t = i / steps
+      points.push(`${(x1 + (x2 - x1) * t + jitter()).toFixed(2)} ${(y1 + (y2 - y1) * t + jitter()).toFixed(2)}`)
+    }
+  }
+  walk(2, 2, 98, 2, 7)
+  walk(98, 2, 98, 98, 7)
+  walk(98, 98, 2, 98, 7)
+  walk(2, 98, 2, 2, 7)
+  return `M${points.join(' L')} Z`
+}
+const stampFrameA = roughFramePath(20260823)
+const stampFrameB = roughFramePath(917421)
 
 const STORAGE_KEY = 'am-stamps-home'
 const stampedIds = ref<Record<string, boolean>>({})
@@ -247,6 +207,25 @@ watchEffect(() => {
 
 <template>
   <div class="dj-page">
+    <!-- line boil 滤镜：feTurbulence 噪声场喂给 feDisplacementMap，
+         baseFrequency 由 SMIL 离散步进换帧——手绘卡通的「沸腾」边缘。
+         纯 SVG/SMIL 无脚本；滤镜仅在 prefers-reduced-motion: no-preference 下被引用。 -->
+    <svg class="dj-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <filter id="dj-boil" x="-6%" y="-6%" width="112%" height="112%">
+          <feTurbulence type="turbulence" baseFrequency="0.55" numOctaves="1" seed="7" result="noise">
+            <animate
+              attributeName="baseFrequency"
+              dur="0.55s"
+              values="0.55;0.60;0.51;0.58;0.55"
+              calcMode="discrete"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+    </svg>
     <!-- 手账封面 -->
     <header class="dj-cover">
       <span class="dj-tape" aria-hidden="true"></span>
@@ -268,7 +247,7 @@ watchEffect(() => {
           <svg
             :data-mood="mood"
             class="dj-mascot"
-            :viewBox="`0 0 ${GRID_W} ${SPRITE.length}`"
+            :viewBox="`0 0 ${MASCOT_GRID_W} ${MASCOT_SPRITE.length}`"
             shape-rendering="crispEdges"
             role="button"
             tabindex="0"
@@ -298,8 +277,11 @@ watchEffect(() => {
           </svg>
           <p class="dj-mascot-note">{{ note }}</p>
         </div>
-
         <div class="dj-stamp-card">
+          <svg class="dj-rough-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path :d="stampFrameA" />
+            <path :d="stampFrameB" class="dj-rough-frame-b" />
+          </svg>
           <h3>
             <span>集章卡 · 已收 <b>{{ doneCount }}</b>/{{ LESSONS.length }} 枚</span>
             <button type="button" class="dj-reset" @click="resetStamps">撕掉重盖</button>
@@ -773,4 +755,26 @@ html.dark .dj-tabs button[aria-selected='true']{outline-color:rgba(10,16,28,.5);
     }
   }
 }
+
+/* line boil 滤镜容器：不占布局。 */
+.dj-defs{position:absolute;width:0;height:0;overflow:hidden;}
+
+/*
+ * 阿溟的「沸腾」边缘：只在用户未要求减少动态时引用滤镜，
+ * SMIL 离散换帧让像素画的轮廓像手绘卡通一样微微颤动。
+ */
+@media (prefers-reduced-motion: no-preference){
+  .dj-mascot{filter:url('#dj-boil');}
+}
+
+/*
+ * 集章卡的确定性手绘边框：rough.js 最小移植。
+ * 两条种子固定的抖动路径替代直线边框，种子不变所以每次加载逐字节一致；
+ * non-scaling-stroke 保证非等比拉伸下线宽恒定。
+ */
+.dj-stamp-card{position:relative;border-color:transparent;}
+.dj-rough-frame{position:absolute;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px);pointer-events:none;}
+.dj-rough-frame path{fill:none;stroke:var(--blue-ink);stroke-width:1.4;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.8;}
+.dj-rough-frame .dj-rough-frame-b{stroke-width:.9;opacity:.38;}
+html.dark .dj-rough-frame path{stroke:var(--blue);}
 </style>
