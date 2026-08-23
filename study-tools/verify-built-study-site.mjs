@@ -71,6 +71,7 @@ export const REQUIRED_PUBLISHED_PAGES = [
 export const REQUIRED_PUBLISHED_ASSETS = [
   'reading.css',
   'favicon.svg',
+  'llms.txt',
   'study-progress.js',
   'study-scrolly.js',
   'study-scrolly-beats.js',

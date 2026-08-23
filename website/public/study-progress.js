@@ -389,4 +389,18 @@ if (typeof document !== 'undefined') {
   }
   if (document.readyState === 'complete') startWhenSettled()
   else addEventListener('load', startWhenSettled, { once: true })
+
+  // [ / ] 翻上一课/下一课：路由信息以页脚 pager 链接为准，这里不维护第二份课程顺序。
+  addEventListener('keydown', event => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
+    if (event.key !== '[' && event.key !== ']') return
+    const target = event.target
+    if (target instanceof HTMLElement
+      && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+        || target.tagName === 'SELECT' || target.isContentEditable)) return
+    const link = document.querySelector(event.key === '[' ? '.pager-link.prev' : '.pager-link.next')
+    if (link === null) return
+    event.preventDefault()
+    location.href = link instanceof HTMLAnchorElement ? link.href : link.getAttribute('href')
+  })
 }

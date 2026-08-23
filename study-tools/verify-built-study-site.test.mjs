@@ -26,8 +26,8 @@ test('the built-study contract accepts pages with all required markers', () => {
     mkdirSync(join(root, 'study'), { recursive: true })
     writeFileSync(join(root, 'reading.css'), '/* reading layer */')
     writeFileSync(join(root, 'favicon.svg'), '<svg />')
-    for (const script of REQUIRED_PUBLISHED_ASSETS.filter(asset => asset.endsWith('.js'))) {
-      writeFileSync(join(root, script), '// runtime layer\n')
+    for (const asset of REQUIRED_PUBLISHED_ASSETS.filter(item => !item.endsWith('.css'))) {
+      writeFileSync(join(root, asset), asset.endsWith('.js') ? '// runtime layer\n' : '# llms\n')
     }
     writeFileSync(join(root, 'index.html'), '<a>第一次来，按这里走</a><link href="reading.css">')
     writeFileSync(join(root, 'study', 'index.html'), '第一课：从零开始读 DSH')
