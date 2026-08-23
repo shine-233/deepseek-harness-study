@@ -124,7 +124,7 @@ function ensureStyle(doc) {
   const style = doc.createElement('style')
   style.id = STYLE_ID
   style.textContent = `
-#dsh-companion { position: fixed; right: 18px; bottom: 16px; z-index: 24; display: none; }
+#dsh-companion { position: fixed; right: 16px; bottom: 78px; z-index: 24; display: none; }
 #dsh-companion.is-on { display: block; }
 #dsh-companion .dsh-comp-btn { display: block; border: 0; background: transparent; padding: 4px; cursor: pointer; }
 #dsh-companion svg { display: block; width: 68px; height: auto; filter: drop-shadow(0 3px 6px rgba(38,34,26,.18)); }
