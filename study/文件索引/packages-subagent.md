@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 90 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/subagent/subagent-acp（7 条）、packages/subagent/subagent-claude-code（9 条）、packages/subagent/subagent-codex（10 条）、packages/subagent/subagent-dsh-sdk（5 条）、packages/subagent/subagent-fork-in-process（4 条）、packages/subagent/subagent-in-process-driver（8 条）、packages/subagent/subagent-spawn-in-process（5 条）、packages/subagent/subagent（28 条）、packages/subagent/tool-subagent-control（6 条）、packages/subagent/tool-subagent-report（3 条）、packages/subagent/tool-subagent（5 条）。
+
+## packages/subagent/subagent-acp
+
 ### [packages/subagent/subagent-acp/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-acp/src/index.ts)
 
 - 所属层：packages/subagent：可复用的 Harness 功能包
@@ -99,6 +103,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent/src/index.ts`、`packages/subagent/subagent-acp/src/index.ts`、`packages/subagent/subagent-acp/src/run.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 889 行；扫描到的声明包括 `request`、`setup`、`text`、`waitForFile`；扫描到的测试主题包括 “acpStopReason”、“maps each ACP stop reason to the harness vocabulary”、“treats an unknown terminal reason as an error”、“acpContentText / toAcpPrompt”、“extracts text from a text content block, empty for non-text”、“keeps text prompt blocks and drops non-text ones”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/subagent/subagent-claude-code
 
 ### [packages/subagent/subagent-claude-code/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-claude-code/src/index.ts)
 
@@ -228,6 +234,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent/src/index.ts`、`packages/llm/llm/src/index.ts`、`packages/runtime-diagnostics/invariants/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 1639 行；扫描到的声明包括 `request`、`nextTask`、`errorCause`、`fakeChild`、`success`、`failure`、`expectedFailureDiagnostic`、`permissionDenied`；扫描到的测试主题包括 “task admission and package contracts”、“ships one independently installable provider-only Bundle patch”、“preserves text sequences and rejects empty, blank, and non-text tasks”、“registers the default descriptor, validates config, and unregisters on HMR”、“keeps named instances, runs, and HMR ownership isolated”、“rejects duplicate provider names without replacing the first instance”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/subagent/subagent-codex
 
 ### [packages/subagent/subagent-codex/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-codex/src/index.ts)
 
@@ -373,6 +381,8 @@
 - 代码证据：固定提交归档实际读取结果：约 2343 行；扫描到的声明包括 `request`、`nextTask`、`ProtocolPeer`、`fakeChild`、`defaultWire`、`runSpec`、`initializeWire`、`publishRun`；扫描到的测试主题包括 “task admission and package contracts”、“ships one independently installable provider-only Bundle patch”、“accepts one or more text blocks and rejects empty or non-text tasks”、“registers the default descriptor, validates config, and unregisters on HMR”、“keeps named instances, runs, and HMR ownership isolated”、“rejects duplicate provider names without replacing the first instance”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/subagent/subagent-dsh-sdk
+
 ### [packages/subagent/subagent-dsh-sdk/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-dsh-sdk/src/index.ts)
 
 - 所属层：packages/subagent：可复用的 Harness 功能包
@@ -443,6 +453,8 @@
 - 代码证据：固定提交归档实际读取结果：约 482 行；扫描到的声明包括 `request`、`setup`、`text`、`waitForFile`；扫描到的测试主题包括 “sdkStopReason”、“maps each child turn-end reason to the harness vocabulary”、“treats an absent or unknown reason as an error”、“dsh-subagent-dsh-sdk provider”、“runs a child turn end to end with a parent-unique run id”、“initializes the child with the configured provider/model/maxTokens and the parent cwd”；源码顶部原注释（英文，仅作回查线索）：Keyless integration tests for the SDK subagent backend. Each spawns a REAL subprocess — the SDK client package's scripted fake runtime — and drives it through the REAL backend over real stdio JSON-RPC, so the handshake, the turn round-trip, stop-reason mapp...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/subagent/subagent-fork-in-process
+
 ### [packages/subagent/subagent-fork-in-process/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-fork-in-process/src/index.ts)
 
 - 所属层：packages/subagent：可复用的 Harness 功能包
@@ -502,6 +514,8 @@
 - 代码证据：固定提交归档实际读取结果：约 252 行；扫描到的声明包括 `mountInvariants`、`start`、`setup`、`text`；扫描到的测试主题包括 “dsh-subagent-fork-in-process”、“emits subagent/start only after the seeded child is published”、“forks an UNSEEDED (fresh) child when the parent has no completed turn”、“seeds every completed parent turn through the last turn/end”、“seeds the child with the parent\”、“produces an invariant-CLEAN seed: forking mid-turn excludes the open turn”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/subagent/subagent-in-process-driver
+
 ### [packages/subagent/subagent-in-process-driver/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-in-process-driver/src/index.ts)
 
 - 所属层：packages/subagent：可复用的 Harness 功能包
@@ -550,7 +564,7 @@
 
 - 所属层：packages/subagent：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为子 agent、工具的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为子 agent、工具提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“A preset row standing in for the agent-plane tool rows a real preset mounts. Import-free on purpose — the Loader resolves entry modules through Node's ESM resolver, which cannot see this workspace's TypeScript sources.”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/subagent/subagent-in-process-driver/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-in-process-driver/README.md)
@@ -619,6 +633,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent-loop/src/index.ts`、`packages/core/agent-loop/src/invariant.ts`、`packages/core/agent/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 381 行；扫描到的声明包括 `mountInvariants`、`setup`、`request`、`text`；扫描到的测试主题包括 “startInProcessRun”、“returns only after publication, drives a fresh child, and disposes it”、“uses explicit child model selectors when the parent has none and preserves its cwd”、“reports a prompt a pre-step rejection discarded as refusal, not completion”、“does not add a final durability checkpoint to a foreground run”、“keeps published run and handle disposal failures on separate channels”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/subagent/subagent-spawn-in-process
 
 ### [packages/subagent/subagent-spawn-in-process/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent-spawn-in-process/src/index.ts)
 
@@ -692,6 +708,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent-loop/src/index.ts`、`packages/core/agent-loop/src/invariant.ts`、`packages/core/agent/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 496 行；扫描到的声明包括 `mountInvariants`、`setup`、`text`、`start`、`disposeChildLifecycle`；扫描到的测试主题包括 “dsh-subagent-spawn-in-process”、“runs a fresh child to completion and returns its final assistant output”、“emits subagent/start only after the fresh child is published”、“gives the child its OWN session (not the parent\”、“a fresh child does NOT inherit the parent conversation (its log starts empty before the prompt)”、“disposes the child to quiescence (agent removed from the registry)”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/subagent/subagent
 
 ### [packages/subagent/subagent/src/activation-setup-registry.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/subagent/src/activation-setup-registry.ts)
 
@@ -1090,6 +1108,8 @@
 - 代码证据：固定提交归档实际读取结果：约 84 行；扫描到的声明包括 `event`、`fold`；扫描到的测试主题包括 “subagent timing projection”、“registers with the optional session projection registry”、“resets inherited seed timing at the child descriptor and sums later completed turns”、“exposes an open turn start and never subtracts time for reversed boundaries”、“ignores completed pre-descriptor turns and unrelated events”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/subagent/tool-subagent-control
+
 ### [packages/subagent/tool-subagent-control/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/tool-subagent-control/src/index.ts)
 
 - 所属层：packages/subagent：可复用的 Harness 功能包
@@ -1179,6 +1199,8 @@
 - 代码证据：固定提交归档实际读取结果：约 390 行；扫描到的声明包括 `GatedAdapter`、`setupWith`、`setup`、`text`、`callTool`、`waitNoActivation`；扫描到的测试主题包括 “dsh-tool-subagent-control”、“registers send_message once, globally, with the two required parameters”、“cold-resumes a settled child and reports the queued next turn”、“queues behind an open turn instead of joining it”、“reports a delivery failure as an errored, not-delivered result”、“rejects a caller that is not the child\”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/subagent/tool-subagent-report
+
 ### [packages/subagent/tool-subagent-report/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/tool-subagent-report/src/index.ts)
 
 - 所属层：packages/subagent：可复用的 Harness 功能包
@@ -1222,6 +1244,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent-loop/src/index.ts`、`packages/core/agent/src/index.ts`、`packages/core/session/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 606 行；扫描到的声明包括 `HeldAdapter`、`setup`、`startChild`、`startHeldParentTurn`、`callReport`、`registerReportConflict`、`reports`、`renderedText`；扫描到的测试主题包括 “dsh-tool-subagent-report”、“registers report only in continuable child scopes”、“adds no implicit capability when the package is absent”、“does not imply parent controls and survives a global-tool allow-list”、“delivers quiet reports with stable message and sender identities without waking”、“delivers next-step reports through waking steering”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/subagent/tool-subagent
 
 ### [packages/subagent/tool-subagent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subagent/tool-subagent/src/index.ts)
 

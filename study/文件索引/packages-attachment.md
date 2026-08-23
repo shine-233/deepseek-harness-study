@@ -90,7 +90,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：图像请求版本缓存
-- 这个文件有什么用：它为随模型请求发送的图像生成确定性的缓存版本：按总像素预算投影尺寸，在允许的质量列表内编码，并让缓存键携带变换版本号，规则一变旧缓存自然失效。
+- 这个文件有什么用：它为随模型请求发送的图像生成确定性的缓存版本：按总像素预算投影尺寸，在允许的质量列表内编码，并让缓存键携带变换版本号。
 - 为什么这样设计：同一张附件图会被多条消息反复读取；把尺寸投影、质量选择和缓存收敛到同一个确定性入口，读取结果可以复现，验证测试也能逐条核对解码事实与编码结果一致。
 - 文件级设计证据：源码顶部注释把它定位为“Deterministic cached image versions for model requests.”；固定提交中扫描到的声明包括 `REQUEST_IMAGE_TRANSFORM_VERSION`、`REQUEST_IMAGE_QUALITIES`、`requestImageDimensions`、`requestImageVariantId`、`readRequestImageFile`；本地静态 import 图显示它直接依赖 4 个源文件，并被 1 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/README.md)、[packages/attachment/attachment-local/src/encoding.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/encoding.ts)、[packages/attachment/attachment-local/src/image.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/image.ts)、[packages/attachment/attachment-local/src/normalization.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/normalization.ts)、[packages/attachment/attachment-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/index.ts)
@@ -118,7 +118,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment-local` 包里的 `tests/encoding.spec.ts` 的具体场景，包括“lazy image encoding”、“does not execute fallback qualities after the first fitting candidate”、“executes later candidates only after earlier candidates exceed the cap”、“rejects an empty candidate list and reports the smallest exhausted candidate”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“encoding”写出可重复运行的断言，覆盖的场景包括“lazy image encoding”、“does not execute fallback qualities after the first fitting candidate”、“executes later candidates only after earlier candidates exceed the cap”、“rejects an empty candidate list and reports the smallest exhausted candidate”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“lazy image encoding”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/README.md)、[packages/attachment/attachment-local/src/compression-limiter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/compression-limiter.ts)、[packages/attachment/attachment-local/src/encoding.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/encoding.ts)
@@ -132,7 +132,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment-local` 包里的 `tests/image.spec.ts` 的具体场景，包括“raster decoding”、“decodes every supported format and its intrinsic dimensions”、“rejects excess decoded pixels before decoding”、“rejects a side above the per-side limit and accepts a side exactly at it”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“image”写出可重复运行的断言，覆盖的场景包括“raster decoding”、“decodes every supported format and its intrinsic dimensions”、“rejects excess decoded pixels before decoding”、“rejects a side above the per-side limit and accepts a side exactly at it”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“raster decoding”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `raster`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/README.md)、[packages/attachment/attachment-local/src/image.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/image.ts)
@@ -146,7 +146,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment-local` 包里的 `tests/index.spec.ts` 的具体场景，包括“local attachment service”、“resolves every omitted admission limit explicitly”、“resolves and validates the instance image-compression concurrency”、“saves and reads through the service boundary”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“index”写出可重复运行的断言，覆盖的场景包括“local attachment service”、“resolves every omitted admission limit explicitly”、“resolves and validates the instance image-compression concurrency”、“saves and reads through the service boundary”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“local attachment service”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/README.md)、[packages/attachment/attachment-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -160,7 +160,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment-local` 包里的 `tests/normalization.spec.ts` 的具体场景，包括“canPassThroughNormalization”、“accepts an in-budget clean PNG/JPEG/WebP and refuses GIF, animation, metadata, oversize...”、“normalizeImage”、“passes an already-normalized source through byte-identically”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“normalization”写出可重复运行的断言，覆盖的场景包括“canPassThroughNormalization”、“accepts an in-budget clean PNG/JPEG/WebP and refuses GIF, animation, metadata, oversize...”、“normalizeImage”、“passes an already-normalized source through byte-identically”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“canPassThroughNormalization”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `noisePixels`、`noiseImage`、`flatImage`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/README.md)、[packages/attachment/attachment-local/src/image.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/image.ts)、[packages/attachment/attachment-local/src/normalization.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/normalization.ts)
@@ -174,7 +174,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment-local` 包里的 `tests/request-image-verification.spec.ts` 的具体场景，包括“request image verification”、“rejects an encoded request whose decoded facts disagree with the encoder result”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“request-image-verification”写出可重复运行的断言，覆盖的场景包括“request image verification”、“rejects an encoded request whose decoded facts disagree with the encoder result”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“request image verification”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/README.md)、[packages/attachment/attachment-local/src/image.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/image.ts)、[packages/attachment/attachment-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -188,7 +188,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment-local` 包里的 `tests/request-image.spec.ts` 的具体场景，包括“request image dimensions”、“projects a portrait within the same total-pixel budget”、“rounds a portrait inward when integer aspect rounding crosses the pixel cap”、“local request-image cache”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“request-image”写出可重复运行的断言，覆盖的场景包括“request image dimensions”、“projects a portrait within the same total-pixel budget”、“rounds a portrait inward when integer aspect rounding crosses the pixel cap”、“local request-image cache”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“request image dimensions”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `store`、`image`、`complexOpaqueAlphaImage`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/README.md)、[packages/attachment/attachment-local/src/compression-limiter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/compression-limiter.ts)、[packages/attachment/attachment-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -301,7 +301,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment` 包里的 `tests/admission.spec.ts` 的具体场景，包括“admitEncodedImages”、“decodes every member and delegates one ordered batch to saveImages”、“omits the name from store inputs when the upload has none”、“delegates an empty batch unchanged”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“admission”写出可重复运行的断言，覆盖的场景包括“admitEncodedImages”、“decodes every member and delegates one ordered batch to saveImages”、“omits the name from store inputs when the upload has none”、“delegates an empty batch unchanged”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“admitEncodedImages”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `storeOf`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment/README.md)、[packages/attachment/attachment/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment/src/index.ts)、[packages/attachment/attachment/src/types.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment/src/types.ts)
@@ -315,7 +315,7 @@
 
 - 所属层：packages/attachment：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/attachment/attachment` 包里的 `tests/index.spec.ts` 的具体场景，包括“AttachmentStore.saveImages”、“validates the complete batch before saving in input order”、“rejects count, aggregate bytes, and deployment media types before validation”、“starts no writes when any member fails validation”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“index”写出可重复运行的断言，覆盖的场景包括“AttachmentStore.saveImages”、“validates the complete batch before saving in input order”、“rejects count, aggregate bytes, and deployment media types before validation”、“starts no writes when any member fails validation”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“AttachmentStore.saveImages”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `RecordingStore`、`UnsupportedProjectionStore`、`image`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/attachment/attachment/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment/README.md)、[packages/attachment/attachment/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)

@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 58 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/fs/fs-local（7 条）、packages/fs/fs-observation-policy（4 条）、packages/fs/fs-sandbox（5 条）、packages/fs/fs（5 条）、packages/fs/tool-fs-search（14 条）、packages/fs/tool-fs（20 条）、packages/fs/tool-str-replace-editor（3 条）。
+
+## packages/fs/fs-local
+
 ### [packages/fs/fs-local/src/fsio.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-local/src/fsio.ts)
 
 - 所属层：packages/fs：可复用的 Harness 功能包
@@ -101,6 +105,8 @@
 - 代码证据：固定提交归档实际读取结果：约 146 行；扫描到的声明包括 `importWithNative`、`successfulNative`；扫描到的测试主题包括 “Windows file-security helpers”、“reads and installs a protected DACL before replacing the destination”、“maps descriptor-size probe failures to Node-style codes”、“surfaces a descriptor read failure after the size probe”、“surfaces DACL installation and replacement failures”；源码顶部原注释（英文，仅作回查线索）：Host-independent binding tests for the Win32 DACL and replacement helpers.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/fs/fs-observation-policy
+
 ### [packages/fs/fs-observation-policy/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-observation-policy/src/index.ts)
 
 - 所属层：packages/fs：可复用的 Harness 功能包
@@ -156,6 +162,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/fs/fs-observation-policy/src/index.ts`、`packages/fs/fs/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 236 行；扫描到的声明包括 `target`、`writeIntent`、`editIntent`、`setup`；扫描到的测试主题包括 “registration / disposal”、“registers no service API (it is a plugin, not ctx.fsPolicy)”、“mounts with no inject (reads no services)”、“write-intent decision”、“an unobserved target decides createIfAbsent”、“a no-owner actor decides createIfAbsent”；源码顶部原注释（英文，仅作回查线索）：Event-level policy tests; no filesystem provider is needed because the plugin performs no I/O.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/fs/fs-sandbox
 
 ### [packages/fs/fs-sandbox/src/containment.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-sandbox/src/containment.ts)
 
@@ -228,6 +236,8 @@
 - 代码证据：固定提交归档实际读取结果：约 236 行；扫描到的声明包括 `boot`、`target`；扫描到的测试主题包括 “the capability fact”、“reports the deployment default mode (what the tool layer advertises against)”、“read-only”、“denies write, leaving no file on disk”、“denies edit of an existing file (the content is unchanged)”、“allows reads (every mode permits reading)”；源码顶部原注释（英文，仅作回查线索）：Tests for the sandbox-enforcing filesystem backend: the per-call policy fence on write/edit (read-only denies, workspace-write contains, danger-full-access passes through), reads always passing through, the capability fact, and the containment matrix — .. t...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/fs/fs
+
 ### [packages/fs/fs/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs/src/index.ts)
 
 - 所属层：packages/fs：可复用的 Harness 功能包
@@ -298,6 +308,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/fs/fs/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 184 行；扫描到的声明包括 `FakeFileSystem`；扫描到的测试主题包括 “FileSystem provider seam”、“registers as ctx.fs and serves the primitives”、“throws when a second implementation is loaded (duplicate service)”、“removes the service when the providing fiber is disposed”、“streamText yields the same text readText returns”、“readBytes returns raw content and enforces the byte cap with FS_TOO_LARGE”；源码顶部原注释（英文，仅作回查线索）：Tests for the filesystem Service Definition: registration, duplicate-service behavior, disposal, and the branded id factories. The provider primitives and policy live in dsh-fs-local and dsh-fs-observation-policy; this seam owns only the abstract service co...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/fs/tool-fs-search
 
 ### [packages/fs/tool-fs-search/src/direct-call.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/tool-fs-search/src/direct-call.ts)
 
@@ -494,6 +506,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/system-prompt/src/index.ts`、`packages/core/tools/src/index.ts`、`packages/fs/tool-fs-search/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 1209 行；扫描到的声明包括 `runResult`、`FakeReader`、`FakeHandle`、`FakeSubprocess`、`FakeSpill`、`setup`、`call`、`text`；扫描到的测试主题包括 “registration”、“registers glob and grep unconditionally with their prompt sections”、“stays pending until ctx.subprocess exists (inject)”、“unregisters everything on fiber disposal (HMR safety)”、“attaches the configured timeoutMs to both tool definitions”、“defaults the timeout budget to 30 seconds”；源码顶部原注释（英文，仅作回查线索）：Consumer-surface tests for the search tools over a FAKE subprocess service and a FAKE spill backend, exercised through ctx.tools.execute() so nothing bypasses the tool registry. The fake service makes every seam outcome scriptable — spawn failure, truncated...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/fs/tool-fs
 
 ### [packages/fs/tool-fs/src/diff.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/tool-fs/src/diff.ts)
 
@@ -776,6 +790,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/system-prompt/src/index.ts`、`packages/core/tools/src/index.ts`、`packages/fs/fs-observation-policy/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 929 行；扫描到的声明包括 `FakeFs`、`setup`、`call`、`text`、`setupWith`、`SandboxingFakeFs`、`setupConfining`、`escalationAgent`；扫描到的测试主题包括 “session cwd resolution”、“retains ordinary spelling but resolves the cwd before parent traversal”、“registration”、“registers read, write, and edit”、“declares read parallel-safe while write/edit remain exclusive”、“registers prompt sections for each tool”；源码顶部原注释（英文，仅作回查线索）：Consumer API tests over a fake provider and the real policy collaborator: schemas, validation, formatting, typed errors, intent dispatch, and observation-driven authorization.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/fs/tool-str-replace-editor
 
 ### [packages/fs/tool-str-replace-editor/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/tool-str-replace-editor/src/index.ts)
 

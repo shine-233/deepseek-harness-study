@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 923 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/client/connection（28 条）、packages/client/hmr（6 条）、packages/client/locale（20 条）、packages/client/modules（8 条）、packages/client/runtime（70 条）、packages/client/tsdown.client.ts（1 条）、packages/client/ui-agent-preset（25 条）、packages/client/ui-attachment（24 条）、packages/client/ui-brand-official（7 条）、packages/client/ui-commands（17 条）、packages/client/ui-conversation（124 条）、packages/client/ui-deliverables（11 条）、packages/client/ui-directory-picker-browse（10 条）、packages/client/ui-directory-picker-native（6 条）、packages/client/ui-goal（15 条）、packages/client/ui-input-trigger（21 条）、packages/client/ui-jobs（10 条）、packages/client/ui-layout（17 条）、packages/client/ui-message-feedback（14 条）、packages/client/ui-model-selection（13 条）、packages/client/ui-permission-presets（13 条）、packages/client/ui-plan（10 条）、packages/client/ui-primitives（92 条）、packages/client/ui-reference（6 条）、packages/client/ui-renderer（19 条）、packages/client/ui-settings-general（23 条）、packages/client/ui-settings-models（35 条）、packages/client/ui-settings-plugin-inventory（11 条）、packages/client/ui-settings-plugins（27 条）、packages/client/ui-settings（14 条）、packages/client/ui-sidebar（16 条）、packages/client/ui-skill（10 条）、packages/client/ui-slots（9 条）、packages/client/ui-subagent（12 条）、packages/client/ui-theme（26 条）、packages/client/ui-tool（46 条）、packages/client/ui-trajectory（45 条）、packages/client/ui-user-questions（15 条）、packages/client/ui-workflow-run（10 条）、packages/client/ui-workspace（23 条）、packages/client/web（14 条）。
+
+## packages/client/connection
+
 ### [packages/client/connection/src/api-path.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/connection/src/api-path.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -398,6 +402,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/hmr
+
 ### [packages/client/hmr/src/client/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/hmr/src/client/index.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -481,6 +487,8 @@
 - 阅读顺序：先读 `packages/client/hmr/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/locale
 
 ### [packages/client/locale/src/client/LanguageRow.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/locale/src/client/LanguageRow.module.css)
 
@@ -764,6 +772,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/modules
+
 ### [packages/client/modules/src/client/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/modules/src/client/index.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -875,6 +885,8 @@
 - 阅读顺序：先读 `packages/client/modules/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 6 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/runtime
 
 ### [packages/client/runtime/src/client/agents/scope.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/runtime/src/client/agents/scope.ts)
 
@@ -1877,6 +1889,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/tsdown.client.ts
+
 ### [packages/client/tsdown.client.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/tsdown.client.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -1890,6 +1904,8 @@
 - 阅读顺序：先读 `packages/client/README.md`，再读本配置/脚本，沿着 `packages/api/gateway/tsdown.config.ts`、`packages/api/remotes/tsdown.config.ts`、`packages/client/connection/tsdown.config.ts` 确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 588 行；扫描到的声明包括 `INLINE_SAFE`、`clientBundle`、`staticLinked`、`isStaticLinkedConfig`、`clientLibrary`、`clientOnly`、`requestedExternals`、`styleInjectionModule`；源码顶部原注释（英文，仅作回查线索）：Shared tsdown preset for UI plugin client bundles. Emits a closure-factory artifact: the bundle calls window.__ModuleLoader__.load({id, factory}) and resolves externals through the injected require (loader module table — cordis DI entities, no globals, no i...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-agent-preset
 
 ### [packages/client/ui-agent-preset/src/client/AgentPresetLabel.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-agent-preset/src/client/AgentPresetLabel.module.css)
 
@@ -2241,6 +2257,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-attachment
+
 ### [packages/client/ui-attachment/src/AttachmentRail.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-attachment/src/AttachmentRail.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -2577,6 +2595,8 @@
 - 代码证据：固定提交归档实际读取结果：约 6 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-brand-official
+
 ### [packages/client/ui-brand-official/src/client/Brand.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-brand-official/src/client/Brand.tsx)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -2674,6 +2694,8 @@
 - 阅读顺序：先读 `packages/client/ui-brand-official/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-commands
 
 ### [packages/client/ui-commands/src/client/PopupSelectView.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-commands/src/client/PopupSelectView.module.css)
 
@@ -2912,6 +2934,8 @@
 - 阅读顺序：先读 `packages/client/ui-commands/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-conversation
 
 ### [packages/client/ui-conversation/src/client/apply.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-conversation/src/client/apply.ts)
 
@@ -4670,6 +4694,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-deliverables
+
 ### [packages/client/ui-deliverables/src/client/ProducedFiles.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-deliverables/src/client/ProducedFiles.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -4824,6 +4850,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-directory-picker-browse
+
 ### [packages/client/ui-directory-picker-browse/src/client/DirectoryBrowser.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-directory-picker-browse/src/client/DirectoryBrowser.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -4964,6 +4992,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-directory-picker-native
+
 ### [packages/client/ui-directory-picker-native/src/client/flow.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-directory-picker-native/src/client/flow.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -5047,6 +5077,8 @@
 - 阅读顺序：先读 `packages/client/ui-directory-picker-native/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-goal
 
 ### [packages/client/ui-goal/src/client/GoalBar.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-goal/src/client/GoalBar.module.css)
 
@@ -5257,6 +5289,8 @@
 - 阅读顺序：先读 `packages/client/ui-goal/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-input-trigger
 
 ### [packages/client/ui-input-trigger/src/client/MenuView.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-input-trigger/src/client/MenuView.module.css)
 
@@ -5552,6 +5586,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-jobs
+
 ### [packages/client/ui-jobs/src/client/JobListAction.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-jobs/src/client/JobListAction.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -5691,6 +5727,8 @@
 - 阅读顺序：先读 `packages/client/ui-jobs/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-layout
 
 ### [packages/client/ui-layout/src/client/AppFrame.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-layout/src/client/AppFrame.module.css)
 
@@ -5930,6 +5968,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-message-feedback
+
 ### [packages/client/ui-message-feedback/src/client/MessageFeedbackActions.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-message-feedback/src/client/MessageFeedbackActions.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -6126,6 +6166,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-model-selection
+
 ### [packages/client/ui-model-selection/src/client/ModelSelect.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-model-selection/src/client/ModelSelect.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -6307,6 +6349,8 @@
 - 阅读顺序：先读 `packages/client/ui-model-selection/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-permission-presets
 
 ### [packages/client/ui-permission-presets/src/client/PermissionRow.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-permission-presets/src/client/PermissionRow.module.css)
 
@@ -6490,6 +6534,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-plan
+
 ### [packages/client/ui-plan/src/client/PlanModeControl.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-plan/src/client/PlanModeControl.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -6629,6 +6675,8 @@
 - 阅读顺序：先读 `packages/client/ui-plan/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-primitives
 
 ### [packages/client/ui-primitives/src/BrandWordmark.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-primitives/src/BrandWordmark.tsx)
 
@@ -7918,6 +7966,8 @@
 - 代码证据：固定提交归档实际读取结果：约 6 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-reference
+
 ### [packages/client/ui-reference/src/client/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-reference/src/client/index.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -8001,6 +8051,8 @@
 - 阅读顺序：先读 `packages/client/ui-reference/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-renderer
 
 ### [packages/client/ui-renderer/src/client/DocumentTitle.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-renderer/src/client/DocumentTitle.tsx)
 
@@ -8267,6 +8319,8 @@
 - 阅读顺序：先读 `packages/client/ui-renderer/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-settings-general
 
 ### [packages/client/ui-settings-general/src/client/GeneralSection.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-settings-general/src/client/GeneralSection.module.css)
 
@@ -8589,6 +8643,8 @@
 - 阅读顺序：先读 `packages/client/ui-settings-general/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-settings-models
 
 ### [packages/client/ui-settings-models/src/client/CustomProviderCard.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-settings-models/src/client/CustomProviderCard.tsx)
 
@@ -9092,6 +9148,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-settings-plugin-inventory
+
 ### [packages/client/ui-settings-plugin-inventory/src/client/PluginInventorySettingsTab.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-settings-plugin-inventory/src/client/PluginInventorySettingsTab.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -9245,6 +9303,8 @@
 - 阅读顺序：先读 `packages/client/ui-settings-plugin-inventory/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-settings-plugins
 
 ### [packages/client/ui-settings-plugins/src/client/AgentLoopCard.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-settings-plugins/src/client/AgentLoopCard.tsx)
 
@@ -9624,6 +9684,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-settings
+
 ### [packages/client/ui-settings/src/client/contract/slots.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-settings/src/client/contract/slots.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -9820,6 +9882,8 @@
 - 阅读顺序：先读 `packages/client/ui-settings/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-sidebar
 
 ### [packages/client/ui-sidebar/src/client/SidebarRoot.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-sidebar/src/client/SidebarRoot.module.css)
 
@@ -10045,6 +10109,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-skill
+
 ### [packages/client/ui-skill/src/client/SkillRow.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-skill/src/client/SkillRow.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -10185,6 +10251,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-slots
+
 ### [packages/client/ui-slots/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-slots/src/index.ts)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -10311,6 +10379,8 @@
 - 阅读顺序：先读 `packages/client/ui-slots/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 6 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-subagent
 
 ### [packages/client/ui-subagent/src/client/SubagentHeaderLineage.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-subagent/src/client/SubagentHeaderLineage.module.css)
 
@@ -10479,6 +10549,8 @@
 - 阅读顺序：先读 `packages/client/ui-subagent/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-theme
 
 ### [packages/client/ui-theme/src/boot-theme.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-theme/src/boot-theme.ts)
 
@@ -10843,6 +10915,8 @@
 - 阅读顺序：先读 `packages/client/ui-theme/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 6 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-tool
 
 ### [packages/client/ui-tool/src/client/apply.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-tool/src/client/apply.ts)
 
@@ -11509,6 +11583,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-trajectory
+
 ### [packages/client/ui-trajectory/src/client/TrajectoryCell.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-trajectory/src/client/TrajectoryCell.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -12139,6 +12215,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-user-questions
+
 ### [packages/client/ui-user-questions/src/client/PlanReviewPanel.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-user-questions/src/client/PlanReviewPanel.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -12349,6 +12427,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/client/ui-workflow-run
+
 ### [packages/client/ui-workflow-run/src/client/WorkflowRunPanel.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-workflow-run/src/client/WorkflowRunPanel.module.css)
 
 - 所属层：packages/client：可复用的 Harness 功能包
@@ -12488,6 +12568,8 @@
 - 阅读顺序：先读 `packages/client/ui-workflow-run/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/ui-workspace
 
 ### [packages/client/ui-workspace/src/client/WorkspaceBrowser.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/ui-workspace/src/client/WorkspaceBrowser.module.css)
 
@@ -12810,6 +12892,8 @@
 - 阅读顺序：先读 `packages/client/ui-workspace/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/client/web
 
 ### [packages/client/web/src/base.css](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/client/web/src/base.css)
 

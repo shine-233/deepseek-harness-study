@@ -244,7 +244,7 @@
 
 - 所属层：packages/sdk：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/sdk/server` 包里的 `tests/built-scope-carrier.e2e.ts` 的具体场景，包括“preserves parent-scoped completion after child disposal”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“built-scope-carrier”写出可重复运行的断言，覆盖的场景包括“preserves parent-scoped completion after child disposal”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“preserves parent-scoped completion after child disposal”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Built-artifact guard for the scope carrier shared by dsh-subagent and dsh-sdk-jsonrpc-server. The carrier registry is module-local, so both bundles must externalize dsh-scope; source-mode tests cannot expose an accidentally inlined second registry. This tes...”；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/sdk/server/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sdk/server/README.md)
@@ -258,7 +258,7 @@
 
 - 所属层：packages/sdk：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/sdk/server` 包里的 `tests/plugin-apply.spec.ts` 的具体场景，包括“dsh-sdk-jsonrpc-server plugin apply”、“serves initialize over the injected stdio pair”、“does not answer initialize until async sibling Loader entries settle”、“drives a session/prompt turn end-to-end and forwards session notifications as output fr...”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“plugin-apply”写出可重复运行的断言，覆盖的场景包括“dsh-sdk-jsonrpc-server plugin apply”、“serves initialize over the injected stdio pair”、“does not answer initialize until async sibling Loader entries settle”、“drives a session/prompt turn end-to-end and forwards session notifications as output fr...”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“dsh-sdk-jsonrpc-server plugin apply”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `waitFor`、`settle`、`mountPlugin`、`mockCompletionServer`；本地静态 import 图显示它直接依赖 5 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/sdk/server/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sdk/server/README.md)、[packages/examples/agent-spine-demo/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/examples/agent-spine-demo/src/index.ts)、[packages/sdk/server/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sdk/server/src/index.ts)、[packages/session/session-persistence-jsonl/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-persistence-jsonl/src/index.ts)
@@ -272,7 +272,7 @@
 
 - 所属层：packages/sdk：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/sdk/server` 包里的 `tests/plugin-shape.spec.ts` 的具体场景，包括“dsh-sdk-jsonrpc-server plugin export shape”、“has the namespace-plugin export shape (no stray default) so the Loader keeps name/injec...”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“plugin-shape”写出可重复运行的断言，覆盖的场景包括“dsh-sdk-jsonrpc-server plugin export shape”、“has the namespace-plugin export shape (no stray default) so the Loader keeps name/injec...”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“dsh-sdk-jsonrpc-server plugin export shape”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/sdk/server/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sdk/server/README.md)、[packages/sdk/server/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sdk/server/src/index.ts)、[vendor/loader/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/loader/src/index.ts)
@@ -286,7 +286,7 @@
 
 - 所属层：packages/sdk：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/sdk/server` 包里的 `tests/server.spec.ts` 的具体场景，包括“HarnessSdkJsonRpcServer”、“creates a harness agent and calls the configured OpenAI-compatible endpoint”、“queues overlapping prompts for one session without blocking other sessions”、“rejects a prompt for a session whose agent was disposed outside the server”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“server”写出可重复运行的断言，覆盖的场景包括“HarnessSdkJsonRpcServer”、“creates a harness agent and calls the configured OpenAI-compatible endpoint”、“queues overlapping prompts for one session without blocking other sessions”、“rejects a prompt for a session whose agent was disposed outside the server”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“HarnessSdkJsonRpcServer”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `FakeTransport`、`mockCompletionServer`、`makeHarness`、`settleSubagent`；本地静态 import 图显示它直接依赖 10 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/sdk/server/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sdk/server/README.md)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/examples/agent-spine-demo/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/examples/agent-spine-demo/src/index.ts)

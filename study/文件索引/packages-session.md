@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 144 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/session/session-checkpoint-policy（5 条）、packages/session/session-persistence-jsonl（11 条）、packages/session/session-persistence-sqlite（70 条）、packages/session/session-persistence（11 条）、packages/session/session-projection-cache（4 条）、packages/session/session-projection（4 条）、packages/session/session-stats（7 条）、packages/session/session-telemetry-otel（4 条）、packages/session/session-telemetry（5 条）、packages/session/session-title-all-prompts-llm（3 条）、packages/session/session-title-first-prompt-llm（5 条）、packages/session/session-title-llm（3 条）、packages/session/session-title（12 条）。
+
+## packages/session/session-checkpoint-policy
+
 ### [packages/session/session-checkpoint-policy/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-checkpoint-policy/src/index.ts)
 
 - 所属层：packages/session：可复用的 Harness 功能包
@@ -48,7 +52,7 @@
 
 - 所属层：packages/session：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为会话、策略的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为会话、策略提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `waitForCrash`、`CrashAdapter`；本地静态 import 图显示它直接依赖 7 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/session/session-checkpoint-policy/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-checkpoint-policy/README.md)、[packages/core/agent-loop/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-loop/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/llm/llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm/src/index.ts)
@@ -71,6 +75,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent/src/index.ts`、`packages/core/session/src/index.ts`、`packages/core/system-prompt/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 270 行；扫描到的声明包括 `TestPersistence`、`RecordingAdapter`、`setup`、`drain`；扫描到的测试主题包括 “session-checkpoint-policy request boundary”、“awaits the live session checkpoint before constructing the downstream model stream”、“delegates a request without a live session without checkpointing”、“delegates an already-detached session id without checkpointing”、“does not dispatch the adapter when the checkpoint rejects”、“session-checkpoint-policy tool and step boundaries”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session/session-persistence-jsonl
 
 ### [packages/session/session-persistence-jsonl/src/format.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-persistence-jsonl/src/format.ts)
 
@@ -232,6 +238,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/session/src/index.ts`、`packages/session/session-persistence-jsonl/src/format.ts`、`packages/session/session-persistence-jsonl/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 750 行；扫描到的声明包括 `freshRoot`、`mount`、`decodeCompleteFrames`、`tornFrame`、`deterministicNoise`、`emptyStructuralFrame`；扫描到的测试主题包括 “Zstandard frame structure”、“scans concatenated checksummed frames and honors a frame limit”、“keeps the public and Node-private synchronous decoders interchangeable”、“falls back to the public decoder when the private Node contract is unavailable”、“enforces decoder lifecycle and checksum errors through both implementations”、“assembles private-decoder output at and beyond its reusable chunk boundary”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session/session-persistence-sqlite
 
 ### [packages/session/session-persistence-sqlite/resources/sql/begin-immediate.sql](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-persistence-sqlite/resources/sql/begin-immediate.sql)
 
@@ -1221,6 +1229,8 @@
 - 代码证据：固定提交归档实际读取结果：约 32 行；扫描到的声明包括 `TestSqlName`、`testSql`；源码顶部原注释（英文，仅作回查线索）：Test-only loader for fixed SQLite fixtures.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/session/session-persistence
+
 ### [packages/session/session-persistence/src/coordinator.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-persistence/src/coordinator.ts)
 
 - 所属层：packages/session：可复用的 Harness 功能包
@@ -1379,6 +1389,8 @@
 - 代码证据：固定提交归档实际读取结果：约 275 行；扫描到的声明包括 `event`；扫描到的测试主题包括 “SessionWriteBehind”、“uses one fixed window from the first queued event and owns its copy”、“coalesces twenty events admitted ten milliseconds apart into one 200 ms batch”、“makes concurrent flushes one immediate barrier that drains admitted tails”、“starts a new window for work admitted after an already-quiescent barrier”、“starts an over-budget tail immediately after the active write”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/session/session-projection-cache
+
 ### [packages/session/session-projection-cache/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-projection-cache/src/index.ts)
 
 - 所属层：packages/session：可复用的 Harness 功能包
@@ -1437,6 +1449,8 @@
 - 代码证据：固定提交归档实际读取结果：约 406 行；扫描到的声明包括 `fakePersistence`、`harness`、`storedRecord`、`storedRows`、`seedRow`；扫描到的测试主题包括 “SessionProjectionCache write policy”、“writes a durable checkpoint at turn/end (mandatory point)”、“writes at session disposal (detach, the live-to-cold moment)”、“flushes when the in-turn event count reaches the configured threshold”、“flushes on the configured interval when the count threshold is not reached”、“write() on a never-dirty session checkpoints directly and rejects a non-JSON unit state”；源码顶部原注释（英文，仅作回查线索）：SessionProjectionCache behavior: mandatory-point writes (turn/end, detach), count/interval throttling between them, fail-soft durability (a failed write logs and stays stale, never throws into the event path), and the cold-read ladder (cached row + readFrom...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/session/session-projection
+
 ### [packages/session/session-projection/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-projection/src/index.ts)
 
 - 所属层：packages/session：可复用的 Harness 功能包
@@ -1492,6 +1506,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/session/src/index.ts`、`packages/session/session-projection/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 420 行；扫描到的声明包括 `harness`；扫描到的测试主题包括 “SessionProjectionRegistry drive”、“drives a registered unit over committed events and snapshots the current value”、“builds the cell lazily from the full log for a unit registered after events flowed”、“serves init-derived state and asOfSeq -1 for an empty log”、“notifies onChanged with the validated view and the causing seq, and skips same-reference applies”、“drives independently per session (cells are per-session watermarks)”；源码顶部原注释（英文，仅作回查线索）：SessionProjectionRegistry unit drive: eager apply on committed events with lazy cell build (registration after events, session after registration), the Object.is no-change gate (same reference ⇒ zero change-feed work), snapshot consistency (asOfSeq = last e...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session/session-stats
 
 ### [packages/session/session-stats/src/client.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-stats/src/client.ts)
 
@@ -1591,6 +1607,8 @@
 - 代码证据：固定提交归档实际读取结果：约 292 行；扫描到的声明包括 `harness`、`closeStep`、`appendEmptyAssistantMessage`、`totals`、`at`、`fold`；扫描到的测试主题包括 “sessionStats projection unit (registry drive)”、“serves zero figures on the empty log”、“counts distinct turns and closed steps and notifies the change feed with the causing seq”、“does not count a rejected or empty turn that closes with no step”、“counts a cancelled step that closed without an assistant message”、“adds no extra step for a max-tokens usage-host assistant message”；源码顶部原注释（英文，仅作回查线索）：The sessionStats projection unit: mounting the plugin beside the projection registry serves whole-log counts and wall times folded from step boundaries, chunks, tool pairs, and assembled messages; compositions without the registry are unaffected; unmounting...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/session/session-telemetry-otel
+
 ### [packages/session/session-telemetry-otel/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-telemetry-otel/src/index.ts)
 
 - 所属层：packages/session：可复用的 Harness 功能包
@@ -1646,6 +1664,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/session/src/index.ts`、`packages/feedback/command-feedback/src/index.ts`、`packages/identity/anonymous-user-id/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 514 行；扫描到的声明包括 `mockCollector`、`boot`、`allRecords`、`eventTypes`；扫描到的测试主题包括 “OpenTelemetrySessionBackend wire”、“ships session records and the ops shutdown marker through the real SDK pipeline”、“drains records enqueued after a timer export began: dispose during an in-flight batch”、“bounds the SDK forceFlush wait when an in-flight transport never settles”、“passes exporter options beyond url and headers through to the SDK exporter”、“maps warn severity from record policy and leaves the seam flush hint unimplemented”；源码顶部原注释（英文，仅作回查线索）：OTel backend unit tier: wire assertions against a scripted node:http mock collector through the SDK's REAL pipeline (BatchLogRecordProcessor → OTLP/HTTP JSON), config fail-loud cases, and the real-Loader-path guard for the default-exported Service class.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session/session-telemetry
 
 ### [packages/session/session-telemetry/src/coordinator.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-telemetry/src/coordinator.ts)
 
@@ -1717,6 +1737,8 @@
 - 代码证据：固定提交归档实际读取结果：约 552 行；扫描到的声明包括 `FakeBackend`、`setup`、`liveSession`、`appendTurn`；扫描到的测试主题包括 “SessionTelemetryCoordinator capture”、“hands every appended event over with envelope identity and cloned body”、“stamps header facts on every record when present”、“maps outcome flags to severity, unknown types falling through as info”、“passes unknown merged event types through unchanged”、“ships only the first chunk of each (turn, step), per session”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/session/session-title-all-prompts-llm
+
 ### [packages/session/session-title-all-prompts-llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-title-all-prompts-llm/src/index.ts)
 
 - 所属层：packages/session：可复用的 Harness 功能包
@@ -1758,6 +1780,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/session/src/index.ts`、`packages/llm/llm/src/index.ts`、`packages/session/session-title-all-prompts-llm/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 73 行；扫描到的声明包括 `RecordingAdapter`、`settle`；扫描到的测试主题包括 “all-messages LLM title provider”、“includes seeded history and the latest prompt while inheriting the logged request route”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session/session-title-first-prompt-llm
 
 ### [packages/session/session-title-first-prompt-llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-title-first-prompt-llm/src/index.ts)
 
@@ -1829,6 +1853,8 @@
 - 代码证据：固定提交归档实际读取结果：约 86 行；扫描到的声明包括 `RecordingAdapter`、`settle`；扫描到的测试主题包括 “first-prompt LLM title provider”、“rejects an impossible empty provider request at its own boundary”、“always selects only the first eligible human message, including explicit refresh”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/session/session-title-llm
+
 ### [packages/session/session-title-llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-title-llm/src/index.ts)
 
 - 所属层：packages/session：可复用的 Harness 功能包
@@ -1870,6 +1896,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/session/src/index.ts`、`packages/llm/llm/src/index.ts`、`packages/session/session-title-llm/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 365 行；扫描到的声明包括 `RecordingAdapter`、`CooperativeAdapter`、`DelayedSuccessAdapter`、`request`、`requestWithoutRoute`、`withScript`；扫描到的测试主题包括 “generateSessionTitleWithLlm”、“uses the exact logged route, language targets, full framed input, and output token cap”、“uses paired explicit overrides and bounds the final framed input before model dispatch”、“requires every deployment limit and a complete optional route pair”、“rejects an absent route, empty selection, and pre-aborted caller before model dispatch”、“rejects tool-call blocks and a successful response with no text”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session/session-title
 
 ### [packages/session/session-title/src/client.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session/session-title/src/client.ts)
 

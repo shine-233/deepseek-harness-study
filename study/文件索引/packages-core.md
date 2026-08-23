@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 109 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/core/agent-default-model（4 条）、packages/core/agent-loop（27 条）、packages/core/agent-tool-presentation（3 条）、packages/core/agent（15 条）、packages/core/scope（8 条）、packages/core/session（24 条）、packages/core/system-prompt（6 条）、packages/core/tools（22 条）。
+
+## packages/core/agent-default-model
+
 ### [packages/core/agent-default-model/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-default-model/src/index.ts)
 
 - 所属层：packages/core：可复用的 Harness 功能包
@@ -57,6 +61,8 @@
 - 阅读顺序：先读 `packages/core/agent-default-model/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 25 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/core/agent-loop
 
 ### [packages/core/agent-loop/src/agent.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-loop/src/agent.ts)
 
@@ -453,6 +459,8 @@
 - 代码证据：固定提交归档实际读取结果：约 25 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/core/agent-tool-presentation
+
 ### [packages/core/agent-tool-presentation/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-tool-presentation/src/index.ts)
 
 - 所属层：packages/core：可复用的 Harness 功能包
@@ -494,6 +502,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/code-runtime/code-runtime/src/index.ts`、`packages/core/agent-tool-presentation/src/index.ts`、`packages/core/agent/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 129 行；扫描到的声明包括 `StubRuntime`、`host`、`mount`；扫描到的测试主题包括 “the tool-presentation row”、“declares the services it uses without holding a code runtime hostage”、“gives its own agent Code Mode and leaves the rest native”、“presents both forms when asked for both”、“restores the deployment default when the agent unloads”、“waits for a code runtime the deployment does not compose”；源码顶部原注释（英文，仅作回查线索）：The row an agent preset carries to pick its tool presentation. What it owes its caller: the choice reaches THIS agent and no other, it unwinds with the agent, and a code mode composed against a deployment with no code runtime stops at mount — where a preset...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/core/agent
 
 ### [packages/core/agent/src/consumed-work.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/consumed-work.ts)
 
@@ -707,6 +717,8 @@
 - 代码证据：固定提交归档实际读取结果：约 25 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/core/scope
+
 ### [packages/core/scope/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/src/index.ts)
 
 - 所属层：packages/core：可复用的 Harness 功能包
@@ -769,7 +781,7 @@
 
 - 所属层：packages/core：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/core/scope` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“scoped-dispatch invariants”、“ignores ordinary events and rejects a scoped dispatch without a carrier”、“checks every generated subject resolver against the carrier key”、“requires carriers for generated presence-only scoped events without comparing a payload...”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“scoped-dispatch invariants”、“ignores ordinary events and rejects a scoped dispatch without a carrier”、“checks every generated subject resolver against the carrier key”、“requires carriers for generated presence-only scoped events without comparing a payload...”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“scoped-dispatch invariants”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `setup`、`emit`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/core/scope/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/README.md)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/scope/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/src/index.ts)、[packages/core/scope/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/src/invariant.ts)
@@ -783,7 +795,7 @@
 
 - 所属层：packages/core：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/core/scope` 包里的 `tests/scope.spec.ts` 的具体场景，包括“createScope”、“tags contexts and derived contexts, with the nearest tag winning”、“is usable synchronously before the backing fiber activates”、“shares quiescence across repeat and raw-disposer-first calls”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“scope”写出可重复运行的断言，覆盖的场景包括“createScope”、“tags contexts and derived contexts, with the nearest tag winning”、“is usable synchronously before the backing fiber activates”、“shares quiescence across repeat and raw-disposer-first calls”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“createScope”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `mintScope`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/core/scope/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/README.md)、[packages/core/scope/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -820,6 +832,8 @@
 - 阅读顺序：先读 `packages/core/scope/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 27 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/core/session
 
 ### [packages/core/session/src/chunk-rows.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/chunk-rows.ts)
 
@@ -1160,6 +1174,8 @@
 - 代码证据：固定提交归档实际读取结果：约 25 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/core/system-prompt
+
 ### [packages/core/system-prompt/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/system-prompt/src/index.ts)
 
 - 所属层：packages/core：可复用的 Harness 功能包
@@ -1244,6 +1260,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/system-prompt/src/index.ts`、`packages/llm/llm/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 115 行；扫描到的声明包括 `tool`、`mount`、`names`；扫描到的测试主题包括 “SystemPrompt tool order”、“exports the rest entry as”、“assembles tools in lexicographic name order when no toolOrder is configured”、“assembles the same order regardless of provider registration order”、“applies a configured toolOrder: listed positions, rest at the rest entry lexicographically”、“rejects the assembly when toolOrder names a tool that is not registered (misconfiguration blocks work)”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/core/tools
 
 ### [packages/core/tools/src/code-mode.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/code-mode.ts)
 

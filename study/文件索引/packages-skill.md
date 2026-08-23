@@ -34,7 +34,7 @@
 
 - 所属层：packages/skill：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/skill/skill-badge` 包里的 `tests/skill-badge.spec.ts` 的具体场景，包括“dsh-skill-badge”、“registers and disposes the bundled badge skill”、“ships the official 726×120 PNG unchanged”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“skill-badge”写出可重复运行的断言，覆盖的场景包括“dsh-skill-badge”、“registers and disposes the bundled badge skill”、“ships the official 726×120 PNG unchanged”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“dsh-skill-badge”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/skill/skill-badge/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill-badge/README.md)、[packages/skill/skill-badge/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill-badge/src/index.ts)、[packages/skill/skill/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -76,7 +76,7 @@
 
 - 所属层：packages/skill：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/skill/skill-filesystem` 包里的 `tests/skill-filesystem-watcher.spec.ts` 的具体场景，包括“skill-filesystem watcher failures”、“canonicalizes an existing root before opening its native watcher”、“preserves a symlink root when link following is disabled”、“ignores missing-path probes until the observed path actually changes”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“skill-filesystem-watcher”写出可重复运行的断言，覆盖的场景包括“skill-filesystem watcher failures”、“canonicalizes an existing root before opening its native watcher”、“preserves a symlink root when link following is disabled”、“ignores missing-path probes until the observed path actually changes”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“skill-filesystem watcher failures”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `tempDir`、`writeSkill`、`settle`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/skill/skill-filesystem/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill-filesystem/README.md)、[packages/skill/skill-filesystem/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill-filesystem/src/index.ts)、[packages/skill/skill/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -90,7 +90,7 @@
 
 - 所属层：packages/skill：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/skill/skill-filesystem` 包里的 `tests/skill-filesystem.spec.ts` 的具体场景，包括“dsh-skill-filesystem plugin exports”、“declares stable plugin metadata”、“FileSystemSkillProvider”、“discovers project, custom, user, and agents skill roots in priority order”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“skill-filesystem”写出可重复运行的断言，覆盖的场景包括“dsh-skill-filesystem plugin exports”、“declares stable plugin metadata”、“FileSystemSkillProvider”、“discovers project, custom, user, and agents skill roots in priority order”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“dsh-skill-filesystem plugin exports”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `tempDir`、`writeSkill`、`writeFlatSkill`、`TestFileSystem`、`setupLocal`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/skill/skill-filesystem/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill-filesystem/README.md)、[packages/fs/fs/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs/src/index.ts)、[packages/skill/skill-filesystem/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill-filesystem/src/index.ts)、[packages/skill/skill/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill/src/index.ts)
@@ -133,7 +133,7 @@
 
 - 所属层：packages/skill：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/skill/skill` 包里的 `tests/skill.spec.ts` 的具体场景，包括“SkillRegistry registry”、“registers providers, resolves duplicates first-wins, and disposes providers”、“returns an invocation-neutral catalog and resolves model and user policy independently”、“validates parsed candidate fields”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“skill”写出可重复运行的断言，覆盖的场景包括“SkillRegistry registry”、“registers providers, resolves duplicates first-wins, and disposes providers”、“returns an invocation-neutral catalog and resolves model and user policy independently”、“validates parsed candidate fields”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“SkillRegistry registry”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `memorySkill`、`MemoryProvider`、`registerProvider`、`scopedSkills`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/skill/skill/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill/README.md)、[packages/core/scope/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/src/index.ts)、[packages/skill/skill/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/skill/skill/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)

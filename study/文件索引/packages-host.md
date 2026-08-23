@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 102 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/host/apiproxy（62 条）、packages/host/directory-picker-auto（6 条）、packages/host/directory-picker-browse（4 条）、packages/host/directory-picker-native（15 条）、packages/host/directory-picker（3 条）、packages/host/frontend-static（3 条）、packages/host/plugin-inventory（5 条）、packages/host/webserver（4 条）。
+
+## packages/host/apiproxy
+
 ### [packages/host/apiproxy/src/api-proxy.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/apiproxy/src/api-proxy.ts)
 
 - 所属层：packages/host：可复用的 Harness 功能包
@@ -872,6 +876,8 @@
 - 代码证据：固定提交归档实际读取结果：约 723 行；扫描到的声明包括 `header`、`artifact`、`node`、`storedImage`、`imageEventLine`、`buildApi`、`responseBytes`；扫描到的测试主题包括 “session export compression config”、“defaults to level 6 and rejects values outside the integer 0-9 range”、“cold blank probe config”、“accepts a per-Session byte bound including zero and rejects invalid bounds”、“session.export download endpoint”、“streams a ZIP with the root artifact verbatim under its original filename”；源码顶部原注释（英文，仅作回查线索）：session.export host path: the GET download endpoint streams a ZIP whose files are the stored artifacts verbatim (root + optional descendants), and the degenerate compositions fail loudly (missing services → 500, missing root → 404, missing descendant → erro...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/host/directory-picker-auto
+
 ### [packages/host/directory-picker-auto/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/directory-picker-auto/src/index.ts)
 
 - 所属层：packages/host：可复用的 Harness 功能包
@@ -956,6 +962,8 @@
 - 代码证据：固定提交归档实际读取结果：约 91 行；扫描到的测试主题包括 “resolveDirectoryPickerBackend”、“resolves native for a loopback bind on a display platform”、“resolves browse for an all-interfaces bind regardless of other signals”、“resolves browse under an SSH launch (either env marker)”、“requires a display session and a chooser binary on linux”、“resolves browse on platforms the native backend cannot serve, display or not”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/host/directory-picker-browse
+
 ### [packages/host/directory-picker-browse/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/directory-picker-browse/src/index.ts)
 
 - 所属层：packages/host：可复用的 Harness 功能包
@@ -1011,6 +1019,8 @@
 - 阅读顺序：先读 `packages/host/directory-picker-browse/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 15 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/host/directory-picker-native
 
 ### [packages/host/directory-picker-native/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/directory-picker-native/src/index.ts)
 
@@ -1222,6 +1232,8 @@
 - 代码证据：固定提交归档实际读取结果：约 31 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/host/directory-picker
+
 ### [packages/host/directory-picker/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/directory-picker/src/index.ts)
 
 - 所属层：packages/host：可复用的 Harness 功能包
@@ -1265,6 +1277,8 @@
 - 代码证据：固定提交归档实际读取结果：约 35 行；扫描到的声明包括 `StubPicker`；扫描到的测试主题包括 “DirectoryPicker seam”、“registers a subclass as ctx.directoryPicker and leaves with its fiber”、“carries the business code and subject path on DirectoryPickerError”；源码顶部原注释（英文，仅作回查线索）：Contract behavior the seam itself owns: registration identity and typed failures.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/host/frontend-static
+
 ### [packages/host/frontend-static/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/frontend-static/src/index.ts)
 
 - 所属层：packages/host：可复用的 Harness 功能包
@@ -1306,6 +1320,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/host/frontend-static/src/index.ts`、`packages/host/webserver/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 174 行；扫描到的声明包括 `loadComposition`、`request`；扫描到的测试主题包括 “real Loader composition”、“serves explicit index entries and files while preserving HTTP error semantics”；源码顶部原注释（英文，仅作回查线索）：REAL-composition coverage: a test-only cordis.yml booted through the vendored Loader mounts the webserver and frontend-static rows, and every assertion observes the served HTTP surface — asset serving, explicit index entry points with index taps, 404 misses...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/host/plugin-inventory
 
 ### [packages/host/plugin-inventory/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/plugin-inventory/src/index.ts)
 
@@ -1376,6 +1392,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/host/plugin-inventory/src/index.ts`、`packages/typert/protocol/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 89 行；扫描到的声明包括 `harness`；扫描到的测试主题包括 “PluginInventoryGateway”、“publishes one direct list method under the pluginInventory namespace”、“projects current non-group Loader entries without a second cache”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/host/webserver
 
 ### [packages/host/webserver/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/host/webserver/src/index.ts)
 

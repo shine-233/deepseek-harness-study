@@ -161,7 +161,7 @@
 
 - 所属层：packages/preset：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为智能体的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为智能体提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“A preset row: registers one tool and one prompt section, both named from config. Import-free on purpose — the Loader resolves entry modules through Node's ESM resolver, which cannot see this workspace's TypeScript sources.”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/preset/agent-presets/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/preset/agent-presets/README.md)
@@ -175,7 +175,7 @@
 
 - 所属层：packages/preset：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为智能体的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为智能体提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Publishes a service with no isolate realm, so it lands in the ROOT realm.”；固定提交中扫描到的声明包括 `name`、`apply`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/preset/agent-presets/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/preset/agent-presets/README.md)
@@ -189,7 +189,7 @@
 
 - 所属层：packages/preset：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为智能体的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为智能体提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Publishes into the ROOT realm only after its plugin body returned, escaping the one-shot mount audit. Exercises the package invariant.”；固定提交中扫描到的声明包括 `name`、`apply`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/preset/agent-presets/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/preset/agent-presets/README.md)
@@ -203,7 +203,7 @@
 
 - 所属层：packages/preset：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为智能体的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为智能体提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Waits forever for a service the composition never supplies: the row stays pending rather than failing, which only the mount audit can catch.”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/preset/agent-presets/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/preset/agent-presets/README.md)
@@ -217,7 +217,7 @@
 
 - 所属层：packages/preset：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为智能体的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为智能体提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Disposes itself once active. The Loader treats a self-disposing entry as a config change and writes the tree back through EntryTree.write(), which is the exact path that once truncated a preset file to [].”；固定提交中扫描到的声明包括 `name`、`apply`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/preset/agent-presets/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/preset/agent-presets/README.md)
@@ -343,7 +343,7 @@
 
 - 所属层：packages/preset：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/preset/persona` 包里的 `tests/persona.spec.ts` 的具体场景，包括“the persona row”、“rejects an unscoped mount, which would collide with the registry default”、“shadows the deployment default for one scope only”、“gives two scopes independent personas”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“persona”写出可重复运行的断言，覆盖的场景包括“the persona row”、“rejects an unscoped mount, which would collide with the registry default”、“shadows the deployment default for one scope only”、“gives two scopes independent personas”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“the persona row”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `harness`、`personaText`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/preset/persona/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/preset/persona/README.md)、[packages/core/scope/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/src/index.ts)、[packages/core/system-prompt/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/system-prompt/src/index.ts)、[packages/preset/persona/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/preset/persona/src/index.ts)

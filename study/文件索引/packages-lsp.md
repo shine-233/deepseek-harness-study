@@ -132,7 +132,7 @@
 
 - 所属层：packages/lsp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/lsp/lsp-stdio` 包里的 `tests/built-lib.e2e.ts` 的具体场景，包括“runs a query through lib/index.js and disposes cleanly, framing over the base protocol”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“built-lib”写出可重复运行的断言，覆盖的场景包括“runs a query through lib/index.js and disposes cleanly, framing over the base protocol”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“runs a query through lib/index.js and disposes cleanly, framing over the base protocol”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 5 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/lsp/lsp-stdio/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/README.md)、[packages/fs/fs-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-local/src/index.ts)、[packages/lsp/lsp-stdio/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/src/index.ts)、[packages/lsp/lsp/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp/src/index.ts)
@@ -174,7 +174,7 @@
 
 - 所属层：packages/lsp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/lsp/lsp-stdio` 包里的 `tests/framing.spec.ts` 的具体场景，包括“encodeMessage”、“prefixes a Content-Length header with the utf-8 byte length”、“MessageDecoder”、“decodes a single framed message”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“framing”写出可重复运行的断言，覆盖的场景包括“encodeMessage”、“prefixes a Content-Length header with the utf-8 byte length”、“MessageDecoder”、“decodes a single framed message”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“encodeMessage”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `frame`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/lsp/lsp-stdio/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/README.md)、[packages/lsp/lsp-stdio/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/src/index.ts)
@@ -202,7 +202,7 @@
 
 - 所属层：packages/lsp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/lsp/lsp-stdio` 包里的 `tests/instance.spec.ts` 的具体场景，包括“LspInstance server-request handling”、“answers workspace/configuration with the static config per item”、“accepts a lifecycle client/registerCapability request”、“rejects a workspace/applyEdit request but keeps serving”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“instance”写出可重复运行的断言，覆盖的场景包括“LspInstance server-request handling”、“answers workspace/configuration with the static config per item”、“accepts a lifecycle client/registerCapability request”、“rejects a workspace/applyEdit request but keeps serving”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“LspInstance server-request handling”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `makeInstance`、`query`、`run`、`scriptInstance`、`processAlive`；本地静态 import 图显示它直接依赖 8 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/lsp/lsp-stdio/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/README.md)、[packages/fs/fs-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-local/src/index.ts)、[packages/lsp/lsp-stdio/src/connection.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/src/connection.ts)、[packages/lsp/lsp-stdio/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/src/index.ts)
@@ -216,7 +216,7 @@
 
 - 所属层：packages/lsp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/lsp/lsp-stdio` 包里的 `tests/lifecycle.spec.ts` 的具体场景，包括“lsp-stdio end to end over a fake server”、“routes different extensions to independent configured servers”、“resolves definition to normalized locations”、“maps a LocationLink for implementation”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“lifecycle”写出可重复运行的断言，覆盖的场景包括“lsp-stdio end to end over a fake server”、“routes different extensions to independent configured servers”、“resolves definition to normalized locations”、“maps a LocationLink for implementation”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“lsp-stdio end to end over a fake server”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `fakeServer`、`mount`、`query`、`locationJson`、`markerLines`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/lsp/lsp-stdio/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/README.md)、[packages/fs/fs-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-local/src/index.ts)、[packages/lsp/lsp-stdio/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/src/index.ts)、[packages/lsp/lsp/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp/src/index.ts)
@@ -230,7 +230,7 @@
 
 - 所属层：packages/lsp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/lsp/lsp-stdio` 包里的 `tests/provider.spec.ts` 的具体场景，包括“lsp-stdio provider resolution”、“resolves a bare command on the child PATH and registers the provider”、“skips empty PATH segments and fails when the command is absent”、“rejects a query after the provider is disposed”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“provider”写出可重复运行的断言，覆盖的场景包括“lsp-stdio provider resolution”、“resolves a bare command on the child PATH and registers the provider”、“skips empty PATH segments and fails when the command is absent”、“rejects a query after the provider is disposed”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“lsp-stdio provider resolution”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `query`、`config`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/lsp/lsp-stdio/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/README.md)、[packages/fs/fs-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-local/src/index.ts)、[packages/lsp/lsp-stdio/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/src/index.ts)、[packages/lsp/lsp/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp/src/index.ts)
@@ -258,7 +258,7 @@
 
 - 所属层：packages/lsp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/lsp/lsp-stdio` 包里的 `tests/typescript-server.e2e.ts` 的具体场景，包括“real typescript-language-server”、“resolves the definition of a call site to its declaration”、“finds references to a symbol including its declaration”、“resolves implementations of an interface”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“typescript-server”写出可重复运行的断言，覆盖的场景包括“real typescript-language-server”、“resolves the definition of a call site to its declaration”、“finds references to a symbol including its declaration”、“resolves implementations of an interface”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“real typescript-language-server”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Keyless real-server e2e: drives the real typescript-language-server through the full ctx.lsp → dsh-lsp-stdio stack over the base protocol, exercising all four operations. No API key needed — the server is a local dev dependency. This establishes one compati...”；固定提交中扫描到的声明包括 `at`、`locations`；本地静态 import 图显示它直接依赖 5 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/lsp/lsp-stdio/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/README.md)、[packages/fs/fs-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/fs/fs-local/src/index.ts)、[packages/lsp/lsp-stdio/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp-stdio/src/index.ts)、[packages/lsp/lsp/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp/src/index.ts)
@@ -328,7 +328,7 @@
 
 - 所属层：packages/lsp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/lsp/lsp` 包里的 `tests/lsp.spec.ts` 的具体场景，包括“finalExtension”、“lowercases and keeps only the final extension”、“returns empty for no extension or a leading-dot dotfile”、“Lsp registration”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“lsp”写出可重复运行的断言，覆盖的场景包括“finalExtension”、“lowercases and keeps only the final extension”、“returns empty for no extension or a leading-dot dotfile”、“Lsp registration”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“finalExtension”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `makeProvider`、`mountLsp`、`query`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/lsp/lsp/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp/README.md)、[packages/lsp/lsp/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/lsp/lsp/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)

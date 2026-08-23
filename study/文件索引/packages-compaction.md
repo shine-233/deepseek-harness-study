@@ -34,7 +34,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/command-compact` 包里的 `tests/command-compact.spec.ts` 的具体场景，包括“@deepseek-ai/dsh-command-compact registration”、“registers one argument-free command with Loader-safe exports and disposes it”、“/compact human command”、“reports success with useful accounting and forwards the exact target and signal”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“command-compact”写出可重复运行的断言，覆盖的场景包括“@deepseek-ai/dsh-command-compact registration”、“registers one argument-free command with Loader-safe exports and disposes it”、“/compact human command”、“reports success with useful accounting and forwards the exact target and signal”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“@deepseek-ai/dsh-command-compact registration”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `StubCompactionEngine`、`harness`、`run`、`expectLastLifecycle`；本地静态 import 图显示它直接依赖 7 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/command-compact/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/command-compact/README.md)、[packages/compaction/command-compact/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/command-compact/src/index.ts)、[packages/compaction/compaction/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/src/index.ts)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)
@@ -48,7 +48,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/command-compact` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“command-compact invariant companion”、“registers the package-owned no-op installer”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“command-compact invariant companion”、“registers the package-owned no-op installer”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“command-compact invariant companion”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/command-compact/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/command-compact/README.md)、[packages/compaction/command-compact/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/command-compact/src/invariant.ts)
@@ -62,7 +62,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/command-compact` 包里的 `tests/loader-composition.spec.ts` 的具体场景，包括“command-compact real Loader composition”、“discovers and executes /compact through the assembled command plane”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“loader-composition”写出可重复运行的断言，覆盖的场景包括“command-compact real Loader composition”、“discovers and executes /compact through the assembled command plane”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“command-compact real Loader composition”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `LoaderCompactionEngine`；本地静态 import 图显示它直接依赖 8 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/command-compact/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/command-compact/README.md)、[packages/compaction/command-compact/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/command-compact/src/index.ts)、[packages/compaction/compaction/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/src/index.ts)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)
@@ -160,7 +160,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/compaction-basic` 包里的 `tests/compaction-basic.spec.ts` 的具体场景，包括“compact configuration and defaults”、“uses low-friction service-wide defaults”、“resolves threshold and retention overrides independently”、“merges exact provider/model policy overrides and scales ratios per model”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“compaction-basic”写出可重复运行的断言，覆盖的场景包括“compact configuration and defaults”、“uses low-friction service-wide defaults”、“resolves threshold and retention overrides independently”、“merges exact provider/model policy overrides and scales ratios per model”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“compact configuration and defaults”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `ContextAdapter`、`RoutedContextAdapter`、`createContext`、`agent`、`summarizedText`；本地静态 import 图显示它直接依赖 12 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/compaction-basic/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/README.md)、[packages/attachment/attachment/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment/src/index.ts)、[packages/compaction/compaction-basic/src/config.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/src/config.ts)、[packages/compaction/compaction-basic/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/src/index.ts)
@@ -174,7 +174,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/compaction-basic` 包里的 `tests/compaction-loop-repro.spec.ts` 的具体场景，包括“CBR-001: a real-loop checkpoint is a valid boundary on both sides”、“uses the model actually routed by agent/request for post-step pressure”、“runs automatic pressure between the completed tool step and the next step”、“the head checkpoint the loop lands is a balanced cut on both sides”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“compaction-loop-repro”写出可重复运行的断言，覆盖的场景包括“CBR-001: a real-loop checkpoint is a valid boundary on both sides”、“uses the model actually routed by agent/request for post-step pressure”、“runs automatic pressure between the completed tool step and the next step”、“the head checkpoint the loop lands is a balanced cut on both sides”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“CBR-001: a real-loop checkpoint is a valid boundary on both sides”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `ReproCompactionEngine`、`StepwiseToolAdapter`、`OverflowRecoveryAdapter`、`mountInvariants`、`harness`；本地静态 import 图显示它直接依赖 15 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/compaction-basic/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/README.md)、[packages/compaction/compaction-basic/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/src/index.ts)、[packages/compaction/compaction/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/src/index.ts)、[packages/core/agent-loop/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-loop/src/index.ts)
@@ -188,7 +188,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/compaction-basic` 包里的 `tests/loader-composition.spec.ts` 的具体场景，包括“real Loader composition”、“loads the shipped token-meter, pruning, and compaction-basic YAML order”、“rejects stale token-meter config after Schemastery normalization”、“rejects stale compaction-basic config after Schemastery normalization”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“loader-composition”写出可重复运行的断言，覆盖的场景包括“real Loader composition”、“loads the shipped token-meter, pruning, and compaction-basic YAML order”、“rejects stale token-meter config after Schemastery normalization”、“rejects stale compaction-basic config after Schemastery normalization”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“real Loader composition”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `loadYaml`；本地静态 import 图显示它直接依赖 8 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/compaction-basic/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/README.md)、[packages/compaction/compaction-basic/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/src/index.ts)、[packages/compaction/compaction-tool-result-pruner/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-tool-result-pruner/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)
@@ -202,7 +202,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/compaction-basic` 包里的 `tests/manual-compaction.spec.ts` 的具体场景，包括“compactNow through the real loop”、“holds a prompt accepted during summarization until the standalone bracket is flushed”、“keeps context injected during summarization pending for the next step”、“keeps the marker order when listeners attempt a re-entrant injection”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“manual-compaction”写出可重复运行的断言，覆盖的场景包括“compactNow through the real loop”、“holds a prompt accepted during summarization until the standalone bracket is flushed”、“keeps context injected during summarization pending for the next step”、“keeps the marker order when listeners attempt a re-entrant injection”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“compactNow through the real loop”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `GatedCompactionEngine`、`TextAdapter`、`loopHarness`、`seedHistory`、`derivedText`；本地静态 import 图显示它直接依赖 17 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/compaction-basic/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/README.md)、[packages/compaction/compaction-basic/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/src/index.ts)、[packages/compaction/compaction-basic/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/src/invariant.ts)、[packages/compaction/compaction-basic/src/summarizer.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction-basic/src/summarizer.ts)
@@ -384,7 +384,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/compaction` 包里的 `tests/compaction.spec.ts` 的具体场景，包括“CompactionEngine seam”、“registers as ctx.compaction”、“disposing the fiber unregisters ctx.compaction (HMR safety)”、“exposes the abstract contract methods”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“compaction”写出可重复运行的断言，覆盖的场景包括“CompactionEngine seam”、“registers as ctx.compaction”、“disposing the fiber unregisters ctx.compaction (HMR safety)”、“exposes the abstract contract methods”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“CompactionEngine seam”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `StubCompactionEngine`、`stubAgent`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/compaction/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/README.md)、[packages/compaction/compaction/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/llm/llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm/src/index.ts)
@@ -398,7 +398,7 @@
 
 - 所属层：packages/compaction：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/compaction/compaction` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“compaction invariants”、“accepts successful and failed compaction lifecycles”、“accepts standalone successful and failed compaction lifecycles between turns”、“clears an inherited open compaction trace at end-seed during replay”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“compaction invariants”、“accepts successful and failed compaction lifecycles”、“accepts standalone successful and failed compaction lifecycles between turns”、“clears an inherited open compaction trace at end-seed during replay”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“compaction invariants”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `setup`、`startTurn`；本地静态 import 图显示它直接依赖 7 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/compaction/compaction/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/README.md)、[packages/compaction/compaction/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/src/index.ts)、[packages/compaction/compaction/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/compaction/compaction/src/invariant.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)

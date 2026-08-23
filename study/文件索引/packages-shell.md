@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 52 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/shell/bash-local（4 条）、packages/shell/bash-sandbox（8 条）、packages/shell/pwsh-local（5 条）、packages/shell/pwsh-sandbox（5 条）、packages/shell/shell-env（3 条）、packages/shell/shell（6 条）、packages/shell/tool-bash-persistent（4 条）、packages/shell/tool-bash（6 条）、packages/shell/tool-pwsh-persistent（4 条）、packages/shell/tool-pwsh（7 条）。
+
+## packages/shell/bash-local
+
 ### [packages/shell/bash-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/bash-local/src/index.ts)
 
 - 所属层：packages/shell：可复用的 Harness 功能包
@@ -58,6 +62,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/settings/settings/src/index.ts`、`packages/shell/bash-local/src/index.ts`、`packages/shell/shell/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 115 行；扫描到的声明包括 `MemorySettings`、`boot`；扫描到的测试主题包括 “bash settings section”、“resolves the user layer over the composition entry”、“refuses a stored value the constructor would have rejected”、“refuses a grace period longer than a timer can carry”、“serves the stored section to every later read”、“falls back to the composition entry when the settings provider detaches”；源码顶部原注释（英文，仅作回查线索）：The bash settings section layered over the executor's composition entry.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/shell/bash-sandbox
 
 ### [packages/shell/bash-sandbox/src/helpers.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/bash-sandbox/src/helpers.ts)
 
@@ -171,6 +177,8 @@
 - 代码证据：固定提交归档实际读取结果：约 127 行；扫描到的声明包括 `tempDir`、`sandboxedBash`；扫描到的测试主题包括 “read-only denies a write — the file must NOT exist, and EPERM text classifies as a denial”、“workspace-write lands a write inside the workspace root and still denies one beside it”、“evaluates BASH_ENV only after Seatbelt confines the inner Bash”、“classifies a background denial once the task settles”、“an approved escalated retry — the spec-level workspace-write override — lands the exact write read-only denied”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/shell/pwsh-local
+
 ### [packages/shell/pwsh-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/pwsh-local/src/index.ts)
 
 - 所属层：packages/shell：可复用的 Harness 功能包
@@ -242,6 +250,8 @@
 - 代码证据：固定提交归档实际读取结果：约 108 行；扫描到的声明包括 `MemorySettings`、`boot`；扫描到的测试主题包括 “pwsh executor over the bash settings section”、“resolves the user layer over the composition entry”、“refuses a stored value the constructor would have rejected”、“re-resolves the executable when the stored path changes”、“keeps the resolved executable when an unrelated field changes”、“falls back to the composition entry when the settings provider detaches”；源码顶部原注释（英文，仅作回查线索）：The shared bash settings section as the pwsh executor family resolves it.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/shell/pwsh-sandbox
+
 ### [packages/shell/pwsh-sandbox/src/helpers.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/pwsh-sandbox/src/helpers.ts)
 
 - 所属层：packages/shell：可复用的 Harness 功能包
@@ -312,6 +322,8 @@
 - 代码证据：固定提交归档实际读取结果：约 326 行；扫描到的声明包括 `pwshAvailable`、`throwingSubprocessRuntime`、`setup`、`FakeSandboxProvider`；扫描到的测试主题包括 “helpers (pure)”、“isRunnerSpawnFailure”、“attributes ENOENT/EACCES with argv[0] provenance and a usable workdir”、“rejects mismatched provenance, foreign codes, unusable workdirs, and non-object errors”、“classifyRunnerFailure”、“matches a fatal signature on a gated exit code, skipping informational lines”；源码顶部原注释（英文，仅作回查线索）：Consumer-side SandboxPwshExecutor tests. A fake Cordis sandbox service makes wrapping, policy hand-off, fail-closed propagation, and fact stamping deterministic; real-provider integration lives in tests/acl.e2e.ts. Requires pwsh for the integration block (s...。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/shell/shell-env
+
 ### [packages/shell/shell-env/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/shell-env/src/index.ts)
 
 - 所属层：packages/shell：可复用的 Harness 功能包
@@ -354,6 +366,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent/src/index.ts`、`packages/core/tools/src/index.ts`、`packages/llm/llm/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 238 行；扫描到的声明包括 `execution`；扫描到的测试主题包括 “ShellEnvRegistry”、“collects unconditional shell facts and the current agent session id”、“resolves DSH_HOME from the ambient override or the user-home default”、“collects declared contributor variables and omits unavailable values”、“rejects duplicate variable ownership at registration time”、“rejects duplicate contributor names and malformed declarations”；源码顶部原注释（英文，仅作回查线索）：Registry tests for @deepseek-ai/dsh-shell-env: built-in facts, contributor ownership and validation, collection ordering, effect-scoped disposal, and the explicit disposer contract.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/shell/shell
 
 ### [packages/shell/shell/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/shell/src/index.ts)
 
@@ -439,6 +453,8 @@
 - 代码证据：固定提交归档实际读取结果：约 84 行；扫描到的声明包括 `StubExecutor`、`SecondExecutor`；扫描到的测试主题包括 “ShellExecutor service seam”、“a concrete subclass registers as ctx.shell and serves the abstract API”、“reports no default sandbox mode from the task-free base seam”、“loading a second implementation throws (one bash service per context — cordis standard)”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/shell/tool-bash-persistent
+
 ### [packages/shell/tool-bash-persistent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/tool-bash-persistent/src/index.ts)
 
 - 所属层：packages/shell：可复用的 Harness 功能包
@@ -494,6 +510,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent/src/index.ts`、`packages/core/session/src/index.ts`、`packages/core/system-prompt/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 601 行；扫描到的声明包括 `agent`、`text`、`call`、`StubPtySession`、`stubBackend`、`setup`；扫描到的测试主题包括 “tool-bash-persistent”、“registers a configurable schema and reuses one owner shell”、“handles inferred idle, stdin_read fallback, shell exit, clipping, and cleanup”、“waits for status digits after a torn completion marker”、“reports the exit path when the shell exits between send settlement and the next poll”、“reports a shell exit when the backend has no code or signal”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/shell/tool-bash
 
 ### [packages/shell/tool-bash/src/background.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/tool-bash/src/background.ts)
 
@@ -581,6 +599,8 @@
 - 代码证据：固定提交归档实际读取结果：约 1279 行；扫描到的声明包括 `setup`、`setupWithTasks`、`registerFakeAgent`、`call`、`text`、`callUntilText`、`RecordingSandboxExecutor`、`CountingStartExecutor`；扫描到的测试主题包括 “bash tool”、“returns stdout for a successful command”、“reports (no output) for silent commands”、“marks stderr sections”、“reports non-zero exits without isError”、“reports timeout kills with both markers (timeout first)”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/shell/tool-pwsh-persistent
+
 ### [packages/shell/tool-pwsh-persistent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/tool-pwsh-persistent/src/index.ts)
 
 - 所属层：packages/shell：可复用的 Harness 功能包
@@ -636,6 +656,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent/src/index.ts`、`packages/core/session/src/index.ts`、`packages/core/system-prompt/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 636 行；扫描到的声明包括 `agent`、`text`、`call`、`StubTerminalSession`、`stubBackend`、`setup`；扫描到的测试主题包括 “tool-pwsh-persistent”、“registers a configurable schema and reuses one owner shell”、“strips the echoed wrapper from captured output”、“preserves command output that equals the private shell prompt”、“reports the exit path when the shell exits between send settlement and the next poll”、“handles inferred idle, prompt fallback, shell exit, clipping, and cleanup”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/shell/tool-pwsh
 
 ### [packages/shell/tool-pwsh/src/background.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/shell/tool-pwsh/src/background.ts)
 

@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 64 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/extensions/cordis-client-runner（18 条）、packages/extensions/cordis-host-runner（14 条）、packages/extensions/tool-cordis（9 条）、packages/extensions/ui-cordis（23 条）。
+
+## packages/extensions/cordis-client-runner
+
 ### [packages/extensions/cordis-client-runner/src/client/api-catalog.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/extensions/cordis-client-runner/src/client/api-catalog.ts)
 
 - 所属层：packages/extensions：可复用的 Harness 功能包
@@ -254,6 +258,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/extensions/cordis-host-runner
+
 ### [packages/extensions/cordis-host-runner/src/guard.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/extensions/cordis-host-runner/src/guard.ts)
 
 - 所属层：packages/extensions：可复用的 Harness 功能包
@@ -460,6 +466,8 @@
 - 代码证据：固定提交归档实际读取结果：约 108 行；扫描到的测试主题包括 “dynamic Plugin versions”、“keeps currentPackageId when an update fails and clears nextPackageId after rollback”、“cancels and retracts a Host activation owned by the pending approval”、“does not stop an existing Host run when an attaching page fails to load Client code”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/extensions/tool-cordis
+
 ### [packages/extensions/tool-cordis/src/api-catalog.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/extensions/tool-cordis/src/api-catalog.ts)
 
 - 所属层：packages/extensions：可复用的 Harness 功能包
@@ -585,6 +593,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 287 行；扫描到的测试主题包括 “Cordis effect ownership”、“makes an effect visible to a reentrant owner restart and awaits setup plus cleanup”、“rolls back collected cleanup and its owner-list entry when setup throws synchronously”、“makes a reentrant owner restart await asynchronous rollback after synchronous setup failure”、“keeps ordinary teardown synchronous and the public disposer single-shot”、“rejects cleanup-time registration while a restart is unloading”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/extensions/ui-cordis
 
 ### [packages/extensions/ui-cordis/src/client/CordisActionRow.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/extensions/ui-cordis/src/client/CordisActionRow.tsx)
 

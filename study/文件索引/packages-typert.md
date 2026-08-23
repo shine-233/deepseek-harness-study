@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 44 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/typert/generator（29 条）、packages/typert/loader（3 条）、packages/typert/protocol（5 条）、packages/typert/registry（7 条）。
+
+## packages/typert/generator
+
 ### [packages/typert/generator/src/analyzer.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/src/analyzer.ts)
 
 - 所属层：packages/typert：可复用的 Harness 功能包
@@ -193,7 +197,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为远程调用、领域模型的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为远程调用、领域模型提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `Agent`；本地静态 import 图显示它直接依赖 2 个源文件，并被 1 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/tests/fixtures/remote-model/packages/domain/src/types.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/remote-model/packages/domain/src/types.ts)、[packages/typert/protocol/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/protocol/src/index.ts)、[packages/typert/generator/tests/fixtures/remote-model/packages/remote/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/remote-model/packages/remote/src/index.ts)
@@ -207,7 +211,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为远程调用、领域模型的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为远程调用、领域模型提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Stable Agent identity crossing the Remote boundary.”；固定提交中扫描到的声明包括 `AgentId`；本地静态 import 图显示它直接依赖 0 个源文件，并被 1 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/tests/fixtures/remote-model/packages/domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/remote-model/packages/domain/src/index.ts)
@@ -221,7 +225,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为远程调用的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为远程调用提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `GoalService`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/tests/fixtures/remote-model/packages/domain/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/remote-model/packages/domain/src/index.ts)、[packages/typert/generator/tests/fixtures/remote-model/packages/remote/src/types.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/remote-model/packages/remote/src/types.ts)、[packages/typert/protocol/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/protocol/src/index.ts)
@@ -235,7 +239,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为远程调用的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为远程调用提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Input accepted by Goal creation.”；固定提交中扫描到的声明包括 `CreateGoalRequest`、`CreateGoalResult`、`RenameGoalRequest`、`RenameGoalResult`；本地静态 import 图显示它直接依赖 0 个源文件，并被 2 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/tests/fixtures/remote-model/packages/remote/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/remote-model/packages/remote/src/index.ts)、[packages/typert/generator/tests/remote-model.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/remote-model.spec.ts)
@@ -249,7 +253,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为远程调用、协议的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为远程调用、协议提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `TypertLookup`、`TypertContext`、`TypertLookupMap`、`TypertContextMap`、`TypertRemoteMap`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)
@@ -263,7 +267,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 Cordis 插件框架的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为 Cordis 插件框架提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `Service`、`Context`、`Events`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)
@@ -277,7 +281,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为浏览器端的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为浏览器端提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `ClientAgent`、`ClientView`、`ClientBridge`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/tests/fixtures/type-model/packages/host/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/type-model/packages/host/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -291,7 +295,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为服务端宿主的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为服务端宿主提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `Agent`、`DemoService`、`AliasedService`、`DefaultOnlyService`；本地静态 import 图显示它直接依赖 2 个源文件，并被 2 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/tests/fixtures/type-model/packages/host/src/models.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/type-model/packages/host/src/models.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)、[packages/typert/generator/tests/fixtures/type-model/packages/client/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/type-model/packages/client/src/index.ts)、[packages/typert/generator/tests/type-model.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/type-model.spec.ts)
@@ -306,7 +310,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为服务端宿主的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为服务端宿主提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Generic source form retained before conditional evaluation.”；固定提交中扫描到的声明包括 `Box`、`Present`、`Flags`、`Entity`、`AgentPhase`；本地静态 import 图显示它直接依赖 0 个源文件，并被 2 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/tests/fixtures/type-model/packages/host/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/fixtures/type-model/packages/host/src/index.ts)、[packages/typert/generator/tests/type-model.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/tests/type-model.spec.ts)
@@ -321,7 +325,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 `packages/typert/generator` 包里的 `tests/fixtures/type-model/packages/write/src/index.ts` 的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为同包测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `WritableService`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -392,7 +396,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/typert/generator` 包里的 `tests/tsdown-plugin.spec.ts` 的具体场景，包括“typertPlugin”、“lowers standard decorators in TypeScript source dependencies”、“skips outputs that do not identify a Typert contributor”、“writes every generated face beside a nested package bundle”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“tsdown-plugin”写出可重复运行的断言，覆盖的场景包括“typertPlugin”、“lowers standard decorators in TypeScript source dependencies”、“skips outputs that do not identify a Typert contributor”、“writes every generated face beside a nested package bundle”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“typertPlugin”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `workspace`、`packageOutput`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/src/tsdown-plugin.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/src/tsdown-plugin.ts)、[packages/typert/generator/src/workspace.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/src/workspace.ts)
@@ -406,7 +410,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/typert/generator` 包里的 `tests/type-model.spec.ts` 的具体场景，包括“WorkspaceAnalyzer”、“builds independent face models with an explicit cross-face type graph”、“merges bounded package programs into the same face model”、“discovers an explicitly keyed service implementation without a Context merge”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“type-model”写出可重复运行的断言，覆盖的场景包括“WorkspaceAnalyzer”、“builds independent face models with an explicit cross-face type graph”、“merges bounded package programs into the same face model”、“discovers an explicitly keyed service implementation without a Context merge”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“WorkspaceAnalyzer”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `normalizedPath`、`distinct`、`formatDiagnostic`、`printType`、`canonicalType`；本地静态 import 图显示它直接依赖 8 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/generator/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/README.md)、[packages/typert/generator/src/analyzer.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/src/analyzer.ts)、[packages/typert/generator/src/emitter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/src/emitter.ts)、[packages/typert/generator/src/model.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/generator/src/model.ts)
@@ -416,6 +420,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/typert/generator/src/analyzer.ts`、`packages/typert/generator/src/emitter.ts`、`packages/typert/generator/src/model.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 1431 行；扫描到的声明包括 `normalizedPath`、`distinct`、`formatDiagnostic`、`printType`、`canonicalType`、`copyFixture`、`configureDualRuntimeClient`、`addSameFacePackage`；扫描到的测试主题包括 “WorkspaceAnalyzer”、“builds independent face models with an explicit cross-face type graph”、“merges bounded package programs into the same face model”、“discovers an explicitly keyed service implementation without a Context merge”、“prefers an explicitly keyed implementation over its protocol Context merge”、“rejects an explicit service implementation without one valid key”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/typert/loader
 
 ### [packages/typert/loader/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/loader/src/index.ts)
 
@@ -449,7 +455,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/typert/loader` 包里的 `tests/loader.spec.ts` 的具体场景，包括“typert loader”、“registers an explicit package without a Loader entry and withdraws it with the loader”、“registers a strict invocation into the local registry and withdraws it with the loader”、“fails loud when an explicit package is absent or has no Typert export”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“loader”写出可重复运行的断言，覆盖的场景包括“typert loader”、“registers an explicit package without a Loader entry and withdraws it with the loader”、“registers a strict invocation into the local registry and withdraws it with the loader”、“fails loud when an explicit package is absent or has no Typert export”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“typert loader”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `writePackage`、`typertSource`、`invocationTypertSource`、`boot`、`linkZod`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/loader/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/loader/README.md)、[packages/typert/loader/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/loader/src/index.ts)、[packages/typert/registry/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/registry/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -458,6 +464,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/typert/loader/src/index.ts`、`packages/typert/registry/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 693 行；扫描到的声明包括 `writePackage`、`typertSource`、`invocationTypertSource`、`boot`、`linkZod`、`mountTypertLoader`、`strictCodec`、`strictInvocation`；扫描到的测试主题包括 “typert loader”、“registers an explicit package without a Loader entry and withdraws it with the loader”、“registers a strict invocation into the local registry and withdraws it with the loader”、“fails loud when an explicit package is absent or has no Typert export”、“auto-registers a mounted package exporting ./typert and withdraws it on unmount”、“follows entries mounted after activation”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/typert/protocol
 
 ### [packages/typert/protocol/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/protocol/src/index.ts)
 
@@ -506,7 +514,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为协议的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为协议提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `Goals`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/protocol/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/protocol/README.md)、[packages/typert/protocol/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/protocol/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -529,6 +537,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/typert/protocol/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 266 行；扫描到的声明包括 `Goals`、`NamespacedGoals`、`Service`、`methodContext`；扫描到的测试主题包括 “typert-protocol Remote declarations”、“binds a TypertRemoteService name and executes decorators through the Vitest source transform”、“executes standard decorator syntax through the TSX source launcher”、“keeps decorator markers in private module state”、“keeps markers idempotent across instances and returns detached snapshots”、“supports explicit export names without exposing marker storage”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/typert/registry
 
 ### [packages/typert/registry/src/client/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/registry/src/client/index.ts)
 
@@ -605,7 +615,7 @@
 
 - 所属层：packages/typert：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/typert/registry` 包里的 `tests/typert.spec.ts` 的具体场景，包括“TypertRegistry”、“registers and queries generated schemas separately from package reflection”、“withdraws schemas and package metadata through the exact contribution disposer”、“follows the registering plugin fiber lifecycle”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“typert”写出可重复运行的断言，覆盖的场景包括“TypertRegistry”、“registers and queries generated schemas separately from package reflection”、“withdraws schemas and package metadata through the exact contribution disposer”、“follows the registering plugin fiber lifecycle”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“TypertRegistry”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `makeCtx`、`toolsContribution`、`invocation`、`scopedInvocation`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/typert/registry/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/registry/README.md)、[packages/typert/protocol/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/protocol/src/index.ts)、[packages/typert/registry/src/client/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/registry/src/client/index.ts)、[packages/typert/registry/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/typert/registry/src/index.ts)

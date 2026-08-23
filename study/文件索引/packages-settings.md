@@ -35,7 +35,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings-file` 包里的 `tests/concurrency.spec.ts` 的具体场景，包括“cross-instance writes”、“keeps both namespaces when two providers write the same document concurrently”、“writer lock”、“waits for a busy writer lock instead of failing”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“concurrency”写出可重复运行的断言，覆盖的场景包括“cross-instance writes”、“keeps both namespaces when two providers write the same document concurrently”、“writer lock”、“waits for a busy writer lock instead of failing”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“cross-instance writes”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Cross-instance and writer-lock behavior: two providers on one document are the in-process equivalent of two dsh processes sharing a harness home — neither knows the other's cache, so only the read-modify-write cycle under the <file>.lock sibling keeps both ...”；固定提交中扫描到的声明包括 `tempDir`、`boot`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings-file/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/README.md)、[packages/settings/settings-file/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/src/index.ts)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -49,7 +49,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings-file` 包里的 `tests/loader-composition.spec.ts` 的具体场景，包括“settings-file real composition”、“boots from cordis.yml and hot-publishes an external settings edit”、“boots the same consumer without a settings entry and keeps entry-config resolution”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“loader-composition”写出可重复运行的断言，覆盖的场景包括“settings-file real composition”、“boots from cordis.yml and hot-publishes an external settings edit”、“boots the same consumer without a settings entry and keeps entry-config resolution”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“settings-file real composition”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Real-composition guard: the provider and a consumer plugin boot from a test-only cordis.yml through the actual Loader + Include path, an external edit of settings.yaml hot-publishes into the consumer's scope, and the same consumer booted WITHOUT a settings ...”；固定提交中扫描到的声明包括 `loadComposition`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings-file/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/README.md)、[packages/settings/settings-file/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/src/index.ts)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -63,7 +63,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings-file` 包里的 `tests/local.spec.ts` 的具体场景，包括“resolveSpec”、“defaults watch and debounce when construction bypasses schema normalization”、“boot and reads”、“resolves defaults over an absent file and reports writable”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“local”写出可重复运行的断言，覆盖的场景包括“resolveSpec”、“defaults watch and debounce when construction bypasses schema normalization”、“boot and reads”、“resolves defaults over an absent file and reports writable”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“resolveSpec”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `tempDir`、`boot`；本地静态 import 图显示它直接依赖 5 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings-file/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/README.md)、[packages/settings/settings-file/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/src/index.ts)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[packages/util/atomic-write/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/atomic-write/src/index.ts)
@@ -77,7 +77,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings-file` 包里的 `tests/lock-race.spec.ts` 的具体场景，包括“writer-lock failure cleanup”、“skips publication when an in-flight document create completes during teardown”、“surfaces an exclusive document-create failure and releases the lock”、“cleans up the temp file and releases the lock when the write fails mid-cycle”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“lock-race”写出可重复运行的断言，覆盖的场景包括“writer-lock failure cleanup”、“skips publication when an in-flight document create completes during teardown”、“surfaces an exclusive document-create failure and releases the lock”、“cleans up the temp file and releases the lock when the write fails mid-cycle”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“writer-lock failure cleanup”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“A temp-file write failure cannot be timed from outside. The fs/promises API injects it once so the test can prove that the writer lock still releases.”；固定提交中扫描到的声明包括 `tempDir`、`boot`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings-file/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/README.md)、[packages/settings/settings-file/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/src/index.ts)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -91,7 +91,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings-file` 包里的 `tests/watcher.spec.ts` 的具体场景，包括“watcher pipeline”、“clamps the write-settle poll interval for a zero debounce”、“survives a watcher error and keeps publishing later edits”、“keeps the last good document when the file turns unreadable at runtime”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“watcher”写出可重复运行的断言，覆盖的场景包括“watcher pipeline”、“clamps the write-settle poll interval for a zero debounce”、“survives a watcher error and keeps publishing later edits”、“keeps the last good document when the file turns unreadable at runtime”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“watcher pipeline”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `FakeWatcher`、`fakeInstances`、`tempDir`、`boot`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings-file/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/README.md)、[packages/settings/settings-file/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings-file/src/index.ts)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -163,7 +163,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“settings invariants”、“fails a settings/updated emission without a live settings service”、“fails a settings/updated emission for an unregistered namespace”、“fails a settings/updated emission without a resolved-value change”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“settings invariants”、“fails a settings/updated emission without a live settings service”、“fails a settings/updated emission for an unregistered namespace”、“fails a settings/updated emission without a resolved-value change”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“settings invariants”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `setup`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[packages/settings/settings/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/invariant.ts)
@@ -192,7 +192,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings` 包里的 `tests/redact.spec.ts` 的具体场景，包括“redactSecrets”、“strips secrets from object, dict, and array containers and records each position”、“enumerates unset object-property slots without inventing containers”、“never mutates the input and preserves keys outside the schema”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“redact”写出可重复运行的断言，覆盖的场景包括“redactSecrets”、“strips secrets from object, dict, and array containers and records each position”、“enumerates unset object-property slots without inventing containers”、“never mutates the input and preserves keys outside the schema”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“redactSecrets”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `boot`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/README.md)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[packages/settings/settings/tests/memory.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/tests/memory.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -207,7 +207,7 @@
 
 - 所属层：packages/settings：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/settings/settings` 包里的 `tests/settings.spec.ts` 的具体场景，包括“provider metadata”、“does not advertise a local document unless the provider overrides it”、“settingsNamespace”、“brands lowercase kebab-case names”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“settings”写出可重复运行的断言，覆盖的场景包括“provider metadata”、“does not advertise a local document unless the provider overrides it”、“settingsNamespace”、“brands lowercase kebab-case names”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“provider metadata”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `BareProvider`、`boot`、`recordUpdates`、`mounted`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/settings/settings/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/README.md)、[packages/settings/settings/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/src/index.ts)、[packages/settings/settings/tests/memory.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/settings/settings/tests/memory.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)

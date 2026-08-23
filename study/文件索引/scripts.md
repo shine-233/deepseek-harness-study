@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 170 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：scripts（170 条）。
+
+## scripts
+
 ### [scripts/agent-note-tree.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/agent-note-tree.ts)
 
 - 所属层：构建、生成、检查和发布自动化
@@ -132,7 +136,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `change-scope.spec.ts` 的具体场景，包括“change-scope”、“uses an explicit base on a fresh branch without a same-name remote and after its first ...”、“reports an exact head above a non-master stacked base while dirty paths remain worktree...”、“keeps committed, staged, unstaged, and untracked paths independent and does not mutate ...”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“change-scope”写出可重复运行的断言，覆盖的场景包括“change-scope”、“uses an explicit base on a fresh branch without a same-name remote and after its first ...”、“reports an exact head above a non-master stacked base while dirty paths remain worktree...”、“keeps committed, staged, unstaged, and untracked paths independent and does not mutate ...”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“change-scope”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `git`、`gitBytes`、`write`、`fixture`、`commit`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/change-scope.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/change-scope.ts)
@@ -202,7 +206,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `check-workspace-constraints.spec.ts` 的具体场景，包括“experimental workspace constraints”、“requires the experimental package-name prefix”、“requires private manifests without publication metadata”、“allows development and experimental consumers but rejects the Python release runtime”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“check-workspace-constraints”写出可重复运行的断言，覆盖的场景包括“experimental workspace constraints”、“requires the experimental package-name prefix”、“requires private manifests without publication metadata”、“allows development and experimental consumers but rejects the Python release runtime”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“experimental workspace constraints”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Experimental-package publication and dependency constraints.”；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/check-workspace-constraints.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/check-workspace-constraints.ts)
@@ -244,7 +248,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `clean.spec.ts` 的具体场景，包括“RepositoryCleaner”、“derives live build outputs from project references and removes safe stale package residue”、“does not delete any target when a manifest-less package contains an unknown file”、“removes the native Landlock entry output and solution build info”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“clean”写出可重复运行的断言，覆盖的场景包括“RepositoryCleaner”、“derives live build outputs from project references and removes safe stale package residue”、“does not delete any target when a manifest-less package contains an unknown file”、“removes the native Landlock entry output and solution build info”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“RepositoryCleaner”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `fixture`、`write`、`addProject`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/clean.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/clean.ts)
@@ -427,7 +431,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `coverage-exempt.spec.ts` 的具体场景，包括“coverage-exempt roster”、“entries never overlap, so no suite is double-run or double-excluded”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“coverage-exempt”写出可重复运行的断言，覆盖的场景包括“coverage-exempt roster”、“entries never overlap, so no suite is double-run or double-excluded”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“coverage-exempt roster”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Mechanical guard for the coverage-exempt roster: each entry's positional filter and exclude glob must select the same non-empty file set out of the repository's spec inventory, so a renamed suite cannot silently fall out of the uninstrumented gate while its...”；固定提交中扫描到的声明包括 `excludeMatches`、`filterMatches`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/coverage-exempt.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/coverage-exempt.ts)
@@ -455,7 +459,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `coverage-partitions.spec.ts` 的具体场景，包括“coverage partition count”、“coverage partition timeout”、“applies one configured timeout to tests and polling”、“keeps Vitest defaults when the timeout is absent”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“coverage-partitions”写出可重复运行的断言，覆盖的场景包括“coverage partition count”、“coverage partition timeout”、“applies one configured timeout to tests and polling”、“keeps Vitest defaults when the timeout is absent”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“coverage partition count”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `writeBlob`、`temporaryRoot`、`successfulCommandRecorder`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/coverage-partitions.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/coverage-partitions.ts)
@@ -707,7 +711,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `gen-doc-graphs.spec.ts` 的具体场景，包括“event relation call-site indexing”、“recovers a proven-local helper through the single-file fast path”、“recovers an alias-escaped helper through the global fallback”、“rejects the locality proof for global script files”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“gen-doc-graphs”写出可重复运行的断言，覆盖的场景包括“event relation call-site indexing”、“recovers a proven-local helper through the single-file fast path”、“recovers an alias-escaped helper through the global fallback”、“rejects the locality proof for global script files”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“event relation call-site indexing”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for the event-relation collector's demand-driven call-site indexing: the single-file fast path and the global fallback must recover the same helper-parameter event names, including shapes that defeat the locality proof (alias escapes and global script...”；固定提交中扫描到的声明包括 `dispatchersOf`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/gen-doc-graphs.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/gen-doc-graphs.ts)、[scripts/ts-project.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/ts-project.ts)
@@ -777,7 +781,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `gen-third-party-notices.spec.ts` 的具体场景，包括“THIRD_PARTY_NOTICES.md”、“matches what the generator produces from the current manifests”、“tierExternalDeps”、“tiers by declaring area, not by the declaring section name”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“gen-third-party-notices”写出可重复运行的断言，覆盖的场景包括“THIRD_PARTY_NOTICES.md”、“matches what the generator produces from the current manifests”、“tierExternalDeps”、“tiers by declaring area, not by the declaring section name”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“THIRD_PARTY_NOTICES.md”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `workspace`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/gen-third-party-notices.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/gen-third-party-notices.ts)
@@ -847,7 +851,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `install-lefthook.spec.ts` 的具体场景，包括“worktree-local Lefthook installer”、“skips hook installation when ${label} marks an automated job”、“isolates main and linked worktrees without changing legacy common hooks”、“replaces the owned hook path Git copies into a newly added worktree”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“install-lefthook”写出可重复运行的断言，覆盖的场景包括“worktree-local Lefthook installer”、“skips hook installation when ${label} marks an automated job”、“isolates main and linked worktrees without changing legacy common hooks”、“replaces the owned hook path Git copies into a newly added worktree”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“worktree-local Lefthook installer”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `commandResult`、`gitResult`、`git`、`write`、`fakeLefthookSource`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/test-fixture-cleanup.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/test-fixture-cleanup.ts)
@@ -875,7 +879,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `lint-rule-fingerprint.spec.ts` 的具体场景，包括“Oxlint repository rule fingerprint”、“pins every override field”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“lint-rule-fingerprint”写出可重复运行的断言，覆盖的场景包括“Oxlint repository rule fingerprint”、“pins every override field”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“Oxlint repository rule fingerprint”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `isRecord`、`isUnknownArray`、`severity`、`normalizedRules`、`mergedRules`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)
@@ -959,7 +963,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `oxlint-contract.spec.ts` 的具体场景，包括“Oxlint executable contract”、“discovers the owning TypeScript project for every file class”、“runs JavaScript compatibility and nursery rules”、“keeps the complete stylistic contract in Oxlint”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“oxlint-contract”写出可重复运行的断言，覆盖的场景包括“Oxlint executable contract”、“discovers the owning TypeScript project for every file class”、“runs JavaScript compatibility and nursery rules”、“keeps the complete stylistic contract in Oxlint”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“Oxlint executable contract”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `secondProbe`、`hasValue`、`longProbe`、`isRecord`、`isUnknownArray`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)
@@ -987,7 +991,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `package-invariants.spec.ts` 的具体场景，包括“package invariant gate”、“accepts a hand-owned checking companion with publication metadata”、“accepts an invariant reference owned by a package-local leaf project”、“rejects missing publication metadata and build output”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“package-invariants”写出可重复运行的断言，覆盖的场景包括“package invariant gate”、“accepts a hand-owned checking companion with publication metadata”、“accepts an invariant reference owned by a package-local leaf project”、“rejects missing publication metadata and build output”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“package invariant gate”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `name`、`inject`、`apply`、`handwrittenInvariant`、`fixture`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/package-invariants.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/package-invariants.ts)
@@ -1015,7 +1019,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `paired-markdown-derivatives.spec.ts` 的具体场景，包括“partitionPairedMarkdownDerivatives”、“treats a complete byte-identical Chinese sequence as derivative”、“keeps reordered, changed, partial, and orphan Chinese sequences primary”、“requires the fence kind to match as well as the body”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“paired-markdown-derivatives”写出可重复运行的断言，覆盖的场景包括“partitionPairedMarkdownDerivatives”、“treats a complete byte-identical Chinese sequence as derivative”、“keeps reordered, changed, partial, and orphan Chinese sequences primary”、“requires the fence kind to match as well as the body”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“partitionPairedMarkdownDerivatives”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/paired-markdown-derivatives.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/paired-markdown-derivatives.ts)
@@ -1043,7 +1047,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `pnpm-invocation.spec.ts` 的具体场景，包括“pnpm invocation”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“pnpm-invocation”写出可重复运行的断言，覆盖的场景包括“pnpm invocation”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“pnpm invocation”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/pnpm-invocation.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/pnpm-invocation.ts)
@@ -1085,7 +1089,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `project-doc-site.spec.ts` 的具体场景，包括“website source layout”、“rejects Markdown outside the subtree instructions”、“contains no tracked or unignored documentation copies”、“publishableImage”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“project-doc-site”写出可重复运行的断言，覆盖的场景包括“website source layout”、“rejects Markdown outside the subtree instructions”、“contains no tracked or unignored documentation copies”、“publishableImage”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“website source layout”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for the documentation website projection adapter.”；固定提交中扫描到的声明包括 `unexpectedWebsiteMarkdown`、`fixture`、`mirrorDir`、`relativeTargets`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/project-doc-site.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/project-doc-site.ts)、[website/docs.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/website/docs.ts)
@@ -1113,7 +1117,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `project-reference-faces.spec.ts` 的具体场景，包括“Project Reference compiler faces”、“allows neutral projects in either graph and matching split leaves”、“rejects the opposite leaf and the solution root of a split project”、“uses the referencing project face throughout the reachable graph”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“project-reference-faces”写出可重复运行的断言，覆盖的场景包括“Project Reference compiler faces”、“allows neutral projects in either graph and matching split leaves”、“rejects the opposite leaf and the solution root of a split project”、“uses the referencing project face throughout the reachable graph”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“Project Reference compiler faces”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `writeJson`、`workspaceFixture`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/project-reference-faces.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/project-reference-faces.ts)
@@ -1141,7 +1145,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `publication-payload.spec.ts` 的具体场景，包括“publication payload policy”、“rejects source members in packed tarballs”、“rejects source maps in packed tarballs”、“accepts a clean packed tarball”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“publication-payload”写出可重复运行的断言，覆盖的场景包括“publication payload policy”、“rejects source members in packed tarballs”、“rejects source maps in packed tarballs”、“accepts a clean packed tarball”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“publication payload policy”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `validateFixtureTarball`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/publication-payload.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/publication-payload.ts)
@@ -1169,7 +1173,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `publint-all.spec.ts` 的具体场景，包括“publint package runner”、“lints recursively declared files from an in-memory publication view”、“rejects an export that exists in the workspace but is not published”、“rejects a public export whose built file is missing”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“publint-all”写出可重复运行的断言，覆盖的场景包括“publint package runner”、“lints recursively declared files from an in-memory publication view”、“rejects an export that exists in the workspace but is not published”、“rejects a public export whose built file is missing”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“publint package runner”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `fixture`、`run`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)
@@ -1225,7 +1229,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `release/families.spec.ts` 的具体场景，包括“release families”、“excludes private experimental packages from the dsh release”、“bumps private dsh packages without adding release tags”、“names one tag for the whole dsh family and one per vendored package”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“families”写出可重复运行的断言，覆盖的场景包括“release families”、“excludes private experimental packages from the dsh release”、“bumps private dsh packages without adding release tags”、“names one tag for the whole dsh family and one per vendored package”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“release families”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Release family discovery, publish order, tag naming, and the bump judgements.”；固定提交中扫描到的声明包括 `member`、`write`、`buildFixture`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/client-build-environment.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/client-build-environment.ts)、[scripts/release/bump.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/release/bump.ts)、[scripts/release/families.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/release/families.ts)
@@ -1351,7 +1355,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `rescope-vendor.spec.ts` 的具体场景，包括“exactEditState”、“classifies an insertion by its target form, so a duplicate is invalid”、“classifies a deletion by its source form, and requires its remainder to survive”、“requires a replacement to leave no source form and the exact target count”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“rescope-vendor”写出可重复运行的断言，覆盖的场景包括“exactEditState”、“classifies an insertion by its target form, so a duplicate is invalid”、“classifies a deletion by its source form, and requires its remainder to survive”、“requires a replacement to leave no source form and the exact target count”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“exactEditState”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Acceptance-path coverage for the rescope codemod's exact-edit classifier: a duplicated insertion — what a non-idempotent apply produces — must be rejected rather than applied again.”；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/rescope-vendor.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/rescope-vendor.ts)
@@ -1547,7 +1551,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `test-invariants.spec.ts` 的具体场景，包括“global test invariant host”、“uses one exhaustive topology to reserve every package name with enabled checks”、“mounts the owning package companion while leaving non-package roots service-only”、“loads and executes every source companion through the real Loader setup”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“test-invariants”写出可重复运行的断言，覆盖的场景包括“global test invariant host”、“uses one exhaustive topology to reserve every package name with enabled checks”、“mounts the owning package companion while leaving non-package roots service-only”、“loads and executes every source companion through the real Loader setup”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“global test invariant host”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `TestInvariantProbe`、`deferred`、`requiredConfig`、`invalidConfigApply`、`rejectionOf`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[scripts/package-invariants.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/package-invariants.ts)、[scripts/test-invariants.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/test-invariants.ts)
@@ -1575,7 +1579,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `translation-brief.spec.ts` 的具体场景，包括“markdown spans”、“lists units with container-scoped kinds in document order”、“lists heading sections with a preamble span and heading labels”、“labels units by their node type”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“translation-brief”写出可重复运行的断言，覆盖的场景包括“markdown spans”、“lists units with container-scoped kinds in document order”、“lists heading sections with a preamble span and heading labels”、“labels units by their node type”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“markdown spans”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Regression tests for the minimal-update briefing assembly.”；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/translation-brief.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/translation-brief.ts)
@@ -1603,7 +1607,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `translation-links.spec.ts` 的具体场景，包括“translation link locale validation”、“rejects a Chinese link to the English sibling with an exact diagnostic”、“rewrites an encoded exact filename without changing its query or fragment suffix”、“encodes each exact path segment with only RFC 3986 unreserved characters”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“translation-links”写出可重复运行的断言，覆盖的场景包括“translation link locale validation”、“rejects a Chinese link to the English sibling with an exact diagnostic”、“rewrites an encoded exact filename without changing its query or fragment suffix”、“encodes each exact path segment with only RFC 3986 unreserved characters”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“translation link locale validation”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Regression coverage for locale-aware bilingual Markdown links.”；固定提交中扫描到的声明包括 `fixture`、`linkContext`、`expectUnchangedLinkInput`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/test-fixture-cleanup.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/test-fixture-cleanup.ts)、[scripts/translation-links.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/translation-links.ts)
@@ -1645,7 +1649,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `translation-pairing-merge.spec.ts` 的具体场景，包括“translation pairing merge composition”、“rejects a pairing-record path outside the repository”、“rejects a pairing record excluded from the active corpus”、“merges the owner blobs named by three valid records”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“translation-pairing-merge”写出可重复运行的断言，覆盖的场景包括“translation pairing merge composition”、“rejects a pairing-record path outside the repository”、“rejects a pairing record excluded from the active corpus”、“merges the owner blobs named by three valid records”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“translation pairing merge composition”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Integration coverage for automatic and explicit pairing-record conflict resolution.”；固定提交中扫描到的声明包括 `mergeTranslationPairingRecords`、`resolveTranslationPairingConflicts`、`git`、`write`、`shellQuote`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/test-fixture-cleanup.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/test-fixture-cleanup.ts)、[scripts/translation-pairing-git.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/translation-pairing-git.ts)、[scripts/translation-pairing-merge.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/translation-pairing-merge.ts)
@@ -1687,7 +1691,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `translation-pairing.spec.ts` 的具体场景，包括“translation pairing snapshots”、“stores exact uncommitted bytes for later recovery by object ID”、“fails before a sidecar can reference an unavailable object”、“fails clearly when Git cannot be started”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“translation-pairing”写出可重复运行的断言，覆盖的场景包括“translation pairing snapshots”、“stores exact uncommitted bytes for later recovery by object ID”、“fails before a sidecar can reference an unavailable object”、“fails clearly when Git cannot be started”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“translation pairing snapshots”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Regression tests for bilingual snapshots, corpus scope, and structure.”；固定提交中扫描到的声明包括 `signature`、`fixtureSignature`、`gitSupportsObjectFormat`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/translation-pairing-git.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/translation-pairing-git.ts)、[scripts/translation-pairing-record.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/translation-pairing-record.ts)、[scripts/translation-pairing.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/translation-pairing.ts)
@@ -1841,7 +1845,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-built-package-invariants.spec.ts` 的具体场景，包括“built package invariant verifier”、“loads the staged compiled self-reference through plain Node and Loader normalization”、“rejects a default export and a broken invariant export map”、“rejects an invariant bundle that needs an unstaged runtime chunk”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-built-package-invariants”写出可重复运行的断言，覆盖的场景包括“built package invariant verifier”、“loads the staged compiled self-reference through plain Node and Loader normalization”、“rejects a default export and a broken invariant export map”、“rejects an invariant bundle that needs an unstaged runtime chunk”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“built package invariant verifier”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `fixture`、`verify`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)
@@ -1911,7 +1915,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-config-source-ownership.spec.ts` 的具体场景，包括“configuration source ownership gate”、“rejects inline endpoints in shipped bundle patches”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-config-source-ownership”写出可重复运行的断言，覆盖的场景包括“configuration source ownership gate”、“rejects inline endpoints in shipped bundle patches”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“configuration source ownership gate”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/verify-config-source-ownership.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/verify-config-source-ownership.ts)
@@ -1995,7 +1999,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-doc-site-fragments.spec.ts` 的具体场景，包括“inspectSiteFragments”、“rejects a directory with no built pages”、“resolves clean, encoded, and same-page routes”、“rejects ambiguous built routes”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-doc-site-fragments”写出可重复运行的断言，覆盖的场景包括“inspectSiteFragments”、“rejects a directory with no built pages”、“resolves clean, encoded, and same-page routes”、“rejects ambiguous built routes”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“inspectSiteFragments”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for built-site fragment validation.”；固定提交中扫描到的声明包括 `fixture`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/verify-doc-site-fragments.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/verify-doc-site-fragments.ts)
@@ -2023,7 +2027,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-dsh-package-licenses.spec.ts` 的具体场景，包括“DSH package license gate”、“checks root, unhyphenated CLI, and dsh-prefixed package names while ignoring other fami...”、“rejects a missing license declaration”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-dsh-package-licenses”写出可重复运行的断言，覆盖的场景包括“DSH package license gate”、“checks root, unhyphenated CLI, and dsh-prefixed package names while ignoring other fami...”、“rejects a missing license declaration”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“DSH package license gate”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `writeManifest`、`createWorkspace`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/verify-dsh-package-licenses.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/verify-dsh-package-licenses.ts)
@@ -2065,7 +2069,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-md-links.spec.ts` 的具体场景，包括“documentAnchors”、“slugs rendered heading text, suffixes repeats, and reads explicit <a id> anchors”、“keeps underscores the way GitHub does”、“slugs a heading containing a link from its rendered text”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-md-links”写出可重复运行的断言，覆盖的场景包括“documentAnchors”、“slugs rendered heading text, suffixes repeats, and reads explicit <a id> anchors”、“keeps underscores the way GitHub does”、“slugs a heading containing a link from its rendered text”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“documentAnchors”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Acceptance-path coverage for fragment validation in verify-md-links: a #fragment onto a Markdown target — same-file anchors included — must name a real heading slug or explicit <a id>, while non-Markdown fragments and external targets stay out of scope.”；固定提交中扫描到的声明包括 `layout`、`violationsIn`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/verify-md-links.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/verify-md-links.ts)
@@ -2135,7 +2139,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-optional-dependency-imports.spec.ts` 的具体场景，包括“optional dependency loads”、“reports every form the compiler keeps, and nothing else”、“names the package, the declaration that made it optional, and the way out”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-optional-dependency-imports”写出可重复运行的断言，覆盖的场景包括“optional dependency loads”、“reports every form the compiler keeps, and nothing else”、“names the package, the declaration that made it optional, and the way out”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“optional dependency loads”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for the optional-dependency load gate: which import and re-export forms survive emit, and therefore load a package the installed tree may not carry. The expectations here match what tsc emits with verbatimModuleSyntax off: import type, import {}, an i...”；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/ts-project.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/ts-project.ts)、[scripts/verify-optional-dependency-imports.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/verify-optional-dependency-imports.ts)
@@ -2219,7 +2223,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-public-repository-links.spec.ts` 的具体场景，包括“repository link policy”、“rejects encoded and case-varied references to the unavailable repository”、“preserves frozen archived Agent Notes”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-public-repository-links”写出可重复运行的断言，覆盖的场景包括“repository link policy”、“rejects encoded and case-varied references to the unavailable repository”、“preserves frozen archived Agent Notes”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“repository link policy”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/verify-public-repository-links.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/verify-public-repository-links.ts)
@@ -2275,7 +2279,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `verify-skill-invocation-metadata.spec.ts` 的具体场景，包括“cross-product skill invocation metadata gate”、“accepts aligned default and manual-only policies”、“rejects either direction of a manual-only policy mismatch”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“verify-skill-invocation-metadata”写出可重复运行的断言，覆盖的场景包括“cross-product skill invocation metadata gate”、“accepts aligned default and manual-only policies”、“rejects either direction of a manual-only policy mismatch”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“cross-product skill invocation metadata gate”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `fixtureRoot`、`writeSkill`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)、[scripts/verify-skill-invocation-metadata.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/scripts/verify-skill-invocation-metadata.ts)
@@ -2359,7 +2363,7 @@
 
 - 所属层：构建、生成、检查和发布自动化
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `scripts` 包里的 `vitest-environment.compat.spec.ts` 的具体场景，包括“Vitest jsdom compatibility”、“provides isolated browser storage instead of Node process storage”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“vitest-environment.compat”写出可重复运行的断言，覆盖的场景包括“Vitest jsdom compatibility”、“provides isolated browser storage instead of Node process storage”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“Vitest jsdom compatibility”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“@vitest-environment jsdom”；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/README.md)

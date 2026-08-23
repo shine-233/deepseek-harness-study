@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 101 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/llm/llm-deepseek（23 条）、packages/llm/llm-pi-ai（28 条）、packages/llm/llm-retry（11 条）、packages/llm/llm（26 条）、packages/llm/token-meter（13 条）。
+
+## packages/llm/llm-deepseek
+
 ### [packages/llm/llm-deepseek/src/adapter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm-deepseek/src/adapter.ts)
 
 - 所属层：packages/llm：可复用的 Harness 功能包
@@ -331,6 +335,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/attachment/attachment/src/index.ts`、`packages/llm/llm-deepseek/src/file-id.ts`、`packages/llm/llm-deepseek/src/upload-index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 181 行；扫描到的测试主题包括 “DeepSeekUploadIndex”、“normalizes trailing endpoint slashes in the credential scope”、“isolates API-key namespaces and reuses only records above the refresh margin”、“keeps a reusable cross-process winner and removes only an exact generation”、“treats a corrupt upload cache as empty and repairs it on the next commit”、“rejects duplicate persisted mappings as a corrupt cache”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/llm/llm-pi-ai
 
 ### [packages/llm/llm-pi-ai/src/adapter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm-pi-ai/src/adapter.ts)
 
@@ -739,6 +745,8 @@
 - 代码证据：固定提交归档实际读取结果：约 75 行；扫描到的声明包括 `gatewayAdapter`、`drain`；扫描到的测试主题包括 “pi-ai SDK retry boundary”、“pins one SDK attempt even when the installed provider currently defaults to zero retries”、“dispatches a hand-declared route to the endpoint and model its configuration describes”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/llm/llm-retry
+
 ### [packages/llm/llm-retry/src/brand.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm-retry/src/brand.ts)
 
 - 所属层：packages/llm：可复用的 Harness 功能包
@@ -892,6 +900,8 @@
 - 阅读顺序：先读 `packages/llm/llm-retry/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 25 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/llm/llm
 
 ### [packages/llm/llm/src/adapter-failure.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm/src/adapter-failure.ts)
 
@@ -1259,6 +1269,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/llm/llm/src/index.ts`、`vendor/cordis/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 268 行；扫描到的声明包括 `NoopAdapter`、`setup`、`entry`；扫描到的测试主题包括 “llm/adapters-updated”、“fires at both adapter registration commit points with the registry already readable”、“contains a throwing listener without vetoing registration or starving later listeners”、“contains an ASYNC listener rejection instead of leaving it unhandled”、“replaces a route set in one event, never publishing an empty registry between the two”、“rethrows the first INVARIANT-coded listener failure after notifying the rest”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/llm/token-meter
 
 ### [packages/llm/token-meter/src/breakdown-projection.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/token-meter/src/breakdown-projection.ts)
 

@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 118 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：apps/cli（23 条）、apps/web（95 条）。
+
+## apps/cli
+
 ### [apps/cli/src/args.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/src/args.ts)
 
 - 所属层：可直接运行的 CLI 或 Web 应用
@@ -90,7 +94,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `apps/cli` 包里的 `tests/args.spec.ts` 的具体场景，包括“parseDshArgs”、“routes profile boots and the web alias, handing the rest to the app”、“ends the launcher flags at the first token it does not own”、“routes the plugin pnpm forwarder”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“args”写出可重复运行的断言，覆盖的场景包括“parseDshArgs”、“routes profile boots and the web alias, handing the rest to the app”、“ends the launcher flags at the first token it does not own”、“routes the plugin pnpm forwarder”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“parseDshArgs”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `exitCode`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[apps/cli/src/args.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/src/args.ts)
@@ -104,7 +108,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `apps/cli` 包里的 `tests/built-bin.e2e.ts` 的具体场景，包括“requires --profile and rejects removed commands”、“routes help and usage errors without activating startup-dependent rows”、“runs the headless profile through its app-owned task positional”、“does not load a project environment for --version”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“built-bin”写出可重复运行的断言，覆盖的场景包括“requires --profile and rejects removed commands”、“routes help and usage errors without activating startup-dependent rows”、“runs the headless profile through its app-owned task positional”、“does not load a project environment for --version”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“requires --profile and rejects removed commands”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `runBuiltBin`、`waitForFile`、`createProfileLifecycleFixture`、`startProfileLifecycle`、`requestProfileShutdown`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[packages/boot/cmdline/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/cmdline/src/index.ts)、[packages/test-support/llm-mock-server/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/llm-mock-server/src/index.ts)
@@ -118,7 +122,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `apps/cli` 包里的 `tests/dsh-badge.snapshot.ts` 的具体场景，包括“dsh badge assembled snapshot”、“advertises and loads the opt-in bundled skill through the shipped app”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“dsh-badge”写出可重复运行的断言，覆盖的场景包括“dsh badge assembled snapshot”、“advertises and loads the opt-in bundled skill through the shipped app”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“dsh badge assembled snapshot”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[packages/test-support/loader-smoke/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/src/index.ts)
@@ -132,7 +136,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 `apps/cli` 包里的 `tests/fixtures/dsh-badge/snapshot.ts` 的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为同包测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 7 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[packages/boot/app-boot/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/boot/app-boot/src/index.ts)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)
@@ -146,7 +150,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 `apps/cli` 包里的 `tests/fixtures/never-dispose.mjs` 的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为同包测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Test-only Cordis plugin whose disposer announces entry and never settles.”；固定提交中扫描到的声明包括 `apply`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -160,7 +164,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 Web 界面的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为 Web 界面提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：固定提交中扫描到的声明包括 `open`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)
@@ -174,7 +178,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 Web 界面的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为 Web 界面提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)
@@ -188,7 +192,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `apps/cli` 包里的 `tests/headless-shutdown.e2e.ts` 的具体场景，包括“lets a second Ctrl+C force exit while the first signal is draining”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“headless-shutdown”写出可重复运行的断言，覆盖的场景包括“lets a second Ctrl+C force exit while the first signal is draining”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“lets a second Ctrl+C force exit while the first signal is draining”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `runHeadlessPtySmoke`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[packages/test-support/loader-smoke/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/src/index.ts)
@@ -230,7 +234,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `apps/cli` 包里的 `tests/process-shutdown.spec.ts` 的具体场景，包括“process shutdown”、“completes naturally after disposal resolves and forces exit when it rejects”、“uses process.exitCode for default normal completion”、“forces exit when graceful disposal reaches its bound”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“process-shutdown”写出可重复运行的断言，覆盖的场景包括“process shutdown”、“completes naturally after disposal resolves and forces exit when it rejects”、“uses process.exitCode for default normal completion”、“forces exit when graceful disposal reaches its bound”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“process shutdown”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `deferred`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[apps/cli/src/process-shutdown.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/src/process-shutdown.ts)
@@ -244,7 +248,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `apps/cli` 包里的 `tests/source-launch.compat.spec.ts` 的具体场景，包括“dsh SOURCE launcher (node --import tsx/esm)”、“launches the source CLI without building”、“boots the source entry and requires a profile”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“source-launch.compat”写出可重复运行的断言，覆盖的场景包括“dsh SOURCE launcher (node --import tsx/esm)”、“launches the source CLI without building”、“boots the source entry and requires a profile”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“dsh SOURCE launcher (node --import tsx/esm)”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)
@@ -258,7 +262,7 @@
 
 - 所属层：可直接运行的 CLI 或 Web 应用
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `apps/cli` 包里的 `tests/telemetry-switch.spec.ts` 的具体场景，包括“resolveTelemetryPatch”、“preserves the configured telemetry mode when the hard-disable switch is unset or empty”、“disables on ANY non-empty value, including falsy-looking ones”、“is trivially satisfied by a composition without the telemetry row”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“telemetry-switch”写出可重复运行的断言，覆盖的场景包括“resolveTelemetryPatch”、“preserves the configured telemetry mode when the hard-disable switch is unset or empty”、“disables on ANY non-empty value, including falsy-looking ones”、“is trivially satisfied by a composition without the telemetry row”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“resolveTelemetryPatch”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[apps/cli/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/README.md)、[apps/cli/src/profile-boot.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/src/profile-boot.ts)
@@ -323,6 +327,8 @@
 - 阅读顺序：先读 `apps/cli/README.md` 和入口，再读当前实现，沿着相关类型、协议或实现和所在包的入口或服务确认输入输出，最后对照同包中与它同名或覆盖相近场景的测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 18 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## apps/web
 
 ### [apps/web/index.html](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/web/index.html)
 

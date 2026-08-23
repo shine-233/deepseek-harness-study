@@ -50,7 +50,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/authorization` 包里的 `tests/authorization.spec.ts` 的具体场景，包括“AuthorizationService registry”、“lists a registered flow and drops it when the registration is disposed”、“refuses a second flow for the same key”、“withdraws an attempt still running when its flow leaves”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“authorization”写出可重复运行的断言，覆盖的场景包括“AuthorizationService registry”、“lists a registered flow and drops it when the registration is disposed”、“refuses a second flow for the same key”、“withdraws an attempt still running when its flow leaves”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“AuthorizationService registry”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `harness`、`surface`、`committingFlow`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/authorization/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/authorization/README.md)、[packages/credentials/authorization/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/authorization/src/index.ts)、[packages/credentials/authorization/tests/memory.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/authorization/tests/memory.ts)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)
@@ -65,7 +65,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/authorization` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“authorization invariant companion”、“accepts an attempt that released its key before settling”、“fails a settlement that left its key in flight”、“fails a settlement emitted without a live service”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“authorization invariant companion”、“accepts an attempt that released its key before settling”、“fails a settlement that left its key in flight”、“fails a settlement emitted without a live service”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“authorization invariant companion”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/authorization/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/authorization/README.md)、[packages/credentials/authorization/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/authorization/src/index.ts)、[packages/credentials/authorization/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/authorization/src/invariant.ts)、[packages/credentials/authorization/tests/memory.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/authorization/tests/memory.ts)
@@ -122,7 +122,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials-local` 包里的 `tests/drain.spec.ts` 的具体场景，包括“write-drain teardown”、“lets the in-flight write land and fails the queued one after disposal”、“fails a queued record write after disposal on the same terms”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“drain”写出可重复运行的断言，覆盖的场景包括“write-drain teardown”、“lets the in-flight write land and fails the queued one after disposal”、“fails a queued record write after disposal on the same terms”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“write-drain teardown”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `setGate`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/README.md)、[packages/credentials/credentials-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/src/index.ts)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[packages/util/atomic-write/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/atomic-write/src/index.ts)
@@ -136,7 +136,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials-local` 包里的 `tests/local.spec.ts` 的具体场景，包括“resolveSpec”、“defaults to .credentials.yaml under the harness home with watching on”、“lets an explicit path win over the home”、“layering and reads”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“local”写出可重复运行的断言，覆盖的场景包括“resolveSpec”、“defaults to .credentials.yaml under the harness home with watching on”、“lets an explicit path win over the home”、“layering and reads”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“resolveSpec”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `writeCredentials`、`tempDir`、`boot`、`updates`、`bootLayered`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/README.md)、[packages/credentials/credentials-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/src/index.ts)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[packages/util/launch-environment/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/launch-environment/src/index.ts)
@@ -150,7 +150,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials-local` 包里的 `tests/migration.spec.ts` 的具体场景，包括“flat-layout boot migration”、“upgrades the flat document in place, byte for byte, and serves its keys”、“a second boot reads the migrated document without touching it”、“yields to a concurrent migrator under the writer lock”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“migration”写出可重复运行的断言，覆盖的场景包括“flat-layout boot migration”、“upgrades the flat document in place, byte for byte, and serves its keys”、“a second boot reads the migrated document without touching it”、“yields to a concurrent migrator under the writer lock”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“flat-layout boot migration”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“One-shot boot upgrade of the pre-release flat layout: a key stored by an earlier build must survive the versioned-document change without a hand edit, byte for byte, while everything the recognizer cannot prove flat keeps the loud rejection local.spec exerc...”；固定提交中扫描到的声明包括 `writeCredentials`、`tempDir`、`boot`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/README.md)、[packages/credentials/credentials-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/src/index.ts)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[packages/util/atomic-write/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/atomic-write/src/index.ts)
@@ -164,7 +164,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials-local` 包里的 `tests/records.spec.ts` 的具体场景，包括“credential keys”、“rejects a segment that is not a lowercase hyphenated identifier”、“stays disjoint from the reference grammar”、“reads back the owning plugin, which is what makes an orphan recognizable”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“records”写出可重复运行的断言，覆盖的场景包括“credential keys”、“rejects a segment that is not a lowercase hyphenated identifier”、“stays disjoint from the reference grammar”、“reads back the owning plugin, which is what makes an orphan recognizable”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“credential keys”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“The record half of the seam: the store keeps an owner's payload verbatim, presence rather than content answers "configured", and every write goes through one serialized read-modify-write so a rotating credential cannot be lost between processes.”；固定提交中扫描到的声明包括 `writeCredentials`、`tempDir`、`boot`、`put`、`recordUpdates`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/README.md)、[packages/credentials/credentials-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/src/index.ts)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -178,7 +178,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials-local` 包里的 `tests/review-fixes.spec.ts` 的具体场景，包括“read-modify-write”、“folds an unobserved external edit into a write instead of overwriting it”、“keeps both refs when two providers write the same document concurrently”、“creates the credentials directory owner-only”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“review-fixes”写出可重复运行的断言，覆盖的场景包括“read-modify-write”、“folds an unobserved external edit into a write instead of overwriting it”、“keeps both refs when two providers write the same document concurrently”、“creates the credentials directory owner-only”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“read-modify-write”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Third-review behaviors: read-modify-write under the writer lock (external edits survive an API write), the contained credentials/reference-updated fan-out (a broken observer never fails a committed write), and the YAML document editor's isolation between en...”；固定提交中扫描到的声明包括 `writeCredentials`、`tempDir`、`boot`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/README.md)、[packages/credentials/credentials-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/src/index.ts)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -192,7 +192,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials-local` 包里的 `tests/watcher.spec.ts` 的具体场景，包括“watcher pipeline”、“clamps the write-settle poll interval for a zero debounce”、“survives a watcher error and keeps publishing later edits”、“keeps the last good snapshot when the file turns unreadable at runtime”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“watcher”写出可重复运行的断言，覆盖的场景包括“watcher pipeline”、“clamps the write-settle poll interval for a zero debounce”、“survives a watcher error and keeps publishing later edits”、“keeps the last good snapshot when the file turns unreadable at runtime”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“watcher pipeline”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `writeCredentials`、`FakeWatcher`、`fakeInstances`、`tempDir`、`boot`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/README.md)、[packages/credentials/credentials-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials-local/src/index.ts)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -250,7 +250,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials` 包里的 `tests/credentials.spec.ts` 的具体场景，包括“credentialRef”、“brands POSIX shell identifiers”、“rejects every other shape”、“isCredentialKeySegment”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“credentials”写出可重复运行的断言，覆盖的场景包括“credentialRef”、“brands POSIX shell identifiers”、“rejects every other shape”、“isCredentialKeySegment”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“credentialRef”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `boot`；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/README.md)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[packages/credentials/credentials/tests/memory.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/tests/memory.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -265,7 +265,7 @@
 
 - 所属层：packages/credentials：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/credentials/credentials` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“credentials invariant companion”、“accepts a committed change emitted by a live service”、“fails an update event emitted without a live service”、“reserves the package name against duplicate registration”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“credentials invariant companion”、“accepts a committed change emitted by a live service”、“fails an update event emitted without a live service”、“reserves the package name against duplicate registration”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“credentials invariant companion”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 5 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/credentials/credentials/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/README.md)、[packages/credentials/credentials/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/index.ts)、[packages/credentials/credentials/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/src/invariant.ts)、[packages/credentials/credentials/tests/memory.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/credentials/credentials/tests/memory.ts)

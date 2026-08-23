@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 48 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/session-query/session-log-export（17 条）、packages/session-query/session-query-sqlite（7 条）、packages/session-query/session-query（15 条）、packages/session-query/tool-session-query（9 条）。
+
+## packages/session-query/session-log-export
+
 ### [packages/session-query/session-log-export/src/client/Dialog.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session-query/session-log-export/src/client/Dialog.tsx)
 
 - 所属层：packages/session-query：可复用的 Harness 功能包
@@ -240,6 +244,8 @@
 - 代码证据：固定提交归档实际读取结果：约 3 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/session-query/session-query-sqlite
+
 ### [packages/session-query/session-query-sqlite/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session-query/session-query-sqlite/src/index.ts)
 
 - 所属层：packages/session-query：可复用的 Harness 功能包
@@ -337,6 +343,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/session/src/index.ts`、`packages/llm/llm/src/index.ts`、`packages/session-query/session-query-sqlite/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 1819 行；扫描到的声明包括 `temporaryPath`、`header`、`messageEvents`、`expectCode`、`replaceCursorOffset`、`TestPersistence`、`liveContext`；扫描到的测试主题包括 “SQLite session search”、“defaults and validates opening policy and persisted inspection concurrency through its Cordis config”、“mounts and disposes first-search mode without opening its database”、“refuses search in never mode while inherited reads and traces keep working”、“opens once on the first search and reuses readiness for later searches”、“shares one readiness promise across concurrent first searches”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session-query/session-query
 
 ### [packages/session-query/session-query/src/config.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session-query/session-query/src/config.ts)
 
@@ -551,6 +559,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/session/src/index.ts`、`packages/llm/llm/src/index.ts`、`packages/session-query/session-query/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 486 行；扫描到的声明包括 `mutableHeader`、`header`、`appendEvent`、`TracePersistence`、`queryContext`、`expectCode`、`appendTraceEvents`；扫描到的测试主题包括 “session lineage tracing”、“returns complete ancestry, deterministic descendant trees, and detached records”、“represents root and unresolved-parent traces explicitly”、“rejects target-connected cycles and missing targets”、“uses one cross-corpus observation and preserves persistence failure semantics”、“constructs deeply nested descendants without consuming the JavaScript call stack”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/session-query/tool-session-query
 
 ### [packages/session-query/tool-session-query/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/session-query/tool-session-query/src/index.ts)
 

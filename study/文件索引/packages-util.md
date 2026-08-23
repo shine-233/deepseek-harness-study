@@ -34,7 +34,7 @@
 
 - 所属层：packages/util：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/util/atomic-write` 包里的 `tests/atomic-write.spec.ts` 的具体场景，包括“writeFileAtomic”、“creates the file and its parents with exactly the stated mode”、“replaces existing content and narrows a wider-permission file to the stated mode”、“replaces a symlinked target itself without writing through to the referent”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“atomic-write”写出可重复运行的断言，覆盖的场景包括“writeFileAtomic”、“creates the file and its parents with exactly the stated mode”、“replaces existing content and narrows a wider-permission file to the stated mode”、“replaces a symlinked target itself without writing through to the referent”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“writeFileAtomic”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `scratch`、`waitForLock`；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/util/atomic-write/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/atomic-write/README.md)、[packages/util/atomic-write/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/atomic-write/src/index.ts)
@@ -48,7 +48,7 @@
 
 - 所属层：packages/util：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/util/atomic-write` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“atomic-write invariant companion”、“registers its explained empty runtime invariant”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“atomic-write invariant companion”、“registers its explained empty runtime invariant”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“atomic-write invariant companion”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 3 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/util/atomic-write/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/atomic-write/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[packages/util/atomic-write/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/atomic-write/src/invariant.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -161,7 +161,7 @@
 
 - 所属层：packages/util：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/util/launch-environment` 包里的 `tests/launch-environment.spec.ts` 的具体场景，包括“createLaunchEnvironmentSnapshot”、“resolves across every layer, most trusted first, and reports the winning source”、“filters layers without changing their trust order”、“copies each layer, so a later mutation of the source object cannot change it”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“launch-environment”写出可重复运行的断言，覆盖的场景包括“createLaunchEnvironmentSnapshot”、“resolves across every layer, most trusted first, and reports the winning source”、“filters layers without changing their trust order”、“copies each layer, so a later mutation of the source object cannot change it”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“createLaunchEnvironmentSnapshot”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/util/launch-environment/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/launch-environment/README.md)、[packages/util/launch-environment/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/launch-environment/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -245,7 +245,7 @@
 
 - 所属层：packages/util：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/util/output-retention` 包里的 `tests/output-retention.spec.ts` 的具体场景，包括“ItemRetainer — head retention”、“keeps the first maxItems while callers keep draining for an exact omitted count”、“reports none when everything fits”、“keeps draining past the cap and reports an exact omitted count”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“output-retention”写出可重复运行的断言，覆盖的场景包括“ItemRetainer — head retention”、“keeps the first maxItems while callers keep draining for an exact omitted count”、“reports none when everything fits”、“keeps draining past the cap and reports an exact omitted count”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“ItemRetainer — head retention”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/util/output-retention/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/output-retention/README.md)、[packages/util/output-retention/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/output-retention/src/index.ts)
@@ -288,7 +288,7 @@
 
 - 所属层：packages/util：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/util/timeout` 包里的 `tests/timeout.spec.ts` 的具体场景，包括“TimeoutReason”、“is an Error carrying the code and elapsed ms”、“clampTimeout”、“fills the default when the hint is absent”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“timeout”写出可重复运行的断言，覆盖的场景包括“TimeoutReason”、“is an Error carrying the code and elapsed ms”、“clampTimeout”、“fills the default when the hint is absent”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“TimeoutReason”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/util/timeout/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/timeout/README.md)、[packages/util/timeout/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/timeout/src/index.ts)

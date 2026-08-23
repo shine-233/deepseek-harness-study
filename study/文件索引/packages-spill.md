@@ -48,7 +48,7 @@
 
 - 所属层：packages/spill：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/spill/spill-local` 包里的 `tests/spill-local.spec.ts` 的具体场景，包括“encodeSegment”、“keeps the safe set literal”、“escapes separators and tilde (dots are literal except as whole-segment tokens)”、“escapes the whole-segment dot tokens”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“spill-local”写出可重复运行的断言，覆盖的场景包括“encodeSegment”、“keeps the safe set literal”、“escapes separators and tilde (dots are literal except as whole-segment tokens)”、“escapes the whole-segment dot tokens”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“encodeSegment”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for the LOCAL spill backend: saveText writes a session-scoped file and returns a locator + byte length + retrieval hint, filename sanitization neutralizes traversal, the configured root is honored (and the private default when omitted), and a storage ...”；固定提交中扫描到的声明包括 `request`；本地静态 import 图显示它直接依赖 5 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/spill/spill-local/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/spill/spill-local/README.md)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/llm/llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm/src/index.ts)、[packages/spill/spill-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/spill/spill-local/src/index.ts)
@@ -160,7 +160,7 @@
 
 - 所属层：packages/spill：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/spill/spill` 包里的 `tests/service.spec.ts` 的具体场景，包括“spill seam”、“registers as ctx.spillStore and saves text”、“rejects a second implementation (one per context)”、“releases the service on disposal”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“service”写出可重复运行的断言，覆盖的场景包括“spill seam”、“registers as ctx.spillStore and saves text”、“rejects a second implementation (one per context)”、“releases the service on disposal”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“spill seam”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for the spill Service Definition: a minimal concrete subclass registers as ctx.spillStore, a second load throws (duplicate service), and disposal releases the service. The storage behavior is the implementation's concern (@deepseek-ai/dsh-spill-local)...”；固定提交中扫描到的声明包括 `StubStore`、`request`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/spill/spill/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/spill/spill/README.md)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/llm/llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm/src/index.ts)、[packages/spill/spill/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/spill/spill/src/index.ts)

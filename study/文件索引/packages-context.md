@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 41 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/context/agent-instructions（9 条）、packages/context/file-reference-local（6 条）、packages/context/file-reference（6 条）、packages/context/session-reference（8 条）、packages/context/time-context（9 条）、packages/context/tmux-context（3 条）。
+
+## packages/context/agent-instructions
+
 ### [packages/context/agent-instructions/src/config.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/context/agent-instructions/src/config.ts)
 
 - 所属层：packages/context：可复用的 Harness 功能包
@@ -133,6 +137,8 @@
 - 代码证据：固定提交归档实际读取结果：约 4649 行；扫描到的声明包括 `tempRepo`、`write`、`RecordingFileSystem`、`BlockingReadFileSystem`、`mountWorkspaceContext`、`mountFileToolsAndWorkspaceContext`、`stubAgent`、`stubToolExecution`；扫描到的测试主题包括 “workspace context instruction discovery”、“treats ENOTDIR while probing a host candidate as confirmed absence”、“loads user-global first, then every root-to-cwd candidate in precedence order”、“loads a same-directory local overlay in addition to the base file by default”、“loads no local overlay when localInstructionFileCandidates is empty”、“treats a .git file as a project root marker and does not search above it”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/context/file-reference-local
+
 ### [packages/context/file-reference-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/context/file-reference-local/src/index.ts)
 
 - 所属层：packages/context：可复用的 Harness 功能包
@@ -217,6 +223,8 @@
 - 代码证据：固定提交归档实际读取结果：约 162 行；扫描到的声明包括 `harness`、`stubAgent`；扫描到的测试主题包括 “LocalFileReferenceService”、“serves the addressed workspace and installs read-tool guidance for existing agents”、“invalidates cached searches after tool results and disposes them with the agent”、“installs guidance for agents announced after the service and validates deployment tunables”、“deduplicates lifecycle announcements and falls back to the process cwd”、“logs rejected prompt cleanup without failing service teardown”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/context/file-reference
+
 ### [packages/context/file-reference/src/grammar.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/context/file-reference/src/grammar.ts)
 
 - 所属层：packages/context：可复用的 Harness 功能包
@@ -300,6 +308,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/context/file-reference/src/index.ts`、`packages/context/file-reference/src/types.ts`、`packages/core/agent/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 21 行；扫描到的声明包括 `StubProvider`；扫描到的测试主题包括 “FileReferenceService”、“serves the Remote face through the abstract discovery member”；源码顶部原注释（英文，仅作回查线索）：The Remote face delegates to the provider's discovery contract unchanged.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/context/session-reference
 
 ### [packages/context/session-reference/src/config.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/context/session-reference/src/config.ts)
 
@@ -413,6 +423,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/compaction/compaction/src/index.ts`、`packages/context/session-reference/src/index.ts`、`packages/context/session-reference/src/serialization.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 760 行；扫描到的声明包括 `TestSessionQueryEngine`、`harness`、`fakeAgent`、`expectCode`、`checkpointSource`、`appendConversation`、`promptData`；扫描到的测试主题包括 “session reference URI and inline mentions”、“round-trips arbitrary session ids and replaces mentions with readable labels”、“rejects malformed explicit references and base64url-shaped bare candidates”、“session reference discovery and preparation”、“matches candidate metadata and titles before ranking by cwd”、“serves the Remote face with the configured limit and canonical mentions”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/context/time-context
 
 ### [packages/context/time-context/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/context/time-context/src/index.ts)
 
@@ -539,6 +551,8 @@
 - 阅读顺序：先读 `packages/context/time-context/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 25 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/context/tmux-context
 
 ### [packages/context/tmux-context/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/context/tmux-context/src/index.ts)
 

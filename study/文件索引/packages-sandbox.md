@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 50 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/sandbox/sandbox-local（9 条）、packages/sandbox/sandbox-policy（6 条）、packages/sandbox/sandbox-windows-acl（28 条）、packages/sandbox/sandbox（7 条）。
+
+## packages/sandbox/sandbox-local
+
 ### [packages/sandbox/sandbox-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sandbox/sandbox-local/src/index.ts)
 
 - 所属层：packages/sandbox：可复用的 Harness 功能包
@@ -129,6 +133,8 @@
 - 代码证据：固定提交归档实际读取结果：约 112 行；扫描到的声明包括 `tempDir`、`provider`、`runConfined`；扫描到的测试主题包括 “read-only denies a write — the file must NOT exist, and the kernel speaks the advertised dialect”、“read-only keeps the tree readable/executable and /dev/null writable”、“read-only grants no temp area: a write under the user temp dir is denied too”、“workspace-write lands a write inside the workspace root and still denies one beside it”、“workspace-write grants /tmp and the user temp dir (the documented Seatbelt-profile temp areas)”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/sandbox/sandbox-policy
+
 ### [packages/sandbox/sandbox-policy/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sandbox/sandbox-policy/src/index.ts)
 
 - 所属层：packages/sandbox：可复用的 Harness 功能包
@@ -213,6 +219,8 @@
 - 阅读顺序：先读 `packages/sandbox/sandbox-policy/README.md`，再读本配置/脚本，沿着所在包的入口或服务确认它如何影响入口和产物，最后对照对应 gate 或快照测试。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 25 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/sandbox/sandbox-windows-acl
 
 ### [packages/sandbox/sandbox-windows-acl/src/acl.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sandbox/sandbox-windows-acl/src/acl.ts)
 
@@ -605,6 +613,8 @@
 - 阅读顺序：先读 `packages/sandbox/sandbox-windows-acl/README.md`、Node/Koffi FFI 定义和实际头文件，再读当前探针，最后对照 `packages/sandbox/sandbox-windows-acl/tests/probe.spec.ts`，确认打印出来的布局和枚举值确实被交叉核对。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 195 行；源码顶部原注释（英文，仅作回查线索）：ABI probe: prints sizeof/offsetof/enum values from the actual MinGW Windows headers on this machine. These numbers are the source of truth for the koffi FFI definitions in the Node.js port.。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/sandbox/sandbox
 
 ### [packages/sandbox/sandbox/src/escalation.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/sandbox/sandbox/src/escalation.ts)
 

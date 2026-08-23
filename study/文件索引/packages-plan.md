@@ -63,7 +63,7 @@
 
 - 所属层：packages/plan：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/plan/plan-mode` 包里的 `tests/integration.spec.ts` 的具体场景，包括“plan mode through the agent loop”、“a pre-turn set() makes the FIRST header plan-shaped, and a non-shell call is guidance-c...”、“a user flip between turns lands at the boundary: one notice and a changed header with s...”、“a mode flip at error settlement waits until the step after a same-step retry”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“integration”写出可重复运行的断言，覆盖的场景包括“plan mode through the agent loop”、“a pre-turn set() makes the FIRST header plan-shaped, and a non-shell call is guidance-c...”、“a user flip between turns lands at the boundary: one notice and a changed header with s...”、“a mode flip at error settlement waits until the step after a same-step retry”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“plan mode through the agent loop”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `harness`、`waitForIdle`、`findEvent`；本地静态 import 图显示它直接依赖 9 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/plan/plan-mode/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/plan/plan-mode/README.md)、[packages/core/agent-loop/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-loop/src/index.ts)、[packages/core/agent-loop/tests/mock-adapter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-loop/tests/mock-adapter.ts)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)
@@ -78,7 +78,7 @@
 
 - 所属层：packages/plan：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/plan/plan-mode` 包里的 `tests/invariant.spec.ts` 的具体场景，包括“plan-mode stream invariants”、“accepts either boolean state”、“accepts standalone plan state between turns (the idle immediate commit)”、“ignores unrelated dispatches and session events”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“invariant”写出可重复运行的断言，覆盖的场景包括“plan-mode stream invariants”、“accepts either boolean state”、“accepts standalone plan state between turns (the idle immediate commit)”、“ignores unrelated dispatches and session events”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“plan-mode stream invariants”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `setup`、`event`、`emitTurnStart`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/plan/plan-mode/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/plan/plan-mode/README.md)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/plan/plan-mode/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/plan/plan-mode/src/invariant.ts)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)
@@ -92,7 +92,7 @@
 
 - 所属层：packages/plan：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/plan/plan-mode` 包里的 `tests/plan-mode.spec.ts` 的具体场景，包括“resolveConfig”、“requires string, non-empty plan instructions”、“returns a detached plan config”、“rejects fields outside the plan policy config”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“plan-mode”写出可重复运行的断言，覆盖的场景包括“resolveConfig”、“requires string, non-empty plan instructions”、“returns a detached plan config”、“rejects fields outside the plan policy config”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“resolveConfig”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `agentWithSession`、`assembleFor`、`setup`、`boundary`、`openTurn`；本地静态 import 图显示它直接依赖 11 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/plan/plan-mode/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/plan/plan-mode/README.md)、[packages/code-runtime/code-runtime/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/code-runtime/code-runtime/src/index.ts)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/scope/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/scope/src/index.ts)

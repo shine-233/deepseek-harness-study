@@ -34,7 +34,7 @@
 
 - 所属层：packages/e2b：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/e2b/e2b` 包里的 `tests/composition.e2e.ts` 的具体场景，包括“scrubs credentials before actual E2B command and PTY login shells”、“runs FS, Bash, PTY, and LSP in one sandbox and deletes it”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“composition”写出可重复运行的断言，覆盖的场景包括“scrubs credentials before actual E2B command and PTY login shells”、“runs FS, Bash, PTY, and LSP in one sandbox and deletes it”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“scrubs credentials before actual E2B command and PTY login shells”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 9 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/e2b/e2b/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/e2b/e2b/README.md)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/e2b/e2b/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/e2b/e2b/src/index.ts)
@@ -48,7 +48,7 @@
 
 - 所属层：packages/e2b：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/e2b/e2b` 包里的 `tests/e2b.spec.ts` 的具体场景，包括“E2BRuntime”、“gives each SDK login shell a fresh non-overridable control home”、“creates one protected shared sandbox and kills it on default disposal”、“rejects handle acquisition when disposal starts during setup”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“e2b”写出可重复运行的断言，覆盖的场景包括“E2BRuntime”、“gives each SDK login shell a fresh non-overridable control home”、“creates one protected shared sandbox and kills it on default disposal”、“rejects handle acquisition when disposal starts during setup”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“E2BRuntime”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `FakeSandbox`、`fakeSandbox`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/e2b/e2b/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/e2b/e2b/README.md)、[packages/e2b/e2b/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/e2b/e2b/src/index.ts)、[packages/e2b/e2b/src/invariant.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/e2b/e2b/src/invariant.ts)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)

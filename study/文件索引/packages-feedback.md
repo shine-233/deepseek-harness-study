@@ -34,7 +34,7 @@
 
 - 所属层：packages/feedback：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/feedback/command-feedback` 包里的 `tests/command-feedback.spec.ts` 的具体场景，包括“@deepseek-ai/dsh-command-feedback registration”、“registers one global command with Loader-safe exports and disposes it”、“/feedback human command”、“acknowledges feedback and records its payload exactly once in the domain event”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“command-feedback”写出可重复运行的断言，覆盖的场景包括“@deepseek-ai/dsh-command-feedback registration”、“registers one global command with Loader-safe exports and disposes it”、“/feedback human command”、“acknowledges feedback and records its payload exactly once in the domain event”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“@deepseek-ai/dsh-command-feedback registration”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `FakeTelemetry`、`stubAgent`、`harness`、`run`、`feedbackTexts`；本地静态 import 图显示它直接依赖 7 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/feedback/command-feedback/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/feedback/command-feedback/README.md)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/feedback/command-feedback/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/feedback/command-feedback/src/index.ts)
@@ -48,7 +48,7 @@
 
 - 所属层：packages/feedback：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/feedback/command-feedback` 包里的 `tests/loader-composition.spec.ts` 的具体场景，包括“/feedback real Loader composition through cordis.yml”、“boots cordis.yml and records feedback without model-visible output”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“loader-composition”写出可重复运行的断言，覆盖的场景包括“/feedback real Loader composition through cordis.yml”、“boots cordis.yml and records feedback without model-visible output”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“/feedback real Loader composition through cordis.yml”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `agent`；本地静态 import 图显示它直接依赖 8 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/feedback/command-feedback/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/feedback/command-feedback/README.md)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/feedback/command-feedback/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/feedback/command-feedback/src/index.ts)

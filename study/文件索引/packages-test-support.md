@@ -2,6 +2,10 @@
 
 本页由 `study-tools/generate-source-index.mjs` 根据官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 生成，共 47 个代码或界面源文件。每个标题对应一个真实路径；用途和拆分原因是面向初学者的结构化解释，自动索引不等于人工精读。
 
+条目按所属包分组：packages/test-support/acp-snapshot（10 条）、packages/test-support/agent-loop-testkit（3 条）、packages/test-support/client-runtime（14 条）、packages/test-support/llm-mock-server（8 条）、packages/test-support/llm-replay（3 条）、packages/test-support/loader-smoke（9 条）。
+
+## packages/test-support/acp-snapshot
+
 ### [packages/test-support/acp-snapshot/src/harness.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/src/harness.ts)
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
@@ -91,7 +95,7 @@
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为智能体的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为智能体提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Scripted fake ACP agent bin for dsh-acp-snapshot's unit specs. Speaks newline-delimited JSON-RPC on stdio like the real dsh-acp-agent bin, but every behavior — how prompts settle, whether session/new rejects, which session logs get persisted, what filesyste...”；固定提交中扫描到的声明包括 `send`、`respond`、`respondError`、`chunk`、`instantiate`；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/test-support/acp-snapshot/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/README.md)
@@ -105,7 +109,7 @@
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/test-support/acp-snapshot` 包里的 `tests/harness.spec.ts` 的具体场景，包括“keeps scenario-owned snapshot spill root length stable across platforms”、“runScenario”、“surfaces an asynchronous child spawn failure through startup and close”、“centralizes ACP boot, captures, updates, fail-closed permissions, and shutdown”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“harness”写出可重复运行的断言，覆盖的场景包括“keeps scenario-owned snapshot spill root length stable across platforms”、“runScenario”、“surfaces an asynchronous child spawn failure through startup and close”、“centralizes ACP boot, captures, updates, fail-closed permissions, and shutdown”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“keeps scenario-owned snapshot spill root length stable across platforms”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `scenario`、`environmentEcho`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/test-support/acp-snapshot/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/README.md)、[packages/test-support/acp-snapshot/src/harness.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/src/harness.ts)、[packages/test-support/acp-snapshot/src/launcher.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/src/launcher.ts)
@@ -133,7 +137,7 @@
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/test-support/acp-snapshot` 包里的 `tests/suite.spec.ts` 的具体场景，包括“defineAcpSnapshotSuite: replay mode”、“defineAcpSnapshotSuite: record mode”、“defineAcpSnapshotSuite: refresh mode”、“defineAcpSnapshotSuite: refresh write-back”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“suite”写出可重复运行的断言，覆盖的场景包括“defineAcpSnapshotSuite: replay mode”、“defineAcpSnapshotSuite: record mode”、“defineAcpSnapshotSuite: refresh mode”、“defineAcpSnapshotSuite: refresh write-back”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“defineAcpSnapshotSuite: replay mode”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `stabilize`、`staleRefreshFixtures`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/test-support/acp-snapshot/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/README.md)、[packages/test-support/acp-snapshot/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/src/index.ts)、[packages/test-support/acp-snapshot/src/suite.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/acp-snapshot/src/suite.ts)
@@ -142,6 +146,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/test-support/acp-snapshot/src/index.ts`、`packages/test-support/acp-snapshot/src/suite.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 1339 行；扫描到的声明包括 `stabilize`、`staleRefreshFixtures`；扫描到的测试主题包括 “defineAcpSnapshotSuite: replay mode”、“defineAcpSnapshotSuite: record mode”、“defineAcpSnapshotSuite: refresh mode”、“defineAcpSnapshotSuite: refresh write-back”、“rewrites stdout and comparable logs from a replay-mode child run”、“defineAcpSnapshotSuite: record inventory write-back”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/test-support/agent-loop-testkit
 
 ### [packages/test-support/agent-loop-testkit/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/agent-loop-testkit/src/index.ts)
 
@@ -185,6 +191,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/core/agent-loop/src/index.ts`、`packages/core/system-prompt/src/index.ts`、`packages/test-support/agent-loop-testkit/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 20 行；扫描到的测试主题包括 “dsh-agent-loop-testkit”、“mounts a configurable prerequisite spine that can activate AgentLoop”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/test-support/client-runtime
 
 ### [packages/test-support/client-runtime/src/fixtures.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/client-runtime/src/fixtures.ts)
 
@@ -382,6 +390,8 @@
 - 代码证据：固定提交归档实际读取结果：约 6 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/test-support/llm-mock-server
+
 ### [packages/test-support/llm-mock-server/src/bin.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/llm-mock-server/src/bin.ts)
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
@@ -494,6 +504,8 @@
 - 代码证据：固定提交归档实际读取结果：约 13 行。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
 
+## packages/test-support/llm-replay
+
 ### [packages/test-support/llm-replay/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/llm-replay/src/index.ts)
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
@@ -536,6 +548,8 @@
 - 阅读顺序：先看它直接导入的被测实现 `packages/compaction/compaction/src/index.ts`、`packages/core/session/src/index.ts`、`packages/llm/llm/src/index.ts`，再读本文件的测试主题、输入和断言；最后对照测试支持和失败输出。自动索引只提供定位线索，复杂行为需要回到源码和测试确认。
 - 代码证据：固定提交归档实际读取结果：约 1246 行；扫描到的声明包括 `sessionJsonl`、`chunkEvent`、`writeSession`、`drain`、`writeLog`、`scriptedCall`、`streamScripted`、`FallthroughAdapter`；扫描到的测试主题包括 “parseSessionLog”、“skips the header line and parses each event”、“ignores blank lines”、“rejects non-object body rows with their source line”、“expands a packed chunk row into its events (a fixture recorded with packChunks on)”、“synthesizes omitted ordinary and packed snapshot envelopes”。 这些数字和声明用于定位，不替代源码阅读。
 - 固定版本：源码链接固定到官方提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`；如果当前条目与运行版本不同，应先重新生成索引再下结论。
+
+## packages/test-support/loader-smoke
 
 ### [packages/test-support/loader-smoke/src/agent-turn.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/src/agent-turn.ts)
 
@@ -611,7 +625,7 @@
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 `packages/test-support/loader-smoke` 包里的 `tests/fixtures/fail.ts` 的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为同包测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Non-zero subprocess fixture for the Loader-smoke harness.”；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/test-support/loader-smoke/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/README.md)
@@ -625,7 +639,7 @@
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 `packages/test-support/loader-smoke` 包里的 `tests/fixtures/hang.ts` 的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为同包测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Deadline subprocess fixture for the Loader-smoke harness.”；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/test-support/loader-smoke/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/README.md)
@@ -639,7 +653,7 @@
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
 - 文件角色：测试夹具
-- 这个文件有什么用：它为 `packages/test-support/loader-smoke` 包里的 `tests/fixtures/success.ts` 的测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
+- 这个文件有什么用：它为同包测试提供固定输入、进程、事件或快照，让每次验证都从同一个受控状态开始。
 - 为什么这样设计：测试材料和被测实现分开，测试可以反复使用同一个受控输入；它不应该被误认为线上入口或生产服务。
 - 文件级设计证据：源码顶部注释把它定位为“Successful subprocess fixture for the Loader-smoke harness.”；本地静态 import 图显示它直接依赖 0 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/test-support/loader-smoke/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/README.md)
@@ -653,7 +667,7 @@
 
 - 所属层：packages/test-support：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 `packages/test-support/loader-smoke` 包里的 `tests/loader-smoke.spec.ts` 的具体场景，包括“runLoaderSmoke”、“isolates the process, closes stdin, captures output, and removes the cwd”、“passes an arbitrary bin argv and inspects world state before cleanup”、“rejects a non-zero exit with captured diagnostics”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它围绕“loader-smoke”写出可重复运行的断言，覆盖的场景包括“runLoaderSmoke”、“isolates the process, closes stdin, captures output, and removes the cwd”、“passes an arbitrary bin argv and inspects world state before cleanup”、“rejects a non-zero exit with captured diagnostics”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“runLoaderSmoke”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：本次固定提交归档没有扫描到顶部注释、顶层声明或专门的结构线索；本地静态 import 图显示它直接依赖 1 个源文件，并被 0 个源文件直接引用。这些是文件级定位证据，用来约束“为什么这样设计”的解释范围；它们仍不替代人工源码阅读。
 - 直接协作者：[packages/test-support/loader-smoke/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/README.md)、[packages/test-support/loader-smoke/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/test-support/loader-smoke/src/index.ts)
