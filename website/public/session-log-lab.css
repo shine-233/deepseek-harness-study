@@ -88,5 +88,8 @@ tbody tr[data-state="applied"] td:nth-child(4) { color: var(--allow-ink); }
 tbody tr[data-state="skipped"] td:nth-child(4) { color: var(--warning-ink); }
 tbody tr[data-state="refused"] td { color: var(--deny-ink); font-weight: 700; }
 tbody tr[data-state="not-reached"] td { opacity: 0.6; }
+/* 物理行表：打包行与纯文本行的判别状态给一点视觉区分。 */
+tbody tr[data-state="final"] td:first-child { box-shadow: inset 3px 0 0 var(--brand); }
+tbody tr[data-state="plain"] td:first-child { opacity: 0.75; }
 
 input[type="range"] { width: 100%; }

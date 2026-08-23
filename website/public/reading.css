@@ -1865,3 +1865,8 @@ body::before {
 html {
   transition: background-color 300ms ease, color 300ms ease;
 }
+
+/* Mermaid 图自带浅色主题；深色外观下反相一次，保持图内文字与线条可读。 */
+html.dark .mermaid {
+  filter: invert(1) hue-rotate(180deg);
+}

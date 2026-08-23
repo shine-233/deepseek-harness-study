@@ -99,8 +99,8 @@ export const COMPANION_LINES = Object.freeze({
     '回去看一眼那一节，再练一轮就是了。',
   ]),
   done: Object.freeze([
-    '又盖一章！首页的我在等这一枚邮票。',
-    '这课收进你的进度里了，下一跳见。',
+    '这课收进你的进度里了，证据链又长了一格。',
+    '已读标记落袋。下一跳想好去哪了吗？',
   ]),
 })
 
@@ -109,7 +109,7 @@ export const COMPANION_LINES = Object.freeze({
 const COMPANION_ID = 'dsh-companion'
 const STYLE_ID = 'dsh-companion-style'
 
-/** 只在 /study/lessons/ 课程页出现；首页、索引页和实验室总览都不打扰。 */
+/** 课程页与示例页出现；首页、逐文件索引和实验室总览都不打扰。 */
 function companionShouldShow() {
   const path = location.pathname
   return path.includes('/study/') && !path.includes('/files/') && !path.endsWith('/study/')

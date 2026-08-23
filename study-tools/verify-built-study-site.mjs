@@ -68,7 +68,14 @@ export const REQUIRED_PUBLISHED_PAGES = [
 ]
 
 /** Assets that make the reading layer visible on the published site. */
-export const REQUIRED_PUBLISHED_ASSETS = ['reading.css', 'favicon.svg']
+export const REQUIRED_PUBLISHED_ASSETS = [
+  'reading.css',
+  'favicon.svg',
+  'study-progress.js',
+  'study-scrolly.js',
+  'study-scrolly-beats.js',
+  'study-companion.js',
+]
 
 /**
  * @typedef {{ file: string, label: string, markers: string[] }} PublishedPageContract

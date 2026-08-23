@@ -102,11 +102,6 @@ function readVarint(bytes, offset, maxValue) {
   let shift = 0n
   while (offset < bytes.length) {
     const byte = bytes[offset]
-    // 非规范编码拒绝：shift>0 时低 7 位全零的字节只会出现在截断或补零里，
-    // 上游同样把它当 malformed 处理。
-    if ((byte & 0x7f) === 0 && shift > 0n) {
-      throw new Error('malformed source_event_seqs storage value: non-canonical varint')
-    }
     value |= BigInt(byte & 0x7f) << shift
     offset += 1
     if ((byte & 0x80) === 0) {

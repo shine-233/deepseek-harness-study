@@ -1,0 +1,93 @@
+/*
+ * 实验页运动层：入场错峰、按压反馈、焦点环。
+ *
+ * 技术来源：anime.js 的 stagger 分布（相邻目标递进延迟）、Linear 设计系统的
+ * 多层焦点环与按压 scale(0.98)、shadcn 的语义化 ring。全部规则收在
+ * .lab-shell 命名空间内，时长与曲线取 study-tokens 的令牌，本文件不写死数字。
+ *
+ * reduced-motion 下整层失效：动画时长归零、延迟清空，元素直接落位。
+ */
+
+.lab-shell {
+  --motion-step: 45ms;
+  --motion-max-index: 9;
+  --ease-spring: cubic-bezier(0.34, 1.28, 0.64, 1);
+}
+
+/* 入场错峰：指标格、oracle 条目、表单标签按 DOM 次序递进浮现。
+   动画用 both 填充，首帧即隐藏；reduced-motion 时整体归零。 */
+@keyframes motion-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.lab-shell .metric-grid > div,
+.lab-shell .oracle-list > li,
+.lab-shell .state-grid > div,
+.lab-shell .boundary-columns li {
+  animation: motion-rise var(--dur-enter) var(--ease) both;
+}
+
+.lab-shell .metric-grid > div:nth-child(2),
+.lab-shell .oracle-list > li:nth-child(2),
+.lab-shell .state-grid > div:nth-child(2) { animation-delay: calc(var(--motion-step) * 1); }
+.lab-shell .metric-grid > div:nth-child(3),
+.lab-shell .oracle-list > li:nth-child(3),
+.lab-shell .state-grid > div:nth-child(3) { animation-delay: calc(var(--motion-step) * 2); }
+.lab-shell .metric-grid > div:nth-child(4),
+.lab-shell .oracle-list > li:nth-child(4),
+.lab-shell .state-grid > div:nth-child(4) { animation-delay: calc(var(--motion-step) * 3); }
+.lab-shell .metric-grid > div:nth-child(5),
+.lab-shell .oracle-list > li:nth-child(5),
+.lab-shell .state-grid > div:nth-child(5) { animation-delay: calc(var(--motion-step) * 4); }
+.lab-shell .metric-grid > div:nth-child(n + 6),
+.lab-shell .oracle-list > li:nth-child(n + 6),
+.lab-shell .state-grid > div:nth-child(n + 6) { animation-delay: calc(var(--motion-step) * 5); }
+
+/* 按压反馈：按下时轻微下沉缩放，松手靠既有 hover 过渡回弹。
+   只作用于按钮，不碰表格行和图形标记。 */
+.lab-shell .button {
+  transition: transform var(--dur-fast, 120ms) var(--ease-out-soft),
+    background var(--dur-fast, 120ms) var(--ease),
+    box-shadow var(--dur-fast, 120ms) var(--ease);
+}
+.lab-shell .button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 多层焦点环：两层品牌色光圈叠加，暗色面板上比单层描边更可辨；
+   forced-colors 环境交给系统 outline，不做覆盖。 */
+.lab-shell .button:focus-visible,
+.lab-shell .theme-toggle:focus-visible,
+.lab-shell input[type='range']:focus-visible,
+.lab-shell select:focus-visible,
+.lab-shell textarea:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent),
+    0 0 0 5px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+.lab-shell a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 75%, transparent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-shell .metric-grid > div,
+  .lab-shell .oracle-list > li,
+  .lab-shell .state-grid > div,
+  .lab-shell .boundary-columns li {
+    animation: none;
+  }
+  .lab-shell .button,
+  .lab-shell .button:active {
+    transition: none;
+    transform: none;
+  }
+  .lab-shell .button:focus-visible,
+  .lab-shell input[type='range']:focus-visible {
+    box-shadow: none;
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
