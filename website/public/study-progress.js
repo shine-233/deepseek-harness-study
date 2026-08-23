@@ -265,7 +265,11 @@ async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore, apply
     })
     submit.replaceWith(Object.assign(document.createElement('p'), {
       className: verdict.score === verdict.total ? 'result-pass' : '',
-      textContent: `得分 ${verdict.score}/${verdict.total}。可以改选项重新判分。`,
+      textContent: `得分 ${verdict.score}/${verdict.total}。这轮不再重判；想换一套题就点下面再练一轮。`,
+    }))
+    // 通知吉祥物伴侣：满分有小庆祝，错题给鼓励台词。
+    document.dispatchEvent(new CustomEvent('dsh-study-delight', {
+      detail: { kind: 'quiz', score: verdict.score, total: verdict.total },
     }))
     const again = document.createElement('button')
     again.type = 'button'
@@ -328,6 +332,8 @@ function initialize() {
       toggle.textContent = '✓ 本课已读（点击撤销）'
       toggle.dataset.done = 'true'
       toggle.classList.add('done')
+      // 通知吉祥物伴侣：盖一枚虚拟邮票。
+      document.dispatchEvent(new CustomEvent('dsh-study-delight', { detail: { kind: 'done', lessonId } }))
     }
     persist()
     status.textContent = summarize(state).doneLessons + ' 课已读完'

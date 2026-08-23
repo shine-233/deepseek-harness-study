@@ -49,7 +49,7 @@
 
 ## 逐文件索引
 
-固定提交中按生成器白名单识别出 2,973 个代码或界面源文件（TypeScript 2,472、TSX 262、CSS 112、SQL 56、MJS 32、Python 20、JS 9、Shell 6 及其他），分到 `study/文件索引/` 的 67 个索引页；每条目有 11 个必填字段：所属层、文件角色、用途、设计原因、文件级设计证据、直接协作者、对应测试、测试关联依据、阅读顺序、代码证据和固定版本，另有可选的「测试支持」字段。[清单](study/source-index-manifest.json)机器可查，[生成器](study-tools/generate-source-index.mjs)、[验证器](study-tools/verify-source-index.mjs)、[质量审计器](study-tools/audit-source-index-quality.mjs)和[手写路径验证器](study-tools/verify-study-links.mjs)保证覆盖与路径正确。普通条目是结构化自动导读，不是逐行人工审查。
+固定提交中按生成器白名单识别出 2,973 个代码或界面源文件（TypeScript 2,472、TSX 262、CSS 112、SQL 56、MJS 32、Python 20、JS 9、Shell 6 及其他），分到 `study/文件索引/` 的 78 个索引页；每条目有 11 个必填字段：所属层、文件角色、用途、设计原因、文件级设计证据、直接协作者、对应测试、测试关联依据、阅读顺序、代码证据和固定版本，另有可选的「测试支持」字段。[清单](study/source-index-manifest.json)机器可查，[生成器](study-tools/generate-source-index.mjs)、[验证器](study-tools/verify-source-index.mjs)、[质量审计器](study-tools/audit-source-index-quality.mjs)和[手写路径验证器](study-tools/verify-study-links.mjs)保证覆盖与路径正确。普通条目是结构化自动导读，不是逐行人工审查。
 
 ## 与上游的边界
 

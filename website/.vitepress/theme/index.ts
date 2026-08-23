@@ -39,6 +39,11 @@ export default {
       scrolly.type = 'module'
       scrolly.src = (base.endsWith('/') ? base : base + '/') + 'study-scrolly.js'
       document.head.append(scrolly)
+      // 吉祥物伴侣：只在 /study/lessons/ 课程页出现，响应判分与“标记已读”事件。
+      const companion = document.createElement('script')
+      companion.type = 'module'
+      companion.src = (base.endsWith('/') ? base : base + '/') + 'study-companion.js'
+      document.head.append(companion)
     }
   },
 } satisfies Theme
