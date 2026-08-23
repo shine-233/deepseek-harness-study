@@ -107,6 +107,19 @@ a { color: var(--brand); }
 }
 
 /*
+ * 预测门控的解锁瞬间：锁定时控件区压暗下沉，答对的一刻以弹簧缓动
+ * 浮起复明——「先思考，再动手」的身体记忆。inert 管住指针/键盘/辅助
+ * 技术，这里只管看得见的部分；禁用态不参与对比度门控。
+ */
+#gated-controls {
+  transition: opacity var(--dur-enter) var(--ease), translate var(--dur-enter) var(--ease-spring);
+}
+#gated-controls[data-gated='locked'] {
+  opacity: 0.45;
+  translate: 0 6px;
+}
+
+/*
  * 区块卡片的滚动入场：纯 CSS 滚动时间线（2026 Baseline），合成器线程执行。
  * 双层降级——不支持的浏览器和减少动态偏好下，卡片保持自然静态，功能不变。
  * 只动 opacity / transform；animation-duration 的 1ms 是 Firefox 的语法要求。
