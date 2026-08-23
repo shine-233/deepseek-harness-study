@@ -114,10 +114,14 @@ export function createPackageScene(canvas, model, options = {}) {
   const maxDegree = Math.max(...model.nodes.map(node => node.dependedOnBy ?? 0), 1)
 
   const camera = { yaw: 0.6, pitch: 0.42, distance: 5.4, focal: 1.05 }
+  const HOME_VIEW = { yaw: 0.6, pitch: 0.42, distance: 5.4 }
   let showEdges = false
   let raf = 0
   let spinning = false
   let cssRatio = 1
+  let focusedGroup = null
+  let resumeSpinOnFocusEnd = false
+  let focusRaf = 0
 
   /** 热点锚定的分组：按组内 src 总行数取前五，其余组交给图例和表格。 */
   const hotspotGroups = (() => {
@@ -260,11 +264,87 @@ export function createPackageScene(canvas, model, options = {}) {
     if (spinning) raf = requestAnimationFrame(step)
   }
 
+  /** 组的世界角：对组内柱子的角度做圆周均值，跨 0/2π 边界不会跳变。 */
+  function groupAngle(group) {
+    let sumX = 0
+    let sumZ = 0
+    for (const entry of placed) {
+      if (entry.group !== group) continue
+      sumX += Math.cos(entry.angle)
+      sumZ += Math.sin(entry.angle)
+    }
+    return Math.atan2(sumZ, sumX)
+  }
+
+  function cancelFocusAnimation() {
+    if (focusRaf !== 0) cancelAnimationFrame(focusRaf)
+    focusRaf = 0
+  }
+
+  /**
+   * 镜头飞到正对该组的视角（vasturiano click-to-focus 模式）。
+   * yaw 取最短路径，距离收近一档；自动旋转在聚焦期间暂停，
+   * reduced-motion 下直接跳到目标不播动画。
+   */
+  function animateCameraTo(target, onDone) {
+    cancelFocusAnimation()
+    const from = { yaw: camera.yaw, pitch: camera.pitch, distance: camera.distance }
+    let deltaYaw = ((target.yaw - from.yaw + Math.PI) % TAU + TAU) % TAU - Math.PI
+    if (options.reducedMotion === true) {
+      camera.yaw = target.yaw
+      camera.pitch = target.pitch
+      camera.distance = target.distance
+      render()
+      if (typeof onDone === 'function') onDone()
+      return
+    }
+    const duration = 650
+    let start = 0
+    const tick = (now) => {
+      if (start === 0) start = now
+      const t = Math.min(1, (now - start) / duration)
+      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+      camera.yaw = from.yaw + deltaYaw * ease
+      camera.pitch = from.pitch + (target.pitch - from.pitch) * ease
+      camera.distance = from.distance + (target.distance - from.distance) * ease
+      render()
+      if (t < 1) focusRaf = requestAnimationFrame(tick)
+      else { focusRaf = 0; if (typeof onDone === 'function') onDone() }
+    }
+    focusRaf = requestAnimationFrame(tick)
+  }
+
   return {
     render,
     resize,
     layout: { placed, ringGroups, innerRingGroups: INNER_RING_GROUPS },
     get camera() { return { ...camera } },
+    get focusedGroup() { return focusedGroup },
+    focusGroup(group) {
+      const entries = placed.some(entry => entry.group === group)
+      if (!entries) return false
+      if (spinning) {
+        spinning = false
+        cancelAnimationFrame(raf)
+        raf = 0
+        resumeSpinOnFocusEnd = options.reducedMotion !== true
+      }
+      focusedGroup = group
+      animateCameraTo({
+        yaw: (Math.PI / 2 - groupAngle(group) + TAU) % TAU,
+        pitch: 0.55,
+        distance: 3.6,
+      })
+      return true
+    },
+    focusReset() {
+      focusedGroup = null
+      const resume = resumeSpinOnFocusEnd && !spinning
+      resumeSpinOnFocusEnd = false
+      animateCameraTo(HOME_VIEW, () => {
+        if (resume) this.startSpin()
+      })
+    },
     setYaw(value) { camera.yaw = value; render() },
     setPitch(value) { camera.pitch = Math.max(0.05, Math.min(1.35, value)); render() },
     nudge(dYaw, dPitch) {
@@ -286,6 +366,9 @@ export function createPackageScene(canvas, model, options = {}) {
       raf = 0
     },
     get spinning() { return spinning },
-    dispose() { this.stopSpin() },
+    dispose() {
+      this.stopSpin()
+      cancelFocusAnimation()
+    },
   }
 }

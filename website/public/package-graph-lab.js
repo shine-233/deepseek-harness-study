@@ -973,7 +973,23 @@ function installScene(model) {
           button.textContent = `${spot.group} · ${spot.count}`
           button.setAttribute('aria-label',
             `聚焦 ${spot.group} 分组：${spot.count} 个包，合计 ${spot.lines} 行源码`)
-          button.addEventListener('click', () => describeGroup(spot))
+          button.setAttribute('aria-pressed', 'false')
+          button.addEventListener('click', () => {
+            if (scene === null) return
+            // 再点一次已聚焦的热点 = 回到全景；镜头飞行由场景层负责。
+            if (scene.focusedGroup === spot.group) {
+              scene.focusReset()
+              writeText(hotspotNote, '已回到全景视角。再点任意热点可重新聚焦。')
+              button.setAttribute('aria-pressed', 'false')
+              return
+            }
+            scene.focusGroup(spot.group)
+            describeGroup(spot)
+            for (const other of hotspotLayer.querySelectorAll('button[data-group][aria-pressed="true"]')) {
+              other.setAttribute('aria-pressed', 'false')
+            }
+            button.setAttribute('aria-pressed', 'true')
+          })
           button.addEventListener('focus', () => describeGroup(spot))
           hotspotLayer.append(button)
         }

@@ -403,4 +403,66 @@ if (typeof document !== 'undefined') {
     event.preventDefault()
     location.href = link instanceof HTMLAnchorElement ? link.href : link.getAttribute('href')
   })
+
+  // ? 呼出快捷键速查（Bruno Simon 的 Options 面板模式）：面板惰性构建，Esc 或点击关闭。
+  let shortcutPanel = null
+  const closeShortcuts = () => {
+    if (shortcutPanel !== null) {
+      shortcutPanel.remove()
+      shortcutPanel = null
+    }
+  }
+  addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeShortcuts()
+    if (event.key !== '?') return
+    const target = event.target
+    if (target instanceof HTMLElement
+      && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+        || target.tagName === 'SELECT' || target.isContentEditable)) return
+    event.preventDefault()
+    if (shortcutPanel !== null) {
+      closeShortcuts()
+      return
+    }
+    shortcutPanel = document.createElement('div')
+    shortcutPanel.setAttribute('role', 'dialog')
+    shortcutPanel.setAttribute('aria-label', '键盘快捷键')
+    Object.assign(shortcutPanel.style, {
+      position: 'fixed', insetInlineEnd: '18px', bottom: '130px', zIndex: '96',
+      maxWidth: '300px', padding: '14px 16px', borderRadius: '10px',
+      background: 'var(--vp-c-bg-elv)', color: 'var(--vp-c-text-1)',
+      border: '1px solid var(--vp-c-border)', boxShadow: 'var(--vp-shadow-3)',
+      fontSize: '13px', lineHeight: '1.7',
+    })
+    const rows = [
+      ['[ / ]', '上一课 / 下一课'],
+      ['Ctrl K', '搜索文档'],
+      ['← → Home End', '实验时间轴步进（实验页内）'],
+      ['?', '开合本面板'],
+    ]
+    for (const [keys, what] of rows) {
+      const row = document.createElement('div')
+      const kbd = document.createElement('kbd')
+      kbd.textContent = keys
+      Object.assign(kbd.style, {
+        fontFamily: 'var(--vp-font-family-mono)', fontSize: '11px',
+        padding: '1px 6px', borderRadius: '5px', marginRight: '8px',
+        background: 'var(--vp-c-default-soft)', border: '1px solid var(--vp-c-border)',
+      })
+      row.append(kbd, document.createTextNode(what))
+      shortcutPanel.append(row)
+    }
+    const close = document.createElement('button')
+    close.type = 'button'
+    close.textContent = '关闭'
+    Object.assign(close.style, {
+      marginTop: '10px', padding: '2px 10px', cursor: 'pointer',
+      font: 'inherit', borderRadius: '6px',
+      background: 'var(--vp-c-default-soft)', color: 'var(--vp-c-text-1)',
+      border: '1px solid var(--vp-c-border)',
+    })
+    close.addEventListener('click', closeShortcuts)
+    shortcutPanel.append(close)
+    document.body.append(shortcutPanel)
+  })
 }
