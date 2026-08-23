@@ -107,7 +107,7 @@ hero:
   </div>
 </section>
 
-<div class="dsh-status-strip" aria-label="当前学习仓库门禁状态" data-study-pages="108" data-index-files="2973" data-learning-tests="298" data-example-tests="8" data-structural-errors="0">
+<div class="dsh-status-strip" aria-label="当前学习仓库门禁状态" data-study-pages="108" data-index-files="2973" data-learning-tests="296" data-example-tests="8" data-structural-errors="0">
   <div class="dsh-status-summary">
     <span class="dsh-status-kicker">本地最近一轮</span>
     <strong>入口和教材结构已通过</strong>
@@ -123,7 +123,7 @@ hero:
     <span>逐文件索引</span>
   </div>
   <div class="dsh-status-metric">
-    <strong>298 + 8</strong>
+    <strong>296 + 8</strong>
     <span>学习工具 / 示例测试</span>
   </div>
   <div class="dsh-status-metric dsh-status-metric-good">
