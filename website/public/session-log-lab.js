@@ -12,7 +12,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons, bindRangeKeys, bindAutoAdvance, installScrollProgress } from './study-lab-kit.js'
+  writeText, animateNumber, installDeclaredIcons, bindRangeKeys, bindAutoAdvance, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   LOG_SCENARIOS,
@@ -20,6 +20,8 @@ import {
   evaluateSessionLogOracle,
 } from './session-log-model.js'
 import {
+  firstCompressionBranchMembers,
+  packedRowFootprint,
   buildSqliteRowModel,
   evaluateSqliteRowOracle,
 } from './sqlite-row-model.js'
@@ -37,6 +39,7 @@ const SESSION_STATE_SCHEMA = {
   upTo: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
   sqlitePacking: { enum: ['on', 'off'] },
   sqlitePayload: { enum: ['small', 'large'] },
+  packN: { integerRange: [3, 260] },
 }
 
 // 只含重放输入的旧版链接：整表校验失败时按它兜底，老书签不至于整页回默认。
@@ -149,6 +152,16 @@ function renderState(model, grid, messageList) {
 }
 
 function renderSqlitePanel(elements, persistState = () => {}) {
+  // Mathigon 式参数滑杆：成员数一动，物理行形状的三个读数立刻跟着走。
+  const updatePackScrubber = () => {
+    const n = Number(elements.packN.value)
+    const fp = packedRowFootprint(n)
+    writeText(elements.packNOutput, String(n))
+    animateNumber(elements.packBytes, fp.dataBytes)
+    animateNumber(elements.packDt, fp.dtCount)
+    writeText(elements.packZstd, fp.entersCompressionBranch ? '是' : '否')
+  }
+
   const rebuildSqlite = () => {
     try {
       const model = buildSqliteRowModel({
@@ -176,10 +189,10 @@ function renderSqlitePanel(elements, persistState = () => {}) {
         + '、单条增量 ' + (model.input.payload === 'large' ? '大' : '小')
         + ' 时的物理行布局（schema ' + String(model.schemaVersion)
         + '，应用 id ' + model.applicationIdAscii + '）')
-      writeText(elements.sqliteLogical, String(model.observations.logicalEvents))
-      writeText(elements.sqlitePhysical, String(model.observations.physicalRowCount))
-      writeText(elements.sqliteBytes, String(model.observations.totalDataBytes))
-      writeText(elements.sqliteZstd, String(model.observations.compressionCandidates))
+      animateNumber(elements.sqliteLogical, model.observations.logicalEvents)
+      animateNumber(elements.sqlitePhysical, model.observations.physicalRowCount)
+      animateNumber(elements.sqliteBytes, model.observations.totalDataBytes)
+      animateNumber(elements.sqliteZstd, model.observations.compressionCandidates)
       persistState()
     } catch (error) {
       console.error('[sqlite-panel] rebuild failed', error)
@@ -193,7 +206,11 @@ function renderSqlitePanel(elements, persistState = () => {}) {
   for (const control of [elements.sqlitePacking, elements.sqlitePayload]) {
     control.addEventListener('change', rebuildSqlite)
   }
+  elements.packN.addEventListener('input', updatePackScrubber)
+  bindRangeKeys(elements.packN)
   rebuildSqlite()
+  updatePackScrubber()
+  animateNumber(elements.packCross, firstCompressionBranchMembers() ?? 0, { duration: 700 })
 }
 
 function initializePage() {
@@ -232,6 +249,12 @@ function initializePage() {
     sqlitePhysical: document.querySelector('#sqlite-metric-physical'),
     sqliteBytes: document.querySelector('#sqlite-metric-bytes'),
     sqliteZstd: document.querySelector('#sqlite-metric-zstd'),
+    packN: document.querySelector('#pack-n'),
+    packNOutput: document.querySelector('#pack-n-output'),
+    packBytes: document.querySelector('#pack-metric-bytes'),
+    packDt: document.querySelector('#pack-metric-dt'),
+    packZstd: document.querySelector('#pack-metric-zstd'),
+    packCross: document.querySelector('#pack-metric-cross'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -299,6 +322,7 @@ function initializePage() {
         upTo: Number(elements.upTo.value),
         sqlitePacking: elements.sqlitePacking.value,
         sqlitePayload: elements.sqlitePayload.value,
+        packN: Number(elements.packN.value),
       }, SESSION_STATE_SCHEMA))
     } catch {
       // 保持安静：hash 写不进去时页面行为不变。
@@ -306,7 +330,15 @@ function initializePage() {
   }
 
   // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
-  installInputReset(elements.resetInputs, elements.form, { onReset: rebuild })
+  // SQLite 面板的两个开关在独立表单里，也要一并回到 authored 默认值并重渲染。
+  installInputReset(elements.resetInputs, elements.form, {
+    onReset: () => {
+      elements.sqlitePacking.value = 'packed'
+      elements.sqlitePayload.value = 'auto'
+      renderSqlitePanel(elements, persistState)
+      rebuild()
+    },
+  })
 
   elements.form.addEventListener('submit', (event) => {
     event.preventDefault()
@@ -336,6 +368,7 @@ function initializePage() {
     elements.upTo.value = String(restored.value.upTo)
     elements.sqlitePacking.value = restored.value.sqlitePacking
     elements.sqlitePayload.value = restored.value.sqlitePayload
+    if ('packN' in restored.value) elements.packN.value = String(restored.value.packN)
   } else if (legacy !== null && legacy.ok) {
     elements.scenario.value = legacy.value.scenario
     elements.upTo.value = String(legacy.value.upTo)

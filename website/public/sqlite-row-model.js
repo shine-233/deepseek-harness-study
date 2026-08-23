@@ -14,9 +14,10 @@
  *   （压缩级别 3），且只在真的变小后才替换原文。本页在浏览器里算不出真实
  *   压缩结果，只能标出哪些行会进入压缩分支——这一点如实写在证明边界里。
  * - compression.ts 的 encodeSourceEventSeqs/decodeSourceEventSeqs 是纯整数
- *   运算，这里逐字节移植：首值按 base-128 varint 原样写入，后续值先做
- *   排序差分再 zigzag（前进偶数、后退奇数），7 位一组、0x80 续位。打包行
- *   覆盖的序号列在本页直接给出真实编码字节，可解码还原。
+ *   运算，这里逐字节移植：首值按 base-128 varint 原样写入，后续值先对
+ *   前一个值做差分再 zigzag（前进偶数、后退奇数；输入的有序性由生产方
+ *   保证，编码本身不排序），7 位一组、0x80 续位。打包行覆盖的序号列在
+ *   本页直接给出真实编码字节，可解码还原。
  *
  * 教学约定：打包与压缩都不改变逻辑事件序列——重放结果和逐条存储完全一致。
  * 没有测量：真实 zstd 输出尺寸、真实写盘耗时、真实并发写入行为。
@@ -26,6 +27,9 @@ const ENCODER = new TextEncoder()
 
 export const SQLITE_SCHEMA_VERSION = 17
 export const SQLITE_APPLICATION_ID_HEX = '0x44534850'
+
+/** 教学流的小载荷文本：与 buildLogicalChunks 的 small 档共用同一个常量。 */
+export const SQLITE_SMALL_TOKEN = 'delta-token-01'
 
 /** 上游保留的应用 id 的 ASCII 形态：44 53 48 50 → "DSHP"。 */
 export function applicationIdAscii() {
@@ -76,7 +80,7 @@ export function decodeSourceEventSeqs(bytes) {
   const limit = BigInt(Number.MAX_SAFE_INTEGER)
   while (offset < bytes.length) {
     const first = values.length === 0
-    const decoded = readVarint(bytes, offset, first ? limit : (limit - 1n) / 2n + 1n)
+    const decoded = readVarint(bytes, offset, first ? limit : limit * 2n)
     offset = decoded.offset
     const delta = first
       ? decoded.value
@@ -98,9 +102,19 @@ function readVarint(bytes, offset, maxValue) {
   let shift = 0n
   while (offset < bytes.length) {
     const byte = bytes[offset]
+    // 非规范编码拒绝：shift>0 时低 7 位全零的字节只会出现在截断或补零里，
+    // 上游同样把它当 malformed 处理。
+    if ((byte & 0x7f) === 0 && shift > 0n) {
+      throw new Error('malformed source_event_seqs storage value: non-canonical varint')
+    }
     value |= BigInt(byte & 0x7f) << shift
     offset += 1
     if ((byte & 0x80) === 0) {
+      // 结尾再补一个全零组只出现在截断或手工拼造里，规范编码总是更短；
+      // 中间的全零组是合法的（大跳差分会出现），不能拒。
+      if ((byte & 0x7f) === 0 && shift > 0n) {
+        throw new Error('malformed source_event_seqs storage value: non-canonical varint')
+      }
       if (value > maxValue) throw new Error('malformed source_event_seqs storage value: varint out of range')
       return { value, offset }
     }
@@ -119,7 +133,7 @@ export const SQLITE_PAYLOAD_SIZES = Object.freeze(['small', 'large'])
 
 /** 一段固定的教学流：8 条同 turn 同 step 的文本增量，seq 与时间都排好。 */
 function buildLogicalChunks(payloadSize) {
-  const text = payloadSize === 'large' ? 'x'.repeat(5200) : 'delta-token-01'
+  const text = payloadSize === 'large' ? 'x'.repeat(5200) : SQLITE_SMALL_TOKEN
   const gaps = [12, 9, 15, 8, 11, 10, 14]
   const chunks = []
   for (let index = 0; index < 8; index += 1) {
@@ -173,6 +187,49 @@ function buildPhysicalRows(input) {
   }
   // 教学流整段连续：8 条折成 1 条打包行（成员数在 3..1024 内）。
   return [packRun(chunks)]
+}
+
+/**
+ * Mathigon 式参数滑杆的纯函数后端：给定打包行成员数 N，按上游 codec 的
+ * 序列化形状（键序 turn/step/index/dt/texts，dt 全部取代表性间隔 12）算出
+ * 这条物理行的 data 字节数与压缩分支判定。
+ *
+ * @param memberCount - 打包行的成员数量，正整数。
+ */
+export function packedRowFootprint(memberCount) {
+  if (!Number.isInteger(memberCount) || memberCount < 1) {
+    throw new RangeError('memberCount 必须是正整数：' + String(memberCount))
+  }
+  const dt = Array.from({ length: memberCount - 1 }, () => 12)
+  const texts = Array.from({ length: memberCount }, () => SQLITE_SMALL_TOKEN)
+  const dataJson = JSON.stringify({ turn: 2, step: 1, index: 0, dt, texts })
+  const dataBytes = utf8Bytes(dataJson)
+  return {
+    memberCount,
+    dtCount: dt.length,
+    dataJson,
+    dataBytes,
+    entersCompressionBranch: dataBytes >= ZSTD_THRESHOLD_BYTES,
+    withinMemberBounds: memberCount >= MIN_PACKED_ROW_MEMBERS && memberCount <= MAX_PACKED_ROW_MEMBERS,
+    withinDataLimit: dataBytes <= MAX_PACKED_DATA_BYTES,
+  }
+}
+
+/**
+ * 二分查找最小的越过压缩阈值的成员数：返回第一个满足
+ * packedRowFootprint(n).entersCompressionBranch 为真的 n；整个范围都不越线时
+ * 返回 null。搜索上界是上游的成员数上限。
+ */
+export function firstCompressionBranchMembers() {
+  let low = MIN_PACKED_ROW_MEMBERS
+  let high = MAX_PACKED_ROW_MEMBERS
+  if (!packedRowFootprint(high).entersCompressionBranch) return null
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2)
+    if (packedRowFootprint(middle).entersCompressionBranch) high = middle
+    else low = middle + 1
+  }
+  return low
 }
 
 export function buildSqliteRowModel(input) {

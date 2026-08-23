@@ -15,6 +15,40 @@ export function writeText(target, value) {
   target.textContent = String(value)
 }
 
+/**
+ * 数字滚动读数：把元素的数值从当前值过渡到目标值。
+ *
+ * Mathigon 式的「参数一动、数字跟着走」读数反馈；只在数值真的变化时动画，
+ * reduced-motion 下直接落位，非数字目标退化为 writeText。
+ *
+ * @param target - 读数元素（dd / output / span 均可）。
+ * @param value - 目标数值。
+ * @param options - digits 小数位（默认 0）；duration 总时长毫秒（默认 360）。
+ */
+export function animateNumber(target, value, { digits = 0, duration = 360 } = {}) {
+  const next = Number(value)
+  if (!Number.isFinite(next)) {
+    writeText(target, String(value))
+    return
+  }
+  const current = parseFloat(target.textContent)
+  const from = Number.isFinite(current) ? current : 0
+  const text = n => n.toFixed(digits)
+  const frame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null
+  if (frame === null || prefersReducedMotion() || duration <= 0 || from === next) {
+    writeText(target, text(next))
+    return
+  }
+  const start = performance.now()
+  const tick = now => {
+    const progress = Math.min(1, (now - start) / duration)
+    const eased = 1 - (1 - progress) ** 3
+    writeText(target, text(from + (next - from) * eased))
+    if (progress < 1) frame(tick)
+  }
+  frame(tick)
+}
+
 export function svgElement(name, attributes = {}, textValue = null) {
   const element = document.createElementNS(SVG_NS, name)
   for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, String(value))

@@ -10,7 +10,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
+  writeText, animateNumber, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   APPROVAL_LANES,
@@ -200,7 +200,7 @@ function initializePage() {
 
       const bodyRuns = model.steps.filter(step => step.bodyRan === true).length
       writeText(elements.ran, model.observations.toolBodyRan ? '是' : '否')
-      writeText(elements.runs, String(bodyRuns))
+      animateNumber(elements.runs, bodyRuns)
       writeText(elements.outcome, model.observations.finalOutcome)
       writeText(elements.audit, model.observations.auditPairComplete ? '完整成对' : '不完整')
       setFeedback('已推演：主体运行=' + (model.observations.toolBodyRan ? '是' : '否')

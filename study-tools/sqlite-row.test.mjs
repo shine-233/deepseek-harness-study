@@ -3,12 +3,16 @@ import { test } from 'node:test'
 import {
   SQLITE_APPLICATION_ID_HEX,
   SQLITE_SCHEMA_VERSION,
+  MAX_PACKED_DATA_BYTES,
+  MIN_PACKED_ROW_MEMBERS,
   ZSTD_THRESHOLD_BYTES,
   applicationIdAscii,
   buildSqliteRowModel,
   decodeSourceEventSeqs,
   encodeSourceEventSeqs,
   evaluateSqliteRowOracle,
+  firstCompressionBranchMembers,
+  packedRowFootprint,
 } from '../website/public/sqlite-row-model.js'
 
 const GRID = {
@@ -81,6 +85,52 @@ test('large payloads cross the zstd threshold; small ones stay text', () => {
 test('unknown inputs fail loud at the model boundary', () => {
   assert.throws(() => buildSqliteRowModel({ packing: 'maybe', payload: 'small' }), RangeError)
   assert.throws(() => buildSqliteRowModel({ packing: 'on', payload: 'huge' }), RangeError)
+})
+
+test('footprint shape follows the physical row: dt = N-1, bounds flags flip at the upstream constants', () => {
+  assert.deepEqual(packedRowFootprint(1).dataJson !== undefined, true)
+  assert.equal(packedRowFootprint(8).dtCount, 7)
+  assert.equal(packedRowFootprint(1).withinMemberBounds, false)
+  assert.equal(packedRowFootprint(2).withinMemberBounds, false)
+  assert.equal(packedRowFootprint(MIN_PACKED_ROW_MEMBERS).withinMemberBounds, true)
+  const over = packedRowFootprint(1025)
+  assert.equal(over.withinMemberBounds, false)
+})
+
+test('footprint data bytes are monotone in member count and cross the zstd threshold exactly once', () => {
+  let previous = -1
+  let crossings = 0
+  let crossed = false
+  for (let n = 3; n <= 400; n += 1) {
+    const fp = packedRowFootprint(n)
+    assert.ok(fp.dataBytes >= previous, `bytes decreased at n=${n}`)
+    const nowCrossing = fp.entersCompressionBranch
+    if (nowCrossing && !crossed) crossings += 1
+    crossed = nowCrossing
+    previous = fp.dataBytes
+  }
+  assert.equal(crossings, 1, '阈值只被跨越一次')
+  assert.ok(crossed, '400 个成员必然越过 4096 字节阈值')
+})
+
+test('firstCompressionBranchMembers is the exact binary-search crossing point', () => {
+  const cross = firstCompressionBranchMembers()
+  assert.notEqual(cross, null)
+  assert.ok(packedRowFootprint(cross).entersCompressionBranch)
+  assert.ok(!packedRowFootprint(cross - 1).entersCompressionBranch)
+
+  // 与线性扫描互证：二分结果必须等于第一个越线的 n。
+  let linear = null
+  for (let n = MIN_PACKED_ROW_MEMBERS; n <= 400; n += 1) {
+    if (packedRowFootprint(n).entersCompressionBranch) { linear = n; break }
+  }
+  assert.equal(cross, linear)
+})
+
+test('footprint serialization key order pins the codec shape (turn/step/index/dt/texts)', () => {
+  const fp = packedRowFootprint(5)
+  assert.deepEqual(Object.keys(JSON.parse(fp.dataJson)), ['turn', 'step', 'index', 'dt', 'texts'])
+  assert.ok(fp.dataBytes <= MAX_PACKED_DATA_BYTES)
 })
 
 test('packed rows carry the ignorable=0 sentinel and a decodable source_event_seqs encoding', () => {

@@ -180,9 +180,9 @@
           <p class="section-label" data-icon="disc">物理行布局</p>
           <h2 id="sqlite-title">同一段流在 SQLite 里的样子</h2>
         </div>
-        <span class="schema-pill">schema 17 · 应用 id DSHP</span>
+        <span class="schema-pill">schema 17 · 应用 id DSHP（基线 aa6c361a 值；本地源码树可能已演进）</span>
       </div>
-      <p class="section-intro">上游的 SQLite 会话库把连续的流式增量打包成一条物理行：信封只存首序号和首时间戳，其余时间用增量数组还原；data 不足 4096 字节直接存文本，达到阈值才进 zstd 分支。打包行的 source_event_seqs 列按「排序差分 + zigzag + base-128 varint」逐字节编码，表里给的就是真实字节，可解码还原。切一下开关，看同一条流怎么落库。</p>
+      <p class="section-intro">上游的 SQLite 会话库把连续的流式增量打包成一条物理行：信封只存首序号和首时间戳，其余时间用增量数组还原；data 不足 4096 字节直接存文本，达到阈值才进 zstd 分支。打包行的 source_event_seqs 列按「差分 + zigzag + base-128 varint」逐字节编码（输入的有序性由生产方保证），表里给的就是真实字节，可解码还原。切一下开关，看同一条流怎么落库。</p>
       <form class="lab-form" id="sqlite-form">
         <label>
           <span>打包</span>
@@ -209,6 +209,19 @@
         <div><dt>进入压缩分支</dt><dd id="sqlite-metric-zstd">—</dd></div>
         <div class="metric-oracle"><dt>独立校验</dt><dd id="sqlite-metric-oracle">—</dd></div>
       </dl>
+      <div class="pack-scrubber">
+        <label>
+          <span>打包行成员数：<output id="pack-n-output">8</output></span>
+          <input id="pack-n" type="range" min="3" max="260" step="1" value="8">
+          <small>拖动看一条 text-chunks 物理行的形状怎么变：dt 增量数随成员数线性增长，data 字节越过 4096 的那一刻就进入压缩分支。</small>
+        </label>
+        <dl class="metric-grid" aria-label="打包形状读数">
+          <div><dt>data 字节</dt><dd id="pack-metric-bytes">—</dd></div>
+          <div><dt>dt 增量数</dt><dd id="pack-metric-dt">—</dd></div>
+          <div><dt>越过压缩阈值</dt><dd id="pack-metric-zstd">—</dd></div>
+          <div><dt>最小越线成员数</dt><dd id="pack-metric-cross">—</dd></div>
+        </dl>
+      </div>
       <ul class="oracle-list" id="sqlite-oracle-list"></ul>
       <div class="table-scroll">
         <table>
