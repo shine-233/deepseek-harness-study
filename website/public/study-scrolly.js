@@ -1,15 +1,18 @@
 /**
  * 课程页的滚动引导（scrollytelling）。
  *
- * 课程正文里放一个空容器 `<div data-scrolly="turn-flow">`，本模块把它变成
- * 左图右文的滚动叙事：左侧是 Turn 轨迹图（数据来自 turn-flow-model 的纯函数，
- * 与实验页同一份），右侧六张卡片随滚动逐段推进轨迹的可见范围。
+ * 课程正文里放一个空容器 `<div data-scrolly="场景名">`，本模块把它变成左图右文
+ * 的滚动叙事：左侧是随滚动推进的粘性舞台，右侧卡片逐段激活。场景以数据驱动方式
+ * 注册在 SCENARIOS 表里；本文件自带 turn-flow 场景（数据来自 turn-flow-model，
+ * 与实验页同一份纯函数），其余场景定义在 study-scrolly-beats.js，与各自的实验页
+ * 共用同一批模型模块。
  *
- * 边界与实验页一致：横轴是步骤序号，不是时间；没有真实 token、耗时或模型输出。
- * 不写存储、不联网；reduced-motion 下不做过渡动画。
+ * 边界与实验页一致：坐标轴都是离散步骤或事件序号，不是时间；没有真实 token、
+ * 耗时或模型输出。不写存储、不联网；reduced-motion 下不做过渡动画。
  */
 
 import { TURN_LANES, buildTurnModel } from './turn-flow-model.js'
+import { COMPACTION_SCROLLY, SESSION_LOG_SCROLLY } from './study-scrolly-beats.js'
 
 const LANE_LABELS = Object.freeze({
   user: '用户',
@@ -31,8 +34,40 @@ const STYLE = `
 .dsh-scrolly-beat[aria-current="true"] { opacity: 1; border-left-color: var(--vp-c-brand-1); }
 .dsh-scrolly-beat h4 { margin: 0 0 6px; font-size: 15px; border: none; padding: 0; }
 .dsh-scrolly-beat p { margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--vp-c-text-2); }
-@media (max-width: 768px) { .dsh-scrolly { grid-template-columns: 1fr; } .dsh-scrolly-stage { position: static; } }
-@media (prefers-reduced-motion: reduce) { .dsh-scrolly-beat { transition: none; } }
+.dsh-scrolly-figure { margin: 0 0 8px; font-size: 12.5px; line-height: 1.6; color: var(--vp-c-text-2); }
+.dsh-scrolly-rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.dsh-scrolly-row { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline;
+  padding: 5px 9px; border: 1px solid var(--vp-c-divider); border-left: 3px solid var(--vp-c-brand-1);
+  border-radius: 8px; background: var(--vp-c-bg); font-size: 12.5px; line-height: 1.55; }
+.dsh-scrolly-row.is-skipped { border-left-style: dashed; border-left-color: var(--vp-c-text-2); }
+.dsh-scrolly-row.is-refused, .dsh-scrolly-row.is-fail { border-left-color: var(--vp-c-danger-1); }
+.dsh-scrolly-row.is-not-reached { opacity: .45; border-left-color: var(--vp-c-divider); }
+.dsh-scrolly-row.is-focus { border-color: var(--vp-c-brand-1); }
+.dsh-row-seq { color: var(--vp-c-text-3); font-variant-numeric: tabular-nums; }
+.dsh-row-type { font-weight: 600; }
+.dsh-row-detail { color: var(--vp-c-text-2); overflow-wrap: anywhere; }
+.dsh-row-tag { margin-left: auto; padding-left: 12px; font-size: 11px; color: var(--vp-c-text-3); white-space: nowrap; }
+.dsh-scrolly-readout { margin: 10px 0 0; font-size: 12px; line-height: 1.65; color: var(--vp-c-text-2); font-variant-numeric: tabular-nums; }
+.dsh-comp-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.dsh-comp-cell { padding: 7px 6px; border: 1px dashed var(--vp-c-divider); border-radius: 8px; background: var(--vp-c-bg); text-align: center; }
+.dsh-comp-cell strong { display: block; font-size: 12px; }
+.dsh-comp-cell small { font-size: 11px; color: var(--vp-c-text-2); font-variant-numeric: tabular-nums; }
+.dsh-comp-strip { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.dsh-comp-node { min-width: 0; flex-basis: 0; overflow: hidden; padding: 7px 8px;
+  border: 1px solid var(--vp-c-divider); border-radius: 8px; background: var(--vp-c-bg); }
+.dsh-comp-node strong { display: block; font-size: 12px; white-space: nowrap; }
+.dsh-comp-node small { font-size: 11px; color: var(--vp-c-text-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dsh-comp-node.is-summary { border-color: var(--vp-c-brand-1);
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 52%, var(--vp-c-bg)); }
+.dsh-comp-node.is-focus { border-color: var(--vp-c-brand-1); }
+@media (max-width: 768px) {
+  .dsh-scrolly { grid-template-columns: 1fr; } .dsh-scrolly-stage { position: static; }
+  .dsh-comp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dsh-comp-strip { flex-direction: column; } .dsh-comp-node { flex-basis: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsh-scrolly-beat { transition: none; }
+}
 `
 
 const BEATS = [
@@ -140,37 +175,46 @@ function installStyles() {
   document.head.append(style)
 }
 
-function buildContainer(container) {
-  const model = buildTurnModel({ scenario: 'two-tools' })
+const SCENARIOS = {
+  'turn-flow': {
+    beats: BEATS,
+    buildStage(stage) {
+      const model = buildTurnModel({ scenario: 'two-tools' })
+      const figureLabel = document.createElement('p')
+      figureLabel.className = 'dsh-scrolly-figure'
+      figureLabel.textContent = '横轴是步骤序号，不是时间。蓝点＝进模型且记日志，灰点＝只记日志，红点＝只进模型；蓝线是同一份载荷的配对。'
+      const svg = document.createElementNS(NS, 'svg')
+      svg.setAttribute('role', 'img')
+      svg.setAttribute('aria-label', 'Turn 步骤轨迹图：五条参与方泳道上的有序步骤')
+      stage.append(figureLabel, svg)
+      return index => renderStage(svg, model, BEATS[index].upTo)
+    },
+  },
+  'session-log': SESSION_LOG_SCROLLY,
+  'compaction': COMPACTION_SCROLLY,
+}
 
+function buildContainer(container, scene) {
   const stage = document.createElement('div')
   stage.className = 'dsh-scrolly-stage'
-  const figureLabel = document.createElement('p')
-  figureLabel.style.cssText = 'margin:0 0 8px;font-size:12.5px;color:var(--vp-c-text-2)'
-  figureLabel.textContent = '横轴是步骤序号，不是时间。蓝点＝进模型且记日志，灰点＝只记日志，红点＝只进模型；蓝线是同一份载荷的配对。'
-  const svg = document.createElementNS(NS, 'svg')
-  svg.setAttribute('role', 'img')
-  svg.setAttribute('aria-label', 'Turn 步骤轨迹图：五条参与方泳道上的有序步骤')
-  stage.append(figureLabel, svg)
-
   const beats = document.createElement('ul')
   beats.className = 'dsh-scrolly-beats'
-
+  const render = scene.buildStage(stage)
   container.replaceChildren(stage, beats)
 
   const buttons = []
-  let currentUpTo = -1
+  let currentIndex = -1
   const activate = index => {
-    const beat = BEATS[index]
-    if (beat === undefined || beat.upTo === currentUpTo) return
-    currentUpTo = beat.upTo
-    renderStage(svg, model, beat.upTo)
+    const beat = scene.beats[index]
+    if (beat === undefined || index === currentIndex) return
+    currentIndex = index
+    render(index)
     for (const [buttonIndex, button] of buttons.entries()) {
       button.setAttribute('aria-current', buttonIndex === index ? 'true' : 'false')
     }
   }
 
-  BEATS.forEach((beat, index) => {
+  scene.beats.forEach((beat, index) => {
     const item = document.createElement('li')
     const button = document.createElement('button')
     button.type = 'button'
@@ -204,10 +248,12 @@ function buildContainer(container) {
 if (typeof document !== 'undefined') {
   installStyles()
   const mount = () => {
-    for (const container of document.querySelectorAll('[data-scrolly="turn-flow"]')) {
+    for (const container of document.querySelectorAll('[data-scrolly]')) {
       if (container.dataset.scrollyReady === 'true') continue
+      const scene = SCENARIOS[container.dataset.scrolly]
+      if (scene === undefined) continue
       container.dataset.scrollyReady = 'true'
-      buildContainer(container)
+      buildContainer(container, scene)
     }
   }
   mount()
