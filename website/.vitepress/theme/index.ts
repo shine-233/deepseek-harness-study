@@ -9,6 +9,7 @@
 
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+import JournalHome from './JournalHome.vue'
 import LessonWidget from './LessonWidget.vue'
 import './lesson-widget.css'
 
@@ -16,6 +17,9 @@ export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
     app.component('LessonWidget', LessonWidget)
+    // 手账首页组件：全局注册后，根目录 SITE-HOME.md（投影为 index.md）
+    // 直接写 <JournalHome /> 即可渲染完整的鲸落手账首页。
+    app.component('JournalHome', JournalHome)
     // 学习进度与自测题组件：客户端注入一次（构建期的 SSR 上下文跳过），
     // 模块内部用 MutationObserver 跟随 VitePress 的单页路由切换。
     // 用编译期替换的 BASE_URL 拼绝对路径——withBase 在部分构建里拿不到站点前缀，

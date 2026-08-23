@@ -5,12 +5,11 @@ import { inspectStudyHomeMetrics } from './verify-study-home-metrics.mjs'
 const repositoryRoot = resolve(import.meta.dirname, '..')
 
 /*
- * 状态条的五个数字只有一个推导来源：verify-study-home-metrics.mjs 从仓库算出来。
- * 这里不再抄一份字面值——抄一份的结果就是构建产物发出 107，而这份清单还在要求 106，
- * 两边各自都自认为正确。
+ * 首页的三张拍立得数字由 verify-study-home-metrics 从仓库推导；这里把它们
+ * 转成构建产物里应出现的 `<b>N</b>` 内容标记，其余结构标记保持字面契约。
  */
-const statusMarkers = Object.entries(inspectStudyHomeMetrics(repositoryRoot).expected)
-  .map(([name, value]) => 'data-' + name + '="' + String(value) + '"')
+const homeMetricsExpected = Object.entries(inspectStudyHomeMetrics(repositoryRoot).expected)
+  .map(([, value]) => '<b>' + String(value) + '</b>')
 
 /**
  * The small set of published pages that make up the first-time reader route.
@@ -32,7 +31,7 @@ export const REQUIRED_PUBLISHED_PAGES = [
       'dsh-route-grid',
       'dsh-home-learning-results',
       'dsh-status-strip',
-      ...statusMarkers,
+      ...homeMetricsExpected,
       'dsh-reading-progress',
       '我第一次来',
       '照着 15 分钟任务单走',

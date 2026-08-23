@@ -54,49 +54,30 @@ export function verifyStudyEntry(root = resolve(import.meta.dirname, '..')) {
   const quality = read('study/29-学习仓库的质量检查与审阅.md')
   const toolbox = read('study/31-学习工具箱.md')
   const manifest = read('website/docs.ts')
-  const sourceIndex = JSON.parse(read('study/source-index-manifest.json'))
+  const journal = read('website/.vitepress/theme/JournalHome.vue')
 
-  for (const marker of [
-    'text: 第一次来，按这里走',
-    'text: 不想选，照着做',
-    'text: 想动手写插件',
-    'link: /study/',
-    'link: /study/lessons/25-从首页到第一次产出的动手任务单',
-    'link: /study/lessons/28-最小插件示例与学习检查',
-    'study/32-源码学习项目的渐进式设计.md',
-    'dsh-status-strip',
-    // Only the presence of each field belongs here. The values are derived from
-    // the repository by verify-study-home-metrics, which this script already
-    // runs; asserting a literal count in both places means every new lesson or
-    // test has to be edited into two files, and the copies drift.
-    'data-study-pages="',
-    'data-index-files="',
-    'data-learning-tests="',
-    'data-example-tests="',
-    'data-structural-errors="',
-    'href="./study/lessons/00-开始这里"',
-    'href="./study/lessons/01-仓库地图"',
-    'href="./study/lessons/25-从首页到第一次产出的动手任务单"',
-    'href="./study/examples/minimal-observer"',
-  ]) {
+  // 首页只承载组件挂载；首屏文案、实验芯片和拍立得数字都住在
+  // JournalHome.vue 里，各自的契约分开锁定。
+  for (const marker of ['<JournalHome />']) {
     if (!home.includes(marker)) errors.push(`首页缺少首屏入口标记：${marker}`)
   }
-
-  const status = home.match(/<div class="dsh-status-strip"[^>]*data-study-pages="(\d+)"[^>]*data-index-files="(\d+)"[^>]*data-learning-tests="(\d+)"[^>]*data-example-tests="(\d+)"[^>]*data-structural-errors="(\d+)"/)
-  if (status === null) {
-    errors.push('首页状态条缺少可核对的 data 数字')
-  } else {
-    const [, studyPages, indexFiles, learningTests, exampleTests, structuralErrors] = status
-    const expectedPages = expectedStudySources(root).size
-    if (Number(studyPages) !== expectedPages) errors.push(`首页学习页面数字 ${studyPages} 与清单预期 ${expectedPages} 不一致`)
-    if (Number(indexFiles) !== Number(sourceIndex.sourceFileCount)) errors.push(`首页索引数字 ${indexFiles} 与清单预期 ${sourceIndex.sourceFileCount} 不一致`)
-    const homeMetrics = inspectStudyHomeMetrics(root)
-    for (const error of homeMetrics.errors) errors.push(`首页状态数字门禁：${error}`)
-    if (Number(exampleTests) !== 8) errors.push(`首页示例测试数字 ${exampleTests} 与当前门禁约定 8 不一致`)
-    if (Number(structuralErrors) !== 0) errors.push(`首页结构错误数字 ${structuralErrors} 不是 0`)
-  }
-
   if (home.includes('点源码学习')) errors.push('首页仍包含已废弃的“点源码学习”按钮文案')
+
+  for (const marker of [
+    '课程、实验、索引',
+    'dj-lab-chip',
+    '个逐文件导读卡',
+    '个离线实验',
+    'research-debug-bridge.html',
+    'doc-fact-error',
+  ]) {
+    if (!journal.includes(marker)) errors.push(`JournalHome 缺少首屏入口标记：${marker}`)
+  }
+  if (journal.includes('点源码学习')) errors.push('JournalHome 仍包含已废弃的“点源码学习”按钮文案')
+
+  const homeMetrics = inspectStudyHomeMetrics(root)
+  for (const error of homeMetrics.errors) errors.push(`首页状态数字门禁：${error}`)
+
   for (const marker of [
     'study/00-开始这里.md',
     'study/01-仓库地图.md',

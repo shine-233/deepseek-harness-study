@@ -6,8 +6,8 @@
  * shape-rendering="crispEdges" 保证像素锐利。形象致敬社区鲸鱼娘二创
  * （原型：上善无形「溟月」、ZipZipPipe 女仆装版，CC BY-NC-SA 4.0，非商用）。
  *
- * 交互：分栏切换（课程 / 实验标本册 / 索引与数字）、集章卡（localStorage 持久化，
- * 盖满触发阿溟开心表情）、左栏目录联动、戳吉祥物的彩蛋台词。
+ * 交互：分栏切换（课程 / 实验标本册 / 索引与数字）、集章卡（localStorage 持久化 + 进度水条，
+ * 盖满触发阿溟开心表情）、迷你 Turn 五步步进模型、左栏目录联动、戳吉祥物的彩蛋台词。
  */
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { withBase } from 'vitepress'
@@ -186,11 +186,42 @@ const doneCount = computed(
 )
 const allDone = computed(() => doneCount.value === LESSONS.length)
 
+/* ---------- 迷你 Turn 步进 ---------- */
+
+interface TurnStep {
+  key: string
+  label: string
+  blurb: string
+}
+
+/** 缩微模型：只讲五步形状；完整可验证证据在 turn-flow-lab.html。 */
+const TURN_STEPS: TurnStep[] = [
+  { key: 'in', label: '输入进来', blurb: '一条用户消息交给 Agent，一次 Turn 开始。' },
+  { key: 'req', label: '组装请求', blurb: '系统提示和全部工具说明一起拼进这条请求。' },
+  { key: 'loop', label: '模型与工具循环', blurb: '模型要调工具就执行，结果塞回请求继续问。' },
+  { key: 'log', label: '落成日志', blurb: '每一步都写成 Session 事件，事后能原样重建。' },
+  { key: 'next', label: '下一条 Turn', blurb: '上下文从日志里恢复，循环接着走。' },
+]
+const turnAt = ref(0)
+function turnMove(delta: number): void {
+  turnAt.value = Math.min(Math.max(turnAt.value + delta, 0), TURN_STEPS.length - 1)
+}
+function turnSlider(event: Event): void {
+  turnAt.value = Number((event.target as HTMLInputElement).value)
+}
+
 /* ---------- 阿溟台词 ---------- */
 
 const mood = ref<'normal' | 'happy'>('normal')
 const quipIndex = ref(0)
-const QUIPS = ['戳我干什么，去读书。', '印章不盖，读了白读。', '实验标本册里那头鲸，是我远房表哥。']
+const QUIPS = [
+  '戳我干什么，去读书。',
+  '印章不盖，读了白读。',
+  '实验标本册里那头鲸，是我远房表哥。',
+  '白饭要管饱，章也要盖满。',
+  '「大概看懂了」？鱼片，你糊弄谁呢。',
+  '十五个实验全做完，我承认你比我勤快。',
+]
 const note = computed(() =>
   allDone.value
     ? '全读完了？鱼片，\n你比我勤快。'
@@ -270,6 +301,9 @@ watchEffect(() => {
             <span>集章卡 · 已收 <b>{{ doneCount }}</b>/{{ LESSONS.length }} 枚</span>
             <button type="button" class="dj-reset" @click="resetStamps">撕掉重盖</button>
           </h3>
+          <div class="dj-wavebar" role="img" :aria-label="`集章进度 ${doneCount} / ${LESSONS.length}`">
+            <i :style="{ width: `${(doneCount / LESSONS.length) * 100}%` }"></i>
+          </div>
           <ul class="dj-stamp-list">
             <li
               v-for="lesson in LESSONS"
@@ -355,6 +389,36 @@ watchEffect(() => {
             <a :href="withBase('/study/examples/minimal-observer')">查看最小示例 →</a>
           </article>
 
+          <div class="dj-turn">
+            <h4>顺手玩一下 · 一次 Turn 的形状</h4>
+            <ol class="dj-turn-track" aria-label="一次 Turn 的五步缩微模型">
+              <li
+                v-for="(step, i) in TURN_STEPS"
+                :key="step.key"
+                :class="{ 'dj-on': i <= turnAt, 'dj-now': i === turnAt }"
+              >
+                <i>{{ i + 1 }}</i><span>{{ step.label }}</span>
+              </li>
+            </ol>
+            <div class="dj-turn-stage">
+              <p class="dj-turn-blurb"><b>{{ TURN_STEPS[turnAt].label }}</b>{{ TURN_STEPS[turnAt].blurb }}</p>
+              <div class="dj-turn-ctrl">
+                <button type="button" :disabled="turnAt === 0" aria-label="上一步" @click="turnMove(-1)">‹</button>
+                <input
+                  type="range"
+                  min="0"
+                  :max="TURN_STEPS.length - 1"
+                  :value="turnAt"
+                  aria-label="Turn 步进滑杆"
+                  @input="turnSlider"
+                >
+                <button type="button" :disabled="turnAt === TURN_STEPS.length - 1" aria-label="下一步" @click="turnMove(1)">›</button>
+                <small>{{ turnAt + 1 }} / {{ TURN_STEPS.length }}</small>
+              </div>
+            </div>
+            <p class="dj-note">缩微模型只讲形状；能逐步验证的完整证据在<a :href="withBase('/turn-flow-lab.html')">Turn 流程实验室</a>。</p>
+          </div>
+
           <div class="dj-course-map">
             <h4>整本手账的目录</h4>
             <div class="dj-stage-grid">
@@ -405,7 +469,7 @@ watchEffect(() => {
               <div class="dj-photo"><b>108</b></div>
               <figcaption>页中文教材</figcaption>
             </figure>
-            <figure class="j-polaroid">
+            <figure class="dj-polaroid">
               <div class="dj-photo"><b>2973</b></div>
               <figcaption>个逐文件导读卡</figcaption>
             </figure>
@@ -494,6 +558,9 @@ watchEffect(() => {
   border-bottom:2px dashed var(--line);padding-bottom:8px;margin-bottom:10px;
   display:flex;justify-content:space-between;align-items:center;letter-spacing:.02em;}
 .dj-stamp-card b{color:var(--red);font-weight:400;}
+.dj-wavebar{height:10px;margin:2px 0 12px;border:1px solid var(--line);border-radius:6px;background:#eef4fb;overflow:hidden;}
+.dj-wavebar i{display:block;height:100%;transition:width .35s ease;
+  background:repeating-linear-gradient(135deg,#8fbcf7 0 8px,#7db1f2 8px 16px);}
 .dj-reset{font-family:'Noto Sans SC';font-size:11px;color:#9aa8b6;background:none;border:none;
   cursor:pointer;text-decoration:underline dotted;transition:.15s;}
 .dj-reset:hover{color:var(--red);}
@@ -554,6 +621,29 @@ li.dj-done .dj-stamp-label{text-decoration:line-through solid rgba(90,110,133,.5
   font-weight:700;color:var(--blue-ink);text-decoration:none;
   border-bottom:2px solid var(--tape-sky);transition:.18s;}
 .dj-entry a:not([class]):hover{border-color:var(--blue-ink);}
+
+.dj-turn{margin-top:24px;border-top:2px dashed var(--line);padding-top:20px;}
+.dj-turn h4{font-family:'Ma Shan Zheng',cursive;font-weight:400;font-size:20px;margin-bottom:14px;}
+.dj-turn-track{list-style:none;display:flex;padding:0;margin:0 0 14px;}
+.dj-turn-track li{flex:1;position:relative;text-align:center;
+  font-family:'Noto Sans SC';font-size:12px;color:#9aa8b6;}
+.dj-turn-track li:not(:last-child)::after{content:'';position:absolute;top:13px;
+  left:calc(50% + 17px);right:calc(-50% + 17px);border-top:2px dashed #d8cdb6;}
+.dj-turn-track li.dj-on:not(:last-child)::after{border-color:#9cc3f5;}
+.dj-turn-track i{display:block;width:26px;height:26px;line-height:23px;margin:0 auto 5px;border-radius:50%;
+  border:2px dashed #cdbfa4;background:#fdfaf2;font-style:normal;font-weight:700;color:#b3a587;transition:.18s;}
+.dj-turn-track li.dj-on i{border:2px solid var(--blue-ink);background:var(--tape-sky);color:#1d4477;}
+.dj-turn-track li.dj-now span{color:var(--red);font-weight:700;}
+.dj-turn-stage{background:#fefcf6;border:1.5px solid var(--line);border-radius:6px;padding:12px 16px;}
+.dj-turn-blurb{margin:0 0 10px;font-size:14px;color:var(--ink-soft);line-height:1.85;}
+.dj-turn-blurb b{color:var(--ink);margin-right:8px;}
+.dj-turn-ctrl{display:flex;align-items:center;gap:10px;}
+.dj-turn-ctrl button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);
+  background:var(--card);color:var(--blue-ink);font-size:17px;line-height:1;cursor:pointer;transition:.15s;}
+.dj-turn-ctrl button:hover:not(:disabled){border-color:var(--blue-ink);}
+.dj-turn-ctrl button:disabled{opacity:.35;cursor:default;}
+.dj-turn-ctrl input[type='range']{flex:1;accent-color:var(--red);}
+.dj-turn-ctrl small{font-family:'Noto Sans SC';font-size:12px;color:var(--ink-soft);min-width:38px;text-align:right;}
 
 .dj-course-map{margin-top:28px;border-top:2px dashed var(--line);padding-top:20px;}
 .dj-course-map h4{font-family:'Ma Shan Zheng',cursive;font-weight:400;font-size:20px;margin-bottom:12px;}
@@ -617,6 +707,9 @@ li.dj-done .dj-stamp-label{text-decoration:line-through solid rgba(90,110,133,.5
   .dj-side{position:static;flex-direction:row;flex-wrap:wrap;}
   .dj-mascot-card,.dj-stamp-card,.dj-toc{flex:1 1 250px;}
   .dj-lab-grid,.dj-stage-grid{grid-template-columns:1fr;}
+  .dj-turn-track{flex-wrap:wrap;gap:8px 0;}
+  .dj-turn-track li{flex:1 1 33%;}
+  .dj-turn-track li:nth-child(3)::after,.dj-turn-track li:last-child::after{display:none;}
   .dj-sheet{padding:22px 18px;}
   .dj-page{margin:-24px -16px 0;padding-left:16px;padding-right:16px;}
 }
