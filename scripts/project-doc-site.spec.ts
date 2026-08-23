@@ -288,7 +288,7 @@ describe('docsPages locale routes', () => {
     const studyHome = homes.find(page => page.route === 'index.md')
     expect(studyHome?.source).toBe('SITE-HOME.md')
     expect(projectedPageContent(readFileSync(resolve(repositoryRoot, 'SITE-HOME.md'), 'utf8'), studyHome!))
-      .toContain('text: 从不知道点哪里，到能追一个源文件')
+      .toContain('<JournalHome />')
 
     const englishHome = homes.find(page => page.route === 'en/index.md')
     expect(englishHome?.source).toBe('docs/user/index.md')
