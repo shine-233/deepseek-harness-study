@@ -1,0 +1,49 @@
+/*
+ * 提示词装配实验页专用：缓存地形图的分段色块与判定徽标。
+ * 其余布局来自 study-lab-shell.css，运动来自 study-lab-motion.css。
+ */
+
+.pa-bar {
+  display: flex;
+  width: 100%;
+  min-height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.pa-block {
+  position: relative;
+  min-width: 14px;
+  padding: 6px 4px;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--surface-strong);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.pa-block.is-cached { opacity: 0.55; }
+.pa-block.is-changed {
+  outline: 2px dashed var(--signal-ink);
+  outline-offset: -3px;
+}
+.pa-block .pa-order {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  opacity: 0.85;
+}
+
+/* 每条泳道一个色相；明暗两种模式都从令牌取色再混白/混墨降饱和。 */
+.pa-block[data-lane='前导'] { background: color-mix(in srgb, var(--muted) 72%, var(--page)); }
+.pa-block[data-lane='persona'] { background: color-mix(in srgb, var(--brand) 78%, var(--page)); }
+.pa-block[data-lane='策略上下文'] { background: color-mix(in srgb, var(--allow) 74%, var(--page)); }
+.pa-block[data-lane='工具表'] { background: color-mix(in srgb, var(--signal) 76%, var(--page)); }
+
+tbody tr.is-after-boundary td:nth-child(6) {
+  color: var(--signal-ink);
+  font-weight: 700;
+}

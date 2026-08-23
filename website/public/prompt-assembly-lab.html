@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="系统提示词按 order 升序装配，缓存前缀在第一个变化段之前保持命中：可交互的提示词装配实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>提示词装配实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./study-lab-motion.css">
+  <link rel="stylesheet" href="./prompt-assembly-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#pa-main">跳到实验</a>
+  <main class="lab-shell" id="pa-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 提示词与缓存</p>
+        <h1>变化点之前的前缀，一个字节都不用重算。</h1>
+        <p class="hero-lead">系统提示词不是一段话，是按 order 升序拼接的一摞贡献：-100 的平台前导、0 号 persona、115 号审批策略上下文、最后的工具表。provider 按「和上一轮完全相同的前缀」命中缓存——本轮哪个段先变，它之前的字节就照旧便宜，它之后的全部重新计费。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/06-LLM与工具执行.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./approval-flow-lab.html">打开审批流实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 16</span>
+        <strong>横轴是字节，纵轴是 order。</strong>
+        <p>规则取自上游 system-prompt 源码；不连接 provider，缓存计价只教边界算术。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：把「审批策略上下文」从 ask 改成 never（115 号）——排在它前面的 persona 段会重新计费吗？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="prefix-safe">
+            <span>不会——它前面的前缀一字未变，照旧命中缓存</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="all-rebilled">
+            <span>会——任何一处改动都让整条提示词重新计费</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="policy-only-free">
+            <span>只有策略段自己免费，后面全要重算</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="pa-form">
+          <label>
+            <span>persona 版本</span>
+            <select id="persona" name="personaVersion">
+              <option value="v1">v1——默认回答风格</option>
+              <option value="v2">v2——紧凑要点+引用路径</option>
+            </select>
+            <small>0 号槽位：模型读到的第一段正文。</small>
+          </label>
+          <label>
+            <span>审批策略上下文（order 115）</span>
+            <select id="policy" name="policy">
+              <option value="ask">ask——可询问文案</option>
+              <option value="never">never——禁问文案</option>
+              <option value="absent">absent——整个上下文缺席</option>
+            </select>
+            <small>absent 对应上游「丢空段」：没有这一段，而不是留空行。</small>
+          </label>
+          <label>
+            <span>本轮变化点</span>
+            <select id="change-target" name="changeTarget">
+              <option value="none">无——和上一轮完全一致</option>
+              <option value="persona">persona 段换版</option>
+              <option value="policy">策略上下文变化</option>
+              <option value="tools">工具表变化</option>
+            </select>
+            <small>变化点决定缓存边界：它之前的字节全部命中。</small>
+          </label>
+          <label>
+            <span>工具顺序配置</span>
+            <select id="tool-order" name="toolOrder">
+              <option value="default">未配置——整表字典序</option>
+              <option value="custom-first">自定义 write_file 优先</option>
+            </select>
+            <small>配置顺序下已列出工具按配置排；&lt;unlisted-tools&gt; 标记永远收尾。</small>
+          </label>
+          <button class="button button-primary" type="submit">重新装配</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="pa-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="装配观测值">
+          <div><dt>段数</dt><dd id="pa-metric-segments">—</dd></div>
+          <div><dt>总字节</dt><dd id="pa-metric-total">—</dd></div>
+          <div><dt>命中字节</dt><dd id="pa-metric-cached">—</dd></div>
+          <div><dt>重算字节</dt><dd id="pa-metric-fresh">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="pa-bar-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="layers">字节地形</p>
+          <h2 id="pa-bar-title">一条提示词的缓存地形图</h2>
+        </div>
+        <span class="schema-pill">order × 字节</span>
+      </div>
+      <p class="section-intro">每个色块是一个 order 段，宽度就是它的字节数。亮色部分本轮命中缓存，斜纹部分因变化点在其之前而重新计费。悬停看每段的来源。</p>
+      <div class="plot-scroll" id="pa-plot"></div>
+      <p class="chart-note" id="pa-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>六条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验自己重排分段，再核对升序不变量、空段丢弃、缓存边界算术、工具规范序、REST 标记唯一性和确定性。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="pa-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="pa-table-title">完整分段表</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">每个色块在这张表里逐行给出：order、来源、字节数，以及它在缓存边界之前还是之后。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="pa-table-caption">当前输入的分段明细</caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">order 段位</th>
+              <th scope="col">泳道</th>
+              <th scope="col">来源</th>
+              <th scope="col">字节</th>
+              <th scope="col">缓存判定</th>
+            </tr>
+          </thead>
+          <tbody id="pa-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/06-LLM与工具执行.html">继续读 LLM 与工具执行</a>
+    </footer>
+  </main>
+  <script type="module" src="./prompt-assembly-lab.js"></script>
+</body>
+</html>

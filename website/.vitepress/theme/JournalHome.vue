@@ -459,7 +459,7 @@ watchEffect(() => {
               <figcaption>个逐文件导读卡</figcaption>
             </figure>
             <figure class="dj-polaroid">
-              <div class="dj-photo"><b>15</b></div>
+              <div class="dj-photo"><b>16</b></div>
               <figcaption>个离线实验</figcaption>
             </figure>
           </div>
@@ -556,7 +556,7 @@ watchEffect(() => {
   font-family:'Noto Sans SC';font-size:13px;font-weight:700;transition:.18s;}
 .dj-stamp-btn:hover{border-color:var(--red);color:var(--red);transform:scale(1.06);}
 .dj-stamp-btn.dj-on{border:2.5px solid var(--red);background:rgba(201,79,61,.07);color:var(--red);
-  transform:rotate(-12deg);animation:dj-stamp-in .22s ease-out;font-size:12.5px;}
+  transform:rotate(-12deg);animation:dj-stamp-in .2s ease-out;font-size:12.5px;}
 @keyframes dj-stamp-in{from{transform:scale(1.9) rotate(8deg);opacity:0}to{transform:scale(1) rotate(-12deg);opacity:1}}
 .dj-stamp-label{font-size:15px;line-height:1.5;}
 .dj-stamp-label a{color:inherit;text-decoration:none;border-bottom:1.5px solid transparent;transition:.15s;}
@@ -585,7 +585,7 @@ li.dj-done .dj-stamp-label{text-decoration:line-through solid rgba(90,110,133,.5
 
 .dj-sheet{background:var(--card);border:1px solid var(--line);border-radius:6px;
   box-shadow:4px 5px 0 rgba(43,90,166,.08);padding:28px 30px;min-height:420px;}
-.dj-sheet{animation:dj-fade-up .22s ease-out;}
+.dj-sheet{animation:dj-fade-up .2s ease-out;}
 .dj-main{min-width:0;}
 @keyframes dj-fade-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
