@@ -14,7 +14,7 @@ A second audit pass over the newly rewritten labs and the companion feature foun
 4. Dark-mode gaps: journal Turn-track active step was unreadable (#1d4477 on #2e4059, ~1.07:1) because `.dj-on i` out-specifies the dark override block; mermaid diagrams stayed light-themed.
 5. Copy/facts: mascot "done" line promised homepage stamp integration that does not exist; lesson 05 said 前三拍 where four beats share the component's model; session-log reset left the SQLite toggles at user-chosen values; packed rows had no visual state; schema pill did not mention it is the pinned-baseline value.
 
-## Changes
+## Decision
 
 - study-progress.js: observer now compares the normalized lesson id and skips rebuilds when nothing changed; teardown+rebuild happens only on a real route change.
 - guard-loop-lab.js: dots carry `data-step` and sync with the playhead; SCHEMA/persist include `step`; enum changes rebuild then jump to the last step (mirrors approval-flow).
@@ -25,6 +25,19 @@ A second audit pass over the newly rewritten labs and the companion feature foun
 - session-log: reset also restores SQLite toggles and re-renders the panel; packed/plain rows get distinct first-cell styling; schema pill notes it is the aa6c361a value.
 - study-companion.js: honest done lines, comment matches actual route behavior.
 - verify-built-study-site: REQUIRED_PUBLISHED_ASSETS now pins the four runtime scripts so their loss fails CI.
+
+## Consequences
+
+- The four pinned runtime scripts are now publication-required: deleting any one of them fails CI instead of silently degrading the labs.
+- The varint decoder got stricter: trailing-zero-group bytes that the previous model accepted are now rejected, so any fixture or state link carrying such bytes must be regenerated.
+- Progress rebuilds fire only on a normalized lesson-id change. Same-lesson mutations (quiz submits, companion insertions) no longer rebuild — and by design, a future route change that keeps the id stable will not rebuild either.
+- Dark-mode mermaid inversion applies to every diagram rendered under `html.dark`, including diagrams added later.
+
+## Alternatives considered
+
+- Closing the stepper parity gap by removing steppers from the other four labs was rejected: the parity direction was upward.
+- Keeping the 2^52 varint bound while softening the fidelity wording was rejected: matching upstream decode behavior was the point of the port.
+- Throttling progress rebuilds with a timer was rejected in favor of comparing the lesson id: the comparison removes the wasted work entirely instead of delaying it.
 
 ## Evidence boundary
 
