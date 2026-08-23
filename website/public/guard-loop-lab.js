@@ -4,7 +4,7 @@
 import {
   makeFeedback, renderBoundary, renderOracle, renderRows,
   requireElements, svgElement, writeText,
-  installDeclaredIcons, installScrollProgress,
+  installDeclaredIcons, installScrollProgress, installInputReset,
 } from './study-lab-kit.js'
 import { buildGuardLoopModel, evaluateGuardLoopOracle } from './guard-loop-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
@@ -67,6 +67,7 @@ function initializePage() {
     mExecuted: document.querySelector('#metric-executed'),
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
+    resetInputs: document.querySelector('#reset-inputs'),
   }
   if (!requireElements(el)) return
   const fb = makeFeedback(el.feedback)
@@ -103,6 +104,8 @@ function initializePage() {
     } catch {}
   }
 
+  // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
+  installInputReset(el.resetInputs, el.form, { onReset: rebuild })
   el.form.addEventListener('submit', e => { e.preventDefault(); rebuild() })
   for (const c of [el.attempts, el.guard]) c.addEventListener('input', () => {
     if (c === el.attempts) writeText(el.attemptsOutput, c.value)

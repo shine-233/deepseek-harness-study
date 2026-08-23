@@ -21,7 +21,7 @@
 ## 2. 仓库分工
 
 - 研究课程仓库（本仓库）：课程、实验、证据门禁、Pages 网站。
-- Debug 仓库：`C:\Users\Zz\Documents\projects\dsh-open-source`（`shine-233/dsh-plugin-debug`），独立 PowerShell 调试插件；与本网站只通过用户手动选择的 request/result JSON 文件协作，见 study/29-研究与-Debug-协作.md。
+- Debug 仓库：`C:\Users\Zz\Documents\projects\dsh-open-source`（`shine-233/dsh-plugin-debug`），独立 PowerShell 调试插件；与本网站只通过用户手动选择的 request/result JSON 文件协作，见 study/36-研究与-Debug-协作.md。
 
 ## 3. 已验证状态（最近一轮全绿）
 

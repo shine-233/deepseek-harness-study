@@ -14,6 +14,7 @@ import { icon } from './study-lab-icons.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
 import { installScrollProgress } from './study-lab-kit.js'
+import { installInputReset } from './study-lab-kit.js'
 import {
   BAR_VIEW_MAX_NODES,
   buildPackageGraphModel,
@@ -370,6 +371,8 @@ function createScatterPlot(container, note, tooltip) {
   function bindInteractions(zoomInButton, zoomOutButton, resetButton) {
     container.addEventListener('wheel', (event) => {
       if (svg === null) return
+      // 带修饰键的滚轮不劫持：Ctrl/Cmd 交给浏览器整页缩放，Shift/Alt 交给原生横向滚动。
+      if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return
       event.preventDefault()
       const point = clientToSvg(event.clientX, event.clientY)
       if (point === null) return
@@ -851,6 +854,9 @@ async function initializePage() {
   groupInput.addEventListener('change', rebuild)
   sortInput.addEventListener('change', rebuild)
   minLinesInput?.addEventListener('input', rebuild)
+  const resetInputs = document.querySelector('#reset-inputs')
+  // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
+  installInputReset(resetInputs, form, { onReset: rebuild })
   const copyLink = document.querySelector('#copy-state-link')
   copyLink?.addEventListener('click', async () => {
     try {

@@ -371,3 +371,34 @@ button[aria-pressed="true"] {
     to { transform: scaleX(1); }
   }
 }
+
+/*
+ * 时间轴步进控件：滑杆、上一步/下一步和当前步骤说明。
+ * 状态切换不做动画：is-current / is-future 只换外观，reduced-motion 与否都一样。
+ */
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--line);
+}
+
+.stepper-seek { display: flex; min-width: 220px; flex: 1 1 260px; flex-direction: column; gap: var(--space-2xs); }
+.stepper-seek > span { font-weight: 700; font-size: 0.9rem; }
+.stepper-seek output { color: var(--brand); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.stepper-seek input[type="range"] { width: 100%; min-height: 44px; margin: 0; }
+.stepper-seek small { color: var(--muted); font-size: 0.78rem; }
+
+.stepper-buttons { display: flex; gap: var(--space-2xs); }
+.stepper-buttons .button[disabled] { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.step-caption { flex: 1 1 100%; margin: 0; color: var(--ink); font-size: 0.9rem; }
+
+.plot-scroll [data-step].is-future { opacity: 0.28; }
+.plot-scroll [data-step].is-current { stroke: var(--ink); stroke-width: 3; r: 11px; }
+
+tbody tr[data-key].is-future { opacity: 0.5; }
+tbody tr[data-key].is-current { background: color-mix(in srgb, var(--brand) 10%, transparent); }

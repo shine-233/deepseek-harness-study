@@ -61,7 +61,12 @@ read_session      read   parallel
 2. 被拒绝的调用是否会出现 `body-start`？
 3. 把策略切到“全部放行”后，`write_summary` 是否会跳过 `policy-check`？
 
+<details class="reference-table">
+<summary>写完三个预测后，再展开答案</summary>
+
 答案不是靠看颜色猜出来的：默认场景的 `policy checks=4`、`body executions=3`、`denied bodies=0`；切到“全部放行”后，四个调用都执行主体，但每一个仍有自己的 `policy-check` 和 `policy-decision`。如果你的预测错了，先看事件表中的 tick 和 phase，再回到源码定位。
+
+</details>
 
 ## 读懂二维时间轴
 
@@ -157,7 +162,7 @@ oracle 至少检查六件事：
 - 它不证明所有插件拥有相同的并发安全声明，或所有外部副作用可以撤销。
 - 它不替代固定 rc.6 源码、keyless 测试、真实模型 E2E、生产日志或人工审批证据。
 
-如果你需要真实诊断证据，回到[研究与 Debug 协作](29-研究与-Debug-协作.md)，按用户手动传递的 request/repro/result 文件流程走；本页不会自动调用那个桥。
+如果你需要真实诊断证据，回到[研究与 Debug 协作](36-研究与-Debug-协作.md)，按用户手动传递的 request/repro/result 文件流程走；本页不会自动调用那个桥。
 
 ## 验证记录
 

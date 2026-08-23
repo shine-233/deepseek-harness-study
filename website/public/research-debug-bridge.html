@@ -8,6 +8,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>研究 ↔ Debug：离线证据桥接</title>
   <link rel="stylesheet" href="./study-tokens.css">
+  <!-- 壳样式垫在私有样式之前：本页自有组件样式保持优先，同时继承 shell 的焦点态、
+       forced-colors 补丁和 44px 触达面积打磨。 -->
+  <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./research-debug-bridge.css">
   <link rel="icon" href="./favicon.svg">
   <script src="./study-theme-boot.js"></script>
@@ -24,7 +27,7 @@
           <p class="hero-copy">这是一个静态文件工作台：在下面的表单里填课程定位和问题，点「生成 request」看规范化后的 JSON，点「下载 JSON」才会真的落盘；在本机显式运行 Debug 之后，用「选择 result 文件」把结果导回来，页面会先做 schema 校验再显示。它不会连接本机，不会扫描文件，不会启动程序，也不会上传任何内容。</p>
           <div class="hero-actions" aria-label="页面导航">
             <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
-            <a class="button button-secondary" href="./study/lessons/29-研究与-Debug-协作.html">回到课程章节</a>
+            <a class="button button-secondary" href="./study/lessons/36-研究与-Debug-协作.html">回到课程章节</a>
             <a class="button button-quiet" href="https://github.com/shine-233/dsh-plugin-debug" rel="noreferrer">查看 Debug 源码</a>
           </div>
         </div>
@@ -205,6 +208,7 @@
           <div class="button-row">
             <button class="button button-primary" type="submit">生成 request</button>
             <button class="button button-secondary" id="download-request" type="button" disabled>下载 JSON</button>
+            <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
           </div>
           <div class="import-row request-import-row">
             <label class="file-picker">
@@ -292,7 +296,7 @@
 
     <footer class="page-footer">
       <span>v1 · request/result JSON · explicit checks · no default connection</span>
-      <a href="./study/lessons/29-研究与-Debug-协作.html">阅读完整课程说明 →</a>
+      <a href="./study/lessons/36-研究与-Debug-协作.html">阅读完整课程说明 →</a>
     </footer>
   </main>
   <script type="module" src="./research-debug-bridge.js"></script>

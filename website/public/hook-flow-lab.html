@@ -78,9 +78,22 @@
           </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
           <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
         </form>
         <p class="feedback" id="hook-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="时间轴步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="hf-step-output">0</output> 步</span>
+            <input id="hf-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数，不改变推演结果；之后的步骤淡出显示。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
+          </label>
+          <div class="stepper-buttons">
+            <button class="button button-quiet" id="hf-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="hf-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="hf-step-caption" role="status" aria-live="polite"></p>
+        </div>
         <dl class="metric-grid" aria-label="瀑布观测值">
           <div><dt>执行的监听器</dt><dd id="metric-executed">—</dd></div>
           <div><dt>被跳过</dt><dd id="metric-skipped">—</dd></div>

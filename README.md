@@ -42,14 +42,14 @@
 | --- | --- |
 | 认识 DSH | [00 从零开始](study/00-开始这里.md) · [01 仓库地图](study/01-仓库地图.md) · [02 Cordis 与插件树](study/02-Cordis与插件树.md) · [25 动手任务单](study/25-从首页到第一次产出的动手任务单.md) · [27 工具预算决策卡](study/27-工具预算与插件责任决策卡.md) |
 | 主链路精读 | [03 核心文件](study/03-核心文件精读.md) · [04 Agent 与 Turn](study/04-Agent与Turn流程.md) · [05 Session 日志与恢复](study/05-Session日志与恢复.md) · [06 LLM 与工具执行](study/06-LLM与工具执行.md) · [07 Host/Client/测试发布](study/07-HostClient示例测试发布.md) |
-| 插件与生态 | [10 扩展边界](study/10-社区生态与扩展边界.md) · [11 写合规插件](study/11-如何写一个合规插件.md) · [12 生态检索核验](study/12-GitHub生态检索与插件实战核验.md) · [13 工具插件契约](study/13-官方工具插件完整契约.md) · [14 Hook Bridge](study/14-官方HookBridge与兼容层.md) · [15 Bundle/Loader](study/15-BundleProfileLoader与发布安装.md) · [22 工具可见性](study/22-工具可见性与非侵入扩展.md) · [28 最小插件工作台](study/28-最小插件工作台.md) |
+| 插件与生态 | [10 扩展边界](study/10-社区生态与扩展边界.md) · [11 写合规插件](study/11-如何写一个合规插件.md) · [12 生态检索核验](study/12-GitHub生态检索与插件实战核验.md) · [13 工具插件契约](study/13-官方工具插件完整契约.md) · [14 Hook Bridge](study/14-官方HookBridge与兼容层.md) · [15 Bundle/Loader](study/15-BundleProfileLoader与发布安装.md) · [22 工具可见性](study/22-工具可见性与非侵入扩展.md) · [35 最小插件工作台](study/35-最小插件工作台.md) |
 | 实验与治理 | [16 工作簿](study/16-学习工作簿与首个实验.md) · [19 测试卸载证据](study/19-插件测试卸载与版本证据.md) · [21 网页/Codespaces 路线](study/21-GitHub网页与Codespaces学习路线.md) · [29 质量检查与审阅](study/29-学习仓库的质量检查与审阅.md) · [30 安全告警与发布维护](study/30-安全告警与网页发布维护.md) · [31 学习工具箱](study/31-学习工具箱.md) · [32 渐进式设计](study/32-源码学习项目的渐进式设计.md) · [33 可视化协议](study/33-确定性可视化实验协议与Code-Mode权限管线.md) |
 
 其余专题（索引读法 [08](study/08-逐文件索引怎么读.md)、业界案例 [09](study/09-业界案例与写法.md)、观测实验 [23](study/23-工具可见集合观测与性能实验.md)、人工抽查 [24](study/24-高风险索引人工抽查.md)、完成度审计 [17](study/17-完成度审计与证据矩阵.md)、维护迁移 [18](study/18-维护更新与版本迁移.md)、实际使用手册 [20](study/20-学习仓库实际使用手册.md)、后续研究 [26](study/26-后续研究路线.md)、Debug 协作与作者判断 [29/34](study/34-作者的判断与理由.md)）都从 [START-HERE](START-HERE.md) 可达。
 
 ## 逐文件索引
 
-固定提交中按生成器白名单识别出 2,973 个代码或界面源文件（TypeScript 2,472、TSX 262、CSS 112、SQL 56、MJS 32、Python 20、JS 9、Shell 6 及其他），分到 `study/文件索引/` 的 67 个索引页；每条目固定十一个字段：所属层、文件角色、用途、设计原因、文件级设计证据、直接协作者、对应测试、测试关联依据、阅读顺序、代码证据和固定版本。[清单](study/source-index-manifest.json)机器可查，[生成器](study-tools/generate-source-index.mjs)、[验证器](study-tools/verify-source-index.mjs)、[质量审计器](study-tools/audit-source-index-quality.mjs)和[手写路径验证器](study-tools/verify-study-links.mjs)保证覆盖与路径正确。普通条目是结构化自动导读，不是逐行人工审查。
+固定提交中按生成器白名单识别出 2,973 个代码或界面源文件（TypeScript 2,472、TSX 262、CSS 112、SQL 56、MJS 32、Python 20、JS 9、Shell 6 及其他），分到 `study/文件索引/` 的 67 个索引页；每条目有 11 个必填字段：所属层、文件角色、用途、设计原因、文件级设计证据、直接协作者、对应测试、测试关联依据、阅读顺序、代码证据和固定版本，另有可选的「测试支持」字段。[清单](study/source-index-manifest.json)机器可查，[生成器](study-tools/generate-source-index.mjs)、[验证器](study-tools/verify-source-index.mjs)、[质量审计器](study-tools/audit-source-index-quality.mjs)和[手写路径验证器](study-tools/verify-study-links.mjs)保证覆盖与路径正确。普通条目是结构化自动导读，不是逐行人工审查。
 
 ## 与上游的边界
 

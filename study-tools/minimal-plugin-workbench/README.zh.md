@@ -13,4 +13,4 @@ pnpm --dir study-tools/minimal-plugin-workbench run verify
 
 `verify` 的输出是机器可读 JSON，至少包含 `result: "PASS"`、构建入口、Loader entry、服务状态、卸载后的剩余 entry 数量，以及模型/网络请求计数。`dist/` 是临时构建输出，不应提交。
 
-配套学习课是 [`study/28-最小插件工作台.md`](../../study/28-最小插件工作台.md)。
+配套学习课是 [`study/35-最小插件工作台.md`](../../study/35-最小插件工作台.md)。

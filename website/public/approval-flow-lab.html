@@ -20,7 +20,7 @@
       <div class="hero-copy">
         <p class="eyebrow">DSH 学习 · 审批与权限</p>
         <h1>没人能批准的时候，批准通道自己变成拒绝。</h1>
-        <p class="hero-lead">一次 ask 要经过三层：工具主体发起请求，审批服务路由给应答者，人给出这一次的裁决。把应答者拿走会发生什么？规则只有一句——询问退化为拒绝，工具主体不运行。切切换开关，看 allow 的一次性语义和统一的结果分类。</p>
+        <p class="hero-lead">一次 ask 要经过三层：工具主体发起请求，审批服务路由给应答者，人给出这一次的裁决。把应答者拿走会发生什么？规则只有一句——询问退化为拒绝，工具主体不运行。切换开关，看 allow 的一次性语义和统一的结果分类。</p>
         <div class="hero-actions">
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
@@ -78,9 +78,22 @@
           </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
           <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
         </form>
         <p class="feedback" id="af-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="时间轴步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="af-step-output">0</output> 步</span>
+            <input id="af-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数，不改变推演结果；之后的步骤淡出显示。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
+          </label>
+          <div class="stepper-buttons">
+            <button class="button button-quiet" id="af-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="af-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="af-step-caption" role="status" aria-live="polite"></p>
+        </div>
         <dl class="metric-grid" aria-label="审批观测值">
           <div><dt>主体是否运行</dt><dd id="metric-ran">—</dd></div>
           <div><dt>执行次数</dt><dd id="metric-runs">—</dd></div>

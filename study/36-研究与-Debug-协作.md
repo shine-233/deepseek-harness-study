@@ -78,7 +78,7 @@ Debug 的 `repro-export` 会从用户明确指定的诊断、incident、pointer 
 示意命令（路径请换成你自己审阅过的文件）：
 
 ```powershell
-Set-Location C:\path\to\dsh-plugin-debug
+Set-Location C:\path\to\dsh-open-source\packages\dsh-plugin-debug
 
 .\Debug-DSH.ps1 `
   -Action repro-export `
@@ -108,7 +108,7 @@ networkAccessed        = false
 把 request 和 repro 放在你能审阅的位置，然后运行：
 
 ```powershell
-Set-Location C:\path\to\dsh-plugin-debug
+Set-Location C:\path\to\dsh-open-source\packages\dsh-plugin-debug
 
 .\Debug-DSH.ps1 `
   -Action research-bridge `

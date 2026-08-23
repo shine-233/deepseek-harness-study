@@ -12,7 +12,8 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
+import { installInputReset } from './study-lab-kit.js'
 import {
   HOOK_LANES,
   buildHookFlowModel,
@@ -24,11 +25,12 @@ import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
-// 状态链接的输入契约：两个维度都是受控枚举；越界值在恢复时会被模型的
-// 校验拒绝并给出明确反馈。
+// 状态链接的输入契约：两个维度都是受控枚举；步进位置的上界由模型按步骤数给出，
+// 这里只卡整数下界，越界值在恢复时被拉回当前输入的末步。
 const HOOK_STATE_SCHEMA = {
   behavior: { enum: ['call-next', 'return-direct'] },
   verdict: { enum: ['allow', 'deny'] },
+  step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
 function renderFlow(model, target, note) {
@@ -115,9 +117,46 @@ function initializePage() {
     author: document.querySelector('#metric-author'),
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
+    resetInputs: document.querySelector('#reset-inputs'),
+    step: document.querySelector('#hf-step'),
+    stepOutput: document.querySelector('#hf-step-output'),
+    stepPrev: document.querySelector('#hf-step-prev'),
+    stepNext: document.querySelector('#hf-step-next'),
+    stepCaption: document.querySelector('#hf-step-caption'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
+
+  let currentModel = null
+
+  // 把滑杆位置同步到图和表：当前步加描边高亮，之后的步骤淡出；
+  // 说明文字逐字取自模型步骤，不在这里新编事实。
+  const syncStep = () => {
+    if (currentModel === null) return
+    const total = currentModel.steps.length
+    const max = String(total - 1)
+    elements.step.max = max
+    if (Number(elements.step.value) > total - 1 || Number(elements.step.value) < 0) {
+      elements.step.value = max
+    }
+    const index = Number(elements.step.value)
+    writeText(elements.stepOutput, String(index))
+    for (const dot of elements.flow.querySelectorAll('[data-step]')) {
+      const at = Number(dot.getAttribute('data-step'))
+      dot.classList.toggle('is-current', at === index)
+      dot.classList.toggle('is-future', at > index)
+    }
+    for (const row of elements.chainBody.querySelectorAll('tr[data-key]')) {
+      const at = Number(row.dataset.key)
+      row.classList.toggle('is-current', at === index)
+      row.classList.toggle('is-future', at > index)
+    }
+    const entry = currentModel.steps[index]
+    writeText(elements.stepCaption, '第 ' + String(entry.index) + ' 步 · ' + entry.lane
+      + ' · ' + entry.phase + '：' + entry.detail)
+    elements.stepPrev.disabled = index <= 0
+    elements.stepNext.disabled = index >= total - 1
+  }
 
   const rebuild = () => {
     try {
@@ -127,6 +166,7 @@ function initializePage() {
       }
       const model = buildHookFlowModel(input)
       const verdict = evaluateHookFlowOracle(model)
+      currentModel = model
 
       renderFlow(model, elements.flow, elements.flowNote)
       renderOracle(verdict, elements.oracleList, elements.oracle)
@@ -156,6 +196,7 @@ function initializePage() {
         + ' 个监听器，短路=' + (model.observations.shortCircuited ? '是' : '否')
         + '，最终结果 ' + model.observations.finalVerdict + '（'
         + model.observations.finalAuthor + '）。', 'success')
+      syncStep()
       persistState()
     } catch (error) {
       console.error('[hook-flow] rebuild failed', error)
@@ -170,6 +211,7 @@ function initializePage() {
       const nextHash = writeStateToHash(location.hash, {
         behavior: elements.behavior.value,
         verdict: elements.verdict.value,
+        step: Number(elements.step.value),
       }, HOOK_STATE_SCHEMA)
       history.replaceState(null, '', nextHash)
     } catch {
@@ -177,22 +219,54 @@ function initializePage() {
     }
   }
 
+  // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
+  installInputReset(elements.resetInputs, elements.form, { onReset: rebuild })
+
   elements.form.addEventListener('submit', (event) => {
     event.preventDefault()
     rebuild()
   })
   for (const control of [elements.behavior, elements.verdict]) {
-    control.addEventListener('change', rebuild)
+    control.addEventListener('change', () => {
+      // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
+      rebuild()
+      elements.step.value = elements.step.max
+      elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+    })
   }
+
+  elements.step.addEventListener('input', () => {
+    syncStep()
+    persistState()
+  })
+  const nudgeStep = delta => {
+    elements.step.value = String(Math.min(Number(elements.step.max),
+      Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
+    elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+  elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
+  elements.stepNext.addEventListener('click', () => nudgeStep(1))
+  // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
+  bindRangeKeys(elements.step)
+
+  // 恢复前先放宽滑杆上界：max=0 时赋值会被浏览器钳回 0，hash 里的步进会丢；
+  // 真实上界由同步步骤按模型步数写回。
+  elements.step.max = String(Number.MAX_SAFE_INTEGER)
 
   // 从状态链接恢复输入；链接缺失或损坏时保持默认输入，不报错打断阅读。
   const restored = readStateFromHash(location.hash, HOOK_STATE_SCHEMA)
+  const hasRestoredStep = restored !== null && restored.ok
   if (restored !== null && restored.ok) {
     elements.behavior.value = restored.value.behavior
     elements.verdict.value = restored.value.verdict
+    elements.step.value = String(restored.value.step)
   }
 
   rebuild()
+  if (!hasRestoredStep || Number(elements.step.value) > Number(elements.step.max)) {
+    elements.step.value = elements.step.max
+    rebuild()
+  }
 
   elements.copyLink.addEventListener('click', async () => {
     try {

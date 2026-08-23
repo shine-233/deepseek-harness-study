@@ -9,6 +9,7 @@ import { installPredictionGate } from './study-lab-gate.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import {
   installDeclaredIcons,
+  installInputReset,
   makeFeedback,
   prefersReducedMotion,
   replaceList,
@@ -1299,6 +1300,9 @@ function initializePage() {
   }
 
   rebuild()
+
+  // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
+  installInputReset(document.querySelector('#reset-inputs'), form, { onReset: rebuild })
 
   document.querySelector('#copy-state-link')?.addEventListener('click', async () => {
     try {

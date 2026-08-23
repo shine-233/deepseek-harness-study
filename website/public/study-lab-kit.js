@@ -222,3 +222,27 @@ export function installScrollProgress() {
   bar.setAttribute('aria-hidden', 'true')
   document.body.append(bar)
 }
+
+/**
+ * 「恢复默认输入」：清掉地址栏 #state=，把表单控件拉回 HTML 里写的默认值，再用
+ * onReset 让调用方重建一次。重建过程可能把默认值重新写回地址栏，所以收尾时再清一次；
+ * file:// 等环境拒绝 replaceState 时保持安静，表单本身照常复位。
+ */
+export function installInputReset(button, form, { onReset } = {}) {
+  // 不用 instanceof：无 DOM 的测试环境没有 HTMLButtonElement 构造器，鸭子类型检查两边都成立。
+  if (button === null || button === undefined || typeof button.addEventListener !== 'function') return
+  if (form === null || form === undefined || typeof form.reset !== 'function') return
+  const clearStateFromUrl = () => {
+    try {
+      history.replaceState(null, '', location.pathname + location.search)
+    } catch {
+      // replaceState 在 file:// 下可能被拒；这只影响地址栏整洁度，不影响重置。
+    }
+  }
+  button.addEventListener('click', () => {
+    clearStateFromUrl()
+    form.reset()
+    if (onReset) onReset()
+    clearStateFromUrl()
+  })
+}

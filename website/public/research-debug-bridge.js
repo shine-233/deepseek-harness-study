@@ -14,7 +14,7 @@ import { installThemeToggle } from './study-lab-theme.js'
 //   导入这个导出。
 // - svgElement 在本文件从未存在过；生命周期流转图是写在 HTML 里的静态 SVG，
 //   不需要构造器。
-import { installDeclaredIcons } from './study-lab-kit.js'
+import { installDeclaredIcons, installInputReset } from './study-lab-kit.js'
 const SCHEMA_VERSION = 1
 const REQUEST_KIND = 'dsh-research-diagnostic-request'
 const RESULT_KIND = 'dsh-research-diagnostic-result'
@@ -983,6 +983,14 @@ function initializePage() {
   form.addEventListener('submit', (event) => {
     event.preventDefault()
     generateRequest()
+  })
+
+  // 恢复默认输入：表单回到 authored 默认值，再按默认预设重新生成 request 预览。
+  installInputReset(document.querySelector('#reset-inputs'), form, {
+    onReset: () => {
+      applyPreset(presetSelect.value)
+      generateRequest()
+    },
   })
 
   presetSelect.addEventListener('change', () => {

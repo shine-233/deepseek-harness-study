@@ -13,4 +13,4 @@ pnpm --dir study-tools/minimal-plugin-workbench run verify
 
 The `verify` output is machine-readable JSON. It includes `result: "PASS"`, the build artifact, the Loader entry, service phases, the number of entries remaining after unload, and model/network request counters. `dist/` is temporary build output and must not be committed.
 
-The accompanying lesson is [`study/28-最小插件工作台.md`](../../study/28-最小插件工作台.md).
+The accompanying lesson is [`study/35-最小插件工作台.md`](../../study/35-最小插件工作台.md).

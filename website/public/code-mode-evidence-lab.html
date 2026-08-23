@@ -8,6 +8,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Code Mode 权限管线证据实验</title>
   <link rel="stylesheet" href="./study-tokens.css">
+  <!-- 壳样式垫在私有样式之前：本页自有组件样式保持优先，同时继承 shell 的焦点态、
+       forced-colors 补丁和 44px 触达面积打磨。 -->
+  <link rel="stylesheet" href="./study-lab-shell.css">
   <link rel="stylesheet" href="./code-mode-evidence-lab.css">
   <link rel="icon" href="./favicon.svg">
   <script src="./study-theme-boot.js"></script>
@@ -104,6 +107,7 @@
           </label>
 <button class="button button-primary button-wide" type="submit">重建实验</button>
 <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+<button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
 </form>
         </div>
         <p class="feedback" id="lab-feedback" role="status" aria-live="polite"></p>
@@ -269,7 +273,7 @@
         <div>
           <h3>本页没有做</h3>
           <p>没有模型调用、审批弹窗、文件写入、网络请求、浏览器持久化、Debug 自动连接或真实 Session 回放。</p>
-          <a href="./study/lessons/29-研究与-Debug-协作.html">查看手动文件协作边界</a>
+          <a href="./study/lessons/36-研究与-Debug-协作.html">查看手动文件协作边界</a>
         </div>
       </div>
     </section>

@@ -13,6 +13,7 @@ import {
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
+import { installInputReset } from './study-lab-kit.js'
 import {
   PLUGIN_LANES,
   PLUGIN_SCENARIOS,
@@ -131,6 +132,7 @@ function initializePage() {
     effects: document.querySelector('#metric-effects'),
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
+    resetInputs: document.querySelector('#reset-inputs'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -207,6 +209,9 @@ function initializePage() {
       // 保持安静：hash 写不进去时页面行为不变。
     }
   }
+
+  // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
+  installInputReset(elements.resetInputs, elements.form, { onReset: rebuild })
 
   elements.form.addEventListener('submit', (event) => {
     event.preventDefault()
