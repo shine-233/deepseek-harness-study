@@ -1,0 +1,48 @@
+name: Regenerate source index (one-off)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: true
+
+      - name: Fetch the pinned upstream commit
+        run: |
+          commit="$(node -p "require('./study/source-index-manifest.json').commit")"
+          git fetch --no-tags --depth 1 origin "$commit"
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check out the pinned upstream tree
+        run: |
+          commit="$(node -p "require('./study/source-index-manifest.json').commit")"
+          git worktree add "$RUNNER_TEMP/upstream" "$commit"
+
+      - name: Regenerate the per-file index
+        run: |
+          commit="$(node -p "require('./study/source-index-manifest.json').commit")"
+          node study-tools/generate-source-index.mjs \
+            --commit "$commit" \
+            --source-root "$RUNNER_TEMP/upstream"
+
+      - name: Commit regenerated pages
+        run: |
+          git config user.name "shine-233"
+          git config user.email "shine-233@users.noreply.github.com"
+          git add study/文件索引 study/source-index-manifest.json
+          if git diff --cached --quiet; then
+            echo "index already up to date"
+            exit 0
+          fi
+          git commit -m "chore(study): regenerate the per-file index with grouped navigation"
+          git push
