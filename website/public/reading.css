@@ -1813,3 +1813,55 @@ body::before {
   max-width: 640px;
   height: auto;
 }
+
+/* ===== 2026 视觉升级：微交互与层次感（追加，不影响既有规则） ===== */
+
+/* 卡片悬停：轻抬 + 阴影加深 + 边框色向品牌色靠拢 */
+.vp-doc .card,
+.vp-doc [class*="card"] {
+  transition: transform 180ms ease, box-shadow 220ms ease, border-color 180ms ease;
+}
+.vp-doc .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  border-color: var(--vp-c-brand-soft);
+}
+
+/* 引用块：左侧品牌色条在暗色模式下更醒目 */
+.vp-doc blockquote {
+  border-left: 3px solid var(--vp-c-brand-1);
+  border-radius: 0 6px 6px 0;
+  padding-left: 16px;
+}
+
+/* 表格行悬停高亮 */
+.vp-doc tr:nth-child(even) {
+  transition: background-color 120ms ease;
+}
+.vp-doc tbody tr:hover {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 5%, transparent);
+}
+
+/* 按钮微交互：按下缩放反馈 */
+.vp-doc a.button,
+.vp-doc button {
+  transition: transform 100ms ease, box-shadow 160ms ease;
+}
+.vp-doc a.button:active,
+.vp-doc button:active {
+  transform: scale(0.97);
+}
+
+/* 实验室枢纽卡片悬停：图标微放大 */
+.lab-card:hover .lab-mini {
+  transform: scale(1.06);
+  transition: transform 200ms ease;
+}
+.lab-mini {
+  transition: transform 200ms ease;
+}
+
+/* 平滑主题切换过渡 */
+html {
+  transition: background-color 300ms ease, color 300ms ease;
+}
