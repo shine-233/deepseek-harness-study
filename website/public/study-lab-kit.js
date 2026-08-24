@@ -574,13 +574,20 @@ if (typeof document !== 'undefined' && typeof MutationObserver === 'function') {
       if (target.dataset.tweening === 'true') continue
       const oldRaw = mutation.oldValue?.trim() ?? ''
       const newRaw = target.textContent?.trim() ?? ''
+      // 数值变化：数字滚动 + 背景闪光
       const oldNum = parseNum(oldRaw)
       const newNum = parseNum(newRaw)
-      if (oldNum === null || newNum === null || reducedMotion.matches) continue
-      if (oldNum === newNum) continue
-      target.dataset.tweening = 'true'
-      animateNumber(target, newNum, { duration: 360 })
-      setTimeout(() => { delete target.dataset.tweening }, 400)
+      if (oldNum !== null && newNum !== null && !reducedMotion.matches && oldNum !== newNum) {
+        target.dataset.tweening = 'true'
+        animateNumber(target, newNum, { duration: 360 })
+        setTimeout(() => { delete target.dataset.tweening }, 400)
+      }
+      // 非数值文本变化：背景闪光（人性化——让读者注意到值变了）
+      if (oldRaw !== newRaw && oldRaw !== '' && newRaw !== '') {
+        target.classList.remove('metric-flash')
+        void target.offsetWidth // 强制重排以重启动画
+        target.classList.add('metric-flash')
+      }
     }
   })
   let metricsObserved = false

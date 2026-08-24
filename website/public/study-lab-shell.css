@@ -797,3 +797,143 @@ html { scroll-behavior: smooth; }
   .card:hover { transform: none; }
   .pulse-once { animation: none; }
 }
+
+/*
+ * ===== 以下为全站视觉增强层（纯 CSS，合成器安全）=====
+ */
+
+/*
+ * 1. Oracle 徽标脉冲：判定从 fail → pass 时绿色扩散环，
+ *    从 pass → fail 时红色抖动。data-pass 属性由 renderOracle 写入。
+ */
+.metric-oracle dd[data-pass="true"] {
+  animation: oracle-pass-pulse 600ms ease-out 1;
+}
+.metric-oracle dd[data-pass="false"] {
+  animation: oracle-fail-shake 400ms ease-out 1;
+}
+@keyframes oracle-pass-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--allow-ink, #2e7d32) 50%, transparent); }
+  70% { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes oracle-fail-shake {
+  0%, 100% { translate: 0 0; }
+  20% { translate: -3px 0; }
+  40% { translate: 3px 0; }
+  60% { translate: -2px 0; }
+  80% { translate: 2px 0; }
+}
+
+/*
+ * 2. 卡片悬停渐变描边（@property + conic-gradient，Chrome 111+/Firefox 128+）：
+ *    悬停时品牌色光弧绕卡片边框旋转一圈。不支持的浏览器静默降级。
+ */
+@property --dsh-card-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card {
+    position: relative;
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--dsh-card-angle),
+      transparent 0deg,
+      transparent 280deg,
+      var(--brand) 330deg,
+      transparent 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease;
+  }
+  .card:hover::after {
+    opacity: 1;
+    animation: dsh-card-spin 2.5s linear infinite;
+  }
+}
+@keyframes dsh-card-spin {
+  to { --dsh-card-angle: 360deg; }
+}
+
+/*
+ * 3. 表格行交错进场（view() timeline）：每行在进入视口时淡入上移，
+ *    行序号通过 nth-child 计算延迟，形成瀑布效果。
+ *    仅在浏览器支持 view() timeline 且未减少动态时启用。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .table-scroll table tbody tr {
+      animation: row-stagger-enter 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+    @keyframes row-stagger-enter {
+      from { opacity: 0; transform: translateX(-12px); }
+      to { opacity: 1; transform: none; }
+    }
+  }
+}
+
+/*
+ * 4. 区块标题下划线绘制：h2 下方的伪元素线条从左到右展开，
+ *    由 view() timeline 驱动——滚到哪画到哪。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .section-heading h2 {
+      position: relative;
+      padding-bottom: 6px;
+    }
+    .section-heading h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--brand), transparent);
+      transform-origin: left;
+      animation: heading-underline-draw 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 45%;
+    }
+    @keyframes heading-underline-draw {
+      from { transform: scaleX(0); opacity: 0; }
+      to { transform: scaleX(1); opacity: 0.35; }
+    }
+  }
+}
+
+/*
+ * 5. 指标值变更闪烁背景：MutationObserver 检测到文本变化时，
+ *    给 dd 元素加 .metric-flash 类触发一次性背景闪光。
+ */
+.metric-flash {
+  animation: metric-flash-bg 500ms ease-out 1;
+}
+@keyframes metric-flash-bg {
+  0% { background: color-mix(in srgb, var(--brand) 15%, transparent); border-radius: 4px; }
+  100% { background: transparent; }
+}
+
+/* 减少动态偏好下全部禁用 */
+@media (prefers-reduced-motion: reduce) {
+  .metric-oracle dd[data-pass="true"],
+  .metric-oracle dd[data-pass="false"] { animation: none !important; }
+  .card::after { display: none !important; }
+  .table-scroll table tbody tr { animation: none !important; }
+  .section-heading h2::after { animation: none !important; }
+  .metric-flash { animation: none !important; }
+}
