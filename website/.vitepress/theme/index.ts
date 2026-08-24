@@ -72,6 +72,24 @@ export default {
       indexCard.type = 'module'
       indexCard.src = (base.endsWith('/') ? base : base + '/') + 'study-indexcard.js'
       document.head.append(indexCard)
+      // 裁决矩阵（17 课）、迁移步进器（18 课）、抽查结果浏览器（24 课）、
+      // 检查边界浏览器（29 课）：同样按容器存在才渲染。
+      const verdict = document.createElement('script')
+      verdict.type = 'module'
+      verdict.src = (base.endsWith('/') ? base : base + '/') + 'study-verdict.js'
+      document.head.append(verdict)
+      const migration = document.createElement('script')
+      migration.type = 'module'
+      migration.src = (base.endsWith('/') ? base : base + '/') + 'study-migration.js'
+      document.head.append(migration)
+      const auditCards = document.createElement('script')
+      auditCards.type = 'module'
+      auditCards.src = (base.endsWith('/') ? base : base + '/') + 'study-auditcards.js'
+      document.head.append(auditCards)
+      const pipeline = document.createElement('script')
+      pipeline.type = 'module'
+      pipeline.src = (base.endsWith('/') ? base : base + '/') + 'study-pipeline.js'
+      document.head.append(pipeline)
     }
   },
 } satisfies Theme
