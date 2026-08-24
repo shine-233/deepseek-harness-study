@@ -10,6 +10,7 @@ import {
   renderBoundary,
   renderOracle,
   renderRows,
+  pulseSignal,
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
@@ -146,6 +147,10 @@ function initializePage() {
       dot.classList.toggle('is-current', at === index)
       dot.classList.toggle('is-future', at > index)
     }
+    // 签名瞬间：短路火花（decide 且直接返回）与下游失活。
+    const sigStep = currentModel.steps[index]
+    if (sigStep.phase === 'decide' && currentModel.input.behavior === 'return-direct') pulseSignal(elements.flow.querySelector('[data-step="' + index + '"]'), 'is-spark')
+    else if (sigStep.phase === 'skip') pulseSignal(elements.flow.querySelector('[data-step="' + index + '"]'), 'is-dead')
     for (const row of elements.chainBody.querySelectorAll('tr[data-key]')) {
       const at = Number(row.dataset.key)
       row.classList.toggle('is-current', at === index)

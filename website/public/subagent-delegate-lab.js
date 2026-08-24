@@ -8,6 +8,7 @@ import {
   renderBoundary,
   renderOracle,
   renderRows,
+  pulseSignal,
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
@@ -144,6 +145,11 @@ function initializePage() {
       dot.classList.toggle('is-current', at === index)
       dot.classList.toggle('is-future', at > index)
     }
+    // 签名瞬间：深度墙撞击 / 子会话创建弹出。
+    const sigDot = elements.flow.querySelector('[data-step="' + index + '"]')
+    const sigStep = currentModel.steps[index]
+    if (sigStep.rejected === true) pulseSignal(sigDot, 'is-wall')
+    else if (sigStep.phase === 'create') pulseSignal(sigDot, 'is-pop')
     for (const row of elements.tableBody.querySelectorAll('tr[data-key]')) {
       const at = Number(row.dataset.key)
       row.classList.toggle('is-current', at === index)

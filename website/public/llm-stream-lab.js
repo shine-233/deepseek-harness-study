@@ -69,7 +69,7 @@ function renderStream(model, target, note) {
       width: slot - 6,
       height: 24,
       rx: 4,
-      class: (KIND_CLASS[chunk.kind] ?? 'st-text') + (rejectedHere ? ' is-rejected' : ''),
+      class: (KIND_CLASS[chunk.kind] ?? 'st-text') + (rejectedHere ? ' is-rejected is-bounce' : ''),
     })
     rect.append(svgElement('title', {},
       '#' + String(chunk.arrival) + ' · ' + chunk.kind + '：' + chunk.text

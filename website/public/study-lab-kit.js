@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 四个学习实验页共用的渲染工具。
  *
  * 只放渲染辅助：SVG 构造、文本写入、列表替换、oracle 列表和证据边界的渲染。
@@ -11,6 +11,23 @@ import { prefixIcon } from './study-lab-icons.js'
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
 /** 一律用 textContent 赋值：导入的字符串永远当文本，不当标记。 */
+export function bindRowJump(tableBody, slider) {
+  if (tableBody === null || slider === null) return
+  tableBody.addEventListener('click', (event) => {
+    const row = event.target instanceof Element ? event.target.closest('tr[data-key]') : null
+    if (row === null) return
+    const key = Number(row.dataset.key)
+    if (!Number.isInteger(key)) return
+    slider.value = String(key)
+    slider.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+}
+export function pulseSignal(element, className) {
+  if (element === null) return
+  element.classList.remove(className)
+  if (typeof element.getBBox === 'function') element.getBBox()
+  requestAnimationFrame(() => element.classList.add(className))
+}
 export function writeText(target, value) {
   target.textContent = String(value)
 }

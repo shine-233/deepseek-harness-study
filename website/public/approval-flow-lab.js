@@ -8,6 +8,7 @@ import {
   renderBoundary,
   renderOracle,
   renderRows,
+  pulseSignal,
   requireElements,
   svgElement,
   writeText, animateNumber, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
@@ -155,6 +156,10 @@ function initializePage() {
       dot.classList.toggle('is-current', at === index)
       dot.classList.toggle('is-future', at > index)
     }
+    // 签名瞬间：拒绝裁决火花 + 工具主体被跳过。
+    const sigStep = currentModel.steps[index]
+    if (sigStep.phase === 'decide' && currentModel.input.decision === 'deny') pulseSignal(elements.flow.querySelector('[data-step="' + index + '"]'), 'is-spark')
+    else if (sigStep.phase === 'skip') pulseSignal(elements.flow.querySelector('[data-step="' + index + '"]'), 'is-dead')
     for (const row of elements.tableBody.querySelectorAll('tr[data-key]')) {
       const at = Number(row.dataset.key)
       row.classList.toggle('is-current', at === index)

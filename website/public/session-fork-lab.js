@@ -8,6 +8,7 @@ import {
   renderBoundary,
   renderOracle,
   renderRows,
+  pulseSignal,
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
@@ -146,6 +147,11 @@ function initializePage() {
       dot.classList.toggle('is-current', at === index)
       dot.classList.toggle('is-future', at > index)
     }
+    // 签名瞬间：崩溃晃动 + 子会话分身亮环。
+    const sigStep = currentModel.steps[index]
+    if (sigStep.phase === 'crash') pulseSignal(elements.flow.querySelector('[data-step="' + index + '"]'), 'is-crash')
+    const childFirst = currentModel.steps.findIndex(item => item.lane.startsWith('子'))
+    if (childFirst !== -1 && index === childFirst) pulseSignal(elements.flow.querySelector('[data-step="' + index + '"]'), 'is-split')
     for (const row of elements.tableBody.querySelectorAll('tr[data-key]')) {
       const at = Number(row.dataset.key)
       row.classList.toggle('is-current', at === index)

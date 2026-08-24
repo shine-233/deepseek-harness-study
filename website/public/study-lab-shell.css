@@ -365,6 +365,11 @@ tbody tr:hover { background: color-mix(in srgb, var(--brand) 7%, transparent); }
   touch-action: pan-y;
 }
 
+/* 反向联动表：行可点击跳时间轴。悬停高亮由既有的 tbody tr:hover 规则承担。 */
+.lab-rows-jump tr[data-key] {
+  cursor: pointer;
+}
+
 /* 这里的过渡只标记指针位置，不编码任何数值，去掉不损失信息。 */
 @media (prefers-reduced-motion: reduce) {
   .button { transition: none; }
@@ -524,3 +529,30 @@ button[aria-pressed="true"] {
 
 tbody tr[data-key].is-future { opacity: 0.5; }
 tbody tr[data-key].is-current { background: color-mix(in srgb, var(--brand) 10%, transparent); }
+
+/* 签名瞬间：步进落到关键步骤时的一次性动画；reduced-motion 全关。 */
+@keyframes sig-spark { 0% { r: 9px; opacity: 1; } 60% { r: 24px; opacity: .35; } 100% { r: 30px; opacity: 0; } }
+@keyframes sig-shake { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-3px, 0); } 55% { transform: translate(3px, -1px); } 80% { transform: translate(-2px, 1px); } }
+@keyframes sig-wall-x { 0%, 100% { transform: translateX(0); } 35% { transform: translateX(-5px); } 70% { transform: translateX(4px); } }
+@keyframes sig-pop { 0% { transform: scale(.55); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+@keyframes sig-ping { 0%, 100% { r: 11px; } 45% { r: 17px; } }
+@keyframes sig-bounce-y { 0% { transform: translateY(0); } 30% { transform: translateY(-8px); } 55% { transform: translateY(4px); } 78% { transform: translateY(-2px); } 100% { transform: translateY(0); } }
+.plot-scroll [data-step].is-spark { animation: sig-spark .7s ease-out both; fill: var(--signal); }
+.plot-scroll [data-step].is-dead { opacity: .28; }
+.plot-scroll [data-step].is-crash { animation: sig-shake .5s ease-in-out both; fill: var(--deny); }
+.plot-scroll [data-step].is-split { animation: sig-ping .6s ease-out 2 both; stroke: var(--brand-bright, var(--brand)); stroke-width: 3; }
+.plot-scroll [data-step].is-wall { animation: sig-wall-x .5s ease both; stroke: var(--deny); stroke-width: 3; }
+.plot-scroll [data-step].is-pop { animation: sig-pop .55s cubic-bezier(.34, 1.56, .64, 1) both; transform-box: fill-box; transform-origin: center; }
+.plot-scroll [data-step].is-ping { animation: sig-ping .5s ease-out both; fill: var(--brand); }
+.plot-scroll [data-step].is-thud { animation: sig-ping .38s ease-out 2 both; fill: var(--signal); }
+svg rect.is-rejected.is-bounce { animation: sig-bounce-y .65s ease both; stroke: var(--deny); stroke-width: 2; }
+@media (prefers-reduced-motion: reduce) {
+  .plot-scroll [data-step].is-spark,
+  .plot-scroll [data-step].is-crash,
+  .plot-scroll [data-step].is-split,
+  .plot-scroll [data-step].is-wall,
+  .plot-scroll [data-step].is-pop,
+  .plot-scroll [data-step].is-ping,
+  .plot-scroll [data-step].is-thud,
+  svg rect.is-rejected.is-bounce { animation: none; }
+}

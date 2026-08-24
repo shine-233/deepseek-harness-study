@@ -2,7 +2,8 @@
  * 循环卫生提醒实验页的渲染层。模型在 guard-loop-model.js。
  */
 import {
-  makeFeedback, renderBoundary, renderOracle, renderRows,
+  makeFeedback,
+  pulseSignal, renderBoundary, renderOracle, renderRows,
   requireElements, svgElement, writeText, animateNumber,
   installDeclaredIcons, installScrollProgress, installInputReset,
   bindRangeKeys, bindPlotScrub,
@@ -165,6 +166,9 @@ function initializePage() {
       dot.classList.toggle('is-current', at === index)
       dot.classList.toggle('is-future', at > index)
     }
+    // 签名瞬间：阈值命中脉冲（温和单响 / 详细双响）。
+    const sigDot = el.flow.querySelector('[data-step="' + index + '"]')
+    if (entry.phase === 'remind') pulseSignal(sigDot, entry.tier === 'gentle' ? 'is-ping' : 'is-thud')
     el.stepPrev.disabled = index <= 0
     el.stepNext.disabled = index >= total - 1
   }
