@@ -1,0 +1,6 @@
+﻿/* 线协议实验室：生命线与消息箭头。 */
+.lifeline { stroke: var(--muted, #9aa3ad); stroke-dasharray: 4 4; }
+.msg { stroke: var(--brand); stroke-width: 2; fill: none; }
+.msg.is-error { stroke: var(--deny-ink, #c62828); }
+.msg.is-note { stroke: var(--signal-ink, #b45309); stroke-dasharray: 6 4; }
+.msg-label { font-size: 12px; }

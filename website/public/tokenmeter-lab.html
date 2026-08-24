@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="Token 计量：从日志重放推导读数，measured 与 estimated 两种基线殊途同归——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Token 计量实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css"><link rel="stylesheet" href="./tokenmeter-lab.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#tmk-main">跳到实验</a>
+  <main class="lab-shell" id="tmk-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 用量与压力</p>
+        <h1>两种基线口径，同一个总数——差别只在账记在谁头上。</h1>
+        <p class="hero-lead">token-meter 从 Session 日志重放推导读数：provider 返回过 usage 时用实测基线（header + 已有表面），增量只算新增；没有 usage 就退化为估算基线（只有 header），增量算全部表面。两种口径的 totalTokens 相同。上下文压力只是读数——跨过阈值不截断，瘦身是 compaction 和 spill 的事。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/06-LLM与工具执行.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./prompt-assembly-lab.html">打开提示组装实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界"><span class="warning-index">MODEL / 10</span><strong>估算口径：每字符 0.25 token。</strong><p>规则取自上游 token-meter 源码（基线 aa6c361a）；页面不装 tokenizer。</p></aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：切到「估算基线」（没有 provider usage）之后，总读数会怎么变？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="same"><span>不变——归属方式变了，总账没变</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="lower"><span>变少——少了 usage 那份实测数据</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="zero"><span>归零——没有 usage 就没有可信读数</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="meter-form">
+          <label><span>已有表面内容：<output id="tmk-existing-output">1200</output> 字符</span><input id="tmk-existing" type="range" min="0" max="20000" step="100" value="1200"></label>
+          <label><span>新增内容：<output id="tmk-new-output">400</output> 字符</span><input id="tmk-new" type="range" min="0" max="20000" step="100" value="400"></label>
+          <label><span>上下文窗口：<output id="tmk-window-output">8000</output> tokens</span><input id="tmk-window" type="range" min="1000" max="32000" step="500" value="8000"></label>
+          <label class="sb-check"><input id="tmk-measured" type="checkbox" checked><span>provider 返回过 usage（实测基线）</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="meter-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="计量观测值">
+          <div><dt>基线来源</dt><dd id="metric-kind">—</dd></div>
+          <div><dt>基线 tokens</dt><dd id="metric-baseline">—</dd></div>
+          <div><dt>表面增量</dt><dd id="metric-delta">—</dd></div>
+          <div><dt>总读数</dt><dd id="metric-total">—</dd></div>
+          <div><dt>上下文压力</dt><dd id="metric-pressure">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="tmk-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="gauge">压力表</p><h2 id="tmk-title">总读数占窗口的比例</h2></div><span class="schema-pill">tokens × 窗口</span></div>
+      <p class="section-intro">条内分段显示两种口径各自的贡献：实测口径把已有表面计入基线、增量只算新增；估算口径基线只剩 header，全部表面都算增量。总数恒等。</p>
+      <div class="plot-scroll" id="tmk-plot"></div>
+      <p class="chart-note" id="tmk-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>规则逐条重算</h2></div><span class="schema-pill schema-oracle">账目校验</span></div>
+        <p class="section-intro">独立校验自己重算总数、双口径一致性与压力数学；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不连接任何 Host</span><a href="./compaction-lab.html">继续看上下文压缩实验</a></footer>
+  </main>
+  <script type="module" src="./tokenmeter-lab.js"></script>
+</body>
+</html>

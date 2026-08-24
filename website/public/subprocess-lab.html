@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="子进程缝：DSH_ 环境隔离、输出按字节封顶保留 TAIL、spill 可恢复或明确丢弃——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>子进程实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css"><link rel="stylesheet" href="./subprocess-lab.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sbp-main">跳到实验</a>
+  <main class="lab-shell" id="sbp-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 子进程</p>
+        <h1>输出超限时留下的是尾巴——诊断价值最高的那段。</h1>
+        <p class="hero-lead">受管子进程的环境事实一律带 DSH_ 前缀，与调用方环境互不串台。输出收集按字节封顶：溢出时保留 TAIL、丢弃头部，truncated 标记如实报告。可选的 spill 文件让完整流可恢复——但流若比 spill 上限还大，宁可承认丢弃也不假装完整。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/06-LLM与工具执行.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./terminal-lab.html">打开终端会话实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 07</span><strong>横轴是字节数，按给定值直接推演。</strong>
+        <p>规则取自上游 subprocess 类型声明（基线 aa6c361a）；页面不启动真实进程。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：输出 1000 字节、maxBytes=300、spill 上限 500——最后你能拿回什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="full-spill"><span>完整流——spill 文件里全都有</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="tail-only"><span>只有 TAIL 300 字节——流比 spill 上限还大，spill 被丢弃</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="head"><span>头部 300 字节——截断从头开始</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="subprocess-form">
+          <label><span>输出大小：<output id="spx-bytes-output">300</output> 字节</span><input id="spx-bytes" type="range" min="0" max="4000" step="50" value="300"></label>
+          <label><span>内存上限 maxBytes：<output id="spx-cap-output">200</output> 字节</span><input id="spx-cap" type="range" min="50" max="2000" step="25" value="200"></label>
+          <label><span>stdin 模式</span><select id="spx-stdin"><option value="pipe">pipe（交互写端）</option><option value="ignore">ignore（/dev/null）</option><option value="data">data（批处理写入）</option></select></label>
+          <label class="sb-check"><input id="spx-spill" type="checkbox" checked><span>启用 spill 文件</span></label>
+          <label><span>spill 上限：<output id="spx-spillcap-output">4000</output> 字节</span><input id="spx-spillcap" type="range" min="500" max="8000" step="250" value="4000"></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="subprocess-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="子进程观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>原始输出</dt><dd id="metric-out">—</dd></div>
+          <div><dt>内存 TAIL</dt><dd id="metric-kept">—</dd></div>
+          <div><dt>丢弃头部</dt><dd id="metric-dropped">—</dd></div>
+          <div><dt>spill 状态</dt><dd id="metric-spill">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="spx-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="gauge">字节去向图</p><h2 id="spx-title">一条流的两个去处</h2></div><span class="schema-pill">字节 × 去处</span></div>
+      <p class="section-intro">上面是原始输出的全长；下面拆出「进内存的 TAIL」与「被丢弃的头部」。启用 spill 且未超限时，完整流在工件行可恢复；超限时那一格标红——它不会假装存在。</p>
+      <div class="plot-scroll" id="spx-plot"></div>
+      <p class="chart-note" id="spx-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>规则逐条重算</h2></div><span class="schema-pill schema-oracle">守恒校验</span></div>
+        <p class="section-intro">独立校验自己重算字节守恒、truncated 如实性与 spill 三态互斥；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不连接任何 Host</span><a href="./terminal-lab.html">继续看终端会话实验</a></footer>
+  </main>
+  <script type="module" src="./subprocess-lab.js"></script>
+</body>
+</html>

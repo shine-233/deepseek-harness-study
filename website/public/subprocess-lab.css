@@ -1,0 +1,8 @@
+/* 子进程实验室：字节去向配色。 */
+.sp2-raw { fill: var(--brand); }
+.sp2-kept { fill: var(--allow-ink, #2e7d32); }
+.sp2-drop { fill: var(--deny-ink, #c62828); opacity: 0.75; }
+.sp2-artifact { fill: color-mix(in srgb, var(--allow-ink, #2e7d32) 35%, transparent); stroke: var(--allow-ink, #2e7d32); }
+.cap-line { stroke: var(--signal-ink, #b45309); stroke-width: 2; stroke-dasharray: 5 4; }
+.cap-label { fill: var(--signal-ink, #b45309); font-size: 12px; font-weight: 700; }
+.sb-controls .sb-check { flex-direction: row; align-items: center; gap: 8px; }

@@ -1,0 +1,6 @@
+/* LSP 实验室：预留表行样式。 */
+.lsp-row { fill: color-mix(in srgb, var(--brand) 12%, transparent); stroke: var(--brand); }
+.lsp-row.is-dead { stroke: var(--deny-ink, #c62828); fill: none; stroke-dasharray: 5 4; }
+.axis.is-strike { fill: var(--deny-ink, #c62828); text-decoration: line-through; }
+.axis.is-query { font-weight: 700; fill: var(--allow-ink, #2e7d32); }
+.sb-controls .sb-check { flex-direction: row; align-items: center; gap: 8px; }

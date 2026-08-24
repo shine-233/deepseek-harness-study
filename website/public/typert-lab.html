@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="Typert 三件套：类型图构建与渲染、注册表两阶段提交与零残留撤销——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Typert 实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css"><link rel="stylesheet" href="./typert-lab.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#ty-main">跳到实验</a>
+  <main class="lab-shell" id="ty-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 类型与模式</p>
+        <h1>类型抽成图，端点先验明正身。</h1>
+        <p class="hero-lead">typert-generator 把 TS 源抽成编译器无关的类型图（declarations + 节点，子边用图局部 id），renderer 只消费这张图。registry 用两阶段提交管理 invocation：prepare 全量校验端点与 id 唯一性，冲突在变更前抛错零残留；withdraw 只撤自己的并释放两端。loader 对导出 ./typert 的挂载包自动注册、卸载即撤销。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/03-核心文件精读.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./mcp-lab.html">打开 MCP 客户端实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / SS</span><strong>类型目录是教学快照。</strong>
+        <p>规则取自上游 typert 源码（基线 aa6c361a）；页面不跑真实 checker 或远程调用。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：owner-b 用不同端点 ep-b 但重用 owner-a 的 invocation id id-a——会发生什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="ok-diff-endpoint"><span>成功——端点不冲突就行，id 可以撞</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="id-conflict"><span>被拒——invocation id 也是全表唯一</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="replace"><span>成功且顶替 owner-a 的旧条目</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="typert-form">
+          <label><span>类型图形态</span><select id="ty-shape">
+            <option value="flat">flat：对象 + 两个关键字字段</option>
+            <option value="nested">nested：两层嵌套对象</option>
+            <option value="with-ref">with-ref：引用共享声明</option>
+          </select></label>
+          <label><span>face</span><select id="ty-face"><option value="host">host</option><option value="client">client</option></select></label>
+          <label><span>注册场景</span><select id="ty-scenario">
+            <option value="clean">clean：双方各占一个端点</option>
+            <option value="endpoint-dup">endpoint 冲突：B 抢 A 的端点</option>
+            <option value="id-dup">id 冲突：B 换端点但重用 A 的 id</option>
+          </select></label>
+          <label class="sb-check"><input id="ty-withdraw" type="checkbox" checked><span>随后撤销 owner-a（观察零残留与定向释放）</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="typert-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="Typert 观测值">
+          <div><dt>图节点数</dt><dd id="metric-nodes">—</dd></div>
+          <div><dt>图边数</dt><dd id="metric-edges">—</dd></div>
+          <div><dt>图最大深度</dt><dd id="metric-depth">—</dd></div>
+          <div><dt>存活的端点</dt><dd id="metric-endpoints">—</dd></div>
+          <div><dt>changes 事件</dt><dd id="metric-changes">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="ty-graph-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="cube">面板一 · 类型图</p><h2 id="ty-graph-title">declarations 与节点的父子结构</h2></div><span class="schema-pill">节点 × 子边</span></div>
+      <p class="section-intro">渲染文本按深度优先展开；切换形态看节点数、边数和深度的联动。face 只决定产物聚合去向，不改图结构。</p>
+      <div class="plot-scroll"><pre class="ty-rendered" id="ty-rendered">—</pre></div>
+      <p class="chart-note" id="ty-graph-note"></p>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="ty-reg-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="lock">面板二 · 注册表</p><h2 id="ty-reg-title">两阶段提交与定向撤销</h2></div><span class="schema-pill">贡献方 × 端点</span></div>
+      <p class="section-intro">每行是一条 invocation：prepare 阶段全量校验（端点与 id 双唯一），commit 才绑定 owner；withdraw 按 owner 定向撤销并发 changes 事件。悬停行看细节。</p>
+      <div class="plot-scroll"><ol class="ty-steps" id="ty-reg-steps"></ol></div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>两个面板各自重算</h2></div><span class="schema-pill schema-oracle">图 + 账目校验</span></div>
+        <p class="section-intro">图侧核对边的存在性与无环性；账目侧核对零残留与定向撤销。两侧都不读渲染层中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不连接任何 Host</span><a href="./study-labs.html">返回实验室总览</a></footer>
+  </main>
+  <script type="module" src="./typert-lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+﻿/* Typert 实验室：渲染文本块与注册步骤行。 */
+.ty-rendered {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  white-space: pre-wrap;
+}
+
+.ty-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ty-step {
+  padding: 8px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--muted, #9aa3ad) 35%, transparent);
+}
+
+.ty-step strong { display: block; font-size: var(--fs-small, 13px); }
+.ty-step.is-reject strong { color: var(--deny-ink, #c62828); }
+.ty-step.is-ok strong { color: var(--allow-ink, #2e7d32); }
+
+.sb-controls .sb-check { flex-direction: row; align-items: center; gap: 8px; }

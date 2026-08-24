@@ -1,0 +1,8 @@
+﻿/* Token 计量实验室：压力表配色。 */
+.tmk-track { fill: color-mix(in srgb, var(--muted, #9aa3ad) 22%, transparent); }
+.tmk-base { fill: var(--brand); }
+.tmk-delta { fill: var(--allow-ink, #2e7d32); }
+.tmk-est { fill: color-mix(in srgb, var(--signal-ink, #b45309) 70%, transparent); }
+.cap-line { stroke: var(--deny-ink, #c62828); stroke-width: 2; stroke-dasharray: 5 4; }
+.cap-label { fill: var(--deny-ink, #c62828); font-size: 12px; font-weight: 700; }
+.sb-controls .sb-check { flex-direction: row; align-items: center; gap: 8px; }

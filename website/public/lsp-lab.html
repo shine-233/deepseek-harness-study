@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="LSP 缝：扩展名独占预留、原子注册、按最终扩展名路由查询——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>语言服务实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css"><link rel="stylesheet" href="./lsp-lab.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#lsp-main">跳到实验</a>
+  <main class="lab-shell" id="lsp-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 语言服务</p>
+        <h1>谁先占了一个扩展名，查询就归谁——与注册顺序无关。</h1>
+        <p class="hero-lead">每个语言服务器 Provider 原子地预留一组文件扩展名：校验和冲突检查全部通过才生效，失败时零残留。查询按文件的最终扩展名路由到唯一的服务器；缝只暴露 goToDefinition、findReferences、goToImplementation、hover 四个操作，没有 JSON-RPC 逃生门。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/06-LLM与工具执行.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./mcp-lab.html">打开 MCP 客户端实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界"><span class="warning-index">MODEL / 08</span><strong>注册表是教学快照。</strong><p>规则取自上游 lsp 源码（基线 aa6c361a）；页面不启动真实语言服务器。</p></aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：typescript-lsp 已预留 .ts，deno-lsp 也想预留 .ts——会发生什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="share"><span>共享：两家都能处理 .ts 的查询</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="last-wins"><span>后到者抢走 .ts，先到者失去它</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="rejected"><span>冲突注册整体失败，先到者不受影响</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="lsp-form">
+          <label class="sb-check"><input id="lsp-conflict" type="checkbox"><span>加入冲突场景：deno-lsp 也申请 .ts</span></label>
+          <label class="sb-check"><input id="lsp-invalid" type="checkbox"><span>某 provider 声明了非法扩展名（空串）</span></label>
+          <label><span>查询目标文件</span><select id="lsp-ext"><option value="ts">sample.ts</option><option value="py">sample.py</option></select></label>
+          <label><span>查询操作</span><select id="lsp-op"><option>hover</option><option>goToDefinition</option><option>findReferences</option><option>goToImplementation</option></select></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="lsp-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="LSP 观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>路由到</dt><dd id="metric-route">—</dd></div>
+          <div><dt>注册失败</dt><dd id="metric-fail">—</dd></div>
+          <div><dt>暴露的操作</dt><dd id="metric-ops">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="lsp-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="route">预留与路由</p><h2 id="lsp-title">扩展名 → Provider 的唯一映射</h2></div><span class="schema-pill">预留 × 路由</span></div>
+      <p class="section-intro">左边是当前预留表（一个扩展名至多一行），右边是这次查询的落点。失败的注册不会在表里留下任何残行。</p>
+      <div class="plot-scroll" id="lsp-plot"></div>
+      <p class="chart-note" id="lsp-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>规则逐条重算</h2></div><span class="schema-pill schema-oracle">路由校验</span></div>
+        <p class="section-intro">独立校验自己重算原子性、路由结果与操作白名单；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不连接任何 Host</span><a href="./mcp-lab.html">继续看 MCP 客户端实验</a></footer>
+  </main>
+  <script type="module" src="./lsp-lab.js"></script>
+</body>
+</html>
