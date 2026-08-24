@@ -225,3 +225,84 @@ export const COMPACTION_SCROLLY = {
     }
   },
 }
+
+/* ---------- 02 · Cordis 六词到依赖图 ---------- */
+
+// 基线 aa6c361a 的读数，与 package-graph.json 及本页组件同源；换基线时随课程一并刷新。
+const GRAPH_FILES = 2973
+const GRAPH_PACKAGES = 227
+const GRAPH_GROUPS = 50
+const GRAPH_EDGES = 1124
+
+const cordisRows = [
+  { key: '插件', readout: '一切能力都长在插件树上：固定提交里有 ' + String(GRAPH_FILES) + ' 个源文件、' + String(GRAPH_PACKAGES) + ' 个包。' },
+  { key: '服务与事件', readout: '插件往 Context 上挂服务、订阅事件；包之间的 peer 关系有 ' + String(GRAPH_EDGES) + ' 条，方向就是依赖方向。' },
+  { key: 'Profile', readout: 'Profile 是一份声明清单：按顺序列出要用哪些 Bundle，装配顺序由它决定。' },
+  { key: 'Bundle', readout: String(GRAPH_GROUPS) + ' 个功能组合把包打成组——装哪个 Bundle，哪一组能力就上线。' },
+  { key: 'Turn', readout: '一次用户输入触发一个 Turn；Turn 内是 0 到多个 Step（模型请求＋工具调用），全程落日志。' },
+]
+
+export const CORDIS_SCROLLY = {
+  beats: cordisRows.map(row => ({ title: row.key, text: row.readout })),
+  buildStage(stage) {
+    stage.append(element('p', 'dsh-scrolly-figure',
+      '五个词就是五层阅读顺序：从一棵插件树走到一次 Turn。每拍高亮当前层，右侧给出该层的规模读数。'))
+    const list = element('div', null, null)
+    const rows = cordisRows.map(row => {
+      const item = element('div', 'pl-row dsh-scrolly-row', null)
+      const name = element('span', 'dsh-scrolly-key', row.key)
+      item.append(name)
+      list.append(item)
+      return item
+    })
+    stage.append(list)
+    const readout = element('p', 'dsh-scrolly-readout', null)
+    stage.append(readout)
+    return index => {
+      rows.forEach((item, i) => {
+        item.classList.toggle('is-active', i === index)
+        item.classList.toggle('is-past', i < index)
+      })
+      readout.textContent = cordisRows[index].readout
+    }
+  },
+}
+
+/* ---------- 10 · 生态四域的升级阶梯 ---------- */
+
+const domainRows = [
+  { key: '普通插件', risk: 1, readout: '公开扩展点：ctx.effect 挂服务、订阅事件，卸载即走。这是唯一鼓励所有人走的入口。' },
+  { key: 'Hook Bridge', risk: 2, readout: '官方兼容层：把外部命令映射成 typed point，仍然不碰核心一致性。' },
+  { key: 'Bundle', risk: 3, readout: 'patch 层：cordis.patch.yml 直接改声明——能用，但已经站在官方边界上。' },
+  { key: 'patch / fork', risk: 4, readout: '宿主维护者的领地：改核心源码必须自己承担一致性与迁移成本。' },
+  { key: '运行时注入', risk: 5, readout: '风险案例区：绕过装载链的注入没有卸载语义，社区方案里见到就该提高警惕。' },
+]
+
+export const ECO_DOMAINS_SCROLLY = {
+  beats: domainRows.map(row => ({ title: row.key, text: row.readout })),
+  buildStage(stage) {
+    stage.append(element('p', 'dsh-scrolly-figure',
+      '阶梯越高，自由度越大、风险也越大。每一拍点亮一级台阶，并给出该层的判断要点。'))
+    const list = element('div', null, null)
+    const rows = domainRows.map((row, i) => {
+      const item = element('div', 'pl-step dsh-scrolly-row', null)
+      item.style.marginLeft = String(i * 14) + 'px'
+      const name = element('span', 'dsh-scrolly-key', row.key)
+      const meter = element('span', 'dsh-scrolly-meter', null)
+      meter.style.width = String(row.risk * 18) + '%'
+      item.append(name, meter)
+      list.append(item)
+      return item
+    })
+    stage.append(list)
+    const readout = element('p', 'dsh-scrolly-readout', null)
+    stage.append(readout)
+    return index => {
+      rows.forEach((item, i) => {
+        item.classList.toggle('is-active', i === index)
+        item.classList.toggle('is-past', i < index)
+      })
+      readout.textContent = domainRows[index].readout
+    }
+  },
+}

@@ -44,9 +44,10 @@ function rememberLab(labId) {
  * @param options.feedback 反馈文本节点。
  * @param options.correct 正确选项的 value；用于给出对错提示，不影响是否解锁。
  * @param options.explain value 到解释文字的映射，答完后显示。
+ * @param options.hint 可选的提交前线索；点击「看条线索」显示，不影响解锁与判分。
  * @returns 读取当前是否已解锁。
  */
-export function installPredictionGate({ form, locked, feedback, correct, explain = {} }) {
+export function installPredictionGate({ form, locked, feedback, correct, explain = {}, hint = '' }) {
   if (!(form instanceof HTMLElement) || !(locked instanceof HTMLElement)) {
     return () => true
   }
@@ -83,8 +84,23 @@ export function installPredictionGate({ form, locked, feedback, correct, explain
     feedback.textContent = verdict + (detail === '' ? '' : ' ' + detail) + ' 控件已解锁，去改参数看它怎么变。' + noteProgress()
   }
 
-  lock()
+  // Mathigon 式脚手架：提交前可看的定向线索，不影响解锁与判分。
+  if (hint.length > 0) {
+    const hintBtn = document.createElement('button')
+    hintBtn.type = 'button'
+    hintBtn.className = 'button button-quiet'
+    hintBtn.style.marginTop = '8px'
+    hintBtn.textContent = '看条线索'
+    let hinted = false
+    hintBtn.addEventListener('click', () => {
+      feedback.dataset.tone = 'neutral'
+      feedback.textContent = (hinted ? '再看一次：' : '线索（不影响解锁）：') + hint
+      hinted = true
+    })
+    feedback.insertAdjacentElement('beforebegin', hintBtn)
+  }
 
+  lock()
   form.addEventListener('submit', (event) => {
     event.preventDefault()
     const chosen = new FormData(form).get('prediction')

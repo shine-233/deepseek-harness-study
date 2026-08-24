@@ -1,6 +1,6 @@
 /** VitePress configuration for the locally projected documentation site. */
 
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import type { DefaultTheme, PageData } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
@@ -428,7 +428,14 @@ export default withMermaid({
     ['meta', { property: 'og:title', content: 'DSH 社区源码学习｜非官方中文导读' }],
     ['meta', { property: 'og:description', content: '面向 DSH 社区的非官方源码学习和生态研究材料：从首页分流到固定版本源文件，按步骤理解插件、工具和运行边界。' }],
     ['meta', { property: 'og:url', content: 'https://shine-233.github.io/deepseek-harness-study/' }],
-    ['meta', { name: 'twitter:card', content: 'summary' }],
+    ['meta', { property: 'og:image', content: 'https://shine-233.github.io/deepseek-harness-study/og-image.png' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { property: 'og:locale', content: 'zh_CN' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'DSH 社区源码学习｜非官方中文导读' }],
+    ['meta', { name: 'twitter:description', content: '面向 DSH 社区的非官方源码学习材料：37 课 · 16 个离线实验 · 2,973 张逐文件索引卡。' }],
+    ['meta', { name: 'twitter:image', content: 'https://shine-233.github.io/deepseek-harness-study/og-image.png' }],
     ['style', {}, siteStyle],
     ['script', {}, readingProgressScript],
     ['script', {}, scrollbarScript],
@@ -514,6 +521,10 @@ export default withMermaid({
     },
   },
   vite: {
+    define: {
+      // 首页拍立得的实验数：构建期计算，单一事实来源（门禁会与仓库事实对账）。
+      __DSH_LAB_COUNT__: JSON.stringify(readdirSync(resolve(import.meta.dirname, '../public')).filter(name => name.endsWith('-lab.html')).length),
+    },
     // `srcDir` puts the Vite root inside the disposable generated tree, whose
     // own `public/` no tracked asset can live in.
     publicDir: resolve(import.meta.dirname, '../public'),

@@ -20,3 +20,5 @@ declare module '*.vue' {
 }
 
 declare module '*.css' {}
+
+declare const __DSH_LAB_COUNT__: number

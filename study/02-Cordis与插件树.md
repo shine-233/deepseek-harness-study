@@ -46,6 +46,9 @@ Profile
 
 Profile 和 Bundle 都不是一个巨大的类。它们主要是配置和组合方式，真正执行工作的仍然是被 Loader 挂到 Context 上的插件。
 
+往下滚动时，右边五段解说按同一顺序走完五个词，每一段的规模读数都来自固定提交的依赖图数据——先看形状，再记数字。
+
+<div class="dsh-scrolly" data-scrolly="cordis-map" aria-label="六个词到依赖图的滚动引导"></div>
 ## Context：插件共同工作的范围
 
 官方起点是 [`vendor/cordis/src/context.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/context.ts)。可以把 `Context` 想成一个带作用范围的工作台：插件从这里取得服务、监听事件、创建子作用域，也把自己提供的能力放回这里。
@@ -110,7 +113,7 @@ Consumer            使用接口，不关心具体实现
 - Agent scoped 服务只对某个 Agent 的子树可见。
 - 测试可以在隔离 Context 中安装 fake provider，不影响另一个测试。
 
-这就是“能力扩展边界（seam）”的直观版本：接口和实现之间留一个插座，插件通过这个预留边界协作。它标记的是位置而非某一次调用，所以实现可以整体换掉，调用点跟着换。
+这就是“能力扩展边界（seam）”的直观版本：接口和实现之间留一个插座，插件通过这个预留边界协作。它标记的是位置而非某一次调用，所以实现可以整体换掉，调用点跟着换。这条缝在 dsh-shell 里长成了显式的 `resolve(request): Spec`——[Shell 解析缝隙实验](/shell-seam-lab.html)展示同一份请求在本地执行器和沙箱执行器上怎样解析出不同的 Spec。
 
 ## Event：插件之间的通知和拦截点
 
@@ -129,7 +132,9 @@ DSH 中要区分两种事实：
 - `bail` 在某个监听器给出足够结果后停止。
 - `waterfall`（瀑布式派发）要求监听器调用 `next()`，这样监听器可以在委托前后检查或改写数据；如果监听器不继续委托，后面的处理就会停在这里。
 
-选错事件域会造成难以恢复的设计问题。必须恢复的事实应该进入 Session 日志；只影响当前请求的拦截和策略则更适合使用 live event。模型能看到的内容原则上都应该能够从 Session 日志重建，这条不变量是 DSH 可恢复设计的核心。
+选错事件域的代价很具体：持久事实若只走 live event，重启后就无法从日志解释这次请求为什么发生。必须恢复的事实应该进入 Session 日志；只影响当前请求的拦截和策略则更适合使用 live event。模型能看到的内容原则上都应该能够从 Session 日志重建，这条不变量是 DSH 可恢复设计的核心。
+
+瀑布派发的“不调用 `next()` 就短路”行为，可以在 [Hook 瀑布短路实验](/hook-flow-lab.html)里逐步推：换一个监听器直接 return，看被跳过的兜底和最终结果的作者怎么变。
 
 ## Profile 与 Bundle 怎样长成一棵树
 
@@ -145,7 +150,7 @@ DSH 中要区分两种事实：
   -> Cordis Loader 挂载最终 Entry List
 ```
 
-每一行配置通常有稳定的 id。patch 可以替换某一行的完整配置，也可以插入新行。这样用户可以只换模型、工具或策略，而不必复制整个官方 Bundle。
+每一行配置通常有稳定的 id。patch 可以替换某一行的完整配置，也可以插入新行。这样用户可以只换模型、工具或策略，而不必复制整个官方 Bundle。想亲手验证“声明顺序决定最终配置”，打开 [Profile 解析顺序实验](/profile-loader-lab.html)：调整 Bundle 顺序、叠加 overlay、故意引入坏引用，矩阵会逐格显示每一步写下了什么。
 
 这一点解释了几个常见文件为什么分开：
 

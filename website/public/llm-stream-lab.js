@@ -258,6 +258,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'once',
+      hint: 'finish 之后到达的重复块，按装配协议必须丢弃而不是合并。',
     explain: {
       once: 'LATE_DUPLICATE_IGNORED 这条校验固定了它：finish 后的重复增量被拒绝，正文里只有最初那份。',
       twice: '那样消息就被污染了——同一段话出现两遍正是装配器要防的事故。',

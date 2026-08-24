@@ -36,6 +36,8 @@ const MOUTHS: Record<'normal' | 'happy', { x: number; y: number; w: number }[]> 
 }
 const MOUTH_FILL = '#c9566b'
 
+const LAB_COUNT = Number(__DSH_LAB_COUNT__)
+
 /* ---------- 状态与交互 ---------- */
 
 type ViewName = 'lessons' | 'labs' | 'index'
@@ -459,7 +461,7 @@ watchEffect(() => {
               <figcaption>个逐文件导读卡</figcaption>
             </figure>
             <figure class="dj-polaroid">
-              <div class="dj-photo"><b>16</b></div>
+              <div class="dj-photo"><b>{{ LAB_COUNT }}</b></div>
               <figcaption>个离线实验</figcaption>
             </figure>
           </div>

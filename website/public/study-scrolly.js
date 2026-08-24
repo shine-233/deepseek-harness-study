@@ -12,7 +12,7 @@
  */
 
 import { TURN_LANES, buildTurnModel } from './turn-flow-model.js'
-import { COMPACTION_SCROLLY, SESSION_LOG_SCROLLY } from './study-scrolly-beats.js'
+import { COMPACTION_SCROLLY, CORDIS_SCROLLY, ECO_DOMAINS_SCROLLY, SESSION_LOG_SCROLLY } from './study-scrolly-beats.js'
 
 const LANE_LABELS = Object.freeze({
   user: '用户',
@@ -192,6 +192,8 @@ const SCENARIOS = {
   },
   'session-log': SESSION_LOG_SCROLLY,
   'compaction': COMPACTION_SCROLLY,
+  'cordis-map': CORDIS_SCROLLY,
+  'eco-domains': ECO_DOMAINS_SCROLLY,
 }
 
 function buildContainer(container, scene) {
