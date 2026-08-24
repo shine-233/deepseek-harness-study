@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>时间上下文实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#ss-main">跳到实验</a>
+  <main class="lab-shell" id="ss-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 时间上下文</p>
+        <h1>钟表可以给模型看，但要署名来源与时区。</h1>
+        <p class="hero-lead">选择加入后，符合条件的步骤会把一条带来源归因的时间读数追加进请求历史——作为 durable 用户消息入册，重放原样回来。未加入的轮次，历史完全不变。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/06-LLM与工具执行.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./client-lab.html">打开 Client 三面镜实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / SS</span>
+        <strong>纯函数模型 · 独立校验。</strong>
+        <p>规则取自上游 time-context 源码（基线 aa6c361a）；页面不读真实时钟。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">关掉选择加入开关之后，请求历史里还有时间读数吗？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="kept"><span>有——之前注入的读数已经是 durable 历史</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="gone"><span>没有了——opt-in 关闭会撤掉历史里的时间</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="partial"><span>只剩最后一条</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="seam-form">
+          <label><span>时区</span><select id="ctl-timezone"><option value="Asia/Shanghai">Asia/Shanghai</option><option value="UTC">UTC</option><option value="America/New_York">America/New_York</option></select></label>
+          <label><span>时钟偏差（分钟）：<output id="ctl-clockDriftMinutes-output">0</output></span><input id="ctl-clockDriftMinutes" type="range" min="-720" max="720" step="15" value="0"></label>
+          <label><span>对话轮数</span><select id="ctl-turns"><option value="1">一轮</option><option value="2">两轮（对比时间流逝）</option></select></label>
+          <label class="sb-check"><input id="ctl-optIn" type="checkbox" checked><span>选择加入时间上下文</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="seam-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>注入条数</dt><dd id="metric-injectedCount">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="seam-steps-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="table">完整文字替代</p><h2 id="seam-steps-title">有序推演表</h2></div><span class="schema-pill">不用脚本也能读</span></div>
+      <div class="table-scroll">
+        <table>
+          <caption id="seam-caption">当前输入的全部步骤</caption>
+          <thead><tr><th scope="col">#</th><th scope="col">泳道</th><th scope="col">阶段</th><th scope="col">说明</th></tr></thead>
+          <tbody id="seam-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定（只读步骤与观测值，自己重算）</summary>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </details>
+    </section>
+
+    <section class="evidence-grid" aria-label="证据边界">
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span><a href="./study-labs.html">返回实验室总览</a></footer>
+  </main>
+  <script type="module" src="./time-lab.js"></script>
+</body>
+</html>

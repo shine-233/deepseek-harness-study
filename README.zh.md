@@ -2,7 +2,7 @@
 
 [![Study material quality](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml) [![Deploy documentation](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml)
 
-这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套三十四个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。English mirror: [README.md](README.md)。
+这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套四十个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。English mirror: [README.md](README.md)。
 
 ## 三条入口
 
@@ -14,7 +14,7 @@
 
 发现文档事实错误、链接问题、教程无法复现或社区扩展风险时，请使用[按类型填写的 Issue 表单](https://github.com/shine-233/deepseek-harness-study/issues/new/choose)；不要提交密钥、Cookie 或私有运行日志。
 
-## 三十四个可以动手的实验
+## 四十个可以动手的实验
 
 这套教材要求每个关键结论都能落到一个确定性实验里：实验全部离线运行——固定输入、固定输出、独立 oracle、公开 canProve/cannotProve；它们是教学模型，不启动真实 DSH、provider 或模型。完整清单见[实验室总览](https://shine-233.github.io/deepseek-harness-study/study-labs.html)。
 
@@ -53,6 +53,16 @@
 | [终端会话](https://shine-233.github.io/deepseek-harness-study/terminal-lab.html) | 持久会话的状态延续与一次性模式对比，单发送位与进程树停稳 |
 | [MCP 客户端](https://shine-233.github.io/deepseek-harness-study/mcp-lab.html) | 外部服务器工具以限定名进场；指数退避重连，卸载释放命名空间 |
 | [自我修改](https://shine-233.github.io/deepseek-harness-study/selfmod-lab.html) | define/run/stop/undefine 给自己装插件；坏定义 fail loud，动态工具同一条权限管线 |
+| [子进程](https://shine-233.github.io/deepseek-harness-study/subprocess-lab.html) | DSH_ 环境隔离、输出封顶保留 TAIL、spill 完整可恢复或明确丢弃 |
+| [语言服务](https://shine-233.github.io/deepseek-harness-study/lsp-lab.html) | 扩展名独占预留与原子注册，查询按最终扩展名路由 |
+| [线协议](https://shine-233.github.io/deepseek-harness-study/wire-lab.html) | 按行分隔的 JSON-RPC：id 配对、通知单向、initialize 必须是第一句 |
+| [Token 计量](https://shine-233.github.io/deepseek-harness-study/tokenmeter-lab.html) | 从日志重放推导读数；两种基线口径殊途同归，压力只报数不截断 |
+| [Agent 预设](https://shine-233.github.io/deepseek-harness-study/preset-lab.html) | 常驻挂载装载一次，N 个 agent 经作用域加入而非复制 |
+| [检查点策略](https://shine-233.github.io/deepseek-harness-study/checkpoint-lab.html) | 三个持久化时刻与崩溃后可恢复范围的推演 |
+| [匿名身份](https://shine-233.github.io/deepseek-harness-study/identity-lab.html) | home 作用域随机 id：删除即重铸，进程内记忆 |
+| [时间上下文](https://shine-233.github.io/deepseek-harness-study/time-lab.html) | 选择性加入的带归因时间读数，durable 入册重放原样回来 |
+| [图片附件](https://shine-233.github.io/deepseek-harness-study/attachment-lab.html) | 尺寸限制在保存处强制执行，拒收时零引用 |
+| [消息反馈](https://shine-233.github.io/deepseek-harness-study/feedback-lab.html) | 按消息 id upsert，绑定已定稿生命周期，重复即更新 |
 | [研究 ↔ Debug 离线桥](https://shine-233.github.io/deepseek-harness-study/research-debug-bridge.html) | 课程网站与独立 Debug 工具怎样用显式文件交接 |
 
 ## 课程地图

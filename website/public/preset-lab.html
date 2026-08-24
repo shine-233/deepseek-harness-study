@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Agent 预设实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#ss-main">跳到实验</a>
+  <main class="lab-shell" id="ss-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 预设与组合</p>
+        <h1>预设装载一次，所有 agent 加入同一份。</h1>
+        <p class="hero-lead">每个预设的 cordis.yml 以常驻挂载方式装载一次：插件实例、工具注册、prompt 分区只存在一份，agent 通过作用域父子关系加入而非复制。没有 agent 的冷读也按 preset id 解析到同一批注册。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/02-Cordis与插件树.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./mcp-lab.html">打开 MCP 客户端实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / SS</span>
+        <strong>纯函数模型 · 独立校验。</strong>
+        <p>规则取自上游 agent-presets 源码（基线 aa6c361a）；页面不加载真实 cordis.yml。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">两个 agent 加入同一个预设后，运行时里有几份插件实例？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="two"><span>两份——每个会话一份独立副本</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="one"><span>一份——常驻挂载被所有加入者共享</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="zero"><span>零份——预设只是配置文本，不会实例化</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="seam-form">
+          <label><span>加入的 agent 数：<output id="ctl-agents-output">2</output></span><input id="ctl-agents" type="range" min="1" max="3" step="1" value="2"></label>
+          <label><span>预设</span><select id="ctl-presetId"><option value="research">research（检索 + 引用）</option><option value="writer">writer（长文 + 校对）</option></select></label>
+          <label class="sb-check"><input id="ctl-duplicateMount" type="checkbox"><span>再次装载同名预设（观察拒绝）</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="seam-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>挂载份数</dt><dd id="metric-mountCount">—</dd></div>
+          <div><dt>agent 数</dt><dd id="metric-agents">—</dd></div>
+          <div><dt>实例副本</dt><dd id="metric-instanceCopies">—</dd></div>
+          <div><dt>冷读一致</dt><dd id="metric-coldReadResolvesSame">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="seam-steps-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="table">完整文字替代</p><h2 id="seam-steps-title">有序推演表</h2></div><span class="schema-pill">不用脚本也能读</span></div>
+      <div class="table-scroll">
+        <table>
+          <caption id="seam-caption">当前输入的全部步骤</caption>
+          <thead><tr><th scope="col">#</th><th scope="col">泳道</th><th scope="col">阶段</th><th scope="col">说明</th></tr></thead>
+          <tbody id="seam-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定（只读步骤与观测值，自己重算）</summary>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </details>
+    </section>
+
+    <section class="evidence-grid" aria-label="证据边界">
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span><a href="./study-labs.html">返回实验室总览</a></footer>
+  </main>
+  <script type="module" src="./preset-lab.js"></script>
+</body>
+</html>

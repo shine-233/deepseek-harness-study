@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>检查点策略实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#ss-main">跳到实验</a>
+  <main class="lab-shell" id="ss-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 持久化时机</p>
+        <h1>三个检查点钉住三种进度，崩溃只能吃掉没落盘的部分。</h1>
+        <p class="hero-lead">session-checkpoint-policy 在三个语义时刻落盘：adapter 派发前的请求前缀、工具主体执行前已记录的调用、下一个请求边界结算的已完成步骤。检查点拒绝会阻止派发——不会出现没落盘就发出的请求。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./session-log-lab.html">打开 Session 日志重放实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / SS</span>
+        <strong>纯函数模型 · 独立校验。</strong>
+        <p>规则取自上游 checkpoint-policy 源码（基线 aa6c361a）；页面不写真实存储。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">关闭全部检查点、在第 4 拍崩溃——重启后能恢复几拍？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="three"><span>3 拍——日志天然是 durable 的</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="zero"><span>0 拍——没有检查点就没有可重放的内容</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="four"><span>4 拍——崩溃前的都算</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="seam-form">
+          <label><span>在第几拍崩溃（0 = 不崩溃）：<output id="ctl-crashAt-output">3</output></span><input id="ctl-crashAt" type="range" min="0" max="6" step="1" value="3"></label>
+          <label class="sb-check"><input id="ctl-checkpointsEnabled" type="checkbox" checked><span>启用检查点策略</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="seam-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>最后 durable 拍</dt><dd id="metric-lastDurableTick">—</dd></div>
+          <div><dt>可恢复拍数</dt><dd id="metric-recoverableCount">—</dd></div>
+          <div><dt>可从日志重放</dt><dd id="metric-replayableFromLog">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="seam-steps-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="table">完整文字替代</p><h2 id="seam-steps-title">有序推演表</h2></div><span class="schema-pill">不用脚本也能读</span></div>
+      <div class="table-scroll">
+        <table>
+          <caption id="seam-caption">当前输入的全部步骤</caption>
+          <thead><tr><th scope="col">#</th><th scope="col">泳道</th><th scope="col">阶段</th><th scope="col">说明</th></tr></thead>
+          <tbody id="seam-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定（只读步骤与观测值，自己重算）</summary>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </details>
+    </section>
+
+    <section class="evidence-grid" aria-label="证据边界">
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span><a href="./study-labs.html">返回实验室总览</a></footer>
+  </main>
+  <script type="module" src="./checkpoint-lab.js"></script>
+</body>
+</html>

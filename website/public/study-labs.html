@@ -38,7 +38,7 @@
       <dl class="metric-grid">
         <div><dt>亲手做过的实验</dt><dd id="metric-labs-done">—</dd></div>
         <div><dt>已读配套课</dt><dd id="metric-lessons-read">—</dd></div>
-        <div><dt>计入进度</dt><dd>33 / 34 个页面</dd></div>
+        <div><dt>计入进度</dt><dd>39 / 40 个页面</dd></div>
       </dl>
       <p class="feedback" id="labs-progress-feedback" role="status" aria-live="polite">进度只写本机浏览器，不上传。</p>
     </section>
@@ -865,7 +865,136 @@
           </div>
         </li>
 
-        <li class="lab-card" data-group="evidence" data-lab="research-debug-bridge" data-lesson="36-研究与-Debug-协作">
+        <li class="lab-card" data-group="plugin" data-lab="subprocess" data-lesson="06-LLM与工具执行">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="8" y="24" width="34" height="20" rx="3"/>
+            <path class="lm-arrow" d="M46 34 h18 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-bar" x="68" y="16" width="44" height="8" rx="2"/>
+            <rect class="lm-bar lm-hi" x="68" y="30" width="30" height="8" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>子进程</h3>
+            <p class="lab-card-question">输出超限时留下的是 TAIL：诊断价值最高的最后一段永远在内存里；spill 要么完整可恢复要么明确丢弃。受管环境变量一律带 DSH_ 前缀。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">TAIL 保留</li><li class="schema-pill">spill 三态</li><li class="schema-pill">环境隔离</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./subprocess-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/06-LLM与工具执行.html">配套课 · LLM 与工具执行</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="lsp" data-lesson="06-LLM与工具执行">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-cell" x="10" y="14" width="40" height="14" rx="3"/>
+            <rect class="lm-cell" x="10" y="36" width="40" height="14" rx="3"/>
+            <path class="lm-arrow" d="M56 32 h22 m-5 -4 l5 4 l-5 4"/>
+            <circle class="lm-dot lm-accent" cx="98" cy="32" r="7"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>语言服务</h3>
+            <p class="lab-card-question">Provider 原子预留扩展名：冲突或非法注册零残留；查询按文件最终扩展名路由，与注册顺序无关。缝只暴露四个操作。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">独占预留</li><li class="schema-pill">原子注册</li><li class="schema-pill">顺序无关路由</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./lsp-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/06-LLM与工具执行.html">配套课 · LLM 与工具执行</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="wire" data-lesson="07-HostClient示例测试发布">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <line x1="20" y1="8" x2="20" y2="60" stroke-width="2"/><line x1="100" y1="8" x2="100" y2="60" stroke-width="2"/>
+            <path class="lm-arrow" d="M24 22 h72 m-6 -4 l6 4 l-6 4"/>
+            <path class="lm-arrow" d="M96 38 h-72 m6 -4 l-6 4 l6 4"/>
+            <circle class="lm-dot" cx="60" cy="54" r="4"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>线协议</h3>
+            <p class="lab-card-question">按行分隔的 JSON-RPC：request 带 id、response 认领同一 id、notification 单向不等待。服务端错误走 response 通道，initialize 必须是第一句。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">id 配对</li><li class="schema-pill">通知单向</li><li class="schema-pill">带内错误</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./wire-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/07-HostClient示例测试发布.html">配套课 · Host/Client/发布</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="evidence" data-lab="tokenmeter" data-lesson="06-LLM与工具执行">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-cell" x="8" y="26" width="104" height="16" rx="4"/>
+            <rect class="lm-bar lm-hi" x="8" y="26" width="62" height="16" rx="4"/>
+            <line x1="90" y1="18" x2="90" y2="50" stroke-width="2" stroke-dasharray="4 3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Token 计量</h3>
+            <p class="lab-card-question">读数从日志重放推导：measured 把已有表面记进基线、estimated 记进增量——总账恒等。压力只是读数，跨阈值不截断。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">双口径基线</li><li class="schema-pill">压力只报数</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./tokenmeter-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/06-LLM与工具执行.html">配套课 · LLM 与工具执行</a></p>
+          </div>
+        </li>
+
+                <li class="lab-card" data-group="plugin" data-lab="preset" data-lesson="02-Cordis与插件树">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true"><rect class="lm-box lm-accent" x="10" y="18" width="100" height="32" rx="4"/></svg>
+          <div class="lab-card-body">
+            <h3>Agent 预设</h3>
+            <p class="lab-card-question">常驻挂载装载一次，N 个 agent 经作用域加入而非复制；重复装载被拒。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">常驻挂载</li><li class="schema-pill">作用域加入</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./preset-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="checkpoint" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true"><rect class="lm-box lm-accent" x="10" y="18" width="100" height="32" rx="4"/></svg>
+          <div class="lab-card-body">
+            <h3>检查点策略</h3>
+            <p class="lab-card-question">三个持久化时刻钉住请求、调用与步骤；拖动崩溃位置，看能恢复到哪一拍。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">三时刻</li><li class="schema-pill">崩溃推演</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./checkpoint-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="identity" data-lesson="07-HostClient示例测试发布">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true"><rect class="lm-box lm-accent" x="10" y="18" width="100" height="32" rx="4"/></svg>
+          <div class="lab-card-body">
+            <h3>匿名身份</h3>
+            <p class="lab-card-question">home 作用域随机 id：删除即重铸，进程内记忆，永不从机器指纹派生。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">隐私设计</li><li class="schema-pill">进程记忆</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./identity-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="context" data-lab="time" data-lesson="06-LLM与工具执行">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true"><rect class="lm-box lm-accent" x="10" y="18" width="100" height="32" rx="4"/></svg>
+          <div class="lab-card-body">
+            <h3>时间上下文</h3>
+            <p class="lab-card-question">选择性加入的带归因时间读数：durable 入册，重放原样回来。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">opt-in</li><li class="schema-pill">来源归因</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./time-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="attachment" data-lesson="06-LLM与工具执行">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true"><rect class="lm-box lm-accent" x="10" y="18" width="100" height="32" rx="4"/></svg>
+          <div class="lab-card-body">
+            <h3>图片附件</h3>
+            <p class="lab-card-question">尺寸限制在保存处强制执行，拒收零引用；取回另受策略管辖。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">保存门槛</li><li class="schema-pill">取回策略</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./attachment-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="feedback" data-lab="feedback" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true"><rect class="lm-box lm-accent" x="10" y="18" width="100" height="32" rx="4"/></svg>
+          <div class="lab-card-body">
+            <h3>消息反馈</h3>
+            <p class="lab-card-question">按消息 id upsert 绑定已定稿消息：重复评价是更新不是追加。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">upsert</li><li class="schema-pill">生命周期</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./feedback-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+<li class="lab-card" data-group="evidence" data-lab="research-debug-bridge" data-lesson="36-研究与-Debug-协作">
           <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
             <rect class="lm-box" x="6" y="18" width="36" height="30" rx="4"/>
             <rect class="lm-box lm-accent" x="78" y="18" width="36" height="30" rx="4"/>

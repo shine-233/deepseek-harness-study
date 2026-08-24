@@ -43,9 +43,20 @@ const TRACKED_LAB_IDS = new Set([
   'terminal',
   'mcp',
   'selfmod',
+  'subprocess',
+  'lsp',
+  'wire',
+  'tokenmeter',
+  'preset',
+  'checkpoint',
+  'identity',
+  'time',
+  'attachment',
+  'feedback',
   'shell-seam',
   'trajectory',
   'skill-catalog',
+  'context',
 ])
 
 const VALID_GROUPS = new Set(['all', 'main', 'plugin', 'evidence'])
