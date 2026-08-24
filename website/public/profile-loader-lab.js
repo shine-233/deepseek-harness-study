@@ -18,6 +18,7 @@ import {
   OVERLAY_SOURCES,
   buildProfileModel,
   evaluateProfileOracle,
+  snapshotProfileAt,
 } from './profile-loader-model.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -32,6 +33,7 @@ const PROFILE_STATE_SCHEMA = {
   order: { stringList: DEFAULT_ORDER },
   overlay: { enum: OVERLAY_SOURCES.map(overlay => overlay.id) },
   broken: 'boolean',
+  step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
 /**
@@ -225,7 +227,7 @@ function renderStage(model, svg, note) {
 
   for (const [keyIndex, key] of keys.entries()) {
     const finalEntry = model.observations.finalValues.find(entry => entry.key === key)
-    const row = svgElement('g', { class: 'pl-key' })
+    const row = svgElement('g', { class: 'pl-key', 'data-key': key })
     row.style.transform = `translate(0px, ${keyY(keyIndex)}px)`
     row.append(svgElement('rect', {
       x: 556, y: -14, width: width - 562, height: 28, rx: 7, class: 'pl-key-box'
@@ -271,11 +273,63 @@ function initializePage() {
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
     resetInputs: document.querySelector('#reset-inputs'),
+    replay: document.querySelector('#replay-step'),
+    replayOutput: document.querySelector('#replay-output'),
+    replayCaption: document.querySelector('#replay-caption'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
 
   let order = [...DEFAULT_ORDER]
+  let currentModel = null
+
+  // 逐步回放：滑杆只改变「已应用几步」的可见状态——卡片淡出、连线隐藏、
+  // 右列键值改读当时的中间快照；快照与最终解析折叠同一份数据。
+  const syncReplay = () => {
+    if (currentModel === null) return
+    const total = currentModel.steps.length
+    elements.replay.max = String(total - 1)
+    if (Number(elements.replay.value) > total - 1 || Number(elements.replay.value) < 0) {
+      elements.replay.value = String(total - 1)
+    }
+    const upto = Number(elements.replay.value)
+    writeText(elements.replayOutput, String(upto))
+    const snapshot = snapshotProfileAt(currentModel, upto)
+    for (const card of elements.stage.querySelectorAll('.pl-card[data-step]')) {
+      card.classList.toggle('is-future', Number(card.getAttribute('data-step')) > upto)
+      card.classList.toggle('is-current', Number(card.getAttribute('data-step')) === upto)
+    }
+    for (const path of elements.stage.querySelectorAll('.pl-line[data-from], .pl-ghost[data-from]')) {
+      path.classList.toggle('is-future', Number(path.getAttribute('data-from')) > upto)
+    }
+    for (const row of elements.stage.querySelectorAll('.pl-key[data-key]')) {
+      const key = row.getAttribute('data-key')
+      const valueNode = row.querySelector('.pl-key-value')
+      const has = Object.hasOwn(snapshot.config, key)
+      const box = row.querySelector('.pl-key-box')
+      if (box !== null) box.classList.toggle('is-unset', !has)
+      if (valueNode === null) continue
+      if (!has) {
+        row.setAttribute('data-value', '')
+        valueNode.textContent = ''
+        const nameNode = row.querySelector('.pl-key-name')
+        if (nameNode !== null && !nameNode.textContent.includes('（未声明）')) {
+          nameNode.textContent = nameNode.textContent + '（未声明）'
+        }
+      } else {
+        const writer = snapshot.writerOf.get(key)
+        row.removeAttribute('data-value')
+        valueNode.textContent = `${String(snapshot.config[key])} ← ${writer?.label ?? ''}（#${String(writer?.index ?? '—')} 时写入）`
+        const nameNode = row.querySelector('.pl-key-name')
+        if (nameNode !== null) nameNode.textContent = key
+      }
+    }
+    const step = currentModel.steps[upto]
+    writeText(elements.replayCaption, step.applied
+      ? '回放到 #' + String(upto) + ' ' + step.label + '：本步写入 ' + (step.wrote.join('、') || '（无）') + '。右列是此刻的中间配置。'
+      : '回放到 #' + String(upto) + '：' + (step.reason ?? '这一步未应用。'))
+    elements.replayCaption.hidden = false
+  }
 
   for (const overlay of OVERLAY_SOURCES) {
     const option = document.createElement('option')
@@ -307,11 +361,13 @@ function initializePage() {
         ;[order[index - 1], order[index]] = [order[index], order[index - 1]]
         renderOrder()
         rebuild()
+        resetReplayToEnd()
       })
       down.addEventListener('click', () => {
         ;[order[index + 1], order[index]] = [order[index], order[index + 1]]
         renderOrder()
         rebuild()
+        resetReplayToEnd()
       })
       chip.append(label, up, down)
       elements.orderList.append(chip)
@@ -325,6 +381,7 @@ function initializePage() {
         : order
       const model = buildProfileModel({ order: withBroken, overlay: elements.overlay.value })
       const verdict = evaluateProfileOracle(model)
+      currentModel = model
 
       renderMatrix(model, elements.matrix, elements.matrixNote)
       renderStage(model, elements.stage, elements.stageNote)
@@ -362,6 +419,11 @@ function initializePage() {
           + String(model.config.maxTurns) + '，telemetry=' + String(model.config.telemetry) + '。'
         : '解析在第 ' + String(model.failure.stepIndex) + ' 步显式失败，不是跳过它继续。',
       model.failure === null ? 'success' : 'notice')
+      elements.replay.max = String(model.steps.length - 1)
+      if (Number(elements.replay.value) > model.steps.length - 1) {
+        elements.replay.value = String(model.steps.length - 1)
+      }
+      syncReplay()
       persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
@@ -375,11 +437,29 @@ function initializePage() {
         order,
         overlay: elements.overlay.value,
         broken: elements.broken.checked,
+        step: Number(elements.replay.value),
       }, PROFILE_STATE_SCHEMA))
     } catch {
       // 保持安静。
     }
   }
+
+  elements.replay.addEventListener('input', () => {
+    syncReplay()
+    persistState()
+  })
+  const nudgeReplay = delta => {
+    elements.replay.value = String(Math.min(Number(elements.replay.max),
+      Math.max(Number(elements.replay.min), Number(elements.replay.value) + delta)))
+    elements.replay.dispatchEvent(new (replay?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+  }
+  document.querySelector('#replay-prev')?.addEventListener('click', () => nudgeReplay(-1))
+  document.querySelector('#replay-next')?.addEventListener('click', () => nudgeReplay(1))
+  // 焦点不在表单控件时，← / → 步进回放。
+  elements.replay.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') { event.preventDefault(); nudgeReplay(-1) }
+    if (event.key === 'ArrowRight') { event.preventDefault(); nudgeReplay(1) }
+  })
 
   // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
   installInputReset(elements.resetInputs, elements.form, { onReset: rebuild })
@@ -388,8 +468,15 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  elements.overlay.addEventListener('change', rebuild)
-  elements.broken.addEventListener('change', rebuild)
+  const resetReplayToEnd = () => {
+    elements.replay.value = elements.replay.max
+    syncReplay()
+  }
+  elements.overlay.addEventListener('change', () => { rebuild(); resetReplayToEnd() })
+  elements.broken.addEventListener('change', () => { rebuild(); resetReplayToEnd() })
+
+  // 恢复前先放宽滑杆上界，避免 max=0 时 hash 里的步进被钳掉；真实上界由 rebuild 写回。
+  elements.replay.max = String(Number.MAX_SAFE_INTEGER)
 
   // 从状态链接恢复输入：order 必须是默认清单的排列（同集合不重不漏）才接受。
   const restored = readStateFromHash(location.hash, PROFILE_STATE_SCHEMA)
@@ -402,10 +489,12 @@ function initializePage() {
     order = [...restored.value.order]
     elements.overlay.value = restored.value.overlay
     elements.broken.checked = restored.value.broken
+    if (typeof restored.value.step === 'number') elements.replay.value = String(restored.value.step)
   }
 
   renderOrder()
   rebuild()
+  if (Number(elements.replay.value) > Number(elements.replay.max)) resetReplayToEnd()
 
   elements.copyLink.addEventListener('click', async () => {
     try {
@@ -430,6 +519,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'overlay-last',
+      hint: 'overlay 排在所有 Bundle 之后应用，同一个键最后一个写者赢。',
     explain: {
       'overlay-last': 'OVERLAY_APPLIES_LAST 和 LAST_WRITER_WINS 两条校验项一起决定了这个结果。',
       'first-writer': '这一页的模型是「最后写的人赢」，不是「先声明的赢」。',

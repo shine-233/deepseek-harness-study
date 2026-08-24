@@ -226,7 +226,7 @@ function initializePage() {
     // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
     rebuild()
     el.step.value = el.step.max
-    el.step.dispatchEvent(new Event('input', { bubbles: true }))
+    el.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   })
 
   // 时间轴步进：只改高亮和读数，不改推演结果。
@@ -235,7 +235,7 @@ function initializePage() {
   const nudgeStep = delta => {
     el.step.value = String(Math.min(Number(el.step.max),
       Math.max(Number(el.step.min), Number(el.step.value) + delta)))
-    el.step.dispatchEvent(new Event('input', { bubbles: true }))
+    el.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   el.stepPrev.addEventListener('click', () => nudgeStep(-1))
   el.stepNext.addEventListener('click', () => nudgeStep(1))
@@ -272,6 +272,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'advisory',
+      hint: 'repeat-tool-reminder 是 post-execute 的建议性提醒，从不拦截任何调用。',
     explain: {
       advisory: 'ADVISORY_ONLY 校验钉住了它：repeat-tool-reminder 是建议性 post-execute 插件，只把提醒挂进 additionalContexts。',
       blocking: '那是另一个机制——Cordis 的 guard() 瀑布可以在 pre-execute 阶段拒绝；repeat-tool-reminder 不走那条路。',

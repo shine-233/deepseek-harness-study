@@ -13,7 +13,7 @@ import {
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
-import { installInputReset } from './study-lab-kit.js'
+import { installInputReset, bindRangeKeys, bindPlotScrub } from './study-lab-kit.js'
 import {
   PLUGIN_LANES,
   PLUGIN_SCENARIOS,
@@ -32,6 +32,7 @@ const FLOW_STATE_SCHEMA = {
   scenario: { enum: PLUGIN_SCENARIOS.map(scenario => scenario.id) },
   subscribed: { enum: ['yes', 'no'] },
   maxLength: { integerRange: [0, 60] },
+  step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
 const LANE_LABELS = {
@@ -133,9 +134,44 @@ function initializePage() {
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
     resetInputs: document.querySelector('#reset-inputs'),
+    step: document.querySelector('#flow-step'),
+    stepOutput: document.querySelector('#flow-step-output'),
+    stepPrev: document.querySelector('#flow-step-prev'),
+    stepNext: document.querySelector('#flow-step-next'),
+    stepCaption: document.querySelector('#flow-step-caption'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
+
+  let currentModel = null
+
+  // 步进器：只改变高亮和读数，不改变推演结果。当前步描边，之后淡出；
+  // 说明文字逐字取自模型步骤，不在这里新编事实。
+  const syncStep = () => {
+    if (currentModel === null) return
+    const total = currentModel.steps.length
+    elements.step.max = String(total - 1)
+    if (Number(elements.step.value) > total - 1 || Number(elements.step.value) < 0) {
+      elements.step.value = String(total - 1)
+    }
+    const index = Number(elements.step.value)
+    writeText(elements.stepOutput, String(index))
+    for (const dot of elements.flow.querySelectorAll('[data-step]')) {
+      const at = Number(dot.getAttribute('data-step'))
+      dot.classList.toggle('is-current', at === index)
+      dot.classList.toggle('is-future', at > index)
+    }
+    for (const row of elements.stepsBody.querySelectorAll('tr[data-key]')) {
+      const at = Number(row.dataset.key)
+      row.classList.toggle('is-current', at === index)
+      row.classList.toggle('is-future', at > index)
+    }
+    const entry = currentModel.steps[index]
+    writeText(elements.stepCaption, '第 ' + String(entry.index) + ' 步 · '
+      + (LANE_LABELS[entry.lane] ?? entry.lane) + ' · ' + entry.phase + '：' + entry.detail)
+    elements.stepPrev.disabled = index <= 0
+    elements.stepNext.disabled = index >= total - 1
+  }
 
   for (const scenario of PLUGIN_SCENARIOS) {
     const option = document.createElement('option')
@@ -157,6 +193,7 @@ function initializePage() {
       model.lanes = PLUGIN_LANES
       model.lanesLength = () => PLUGIN_LANES.length
       const verdict = evaluatePluginFlowOracle(model)
+      currentModel = model
 
       writeText(elements.scenarioNote, model.scenario.description)
       renderFlow(model, elements.flow, elements.flowNote)
@@ -203,6 +240,7 @@ function initializePage() {
         scenario: elements.scenario.value,
         subscribed: elements.subscribed.value,
         maxLength: Number(elements.maxLength.value),
+        step: Number(elements.step.value),
       }, FLOW_STATE_SCHEMA)
       history.replaceState(null, '', nextHash)
     } catch {
@@ -217,24 +255,52 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  for (const control of [elements.scenario, elements.subscribed]) {
-    control.addEventListener('change', rebuild)
-  }
   elements.maxLength.addEventListener('input', () => {
     writeText(elements.lengthOutput, elements.maxLength.value)
     rebuild()
   })
+  for (const control of [elements.scenario, elements.subscribed]) {
+    control.addEventListener('change', () => {
+      rebuild()
+      // 换输入会改变步数：重建后把步进拉回末尾看完整时间线。
+      elements.step.value = elements.step.max
+      elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+    })
+  }
+
+  elements.step.addEventListener('input', () => {
+    syncStep()
+    persistState()
+  })
+  const nudgeStep = delta => {
+    elements.step.value = String(Math.min(Number(elements.step.max),
+      Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
+    elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+  }
+  elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
+  elements.stepNext.addEventListener('click', () => nudgeStep(1))
+  bindRangeKeys(elements.step)
+  bindPlotScrub(elements.flow, elements.step)
+
+  // 恢复前先放宽滑杆上界，避免 max=0 时 hash 步进被钳掉；真实上界由 syncStep 写回。
+  elements.step.max = String(Number.MAX_SAFE_INTEGER)
 
   // 从状态链接恢复输入；链接缺失或损坏时保持默认输入，不报错打断阅读。
   const restored = readStateFromHash(location.hash, FLOW_STATE_SCHEMA)
+  const hasRestoredStep = restored !== null && restored.ok
   if (restored !== null && restored.ok) {
     elements.scenario.value = restored.value.scenario
     elements.subscribed.value = restored.value.subscribed
     elements.maxLength.value = String(restored.value.maxLength)
+    elements.step.value = String(restored.value.step)
   }
   writeText(elements.lengthOutput, elements.maxLength.value)
 
   rebuild()
+  if (!hasRestoredStep || Number(elements.step.value) > Number(elements.step.max)) {
+    elements.step.value = elements.step.max
+    rebuild()
+  }
 
   elements.copyLink.addEventListener('click', async () => {
     try {
@@ -259,6 +325,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'logged-only',
+      hint: '观察插件订阅事件但不改写结果——想想 Session 日志里会留下什么。',
     explain: {
       'logged-only': 'LOG_COMPLETE 和 UNLOAD_SEMANTICS 两条校验一起固定了这个组合：日志由宿主写入，订阅只决定插件收不收得到广播。',
       neither: '那就违反「call 与 result 全部入册」——日志完整性不依赖任何插件的存活。',

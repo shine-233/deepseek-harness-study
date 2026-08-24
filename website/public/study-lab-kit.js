@@ -19,7 +19,7 @@ export function bindRowJump(tableBody, slider) {
     const key = Number(row.dataset.key)
     if (!Number.isInteger(key)) return
     slider.value = String(key)
-    slider.dispatchEvent(new Event('input', { bubbles: true }))
+    slider.dispatchEvent(new (slider?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   })
 }
 export function pulseSignal(element, className) {
@@ -182,7 +182,7 @@ export function bindRangeKeys(slider) {
     if (next === null) return
     event.preventDefault()
     slider.value = String(next)
-    slider.dispatchEvent(new Event('input', { bubbles: true }))
+    slider.dispatchEvent(new (slider?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   })
 }
 
@@ -230,7 +230,7 @@ export function bindPlotScrub(plot, slider) {
     if (index === null) return
     if (index < Number(slider.min) || index > Number(slider.max)) return
     slider.value = String(index)
-    slider.dispatchEvent(new Event('input', { bubbles: true }))
+    slider.dispatchEvent(new (slider?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   plot.addEventListener('pointerdown', event => {
     active = true
@@ -277,7 +277,7 @@ export function installNumberScrub(target, slider) {
   const apply = value => {
     if (String(value) === slider.value) return
     slider.value = String(value)
-    slider.dispatchEvent(new Event('input', { bubbles: true }))
+    slider.dispatchEvent(new (slider?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   target.classList.add('lab-scrub-number')
   target.addEventListener('pointerdown', event => {
@@ -332,7 +332,7 @@ export function bindAutoAdvance(playButton, slider, { stepMs = 650 } = {}) {
   let selfDispatch = false
   const dispatchInput = () => {
     selfDispatch = true
-    slider.dispatchEvent(new Event('input', { bubbles: true }))
+    slider.dispatchEvent(new (slider?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
     selfDispatch = false
   }
   const stepOnce = () => {

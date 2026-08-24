@@ -236,7 +236,7 @@ function initializePage() {
       // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
       rebuild()
       elements.step.value = elements.step.max
-      elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+      elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
     })
   }
 
@@ -247,7 +247,7 @@ function initializePage() {
   const nudgeStep = delta => {
     elements.step.value = String(Math.min(Number(elements.step.max),
       Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
-    elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+    elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
@@ -297,6 +297,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'short-circuit',
+      hint: '瀑布里不调用 next 就把裁决权攥在自己手里，后面的监听器不会再执行。',
     explain: {
       'fallback-runs': '那需要策略监听器先把控制权交还给链条——DELEGATE_ORDER 这条校验显示，只有调用 next 之后兜底才有机会执行。',
       'short-circuit': 'SHORT_CIRCUIT_RULE 和 FINAL_AUTHOR 两条校验一起固定了它：直接 return 不交还控制权，兜底被跳过，策略返回的 deny 就是最终结果。',

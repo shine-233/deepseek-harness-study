@@ -27,7 +27,7 @@ import { installThemeToggle } from './study-lab-theme.js'
 // 状态链接的输入契约：两个维度都是受控枚举；步进位置的上界由模型按步骤数给出，
 // 这里只卡整数下界，越界值在恢复时被拉回当前输入的末步。
 const FORK_STATE_SCHEMA = {
-  crash: { enum: ['complete', 'crash-mid-tool'] },
+  crash: { enum: ['complete', 'crash-mid-tool', 'crash-mid-stream', 'crash-open-turn'] },
   fork: { enum: ['no-fork', 'fork'] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
@@ -90,6 +90,10 @@ function renderFlow(model, target, note) {
     + model.observations.closingLane + '」泳道。'
   if (model.input.crash === 'crash-mid-tool') {
     message += '崩溃后恢复补出 interrupted、结果记为 unknown——诚实优先于好看。'
+  } else if (model.input.crash === 'crash-mid-stream') {
+    message += '流式中断补出一条带 interrupted 标记的 assistant/message：半截回答也是可读的事实。'
+  } else if (model.input.crash === 'crash-open-turn') {
+    message += '输入已入册但模型请求没发出：恢复补写 interrupted 的 turn/end，这个 Turn 没有任何 Step。'
   } else {
     message += '没有崩溃：意图和结果成对出现，不需要任何修复。'
   }
@@ -189,15 +193,19 @@ function initializePage() {
           step.phase,
           step.detail,
           typeof step.inherited === 'number' ? 'seed=' + String(step.inherited)
-            : step.repairedAsUnknown === true ? 'unknown' : '—',
+            : step.repairedAsUnknown === true ? 'unknown'
+              : step.repairedAsInterruptedMessage === true ? 'interrupted'
+                : step.repairedAsOpenTurn === true ? 'turn/end' : '—',
         ],
       })))
       writeText(elements.tableCaption, '当前输入的全部 ' + String(model.steps.length) + ' 步')
 
       const repairCount = model.steps.filter(step => step.phase === 'repair').length
+      const kindLabel = { 'unknown': 'unknown 结果', 'interrupted-message': 'interrupted 消息', 'open-turn': 'interrupted turn/end', [null]: null }
       writeText(elements.inherited, model.observations.eventsInherited === null
         ? '—' : String(model.observations.eventsInherited))
-      writeText(elements.repairs, String(repairCount))
+      writeText(elements.repairs, model.observations.repairKind === null
+        ? String(repairCount) : `${String(repairCount)}（${kindLabel[model.observations.repairKind]}）`)
       writeText(elements.closing, model.observations.closingLane)
       writeText(elements.ghost, model.observations.ghostSuccess ? '有' : '无')
       setFeedback('已推演：修复 ' + String(repairCount) + ' 条，收束于「'
@@ -236,7 +244,7 @@ function initializePage() {
       // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
       rebuild()
       elements.step.value = elements.step.max
-      elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+      elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
     })
   }
 
@@ -247,7 +255,7 @@ function initializePage() {
   const nudgeStep = delta => {
     elements.step.value = String(Math.min(Number(elements.step.max),
       Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
-    elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+    elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
@@ -295,6 +303,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'interrupted-unknown',
+      hint: 'fork 继承父日志前缀；等不到结果的意图补 interrupted，绝不补成功。',
     explain: {
       'marked-ok': 'REPAIR_HONESTY 不允许它发生：结果从未落册，把它写成成功就是伪造证据。',
       'interrupted-unknown': '正确。恢复阶段根据未闭合事实补出 interrupted，NO_GHOST_SUCCESS 同时确认每个意图都有去向。',

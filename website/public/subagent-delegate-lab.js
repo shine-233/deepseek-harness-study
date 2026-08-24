@@ -230,7 +230,7 @@ function initializePage() {
       // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
       rebuild()
       elements.step.value = elements.step.max
-      elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+      elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
     })
   }
 
@@ -241,7 +241,7 @@ function initializePage() {
   const nudgeStep = delta => {
     elements.step.value = String(Math.min(Number(elements.step.max),
       Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
-    elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+    elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
@@ -289,6 +289,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'rejected-at-boundary',
+      hint: '数字 maxDepth 在委派边界逐请求核对，超限的子代理根本不会被创建。',
     explain: {
       'spawns-anyway': 'REJECTION_RULE 不允许它发生：子深度超过上限就抛 SubagentDepthError，不是记一笔了事。',
       'rejected-at-boundary': '正确。超限委派在边界处被拒，LANE_ISOLATION 同时确认子泳道完全为空。',
