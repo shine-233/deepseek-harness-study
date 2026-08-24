@@ -1,0 +1,32 @@
+/* MCP 实验室：退避条与限定名工具芯片。 */
+.mc-bar { fill: var(--brand); }
+.mc-bar.is-final { fill: var(--deny-ink, #c62828); }
+
+.mc-ok { color: var(--ink-soft, #57606a); }
+
+.mc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.mc-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--brand);
+  font-size: var(--fs-small, 13px);
+}
+
+.mc-chip.is-none {
+  border-color: var(--muted, #9aa3ad);
+  color: var(--ink-soft, #57606a);
+}
+
+.sb-controls .sb-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}

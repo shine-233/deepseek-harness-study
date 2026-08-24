@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="自我修改实验：模型用 cordis_define/run/stop/undefine 检查并修改自己脚下的运行时——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>自我修改实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./selfmod-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sm-main">跳到实验</a>
+  <main class="lab-shell" id="sm-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 自我修改</p>
+        <h1>「一切皆插件」的尽头：模型给自己装插件。</h1>
+        <p class="hero-lead">tool-cordis 给模型五个工具：inspect 看自己脚下、define 登记动态包、run 把它激活成 Fiber、stop 停掉、undefine 删掉。能力从 run 那一步进入 schema，从 stop 那一步消失；坏定义 fail loud——解析失败时没有任何半个插件被挂上来。动态工具照样要过完整权限管线。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/02-Cordis与插件树.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./plugin-flow-lab.html">打开插件事件流实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 06</span>
+        <strong>动作序列来自脚本事实表。</strong>
+        <p>规则取自上游 tool-cordis 源码（基线 aa6c361a）；页面不执行真实 yml 或代码。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：cordis_define 提交了一个 yml 有语法错误的包，然后 cordis_run——运行时会发生什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="partial-mount"><span>能挂多少挂多少——其余部分报错</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="fail-loud"><span>fail loud：错误原文回给模型，没有任何半个插件被挂载</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="silent-skip"><span>静默跳过这个包，其余照常运行</span></label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="selfmod-form">
+          <label><span>动作序列</span><select id="sm-action">
+            <option value="full-lifecycle">define → run → stop → undefine</option>
+            <option value="run-only">define → run（保持运行）</option>
+            <option value="broken-yml">define → run（yml 有语法错误）</option>
+          </select></label>
+          <label class="sb-check"><input id="sm-guard" type="checkbox"><span>guard 拒绝对新工具的调用（可见 ≠ 允许执行）</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="selfmod-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="自我修改观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>Fiber 激活</dt><dd id="metric-fiber">—</dd></div>
+          <div><dt>schema 增长</dt><dd id="metric-grow">—</dd></div>
+          <div><dt>schema 收缩</dt><dd id="metric-shrink">—</dd></div>
+          <div><dt>guard 拒绝</dt><dd id="metric-guard">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="sm-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">有序时间线</p>
+          <h2 id="sm-title">四个工具调用串起的一次自我修改</h2>
+        </div>
+        <span class="schema-pill">步骤 × 参与方</span>
+      </div>
+      <p class="section-intro">模型调用、dynamicCordisRunner、Fiber、工具注册表四条泳道。绿色点是 schema 增长的时刻，蓝色描边是收缩的时刻——来去都要留痕。悬停圆点看每步说明。</p>
+      <div class="plot-scroll" id="sm-plot"></div>
+      <p class="chart-note" id="sm-note"></p>
+      <div class="mc-chips" id="sm-schema" aria-label="当前 schema 里的动态工具"></div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">生命周期校验</span>
+        </div>
+        <p class="section-intro">独立校验把同一输入整体重建一遍再逐条核对 fail-loud、schema 增减与 guard 行为；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./plugin-flow-lab.html">继续看插件订阅与日志实验</a>
+    </footer>
+  </main>
+  <script type="module" src="./selfmod-lab.js"></script>
+</body>
+</html>

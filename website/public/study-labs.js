@@ -41,6 +41,8 @@ const TRACKED_LAB_IDS = new Set([
   'plan-stack',
   'spill',
   'terminal',
+  'mcp',
+  'selfmod',
   'shell-seam',
   'trajectory',
   'skill-catalog',

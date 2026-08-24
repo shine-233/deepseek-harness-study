@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="MCP 客户端桥：服务器限定公开名 mcp__server__tool、指数退避重连、dispose 释放命名空间——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>MCP 客户端实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./mcp-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#mc-main">跳到实验</a>
+  <main class="lab-shell" id="mc-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 外部生态接入</p>
+        <h1>外部服务器的工具进来时，名字先带上它的姓氏。</h1>
+        <p class="hero-lead">一个 MCP 客户端实例只连一台服务器，把它声明的工具以 mcp__&lt;serverName&gt;__&lt;rawName&gt; 的限定名注册进 ctx.tools。断线后按策略重连：首次延迟起每次翻倍、封顶为止，连续失败达到预算就永久放弃本次加载。卸载实例时注销它的全部工具并释放命名空间；HMR 热替换用相同 serverName 复现完全相同的公开名。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/12-GitHub生态检索与插件实战核验.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./tool-visibility-lab.html">打开工具可见性实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 05</span>
+        <strong>重连延迟是策略值，不是实测耗时。</strong>
+        <p>规则取自上游 mcp-client 源码（基线 aa6c361a）；页面不发起真实网络连接。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：initialDelayMs=500、预算 4 次、封顶 8000ms——四次尝试的延迟序列是？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="linear"><span>500、500、500、500——每次都等一样久</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="doubling"><span>500、1000、2000、4000——每失败一次翻倍</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="capped-first"><span>2000、2000、2000、2000——直接从封顶值开始</span></label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="mcp-form">
+          <label><span>场景动作</span><select id="mc-action"><option value="connect-list">连接并列出工具</option><option value="call-tool">调用一个工具</option><option value="dispose">卸载插件实例</option></select></label>
+          <label><span>首次重连延迟：<output id="mc-delay-output">500</output> ms</span><input id="mc-delay" type="range" min="125" max="2000" step="25" value="500"></label>
+          <label><span>连续失败预算：<output id="mc-attempts-output">3</output> 次</span><input id="mc-attempts" type="range" min="1" max="6" step="1" value="3"></label>
+          <label class="sb-check"><input id="mc-down" type="checkbox"><span>服务器不可达（触发重连）</span></label>
+          <label class="sb-check"><input id="mc-reconnect" type="checkbox" checked><span>自动重连已启用</span></label>
+          <label class="sb-check"><input id="mc-fail" type="checkbox"><span>远端工具返回 isError</span></label>
+          <label class="sb-check"><input id="mc-hmr" type="checkbox"><span>HMR 热替换（同名重建）</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="mcp-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="MCP 观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>连接状态</dt><dd id="metric-connected">—</dd></div>
+          <div><dt>可见工具</dt><dd id="metric-tools">—</dd></div>
+          <div><dt>放弃于第几次</dt><dd id="metric-gaveup">—</dd></div>
+          <div><dt>命名空间</dt><dd id="metric-ns">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="mc-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">重连时间线</p>
+          <h2 id="mc-title">每次失败的等待有多久</h2>
+        </div>
+        <span class="schema-pill">尝试 × 延迟</span>
+      </div>
+      <p class="section-intro">每一格是一次连接尝试，格子宽度按延迟比例画出：翻倍关系一眼可见，封顶之后不再变宽。悬停看具体毫秒数。</p>
+      <div class="plot-scroll" id="mc-plot"></div>
+      <p class="chart-note" id="mc-note"></p>
+      <div class="mc-chips" id="mc-tools" aria-label="当前可见的限定名工具"></div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">协议校验</span>
+        </div>
+        <p class="section-intro">独立校验自己重算退避序列、失败预算、限定名前缀与命名空间释放；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./tool-visibility-lab.html">继续看工具可见性实验</a>
+    </footer>
+  </main>
+  <script type="module" src="./mcp-lab.js"></script>
+</body>
+</html>
