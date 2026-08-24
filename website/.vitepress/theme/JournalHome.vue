@@ -453,7 +453,7 @@ watchEffect(() => {
         <section v-show="view === 'index'" id="dj-view-index" role="tabpanel" aria-labelledby="dj-tab-index" class="dj-sheet">
           <div class="dj-polaroid-row">
             <figure class="dj-polaroid">
-              <div class="dj-photo"><b>119</b></div>
+              <div class="dj-photo"><b>120</b></div>
               <figcaption>页中文教材</figcaption>
             </figure>
             <figure class="dj-polaroid">

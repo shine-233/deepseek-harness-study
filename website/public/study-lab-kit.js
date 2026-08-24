@@ -26,6 +26,10 @@ export function pulseSignal(element, className) {
   if (element === null) return
   element.classList.remove(className)
   if (typeof element.getBBox === 'function') element.getBBox()
+  if (typeof requestAnimationFrame !== 'function') {
+    element.classList.add(className)
+    return
+  }
   requestAnimationFrame(() => element.classList.add(className))
 }
 export function writeText(target, value) {
