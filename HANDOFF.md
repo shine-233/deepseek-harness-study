@@ -16,7 +16,7 @@
 
 - 分支：`work`，推送目标 `origin/master`，两者始终同步。
 - 教材固定上游提交：`aa6c361a972c8369148dea7380bb5c21c24e07ec`（`release(dsh): 0.1.1-rc.2`，2026-08-21）。换基线流程见 study/18。
-- 规模：119 个中文学习页面、2,973 个源文件索引（78 页，含 1 页 packages/client 总览与 11 页分页）、15 个离线实验、190 个学习工具测试 + 8 个示例测试。
+- 规模：120 个中文学习页面、2,973 个源文件索引（78 页，含 1 页 packages/client 总览与 11 页分页）、24 个离线实验、190 个学习工具测试 + 8 个示例测试。
 
 ## 2. 仓库分工
 
@@ -45,10 +45,10 @@
 
 ## 5. 剩余缺口
 
-- 状态链接目前只有 turn-flow 接入；其余实验室刷新即丢输入。
-- 浏览器级 QA 矩阵（移动端/键盘/reduced-motion/WebGL 回退的真机走查）未闭合。
+- ~~状态链接目前只有 turn-flow 接入~~ 已闭合：全部实验室经 `study-lab-state.js` 写 URL hash；Playwright 实测 compaction/hook/approval/session-log 四个实验室刷新后输入回填。
+- ~~浏览器级 QA 矩阵未闭合~~ 已闭合（自动化走查，2026-08-24）：375px 移动端首页/课程/实验室/索引横向溢出 0px（修掉首页 `.dj-page` 负边距导致的 16px 溢出，`reading.css` 给 `.VPPage` 加 `overflow-x: clip`）；键盘 focus-visible 规则与 tablist ARIA 在位；`prefers-reduced-motion` 下首页与课程页伴侣动画停用（实测 `animation: none`）；package-graph 3D 画布带 2D 表格回退。标题锚点等 VitePress 原生小触控目标按上游原样保留。
 - rc.5 → 0.1.1-rc.2 只验证了引用路径存在性，未逐行复审语义差异。
-- reading.css 里残留已删首页区块的死规则（dsh-home-contract/dsh-proof-strip/dsh-learning-map），可清理。
+- ~~reading.css 死规则可清理~~ 已清理：36 个死类族（dsh-home-contract/dsh-proof-strip/dsh-learning-map/dsh-route-*/dsh-status-*/dsh-stuck-* 等）连同随附注释移除，1593 行 → 966 行；重建后首页 0.05%（吉祥物眨眼帧差）、课程页 0.00% 像素差，28 个 doc-sync 门禁与 407 个 study-tools 测试全绿。
 
 ## 6. 安全红线
 

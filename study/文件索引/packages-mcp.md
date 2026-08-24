@@ -14,7 +14,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：连接与传输边界
-- 这个文件有什么用：它负责 MCP 连接、浏览器端、连接的建立、消息传输、断开和错误状态，把网络细节隔离在上层业务之外。
+- 这个文件有什么用：它负责 MCP 客户端、连接的建立、消息传输、断开和错误状态，把网络细节隔离在上层业务之外。
 - 为什么这样设计：连接断开、重连和协议错误集中处理，业务层只面对稳定的请求与事件接口；测试也能用替身验证网络边界而不依赖真实服务。
 - 文件级设计证据：源码顶部注释把它定位为“Connection supervisor: owns the MCP client/transport generations for one plugin instance, keeps the harness tool registry in sync with the live generation, and — when the connection drops — restarts the configured server with bounded exponential backoff. On...”；固定提交中扫描到的声明包括 `ReconnectConfig`、`RECONNECT_DEFAULTS`、`ResolvedReconnectPolicy`、`resolveReconnectPolicy`、`ConnectionOutcome`；本地静态 import 图显示它直接依赖 5 个源文件，并被 2 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/mcp/mcp-client/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/index.ts)、[packages/mcp/mcp-client/src/tools.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/tools.ts)、[packages/mcp/mcp-client/src/transport.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/transport.ts)、[packages/mcp/mcp-client/tests/reconnect.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/tests/reconnect.spec.ts)
@@ -28,7 +28,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：模块入口
-- 这个文件有什么用：它把 MCP 连接、浏览器端相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
+- 这个文件有什么用：它把 MCP 客户端相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
 - 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
 - 文件级设计证据：源码顶部注释把它定位为“MCP client bridge plugin: connects to an external MCP server and registers its tools on ctx.tools under server-qualified public names (mcp__<serverName>__<rawName>). Each plugin instance connects to one MCP server; load multiple instances in cordis.yml for ...”；固定提交中扫描到的声明包括 `name`、`inject`、`StdioConfig`、`StreamableHttpConfig`、`Config`；本地静态 import 图显示它直接依赖 6 个源文件，并被 8 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)、[packages/mcp/mcp-client/src/connection.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/connection.ts)、[packages/mcp/mcp-client/src/tools.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/tools.ts)、[apps/cli/tests/memory-mcp-configs.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/apps/cli/tests/memory-mcp-configs.spec.ts)
@@ -42,7 +42,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：运行时不变量
-- 这个文件有什么用：它检查 MCP 连接、浏览器端必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
+- 这个文件有什么用：它检查 MCP 客户端必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
 - 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
 - 文件级设计证据：源码顶部注释把它定位为“Package-owned invariant companion for @deepseek-ai/dsh-mcp-client. @module @deepseek-ai/dsh-mcp-client/invariant”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -70,7 +70,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：外部能力适配层
-- 这个文件有什么用：它把外部协议转换成 MCP 连接、浏览器端能理解的内部协议。转换集中在边界，核心逻辑就不必到处处理供应商差异。
+- 这个文件有什么用：它把外部协议转换成 MCP 客户端能理解的内部协议。转换集中在边界，核心逻辑就不必到处处理供应商差异。
 - 为什么这样设计：把“接口是什么”和“这一版怎样实现”分开，替换实现或写测试替身时不必改动使用者。
 - 文件级设计证据：源码顶部注释把它定位为“Transport factory: creates the appropriate MCP transport based on the plugin's resolved config. Stdio spawns a child process (with credential scrubbing); Streamable HTTP connects to a URL. @module”；固定提交中扫描到的声明包括 `createTransport`、`buildChildEnv`；本地静态 import 图显示它直接依赖 2 个源文件，并被 2 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/mcp/mcp-client/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/index.ts)、[packages/subprocess/subprocess/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/subprocess/subprocess/src/index.ts)、[packages/mcp/mcp-client/src/connection.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/connection.ts)、[packages/mcp/mcp-client/tests/mcp-client.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/tests/mcp-client.spec.ts)
@@ -84,7 +84,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 MCP 连接、浏览器端的具体场景，包括“mcp-client plugin module exports”、“exports name, inject, and Config”、“Config schema rejects a missing serverName”、“Config schema rejects an invalid serverName”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它用自动化测试检查 MCP 客户端的具体场景，包括“mcp-client plugin module exports”、“exports name, inject, and Config”、“Config schema rejects a missing serverName”、“Config schema rejects an invalid serverName”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“mcp-client plugin module exports”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for the mcp-client plugin's apply lifecycle entry point. Isolated file so vi.mock of the MCP SDK doesn't pollute other test suites.”；固定提交中扫描到的声明包括 `MockClient`、`mountRegistry`、`sleep`；本地静态 import 图显示它直接依赖 4 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/core/system-prompt/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/system-prompt/src/index.ts)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)、[packages/mcp/mcp-client/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/index.ts)
@@ -112,7 +112,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 MCP 连接、浏览器端、路径的具体场景，包括“dsh-mcp-client real-load-path guard”、“has no default export and keeps name/inject/Config through unwrapExports”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它用自动化测试检查 MCP 客户端、路径的具体场景，包括“dsh-mcp-client real-load-path guard”、“has no default export and keeps name/inject/Config through unwrapExports”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“dsh-mcp-client real-load-path guard”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Real-load-path guard for @deepseek-ai/dsh-mcp-client. mcp-client is a NAMESPACE plugin with inject — so a stray export default apply would make the cordis Loader's unwrapExports (exports.default ?? exports) collapse the module to the bare apply function, DR...”；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/mcp/mcp-client/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/src/index.ts)、[vendor/loader/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/loader/src/index.ts)
@@ -126,7 +126,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 MCP 连接、浏览器端的具体场景，包括“fixture server — controlled scenarios”、“discovers all fixture tools under the server namespace”、“normalizes the dotted tool name with a deterministic hash suffix”、“executes the dotted tool via its normalized public name”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它用自动化测试检查 MCP 客户端的具体场景，包括“fixture server — controlled scenarios”、“discovers all fixture tools under the server namespace”、“normalizes the dotted tool name with a deterministic hash suffix”、“executes the dotted tool via its normalized public name”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“fixture server — controlled scenarios”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“End-to-end tests for dsh-mcp-client. Exercises the REAL MCP protocol against: 1. A self-written fixture server over stdio (controlled edge cases) 2. @modelcontextprotocol/server-everything (official integration test server) 3. @modelcontextprotocol/server-f...”；固定提交中扫描到的声明包括 `mountRegistry`、`ImageAdapter`、`mountImageRegistry`、`imageAgent`、`sleep`；本地静态 import 图显示它直接依赖 7 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/attachment/attachment-local/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment-local/src/index.ts)、[packages/core/system-prompt/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/system-prompt/src/index.ts)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)
@@ -140,7 +140,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 MCP 连接、浏览器端的具体场景，包括“publicToolName”、“joins clean names verbatim”、“replaces invalid characters and appends an identity hash”、“truncates over-long names and appends an identity hash”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它用自动化测试检查 MCP 客户端的具体场景，包括“publicToolName”、“joins clean names verbatim”、“replaces invalid characters and appends an identity hash”、“truncates over-long names and appends an identity hash”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“publicToolName”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `createMockClient`、`mountRegistry`、`RecordingAttachmentStore`、`ImageCatalogAdapter`、`mountRichRegistry`；本地静态 import 图显示它直接依赖 8 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/attachment/attachment/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/attachment/attachment/src/index.ts)、[packages/core/system-prompt/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/system-prompt/src/index.ts)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)
@@ -154,7 +154,7 @@
 
 - 所属层：packages/mcp：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查 MCP 连接、浏览器端的具体场景，包括“reconnect supervisor”、“reconnects after a transport close, re-syncs tools through the new generation, and serv...”、“stops at the failure cap, unregisters the tools, and reports final failure”、“gives up behind an in-flight re-sync and removes the generation it publishes”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它用自动化测试检查 MCP 客户端的具体场景，包括“reconnect supervisor”、“reconnects after a transport close, re-syncs tools through the new generation, and serv...”、“stops at the failure cap, unregisters the tools, and reports final failure”、“gives up behind an in-flight re-sync and removes the generation it publishes”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“reconnect supervisor”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Tests for the mcp-client connection supervisor: crash-driven reconnection with bounded backoff, generation-safe tool re-registration, the failure cap, the stability-window budget reset, and disposal stopping reconnection. Isolated file so vi.mock of the MCP...”；固定提交中扫描到的声明包括 `MockClient`、`mountRegistry`、`sleep`、`captureLogs`、`stdioConfig`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/mcp/mcp-client/README.md)、[packages/core/system-prompt/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/system-prompt/src/index.ts)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)、[packages/llm/llm/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/llm/llm/src/index.ts)

@@ -22,9 +22,9 @@
 
 > 当外层 `run_code` 程序发起多个内部调用时，策略拒绝是否会阻止工具主体执行？策略允许时，内部调用是否仍先经过同一条 policy lane？并发安全调用和 exclusive 调用在这个模型里怎样排列？
 
-上游源码给出可核对的依据。Code Mode 的 bridge 让内部绑定进入 registry 的 staged scheduler；前置阶段和提交阶段在有序 driver lane 中运行，只有 around-dispatch/body 阶段可以并发。exclusive 调用会先排空并发池再独占运行，屏障持续到提交完成。[``code-mode.ts`` 的调度注释](../packages/core/tools/src/code-mode.ts#L342-L357)和[实时并行 Agent Note](../.agents/notes/implemented/feature/2026-07-26-code-mode-live-parallel-dispatch.md)描述了这条约定。
+上游源码给出可核对的依据。Code Mode 的 bridge 让内部绑定进入 registry 的 staged scheduler；前置阶段和提交阶段在有序 driver lane 中运行，只有 around-dispatch/body 阶段可以并发。exclusive 调用会先排空并发池再独占运行，屏障持续到提交完成。[``code-mode.ts`` 的调度注释](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/code-mode.ts#L345-L359)和[实时并行 Agent Note](../.agents/notes/implemented/feature/2026-07-26-code-mode-live-parallel-dispatch.md)描述了这条约定。
 
-“拒绝后主体不执行”也不是动画作者凭经验补的。`prepareExecution` 在策略或 guard 产生 denial 时返回 `post-result`，而不是 `dispatch`；真正调用工具主体的 `dispatchToolBody` 只有在调度器拿到 `dispatch` 后才会运行。可以对照 [``index.ts`` 的 prepare 路径](../packages/core/tools/src/index.ts#L1463-L1505)和[主体调用路径](../packages/core/tools/src/index.ts#L1527-L1558)。
+“拒绝后主体不执行”也不是动画作者凭经验补的。`prepareExecution` 在策略或 guard 产生 denial 时返回 `post-result`，而不是 `dispatch`；真正调用工具主体的 `dispatchToolBody` 只有在调度器拿到 `dispatch` 后才会运行。可以对照 [``index.ts`` 的 prepare 路径](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts#L1463-L1507)和[主体调用路径](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts#L1527-L1560)。
 
 ## 三层证据不要混在一起
 
@@ -160,7 +160,7 @@ oracle 至少检查六件事：
 - 它不证明真实 DSH Host、Session、模型、审批服务或工具进程运行过。
 - 它不证明教学 tick 等于真实时间，也不证明示例工具名和策略配置存在于你的部署。
 - 它不证明所有插件拥有相同的并发安全声明，或所有外部副作用可以撤销。
-- 它不替代固定 rc.6 源码、keyless 测试、真实模型 E2E、生产日志或人工审批证据。
+- 它不替代固定上游提交 `aa6c361a`（根包 `0.1.1-rc.2`）的源码阅读、keyless 测试、真实模型 E2E、生产日志或人工审批证据。
 
 如果你需要真实诊断证据，回到[研究与 Debug 协作](36-研究与-Debug-协作.md)，按用户手动传递的 request/repro/result 文件流程走；本页不会自动调用那个桥。
 

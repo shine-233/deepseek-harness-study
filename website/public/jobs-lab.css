@@ -1,0 +1,44 @@
+/* jobs-lab 实验页的少量专属样式。 */
+
+.jb-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.jb-step {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.jb-step.is-current { outline: 2px solid var(--brand); }
+.jb-step.is-future { opacity: 0.38; }
+
+.jb-step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2xs);
+}
+
+.jb-step-head code { font-size: 0.8rem; }
+
+.jb-transition {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--signal-ink, var(--signal));
+  white-space: nowrap;
+}
+
+.jb-step-detail { margin: 6px 0 0; color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+
+.tj-view-chip.is-suppressed { color: var(--muted); border-color: var(--line); }
+
+@media (forced-colors: active) {
+  .jb-step { border: 1px solid CanvasText; }
+}

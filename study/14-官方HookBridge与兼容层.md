@@ -56,7 +56,7 @@ bridge 的价值是兼容已有的外部 shell hook，而不是提供比原生�
 
 | 方言 | matcher 规则 | matcher 查询值 | 没有匹配主体的事件 |
 |---|---|---|---|
-| Claude Code | 纯 `[A-Za-z0-9_|]+` 按字面量精确匹配；`|` 是精确的备选项；其他模式按不自动加锚点的正则匹配 | `PreToolUse`/`PostToolUse` 用工具名；`SessionStart` 用 session source；`SubagentStart`/`SubagentStop` 用固定的 `general-purpose` | `UserPromptSubmit` 和 `Stop` 的 matcher 在解析时被丢弃 |
+| Claude Code | 只含字母、数字、下划线和 `\|` 的模式（`[A-Za-z0-9_\|]+`）按字面量处理：先按 `\|` 拆成备选项，再与查询值做整串精确比较，`Bash\|Read` 只匹配 `Bash` 或 `Read`；含其他字符的模式按不自动加锚点的正则解释 | `PreToolUse`/`PostToolUse` 用工具名；`SessionStart` 用 session source；`SubagentStart`/`SubagentStop` 用固定的 `general-purpose` | `UserPromptSubmit` 和 `Stop` 的 matcher 在解析时被丢弃 |
 | Codex | 所有非空模式都是不自动加锚点的正则，没有 Claude Code 的字面量快捷规则 | `PreToolUse`/`PostToolUse` 用真实工具名；`SessionStart` 用 session source | `UserPromptSubmit` 和 `Stop` 的 matcher 在解析时被丢弃 |
 
 例如 Claude Code 的 `Bash` 只精确匹配 `Bash`，不会匹配 `BashOutput`；

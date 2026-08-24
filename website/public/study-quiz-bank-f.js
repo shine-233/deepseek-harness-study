@@ -189,4 +189,42 @@ export default {
       source: 'study/34-作者的判断与理由.md#本教材作者的判断与理由',
     },
   ],
+  '37-计划栈': [
+    {
+      id: 'q1',
+      q: 'todo_write 的重放语义是什么？',
+      options: [
+        '按增量增删接口逐条合并，删除标记优先',
+        '整表替换快照，重放时 last-write-wins，最后一份快照就是当前清单',
+        '清单存在独立文件里，Session 只存指针',
+      ],
+      answer: 1,
+      explain: '「Todo」一节：每次调用追加一份 todo/write 快照到调用方 Session；界面从 Session 事件渲染。非 agent 调用者没有归属清单，会被拒绝。',
+      source: 'study/37-计划栈.md#todo整表替换的快照',
+    },
+    {
+      id: 'q2',
+      q: 'Plan 模式激活期间，部署方引导段发生在什么时候？',
+      options: [
+        '只在计划创建那一刻注入一次，之后请求不再携带',
+        '每次模型请求都携带这段引导文本，直到用户 /plan off 或提交审阅结束',
+        '引导段只写给 UI 展示，从不进入模型请求',
+      ],
+      answer: 1,
+      explain: '「Plan」一节：计划态是 logged per-agent collaboration state——激活期间部署方 guidance 段进入每一次模型请求；exit_plan_mode 把成品提交审阅，/plan off 随时退出。',
+      source: 'study/37-计划栈.md#plan协作状态本身就是日志',
+    },
+    {
+      id: 'q3',
+      q: 'Workflow 的 Ralph 循环每轮启动的子代理携带什么？',
+      options: [
+        '完整会话历史加全部工具结果',
+        '只带不可变的目标和上一轮有界的交接摘要',
+        '随机采样的一段上下文，长度由 provider 决定',
+      ],
+      answer: 1,
+      explain: '「Workflow」一节顶注：固定脚本每轮启动一个新的结构化输出子代理，只携带不可变目标与上一轮有界交接摘要；循环次数由脚本而非模型决定。',
+      source: 'study/37-计划栈.md#workflow固定脚本的-foreground-循环',
+    },
+  ],
 }

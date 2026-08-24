@@ -1,0 +1,7 @@
+/* orchestration 实验页的少量专属样式；时间线复用 jobs-lab.css。 */
+
+#panel-schedule, #panel-workflow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}

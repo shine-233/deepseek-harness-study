@@ -1,6 +1,6 @@
 # 逐文件索引导航
 
-`study/文件索引/` 保存按目录分片的源码索引。当前已有 78 页生成索引，覆盖固定提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 的 2,973 个代码或界面源文件；本 README 是人工导航页，不计入这 67 页，也不增加源文件条目。
+`study/文件索引/` 保存按目录分片的源码索引。当前已有 78 页生成索引，覆盖固定提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 的 2,973 个代码或界面源文件；本 README 是人工导航页，不计入这 78 页，也不增加源文件条目。
 
 每个索引页把真实源文件整理成一张张中文卡片，卡片包含路径、文件角色、用途、设计证据、协作者、测试线索、阅读顺序和固定版本链接。先用本页选择目录，再打开对应索引页中的具体路径；需要理解行为时，回到源码和测试，不要把卡片当成完整代码审查。
 
@@ -100,6 +100,7 @@
 | [packages-core.md](./packages-core.md)（109 条） | `packages/core/` | DSH 核心主链路：Session、System Prompt、Agent、Agent Loop、Tools 和作用域。 |
 | [packages-credentials.md](./packages-credentials.md)（12 条） | `packages/credentials/` | 凭据引用、环境变量和本地 `.env` 提供器；适合查密钥如何进入运行时。 |
 | [packages-e2b.md](./packages-e2b.md)（16 条） | `packages/e2b/` | E2B 沙箱、文件系统和子进程适配器；适合查外部沙箱集成。 |
+| [packages-experimental.md](./packages-experimental.md)（22 条） | `packages/experimental/` | 实验性包和未定型的能力原型；适合查哪些实现还处于试验阶段。 |
 | [packages-examples.md](./packages-examples.md)（18 条） | `packages/examples/` | 包内 ACP、JSON-RPC 和其他 demo Bundle；适合查发布包级别的最小示例。 |
 | [packages-extensions.md](./packages-extensions.md)（64 条） | `packages/extensions/` | Cordis 客户端运行器和扩展接入代码；适合查插件怎样把能力投影到浏览器侧。 |
 | [packages-feedback.md](./packages-feedback.md)（12 条） | `packages/feedback/` | 用户反馈命令和反馈相关服务；适合查反馈从交互入口进入运行时的路径。 |

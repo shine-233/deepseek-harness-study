@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="定时提醒与动态工作流：三种触发器、冷会话追投、agent 配对与有界宽限结算">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>编排实验室：定时与工作流</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./jobs-lab.css">
+  <link rel="stylesheet" href="./orchestration-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#oc-main">跳到实验</a>
+  <main class="lab-shell" id="oc-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 任务编排</p>
+        <h1>到点不抢话，错过不补票；脚本死了，结果照样落定。</h1>
+        <p class="hero-lead">schedule 的提醒只活在原会话里：一次性到期优先进场；Every 错过多个锚点也只投最新一次、然后一步推进——派发只是同步入队后续回合。workflow 引擎在脚本体之前先按数据校验 meta；agent 调用按 seq 精确配对，取消路径上缺失的端由引擎合成；result 永不 reject，取消在有界宽限内强制结算。切下面的模式亲手推一遍。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./jobs-lab.html">打开任务生命周期实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 23</span>
+        <strong>契约逐条来自 schedule.md 与 workflow.md。</strong>
+        <p>步序号代替时间戳；没有真实计时器、worker 或子代理。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：一条 every 记录在会话冷掉的 30 分钟里错过了 3 个锚点——重新打开后会发生什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="replay-each">
+            <span>逐个补投 3 次，一次不少</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="latest-only-advance">
+            <span>只投最新一次到期，然后一步推进到下一个锚点</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="drop-record">
+            <span>错太多就作废整条记录</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="orch-form">
+          <label>
+            <span>编排面</span>
+            <select id="orch-mode" name="mode">
+              <option value="schedule">schedule —— 定时提醒的触发与追投</option>
+              <option value="workflow">workflow —— 脚本编排子代理</option>
+            </select>
+          </label>
+
+          <div id="panel-schedule">
+            <label>
+              <span>触发器</span>
+              <select id="sched-kind" name="kind"></select>
+            </label>
+            <label>
+              <span>到期时的会话状态</span>
+              <select id="sched-state" name="sessionState"></select>
+            </label>
+          </div>
+
+          <div id="panel-workflow" hidden>
+            <label>
+              <span>结局</span>
+              <select id="wf-ending" name="ending"></select>
+            </label>
+            <label>
+              <span>脚本形状</span>
+              <select id="wf-shape" name="shape"></select>
+            </label>
+          </div>
+
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="orch-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="编排观测值">
+          <div><dt>派发次数</dt><dd id="metric-dispatches">—</dd></div>
+          <div><dt>跳过锚点</dt><dd id="metric-skipped">—</dd></div>
+          <div><dt>agent 配对</dt><dd id="metric-agents">—</dd></div>
+          <div><dt>终局 / 记录态</dt><dd id="metric-stop">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="oc-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">编排时间线</p>
+          <h2 id="oc-title">从创建/启动到落定</h2>
+        </div>
+        <span class="schema-pill">操作 × 契约依据</span>
+      </div>
+      <p class="section-intro">每一格是一次注册表或引擎操作，说明行给出上游契约依据；事件格带视图徽章标出 workflow/* 事件名。</p>
+      <ol class="jb-timeline" id="orch-timeline"></ol>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>六条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重推同一条时间线，再核对确定性、派发计数、锚点跳过、维护相位顺序、agent 配对、封闭 stopReason 与 end 事件的 value 缺席。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/13-官方工具插件完整契约.html">继续读工具插件完整契约</a>
+    </footer>
+  </main>
+  <script type="module" src="./orchestration-lab.js"></script>
+</body>
+</html>

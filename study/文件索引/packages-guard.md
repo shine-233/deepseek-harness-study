@@ -14,7 +14,7 @@
 
 - 所属层：packages/guard：可复用的 Harness 功能包
 - 文件角色：模块入口
-- 这个文件有什么用：它把权限保护、工具相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
+- 这个文件有什么用：它把循环卫生、工具相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
 - 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
 - 文件级设计证据：源码顶部注释把它定位为“Advisory per-agent repeat-call detector. It enriches post-execute decisions with logged model context without vetoing or rewriting calls. Configuration and chain semantics live in the package README; rationale lives in the repeat-tool-reminder Agent Note. @...”；固定提交中扫描到的声明包括 `name`、`Config`、`apply`、`detailedReminder`、`sortJsonValue`；本地静态 import 图显示它直接依赖 6 个源文件，并被 1 个源文件直接引用。
 - 直接协作者：[packages/guard/repeat-tool-reminder/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/repeat-tool-reminder/README.md)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)、[packages/core/session/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/session/src/index.ts)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)、[packages/guard/repeat-tool-reminder/tests/repeat-tool-reminder.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/repeat-tool-reminder/tests/repeat-tool-reminder.spec.ts)
@@ -29,7 +29,7 @@
 
 - 所属层：packages/guard：可复用的 Harness 功能包
 - 文件角色：运行时不变量
-- 这个文件有什么用：它检查权限保护、工具必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
+- 这个文件有什么用：它检查循环卫生、工具必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
 - 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
 - 文件级设计证据：源码顶部注释把它定位为“Package-owned invariant companion for @deepseek-ai/dsh-repeat-tool-reminder. @module @deepseek-ai/dsh-repeat-tool-reminder/invariant”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/guard/repeat-tool-reminder/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/repeat-tool-reminder/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -43,7 +43,7 @@
 
 - 所属层：packages/guard：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查权限保护、工具的具体场景，包括“threshold escalation”、“reminds gently at the first default threshold (3) and in detail at the second (5)”、“keys the gentle text to thresholds[0], not the literal 3”、“chain semantics”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它用自动化测试检查循环卫生、工具的具体场景，包括“threshold escalation”、“reminds gently at the first default threshold (3) and in detail at the second (5)”、“keys the gentle text to thresholds[0], not the literal 3”、“chain semantics”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“threshold escalation”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：固定提交中扫描到的声明包括 `harness`、`waitForIdle`、`reminders`、`spine`；本地静态 import 图显示它直接依赖 9 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/guard/repeat-tool-reminder/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/repeat-tool-reminder/README.md)、[packages/core/agent-loop/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-loop/src/index.ts)、[packages/core/agent-loop/tests/mock-adapter.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent-loop/tests/mock-adapter.ts)、[packages/core/agent/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/agent/src/index.ts)
@@ -58,7 +58,7 @@
 
 - 所属层：packages/guard：可复用的 Harness 功能包
 - 文件角色：模块入口
-- 这个文件有什么用：它把权限保护、策略相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
+- 这个文件有什么用：它把循环卫生、策略相关的公开能力集中导出，并决定调用者可以依赖哪些边界；调用者因此不必记住所有内部文件。
 - 为什么这样设计：入口文件把公开边界固定下来，内部文件可以继续拆分或替换；其他包只依赖入口暴露的 API，依赖方向更稳定。
 - 文件级设计证据：源码顶部注释把它定位为“Cooperative tool-call timeout enforcer. A tool declares timeoutMs and promises to honor exec.signal; this wrapper arms that deadline and maps its own expiry to TOOL_TIMEOUT without racing or abandoning the tool promise. FIXME: settle the intended @deepseek-...”；固定提交中扫描到的声明包括 `TOOL_TIMEOUT`、`name`、`inject`、`apply`、`toolTimeoutResult`；本地静态 import 图显示它直接依赖 3 个源文件，并被 4 个源文件直接引用。
 - 直接协作者：[packages/guard/timeout-policy/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/timeout-policy/README.md)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)、[packages/util/timeout/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/util/timeout/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)、[packages/guard/timeout-policy/tests/timeout-policy.spec.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/timeout-policy/tests/timeout-policy.spec.ts)
@@ -72,7 +72,7 @@
 
 - 所属层：packages/guard：可复用的 Harness 功能包
 - 文件角色：运行时不变量
-- 这个文件有什么用：它检查权限保护、策略必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
+- 这个文件有什么用：它检查循环卫生、策略必须始终成立的条件，在错误刚出现时报告，而不是等到更深层才出现难以解释的结果。
 - 为什么这样设计：把不变量集中在一个位置，调用者和测试就能用同一条规则检查状态；错误在边界处报告，比在后续 UI 或网络请求中才暴露更容易修复。
 - 文件级设计证据：源码顶部注释把它定位为“Package-owned invariant companion for @deepseek-ai/dsh-tool-call-timeout-policy. @module @deepseek-ai/dsh-tool-call-timeout-policy/invariant”；固定提交中扫描到的声明包括 `name`、`inject`、`apply`；本地静态 import 图显示它直接依赖 2 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/guard/timeout-policy/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/timeout-policy/README.md)、[packages/runtime-diagnostics/invariants/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/runtime-diagnostics/invariants/src/index.ts)、[vendor/cordis/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/index.ts)
@@ -86,7 +86,7 @@
 
 - 所属层：packages/guard：可复用的 Harness 功能包
 - 文件角色：测试用例
-- 这个文件有什么用：它用自动化测试检查权限保护、策略的具体场景，包括“timeout-policy delegation (unconfigured / fast)”、“delegates a tool with NO declared budget unchanged and does not touch exec.signal”、“a tool with a budget that returns fast keeps its own result (no timeout)”、“a budgeted tool receives the DERIVED deadline signal (not the caller signal) during dis...”；这些断言把“应该发生什么”变成可以重复运行的证据。
+- 这个文件有什么用：它用自动化测试检查循环卫生、策略的具体场景，包括“timeout-policy delegation (unconfigured / fast)”、“delegates a tool with NO declared budget unchanged and does not touch exec.signal”、“a tool with a budget that returns fast keeps its own result (no timeout)”、“a budgeted tool receives the DERIVED deadline signal (not the caller signal) during dis...”；这些断言把“应该发生什么”变成可以重复运行的证据。
 - 为什么这样设计：把测试主题“timeout-policy delegation (unconfigured / fast)”写成独立测试用例，读者可以从输入、触发动作和断言反推实现的不变量；不同回归问题也不会互相遮蔽。
 - 文件级设计证据：源码顶部注释把它定位为“Unit + real-load-path coverage for @deepseek-ai/dsh-tool-call-timeout-policy. The timeout-wins cases drive the deadline under fake timers (deterministic — no wall-clock race) and use a COOPERATIVE tool that settles only when its exec.signal aborts, mirrorin...”；固定提交中扫描到的声明包括 `setup`；本地静态 import 图显示它直接依赖 6 个源文件，并被 0 个源文件直接引用。
 - 直接协作者：[packages/guard/timeout-policy/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/timeout-policy/README.md)、[packages/core/system-prompt/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/system-prompt/src/index.ts)、[packages/core/tools/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts)、[packages/guard/timeout-policy/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/guard/timeout-policy/src/index.ts)

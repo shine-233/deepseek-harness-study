@@ -12,7 +12,7 @@
   fallback-href="#先记住边界"
 >
 
-组件是一个静态文件工作台：它生成 request、下载 JSON、让你在本机显式运行 Debug，再手动导入 result。它不连接本机、不扫描文件、不启动程序、不上传任何内容——页面自己的 `connect-src 'none'` 就是这条边界的技术凭据。不打开组件也能按本页正文走完整个流程，正文写出了每一步的输入、输出和四种状态。
+组件是一个静态文件工作台：它生成 request、下载 JSON、让你在本机显式运行 Debug，再手动导入 result。它不连接本机、不扫描文件、不启动程序、不上传任何内容——页面自己的 `connect-src 'none'` 是可机器验证的依据。不打开组件也能按本页正文走完整个流程，正文写出了每一步的输入、输出和四种状态。
 
 </LessonWidget>
 
@@ -35,7 +35,7 @@
 - 只有用户把文件路径明确交给 Debug，才会发生一次本地文件读取；
 - result 只陈述脱敏 artifact 声明出的证据覆盖，不能把课程里的教学推断改写成真实 DSH 运行时事实。
 
-这里没有默认 loopback、HTTP、WebSocket、Cookie、localStorage、浏览器凭据、共享数据库、常驻 watcher 或自动启动 PowerShell。需要实时 RPC 时，必须另写一份拥有独立权限和生命周期合同的设计，不能把它从这个文件协议“推断出来”。
+这条链没有任何默认通道：不监听端口、不建立连接、不写浏览器存储、不起常驻进程，也不会自动执行命令。需要实时 RPC 时，必须另写一份拥有独立权限和生命周期合同的设计，不能从这个文件协议“推断出来”。
 
 ## 第一步：在网站生成 request
 
@@ -101,7 +101,7 @@ absolutePathsStored    = false
 networkAccessed        = false
 ```
 
-这些字段是安全合同，不是让工具相信一段任意文本的魔法。桥接只读取字段和允许的 source metadata；它不会读取被忽略字段，也不会为缺失字段自动扫描别处。如果 `repro-export` 输出目录旁有 `manifest.json`，桥接会核对 `repro.json` 的 SHA-256。没有 manifest 时会显示 `integrity=absent` warning，而不是声称哈希已验证。
+这些字段是 fail-closed 的合同：缺一项就拒绝，不做兜底推断。桥接只读取字段和允许的 source metadata；它不会读取被忽略字段，也不会为缺失字段自动扫描别处。如果 `repro-export` 输出目录旁有 `manifest.json`，桥接会核对 `repro.json` 的 SHA-256。没有 manifest 时会显示 `integrity=absent` warning，而不是声称哈希已验证。
 
 ## 第三步：显式运行 Debug bridge
 

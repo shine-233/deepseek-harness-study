@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="四个持久事件折叠成一个 workflow-run 聊天节点：相位分组、中断呈现与披露初始态">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>工作流节点折叠实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./jobs-lab.css">
+  <link rel="stylesheet" href="./workflow-node-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#wn-main">跳到实验</a>
+  <main class="lab-shell" id="wn-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 日志到界面</p>
+        <h1>四条记录折成一个节点；缺了终局，就诚实地写「中断」。</h1>
+        <p class="hero-lead">tool-workflow 往会话里追加四类 log-only 记录：run-start、成员 start/end、run-end。浏览器插件把它们经 Conversation Node 引擎折成一个 workflow-run 节点——锚在 run-start 上、原工具卡不变。相位分组只来自真正启动过的成员，省略 phase 与空字符串分属两组；截断的日志是合法前缀，按 interrupted 呈现且工具结果一字不改。勾上「模拟中断」，亲眼看这条边界。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./orchestration-lab.html">打开编排实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 24</span>
+        <strong>左列是日志，右列是界面；两者同源。</strong>
+        <p>执行时间线复用编排实验的模型；没有真实 React 渲染。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：进程在 run-end 落册之前崩溃——重放时这个节点会怎样？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="corrupt-log">
+            <span>整个日志判为损坏，节点拒绝渲染</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="drop-node">
+            <span>节点消失，反正运行没结束</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="interrupted-no-change">
+            <span>照常锚定，以 interrupted 呈现，工具结果不变</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="wfn-form">
+          <label>
+            <span>运行结局（执行层）</span>
+            <select id="wfn-ending" name="ending"></select>
+          </label>
+          <label>
+            <span>脚本形状</span>
+            <select id="wfn-shape" name="shape"></select>
+            <small>并发形状里第 2 个成员会失败；第 3 个带显式空相位。</small>
+          </label>
+          <label class="bundle-check">
+            <input type="checkbox" id="wfn-truncated">
+            <span>模拟中断：截掉 run-end 与末尾成员端（合法前缀）</span>
+          </label>
+          <button class="button button-primary" type="submit">重新折叠</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="wfn-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="折叠观测值">
+          <div><dt>持久记录数</dt><dd id="metric-records">—</dd></div>
+          <div><dt>节点状态</dt><dd id="metric-node-status">—</dd></div>
+          <div><dt>相位分组</dt><dd id="metric-groups">—</dd></div>
+          <div><dt>原工具卡</dt><dd id="metric-tool-card">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="wfn-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">双栏对照</p>
+          <h2 id="wfn-title">左边是日志，右边是折出来的那一个节点</h2>
+        </div>
+        <span class="schema-pill">四事件 → 单节点</span>
+      </div>
+      <p class="section-intro">左列每条记录都是 log-only 的 Session 事件；右列是它们经 Node 引擎折出的唯一聊天节点。行可点击展开/收起——初始展开规则从持久事实重建：非完成层打开，完成层关闭。</p>
+      <div class="tj-grid">
+        <div class="tj-pane" id="wfn-records"></div>
+        <div class="tj-pane tj-pane-right" id="wfn-node"></div>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>六条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重放同一份投影，再核对确定性、合法前缀、成员配对、相位分组来源、锚定位置与中断呈现；它不读渲染层的任何中间量。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 双栏对照 · 不连接任何 Host</span>
+      <a href="./study/lessons/05-Session日志与恢复.html">继续读 Session 日志与恢复</a>
+    </footer>
+  </main>
+  <script type="module" src="./workflow-node-lab.js"></script>
+</body>
+</html>

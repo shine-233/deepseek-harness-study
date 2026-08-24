@@ -52,7 +52,7 @@ turn/start
 turn/end
 ```
 
-这张图中只有一部分是直接函数调用。很多箭头是 Cordis 事件，因此插件可以在中间观察、修改、拒绝或提供能力。要判断某件事的先后顺序，应以事件定义和测试为准。
+这张图中只有一部分是直接函数调用。`turn/*`、`step/*`、`user/message`、`assistant/*` 和 `tool/*` 是写入 Session 日志的持久事件（官方架构文档的分类），而 `agent/pre-step`、`agent/request`、`llm/stream` 和三个 `tools/*` 阶段是运行中的 live 扩展点，插件因此可以在中间观察、修改、拒绝或提供能力。要判断某件事的先后顺序，应以事件定义和测试为准。
 
 ## 为什么要分 Turn 和 Step
 
@@ -74,7 +74,7 @@ Agent 有 inbox。直接用户消息、注入的运行时上下文和 goal conti
 
 ## 工具调用怎样回来
 
-模型流里出现 tool-call block 时，Agent Loop 不直接执行函数，而是把它交给 Tools 服务。Tools 会重新检查工具是否可见、参数是否是可接受的 JSON、是否需要审批、是否允许并发，然后发布执行和结果事件。结果回到 Session 后，下一次 prompt 由日志推导，而不是由 Agent 私自拼一段隐藏文本。
+模型流里出现 tool-call block 时，Agent Loop 不直接执行函数，而是把它交给 Tools 服务。Tools 会重新检查工具是否可见（三层集合怎样收窄，见[工具可见性实验](/tool-visibility-lab.html)）、参数是否是可接受的 JSON、是否需要审批（ask 的完整生命周期，见[审批流实验](/approval-flow-lab.html)）、是否允许并发，然后发布执行和结果事件。结果回到 Session 后，下一次 prompt 由日志推导，而不是由 Agent 私自拼一段隐藏文本。
 
 ## 取消和失败
 

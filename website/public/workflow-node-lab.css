@@ -1,0 +1,62 @@
+/* workflow-node 实验页的少量专属样式；时间线复用 jobs-lab.css，双栏复用 trajectory 布局类。 */
+
+.wn-tool-card {
+  padding: 7px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 7px;
+  margin-bottom: var(--space-2xs);
+}
+
+.wn-tool-card code { font-size: 0.78rem; color: var(--muted); }
+
+.wn-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+}
+
+.wn-row.is-open { border-color: var(--brand); }
+
+.wn-chevron { color: var(--muted); font-family: var(--mono); }
+
+.wn-row strong { font-size: 0.86rem; margin-inline-end: auto; }
+.wn-row span:not(.wn-chevron):not(.wn-status) { font-size: 0.84rem; }
+
+.wn-body { display: flex; flex-direction: column; gap: var(--space-2xs); margin-top: var(--space-2xs); }
+.wn-body[hidden] { display: none; }
+
+.wn-phase { min-height: 32px; }
+.wn-members { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.wn-members[hidden] { display: none; }
+
+.wn-member {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: 5px 10px 5px 26px;
+}
+
+.wn-member-name { font-size: 0.82rem; overflow-wrap: anywhere; margin-inline-end: auto; }
+.wn-member-status { font-size: 0.76rem; white-space: nowrap; }
+
+.wn-status {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.wn-status.is-completed { color: var(--allow-ink, var(--allow)); }
+.wn-status.is-error, .wn-status.is-failed { color: var(--deny-ink, var(--deny)); }
+.wn-status.is-cancelled { color: var(--signal-ink, var(--signal)); }
+.wn-status.is-interrupted { color: var(--warning-ink, var(--warning)); }
+.wn-status.is-running { color: var(--brand); }
+
+@media (forced-colors: active) {
+  .wn-row, .wn-tool-card, .wn-member { border: 1px solid CanvasText; }
+}

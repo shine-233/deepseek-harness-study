@@ -1,6 +1,6 @@
 # Bundle、Profile、Loader 与发布安装
 
-这篇解释一个插件怎样从代码变成可以被 DSH 发现、组合、启动和卸载的安装单元。读完后，你应该能区分普通 Cordis 插件、Bundle、Profile、patch 文件和 Loader；也应该知道为什么 package.json 里有 dsh.bundle 只能说明装配格式，不能证明发布者是官方团队。
+这篇解释一个插件怎样从代码变成可以被 DSH 发现、组合、启动和卸载的安装单元。读完你要能做一件事：拿 base Bundle patch 里的一个条目，说出它在 Profile、home 和 `--patch` 逐层叠加后的最终值是谁写的；顺带分清 package.json 里的 `dsh.bundle` 为什么只说明装配格式，不证明发布者是官方团队。
 
 ## 亲手换一次解析顺序
 

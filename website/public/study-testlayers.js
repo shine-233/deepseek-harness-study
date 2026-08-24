@@ -78,7 +78,8 @@ function ensureStyle(doc) {
   style.id = 'dsh-testlayers-style'
   style.textContent = `
 .dsh-testlayers{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:14px;margin:20px 0;}
-.dsh-testlayers-stack{display:grid;gap:6px;margin:0;padding:0;list-style:none;}
+.dsh-testlayers-stack,.vp-doc .dsh-testlayers-stack{display:grid;gap:6px;margin:0;padding:0;list-style:none;}
+.dsh-testlayers-stack li{list-style:none;}
 .dsh-testlayers-band{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border:1px solid var(--vp-c-divider);
   border-radius:8px;background:var(--vp-c-bg-soft);color:var(--vp-c-text-1);font:inherit;text-align:left;cursor:pointer;}
 .dsh-testlayers-band[aria-pressed="true"]{border-color:var(--vp-c-brand-1);background:var(--vp-c-brand-soft);box-shadow:inset 0 0 0 1px var(--vp-c-brand-1);}

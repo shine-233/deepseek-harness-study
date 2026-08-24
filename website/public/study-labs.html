@@ -38,7 +38,7 @@
       <dl class="metric-grid">
         <div><dt>亲手做过的实验</dt><dd id="metric-labs-done">—</dd></div>
         <div><dt>已读配套课</dt><dd id="metric-lessons-read">—</dd></div>
-        <div><dt>计入进度</dt><dd>20 / 21 个页面</dd></div>
+        <div><dt>计入进度</dt><dd>23 / 24 个页面</dd></div>
       </dl>
       <p class="feedback" id="labs-progress-feedback" role="status" aria-live="polite">进度只写本机浏览器，不上传。</p>
     </section>
@@ -555,6 +555,79 @@
             <p class="lab-card-links">
               <a class="button button-primary" href="./skill-catalog-lab.html">打开实验</a>
               <a class="lab-lesson-link" href="./study/lessons/22-工具可见性与非侵入扩展.html">配套课 · 工具可见性</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="jobs" data-lesson="13-官方工具插件完整契约">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <circle class="lm-dot" cx="16" cy="34" r="6"/>
+            <path class="lm-arrow" d="M26 34 h12 m-4 -4 l4 4 l-4 4"/>
+            <rect class="lm-box lm-accent" x="42" y="26" width="30" height="16" rx="3"/>
+            <path class="lm-arrow" d="M76 34 h10 m-4 -4 l4 4 l-4 4"/>
+            <rect class="lm-summary" x="90" y="26" width="22" height="16" rx="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>后台任务生命周期</h3>
+            <p class="lab-card-question">kill 返回 requested 并认领 reported；结算先到先得，迟到的 resolved(completed) 被忽略；teardown 排空后零通知。三个剧本 × 三种结局逐步推。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">先到先得</li>
+              <li class="schema-pill">reported 认领</li>
+              <li class="schema-pill">时间线单步</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./jobs-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/13-官方工具插件完整契约.html">配套课 · 工具插件完整契约</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="orchestration" data-lesson="13-官方工具插件完整契约">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <circle class="lm-dot" cx="14" cy="34" r="5"/>
+            <path class="lm-arrow" d="M22 34 h10 m-4 -4 l4 4 l-4 4"/>
+            <rect class="lm-box lm-accent" x="36" y="26" width="24" height="16" rx="3"/>
+            <path class="lm-arrow" d="M64 34 h8 m-3 -3 l3 3 l-3 3"/>
+            <rect class="lm-cell" x="76" y="20" width="14" height="9" rx="2"/>
+            <rect class="lm-cell" x="94" y="38" width="16" height="9" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>定时与工作流编排</h3>
+            <p class="lab-card-question">after/at/every 三种触发器：冷会话错过 3 个锚点也只投最新一次、然后一步推进。工作流侧：meta 先校验，agent 按 seq 配对，取消走有界宽限强结算。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">追投语义</li>
+              <li class="schema-pill">seq 配对</li>
+              <li class="schema-pill">有界宽限</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./orchestration-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/13-官方工具插件完整契约.html">配套课 · 工具插件完整契约</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="workflow-node" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-cell" x="8" y="10" width="44" height="9" rx="2"/>
+            <rect class="lm-cell" x="8" y="25" width="36" height="9" rx="2"/>
+            <rect class="lm-cell lm-dim" x="8" y="40" width="40" height="9" rx="2"/>
+            <path class="lm-arrow" d="M56 34 h12 m-4 -4 l4 4 l-4 4"/>
+            <rect class="lm-box lm-accent" x="72" y="16" width="40" height="34" rx="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>工作流节点折叠</h3>
+            <p class="lab-card-question">四条 log-only 记录折成一个聊天节点：相位只认启动过的成员、空串与省略分列；截断日志是合法前缀，按 interrupted 呈现且工具卡一字不改。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">四折一</li>
+              <li class="schema-pill">合法前缀</li>
+              <li class="schema-pill">披露初始态</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./workflow-node-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · Session 日志与恢复</a>
             </p>
           </div>
         </li>
