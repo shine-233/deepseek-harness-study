@@ -418,9 +418,13 @@ export default withMermaid({
   title: 'DSH 社区源码学习与生态导读',
   description: '面向 DSH 社区的非官方中文源码学习、插件实践与生态研究材料',
   base,
-  // 索引导航页一屏排着几十个大 chunk 链接。当前锁定的 VitePress 1.6 没有
-  // shouldPrefetch 配置（升级后再考虑），而它的路由本来就只在点击时加载
-  // 目标页 chunk，不做跨页预取——大索引页不会被一次性拉取。
+  // 索引导航页一屏排着几十个大 chunk 链接。VitePress 1.6 的视口预取默认开启
+  // （router.prefetchLinks 缺省为 true），会在无点击时后台拉取约 4MB 的索引页
+  // chunk。关掉它：页间切换改为点击时加载，静态站点单页 100–500KB，CDN 首字
+  // 节很快；省下的是不确定流量下的一次性多 MB 后台下载。
+  router: {
+    prefetchLinks: false,
+  },
   head: [
     // VitePress leaves head hrefs untouched, so the base belongs here explicitly.
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }],
