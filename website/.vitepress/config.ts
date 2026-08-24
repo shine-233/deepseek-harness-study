@@ -418,6 +418,9 @@ export default withMermaid({
   title: 'DSH 社区源码学习与生态导读',
   description: '面向 DSH 社区的非官方中文源码学习、插件实践与生态研究材料',
   base,
+  // 索引导航页一屏排着几十个大 chunk 链接。当前锁定的 VitePress 1.6 没有
+  // shouldPrefetch 配置（升级后再考虑），而它的路由本来就只在点击时加载
+  // 目标页 chunk，不做跨页预取——大索引页不会被一次性拉取。
   head: [
     // VitePress leaves head hrefs untouched, so the base belongs here explicitly.
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }],
@@ -434,7 +437,7 @@ export default withMermaid({
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'DSH 社区源码学习｜非官方中文导读' }],
-    ['meta', { name: 'twitter:description', content: '面向 DSH 社区的非官方源码学习材料：37 课 · 16 个离线实验 · 2,973 张逐文件索引卡。' }],
+    ['meta', { name: 'twitter:description', content: '面向 DSH 社区的非官方源码学习材料：38 课 · 35 个离线实验 · 2,973 张逐文件索引卡。' }],
     ['meta', { name: 'twitter:image', content: 'https://shine-233.github.io/deepseek-harness-study/og-image.png' }],
     ['style', {}, siteStyle],
     ['script', {}, readingProgressScript],
