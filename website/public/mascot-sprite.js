@@ -56,13 +56,128 @@ export const MASCOT_SPRITE = Object.freeze([
   '....rrrrrrrrrrrrrr....',
 ])
 
+/** 挥手：右臂举过头顶，其余与待机一致。戳一戳时播放。 */
+export const MASCOT_SPRITE_WAVE = Object.freeze([
+  '..........hh..........',
+  '.........hHHh.........',
+  '........HHHHHHHH...DD.',
+  '......WWWWWWWWWWWW.DD.',
+  '.....hHHHHHHHHHHHHhDD.',
+  '.TT.hHHHHHHHHHHHHh.TT.',
+  '.TT.HHHHHHHHHHHHHH.TT.',
+  '..T.HHHHHHHHHHHHHH.T..',
+  '....HHhhhhhhhhhhHH....',
+  '...dHSSSSSSSSSSSSHd...',
+  '...dSSSSSSSSSSSSSSd...',
+  '...dSwEESSSSSwEESd....',
+  '...dSEEESSSSSEEESd....',
+  '...dBBSSSSSSSSSSBBd...',
+  '....SSSSSSSSSSSSSS....',
+  '......SSSSSSSSSS......',
+  '.......AAAAAAAA.......',
+  '.....DDDCCCCCCDDD.....',
+  '..DD.DDDDAAAADDDD.....',
+  '..DD.DDDDAAAADDDD.....',
+  '..ss.DDDDAAAADDDD.ss..',
+  '....rrrrrrrrrrrrrr....',
+])
+
+/** 走路：双腿迈开（巡游时与待机帧交替播放）。 */
+export const MASCOT_SPRITE_WALK = Object.freeze([
+  '..........hh..........',
+  '.........hHHh.........',
+  '........HHHHHHHH......',
+  '......WWWWWWWWWWWW....',
+  '.....hHHHHHHHHHHHHh...',
+  '.TT.hHHHHHHHHHHHHh.TT.',
+  '.TT.HHHHHHHHHHHHHH.TT.',
+  '..T.HHHHHHHHHHHHHH.T..',
+  '....HHhhhhhhhhhhHH....',
+  '...dHSSSSSSSSSSSSHd...',
+  '...dSSSSSSSSSSSSSSd...',
+  '...dSwEESSSSSwEESd....',
+  '...dSEEESSSSSEEESd....',
+  '...dBBSSSSSSSSSSBBd...',
+  '....SSSSSSSSSSSSSS....',
+  '......SSSSSSSSSS......',
+  '.......AAAAAAAA.......',
+  '.....DDDCCCCCCDDD.....',
+  '.DD..DDDDAAAADDDDDD...',
+  '.DD.DDDDAAAAADDDD..DD.',
+  '..s.DDDDAAAAADDDD..ss.',
+  '....rrrrrrrrrrrrrr....',
+])
+
+/** 开心：弯成 ∧ 的闭眼笑（判分满分时播放）。 */
+export const MASCOT_SPRITE_HAPPY = Object.freeze([
+  '..........hh..........',
+  '.........hHHh.........',
+  '........HHHHHHHH......',
+  '......WWWWWWWWWWWW....',
+  '.....hHHHHHHHHHHHHh...',
+  '.TT.hHHHHHHHHHHHHh.TT.',
+  '.TT.HHHHHHHHHHHHHH.TT.',
+  '..T.HHHHHHHHHHHHHH.T..',
+  '....HHhhhhhhhhhhHH....',
+  '...dHSSSSSSSSSSSSHd...',
+  '...dSSSSSSSSSSSSSSd...',
+  '...dS.E.SSSSS.E.Sd....',
+  '...dSE.ESSSSSE.ESd....',
+  '...dBBSSSSSSSSSSBBd...',
+  '....SSSSSSSSSSSSSS....',
+  '......SSSSSSSSSS......',
+  '.......AAAAAAAA.......',
+  '.....DDDCCCCCCDDD.....',
+  '..DD.DDDDAAAADDDD.DD..',
+  '..DD.DDDDAAAADDDD.DD..',
+  '..ss.DDDDAAAADDDD.ss..',
+  '....rrrrrrrrrrrrrr....',
+])
+
+/** 打盹：闭眼成一条线（打盹插件触发，配合 CSS 倾斜与 zzZ）。 */
+export const MASCOT_SPRITE_NAP = Object.freeze([
+  '..........hh..........',
+  '.........hHHh.........',
+  '........HHHHHHHH......',
+  '......WWWWWWWWWWWW....',
+  '.....hHHHHHHHHHHHHh...',
+  '.TT.hHHHHHHHHHHHHh.TT.',
+  '.TT.HHHHHHHHHHHHHH.TT.',
+  '..T.HHHHHHHHHHHHHH.T..',
+  '....HHhhhhhhhhhhHH....',
+  '...dHSSSSSSSSSSSSHd...',
+  '...dSSSSSSSSSSSSSSd...',
+  '...dSSSSSSSSSSSSSSd...',
+  '...dSEEESSSSSEEESd....',
+  '...dBBSSSSSSSSSSBBd...',
+  '....SSSSSSSSSSSSSS....',
+  '......SSSSSSSSSS......',
+  '.......AAAAAAAA.......',
+  '.....DDDCCCCCCDDD.....',
+  '..DD.DDDDAAAADDDD.DD..',
+  '..DD.DDDDAAAADDDD.DD..',
+  '..ss.DDDDAAAADDDD.ss..',
+  '....rrrrrrrrrrrrrr....',
+])
+
+/** 具名帧注册表：行为插件按名字取帧。 */
+export const MASCOT_FRAMES = Object.freeze({
+  idle: MASCOT_SPRITE,
+  wave: MASCOT_SPRITE_WAVE,
+  walk: MASCOT_SPRITE_WALK,
+  happy: MASCOT_SPRITE_HAPPY,
+  nap: MASCOT_SPRITE_NAP,
+})
+
 /**
  * 同色横向贪婪合并成 rect；眼睛格单独标记以便做眨眼动画。
  * 返回 { x, y, w, fill, eye } 数组，坐标系为 22×21 的字符网格。
+ *
+ * @param {string[]} [grid] - 字符网格，缺省用待机帧。
  */
-export function buildMascotRects() {
+export function buildMascotRects(grid = MASCOT_SPRITE) {
   const rects = []
-  MASCOT_SPRITE.forEach((row, y) => {
+  grid.forEach((row, y) => {
     const cells = row.padEnd(MASCOT_GRID_W, '.').slice(0, MASCOT_GRID_W).split('')
     let x = 0
     while (x < cells.length) {

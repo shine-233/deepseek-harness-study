@@ -7,10 +7,16 @@
  * 面板里卸载「巡游」，阿溟立刻停下走回家。事件日志实时记录它收到的页面事件
  * （戳、判分、标记已读），对应 Session 日志的概念。
  *
+ * 帧动画：mascot-sprite.js 的具名帧（待机/挥手/走路/开心/打盹）由本模块按
+ * 行为切换，渲染约定与 study-companion.js 的 buildSpriteSvg 一致（眼睛格带
+ * .dsh-comp-eye 类，眨眼 CSS 继续生效）。
+ *
  * 与 study-companion.js 的关系：伴侣模块负责创建 #dsh-companion 与判分反应；
  * 本模块等它挂载后叠加行为层，不修改伴侣的文件。找不到宿主时静默退出。
  * 纯运行时模块（依赖真实 DOM 事件），导出注册表与日志纯函数供测试。
  */
+
+import { MASCOT_FRAMES, MASCOT_PALETTE, MASCOT_GRID_W, buildMascotRects } from './mascot-sprite.js'
 
 export const PET_PLUGINS = Object.freeze([
   Object.freeze({
@@ -152,13 +158,48 @@ export function createPetRuntime(factories, host) {
 function initializePetPlugins(doc) {
   const root = doc.getElementById('dsh-companion')
   if (!root || root.dataset.petplugins === 'true') return
-  const sprite = root.querySelector('svg')
-  if (!sprite) return
+  const svg = root.querySelector('svg')
+  if (!svg) return
   root.dataset.petplugins = 'true'
   ensureStyle(doc)
 
   const reducedMotion = doc.defaultView.matchMedia('(prefers-reduced-motion: reduce)').matches
   const homeX = { value: null }
+
+  // ---- 帧切换：按名字重绘精灵（渲染约定与伴侣的 buildSpriteSvg 一致） ----
+  let baseFrame = 'idle'
+  let tempTimer = null
+  const setFrame = name => {
+    const rects = buildMascotRects(MASCOT_FRAMES[name] ?? MASCOT_FRAMES.idle)
+    const fresh = doc.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    fresh.setAttribute('viewBox', `0 0 ${MASCOT_GRID_W} ${MASCOT_FRAMES[name].length}`)
+    fresh.setAttribute('role', 'img')
+    fresh.setAttribute('aria-label', '像素吉祥物阿溟')
+    for (const rect of rects) {
+      const node = doc.createElementNS('http://www.w3.org/2000/svg', 'rect')
+      node.setAttribute('x', String(rect.x))
+      node.setAttribute('y', String(rect.y))
+      node.setAttribute('width', String(rect.w))
+      node.setAttribute('height', '1')
+      node.setAttribute('fill', rect.fill)
+      if (rect.eye) node.setAttribute('class', 'dsh-comp-eye')
+      fresh.append(node)
+    }
+    svg.replaceChildren(...fresh.children)
+    svg.setAttribute('viewBox', fresh.getAttribute('viewBox'))
+  }
+  /** 临时帧播完回到基础帧；reduced-motion 或重复触发时直接落定。 */
+  const playTemp = (name, ms) => {
+    if (reducedMotion) return
+    clearTimeout(tempTimer)
+    setFrame(name)
+    tempTimer = setTimeout(() => setFrame(baseFrame), ms)
+  }
+  const setBase = name => {
+    baseFrame = name
+    clearTimeout(tempTimer)
+    setFrame(name)
+  }
 
   const logEntries = []
   const logEl = doc.createElement('div')
@@ -176,15 +217,17 @@ function initializePetPlugins(doc) {
     renderLog()
   }
 
-  // ---- 巡游：沿底部缓慢平移，转身翻转 ----
+  // ---- 巡游：沿底部缓慢平移，走路帧与待机帧交替，转身翻转 ----
   let wanderTimer = null
+  let walkSwap = null
   let facing = 1
   const mountWander = api => {
     if (reducedMotion) return () => {}
-    let offset = 0
     const step = () => {
-      offset = facing * (40 + Math.round(Math.random() * 90))
-      api.root.style.translate = `${offset}px 0`
+      if (baseFrame === 'nap') { wanderTimer = setTimeout(step, 4000); return }
+      setBase('walk')
+      walkSwap = setTimeout(() => { if (baseFrame === 'walk') setFrame('idle') }, 700)
+      api.root.style.translate = `${facing * (40 + Math.round(Math.random() * 90))}px 0`
       api.root.style.transform = facing === -1 ? 'scaleX(-1)' : ''
       facing = -facing
       wanderTimer = setTimeout(step, 9000 + Math.random() * 5000)
@@ -192,17 +235,19 @@ function initializePetPlugins(doc) {
     wanderTimer = setTimeout(step, 6000)
     return () => {
       clearTimeout(wanderTimer)
+      clearTimeout(walkSwap)
       api.root.style.translate = ''
       api.root.style.transform = ''
+      setBase('idle')
     }
   }
 
-  // ---- 眼神跟随：pointermove 平移瞳孔 ----
+  // ---- 眼神跟随：pointermove 平移瞳孔（每次现查节点，换帧后仍有效） ----
   let eyeHandler = null
   const mountEyeTrack = api => {
-    const eyes = api.root.querySelectorAll('.dsh-comp-eye')
-    if (eyes.length === 0) return () => {}
     eyeHandler = event => {
+      const eyes = api.root.querySelectorAll('.dsh-comp-eye')
+      if (eyes.length === 0) return
       const rect = api.root.getBoundingClientRect()
       const dx = Math.max(-1.4, Math.min(1.4, (event.clientX - rect.left) / 60))
       const dy = Math.max(-1, Math.min(1, (event.clientY - rect.top) / 60))
@@ -211,14 +256,15 @@ function initializePetPlugins(doc) {
     doc.addEventListener('pointermove', eyeHandler)
     return () => {
       doc.removeEventListener('pointermove', eyeHandler)
-      eyes.forEach(eye => { eye.style.translate = '' })
+      api.root.querySelectorAll('.dsh-comp-eye').forEach(eye => { eye.style.translate = '' })
     }
   }
 
-  // ---- 打盹：45 秒无操作趴下 ----
+  // ---- 打盹：45 秒无操作趴下（切打盹帧） ----
   let napTimer = null
   let zzz = null
   const wake = () => {
+    if (baseFrame === 'nap') setBase('idle')
     root.classList.remove('dsh-pp-nap')
     if (zzz) { zzz.remove(); zzz = null }
     armNap()
@@ -226,6 +272,7 @@ function initializePetPlugins(doc) {
   const armNap = () => {
     clearTimeout(napTimer)
     napTimer = setTimeout(() => {
+      setBase('nap')
       root.classList.add('dsh-pp-nap')
       zzz = doc.createElement('span')
       zzz.className = 'dsh-pp-zzz'
@@ -242,6 +289,7 @@ function initializePetPlugins(doc) {
       clearTimeout(napTimer)
       doc.removeEventListener('pointerdown', wake, true)
       doc.removeEventListener('keydown', wake, true)
+      if (baseFrame === 'nap') setBase('idle')
       api.root.classList.remove('dsh-pp-nap')
       if (zzz) { zzz.remove(); zzz = null }
     }
@@ -376,11 +424,15 @@ function initializePetPlugins(doc) {
   // 默认全部挂载（眨眼插件默认挂载 = 保持伴侣的 CSS 循环可见）。
   for (const plugin of PET_PLUGINS) runtime.mount(plugin.id)
 
-  // 事件日志：戳一戳与判分事件。
-  root.addEventListener('click', () => log('poke'))
+  // 事件日志：戳一戳与判分事件；同时播放对应帧（挥手 / 开心）。
+  root.addEventListener('click', () => {
+    log('poke')
+    if (baseFrame !== 'nap') playTemp('wave', 900)
+  })
   doc.addEventListener('dsh-study-delight', event => {
     const kind = event.detail?.kind ?? 'delight'
     log(kind === 'done' ? 'done' : 'delight')
+    if (kind !== 'done' && baseFrame !== 'nap') playTemp('happy', 1400)
   })
 }
 
