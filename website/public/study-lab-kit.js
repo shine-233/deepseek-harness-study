@@ -597,3 +597,36 @@ if (typeof document !== 'undefined' && typeof MutationObserver === 'function') {
     observeMetrics()
   }
 }
+
+/*
+ * 返回顶部浮动按钮：滚动超过两屏后淡入，点击平滑回顶。
+ * IntersectionObserver 哨兵放在 body 开头——滚过哨兵即显示按钮。
+ * 无 DOM 的导入环境不安装。
+ */
+if (typeof document !== 'undefined' && typeof IntersectionObserver === 'function') {
+  const sentinel = document.createElement('div')
+  sentinel.setAttribute('aria-hidden', 'true')
+  sentinel.style.cssText = 'position:absolute;top:0;height:' + (window.innerHeight * 2) + 'px;width:1px;pointer-events:none'
+  const btn = document.createElement('a')
+  btn.href = '#'
+  btn.className = 'back-to-top'
+  btn.textContent = '↑'
+  btn.setAttribute('aria-label', '返回顶部')
+  btn.addEventListener('click', event => {
+    event.preventDefault()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
+  const observer = new IntersectionObserver(([entry]) => {
+    btn.classList.toggle('is-visible', !entry.isIntersecting)
+  })
+  const mount = () => {
+    document.body.prepend(sentinel)
+    document.body.append(btn)
+    observer.observe(sentinel)
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount, { once: true })
+  } else {
+    mount()
+  }
+}
