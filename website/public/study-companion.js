@@ -1,85 +1,21 @@
 /**
  * 课程页吉祥物伴侣「阿溟」：像素画精灵 + 台词气泡。
  *
- * 数据与渲染函数是纯函数，可在 Node 里单独测试；所有 DOM 操作都在文件尾部的
- * 浏览器守卫里（与 study-progress.js 同一约定，无 DOM 导入门禁会检查这一点）。
- * 触发源：study-progress.js 在判分与“标记本课已读”时分发的 dsh-study-delight
- * 事件；点击精灵本身也会随机说一句台词。
+ * 精灵数据与矩形构建的唯一来源是 `./mascot-sprite.js`（首页 JournalHome.vue
+ * 打包的是同一份文件）；本模块只保留台词池和 DOM 渲染。所有 DOM 操作都在
+ * 文件尾部的浏览器守卫里（与 study-progress.js 同一约定，无 DOM 导入门禁会
+ * 检查这一点）。触发源：study-progress.js 在判分与"标记本课已读"时分发的
+ * dsh-study-delight 事件；点击精灵本身也会随机说一句台词。
  */
 
-/** 字符调色板：一个字符对应一个颜色，'.' 为透明。与 JournalHome 的像素画同源。 */
-export const MASCOT_PALETTE = Object.freeze({
-  h: '#7db8ff',
-  H: '#3b79f0',
-  d: '#2a5cc9',
-  W: '#ffffff',
-  S: '#fff6ed',
-  s: '#f5ddc4',
-  E: '#22315e',
-  w: '#ffffff',
-  B: '#ffb9c6',
-  D: '#2f63d6',
-  r: '#2454b8',
-  A: '#fffdf7',
-  C: '#f07a5a',
-  T: '#5e9bff',
-})
+import {
+  MASCOT_GRID_W,
+  MASCOT_PALETTE,
+  MASCOT_SPRITE,
+  buildMascotRects,
+} from './mascot-sprite.js'
 
-export const MASCOT_GRID_W = 22
-
-/** 像素画本体：每行一个字符串；渲染器把行长补齐/裁齐到 GRID_W。 */
-export const MASCOT_SPRITE = Object.freeze([
-  '..........hh..........',
-  '.........hHHh.........',
-  '........HHHHHHHH......',
-  '......WWWWWWWWWWWW....',
-  '.....hHHHHHHHHHHHHh...',
-  '.TT.hHHHHHHHHHHHHh.TT.',
-  '.TT.HHHHHHHHHHHHHH.TT.',
-  '..T.HHHHHHHHHHHHHH.T..',
-  '....HHhhhhhhhhhhHH....',
-  '...dHSSSSSSSSSSSSHd...',
-  '...dSSSSSSSSSSSSSSd...',
-  '...dSwEESSSSSwEESd....',
-  '...dSEEESSSSSEEESd....',
-  '...dBBSSSSSSSSSSBBd...',
-  '....SSSSSSSSSSSSSS....',
-  '......SSSSSSSSSS......',
-  '.......AAAAAAAA.......',
-  '.....DDDCCCCCCDDD.....',
-  '..DD.DDDDAAAADDDD.DD..',
-  '..DD.DDDDAAAADDDD.DD..',
-  '..ss.DDDDAAAADDDD.ss..',
-  '....rrrrrrrrrrrrrr....',
-])
-
-/**
- * 同色横向贪婪合并成 rect；眼睛格单独标记以便做眨眼动画。
- * 返回 { x, y, w, fill, eye } 数组，坐标系为 22×21 的字符网格。
- */
-export function buildMascotRects() {
-  const rects = []
-  MASCOT_SPRITE.forEach((row, y) => {
-    const cells = row.padEnd(MASCOT_GRID_W, '.').slice(0, MASCOT_GRID_W).split('')
-    let x = 0
-    while (x < cells.length) {
-      const ch = cells[x]
-      let w = 1
-      while (x + w < cells.length && cells[x + w] === ch) w++
-      if (ch !== '.') {
-        rects.push({
-          x,
-          y,
-          w,
-          fill: MASCOT_PALETTE[ch] ?? '#cccccc',
-          eye: [...Array(w)].every((_, i) => cells[x + i] === 'E' || cells[x + i] === 'w'),
-        })
-      }
-      x += w
-    }
-  })
-  return rects
-}
+export { MASCOT_GRID_W, MASCOT_PALETTE, MASCOT_SPRITE, buildMascotRects }
 
 /** 台词池：戳精灵、判分、标记已读各一组；句子要短，且只谈这页正在发生的事。 */
 export const COMPANION_LINES = Object.freeze({
@@ -101,6 +37,10 @@ export const COMPANION_LINES = Object.freeze({
   done: Object.freeze([
     '这课收进你的进度里了，证据链又长了一格。',
     '已读标记落袋。下一跳想好去哪了吗？',
+  ]),
+  stuck: Object.freeze([
+    '连错{misses}道？先看「{src}」。',
+    '别硬猜，线索在「{src}」里。',
   ]),
 })
 
@@ -170,6 +110,22 @@ function buildSpriteSvg(doc, rects) {
 
 let bubbleTimer = 0
 
+/** 把题目出处（study/NN-标题.md#锚点）缩成气泡里读得懂的「NN · 锚点」。 */
+function shortSource(source) {
+  const withoutDir = String(source).replace(/^study\//, '')
+  const [file, anchor] = withoutDir.split('#')
+  const number = file.match(/^(\d+)/)
+  if (anchor !== undefined && number !== null) return `${number[1]} · ${anchor}`
+  if (anchor !== undefined) return anchor
+  return file
+}
+
+function stuckLine(template, detail) {
+  return template
+    .replaceAll('{misses}', String(detail.misses ?? 2))
+    .replaceAll('{src}', shortSource(typeof detail.source === 'string' ? detail.source : ''))
+}
+
 function say(root, text, reducedMotion) {
   const bubble = root.querySelector('.dsh-comp-bubble')
   if (bubble === null) return
@@ -216,6 +172,8 @@ function initializeCompanion(doc) {
     } else if (detail.kind === 'done') {
       say(root, pickLine(COMPANION_LINES.done), reducedMotion)
       cheer(root, reducedMotion)
+    } else if (detail.kind === 'stuck') {
+      say(root, stuckLine(pickLine(COMPANION_LINES.stuck), detail), reducedMotion)
     }
   })
 

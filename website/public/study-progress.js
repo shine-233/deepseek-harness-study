@@ -267,10 +267,21 @@ async function renderQuizInto(docRoot, lessonId, getState, applyQuizScore, apply
       className: verdict.score === verdict.total ? 'result-pass' : '',
       textContent: `得分 ${verdict.score}/${verdict.total}。这轮不再重判；想换一套题就点下面再练一轮。`,
     }))
-    // 通知吉祥物伴侣：满分有小庆祝，错题给鼓励台词。
-    document.dispatchEvent(new CustomEvent('dsh-study-delight', {
-      detail: { kind: 'quiz', score: verdict.score, total: verdict.total },
-    }))
+    // 通知吉祥物伴侣：满分有小庆祝；同一课连错两题起，改推「卡住了」线索——
+    // 把首道错题的出处交给阿溟播报（Mathigon 式主动提示：线索只指向本页
+    // 真实存在的小节，不新编内容）。
+    const wrongSources = verdict.results
+      .map((result, index) => result.pass ? null : questions[index].source)
+      .filter(source => typeof source === 'string' && source.length > 0)
+    if (wrongSources.length >= 2) {
+      document.dispatchEvent(new CustomEvent('dsh-study-delight', {
+        detail: { kind: 'stuck', source: wrongSources[0], misses: wrongSources.length },
+      }))
+    } else {
+      document.dispatchEvent(new CustomEvent('dsh-study-delight', {
+        detail: { kind: 'quiz', score: verdict.score, total: verdict.total },
+      }))
+    }
     const again = document.createElement('button')
     again.type = 'button'
     again.textContent = '再练一轮（题目与选项重新打乱）'
