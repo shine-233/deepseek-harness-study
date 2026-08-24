@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="工作区注册表：realpath 去重、稳定注册序、header 校验挂接、非法移动零副作用——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>工作区注册表实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#ws-main">跳到实验</a>
+  <main class="lab-shell" id="ws-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 工作区</p>
+        <h1>同一路径只留一条记录，先到者永远排在前。</h1>
+        <p class="hero-lead">workspace 注册表按 realpath 规范化后的根路径去重：重复注册返回同一条记录而非新增一行。注册序稳定——先到者永远排在前。会话经 header 校验后才能挂到工作区名下；移动到非法目标时 WorkspaceMoveInvalidError 抛出且原记录原地不动。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./session-log-lab.html">打开 Session 日志重放实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界"><span class="warning-index">MODEL / SS</span><strong>路径合法性是输入旋钮。</strong><p>规则取自上游 workspace 源码（基线 aa6c361a）；页面不做真实 fs.stat。</p></aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：同一路径注册两次，注册表里有几行？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="two"><span>两行——每次注册都是新条目</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="one"><span>一条——realpath 归一化后去重返回原记录</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="error"><span>报错——重复注册是不合法的</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="workspace-form">
+          <label class="sb-check"><input id="ws-duplicate" type="checkbox"><span>加入重复注册场景（观察去重）</span></label>
+          <label class="sb-check"><input id="ws-move-invalid" type="checkbox"><span>尝试非法移动（目标 stat 失败）</span></label>
+          <label class="sb-check"><input id="ws-attach" type="checkbox" checked><span>挂接一个已校验的会话</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="workspace-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="工作区观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>记录条数</dt><dd id="metric-count">—</dd></div>
+          <div><dt>注册序稳定</dt><dd id="metric-order">—</dd></div>
+          <div><dt>非法移动被拒</dt><dd id="metric-reject">—</dd></div>
+          <div><dt>会话挂接</dt><dd id="metric-attach">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="ws-steps-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="table">有序推演表</p><h2 id="ws-steps-title">每一步发生了什么</h2></div><span class="schema-pill">步骤 × 参与方</span></div>
+      <div class="table-scroll">
+        <table>
+          <caption id="ws-caption">当前输入的全部步骤</caption>
+          <thead><tr><th scope="col">#</th><th scope="col">泳道</th><th scope="col">阶段</th><th scope="col">说明</th></tr></thead>
+          <tbody id="ws-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定</summary>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </details>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>规则逐条重算</h2></div><span class="schema-pill schema-oracle">注册校验</span></div>
+        <p class="section-intro">独立校验自己重算记录数、原子移动与挂接行为；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不连接任何 Host</span><a href="./session-log-lab.html">继续看 Session 日志重放实验</a></footer>
+  </main>
+  <script type="module" src="./workspace-lab.js"></script>
+</body>
+</html>

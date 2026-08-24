@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="会话查询：种类过滤、全文搜索、窗口截取三类条件合取生效——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>会话查询实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sq-main">跳到实验</a>
+  <main class="lab-shell" id="sq-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 会话查询</p>
+        <h1>三类条件合取生效：种类、搜索、窗口缺一不可。</h1>
+        <p class="hero-lead">session-query 对已落盘的事件流做读取、过滤与全文搜索。窗口是事件序号的闭区间（边界包含）；搜索对文本做大小写不敏感的子串匹配；三者叠加时逐条合取。查询是纯读：不修改日志、不触发任何副作用。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./session-log-lab.html">打开 Session 日志重放实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界"><span class="warning-index">MODEL / SS</span><strong>教学日志固定 12 条。</strong><p>规则取自上游 session-query 源码（基线 aa6c361a）；页面不做真实 SQLite 全文索引。</p></aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：kind 过滤 tool/call + 窗口 [0,11]，能命中几条？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="2"><span>2 条——只有两次 read_file 算 call</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="3"><span>3 条——edit_file 也是一次调用</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="0"><span>0 条——call 不在日志里</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="query-form">
+          <label><span>种类过滤</span><select id="sq-kind">
+            <option value="all">全部</option>
+            <option value="user/message">user/message</option>
+            <option value="tool/call">tool/call</option>
+            <option value="tool/result">tool/result</option>
+          </select></label>
+          <label><span>全文搜索（子串）</span><input id="sq-search" type="text" placeholder="留空 = 不过滤"></label>
+          <label><span>窗口起点：<output id="sq-start-output">0</output></span><input id="sq-start" type="range" min="0" max="11" step="1" value="0"></label>
+          <label><span>窗口终点：<output id="sq-end-output">11</output></span><input id="sq-end" type="range" min="0" max="11" step="1" value="11"></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="query-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="查询观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>命中条数</dt><dd id="metric-count">—</dd></div>
+          <div><dt>命中序号</dt><dd id="metric-seqs">—</dd></div>
+          <div><dt>涉及种类</dt><dd id="metric-kinds">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="sq-steps-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="table">命中记录</p><h2 id="sq-steps-title">逐条列出</h2></div><span class="schema-pill"># × 种类 × 文本</span></div>
+      <div class="table-scroll">
+        <table>
+          <caption id="sq-caption">当前过滤条件的命中结果</caption>
+          <thead><tr><th scope="col">#</th><th scope="col">种类</th><th scope="col">文本</th></tr></thead>
+          <tbody id="sq-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定</summary>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </details>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>规则逐条重算</h2></div><span class="schema-pill schema-oracle">查询校验</span></div>
+        <p class="section-intro">独立校验自己重算窗口边界、种类过滤与搜索匹配；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+  </main>
+  <script type="module" src="./query-lab.js"></script>
+</body>
+</html>
