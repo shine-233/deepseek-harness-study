@@ -44,6 +44,12 @@ export default {
       companion.type = 'module'
       companion.src = (base.endsWith('/') ? base : base + '/') + 'study-companion.js'
       document.head.append(companion)
+      // 阿溟的插件面板：等伴侣挂载后叠加行为插件（巡游/打盹/眼神跟随/拖拽），
+      // 面板可实时卸载插件演示 dispose 语义。无伴侣的页面静默退出。
+      const petPlugins = document.createElement('script')
+      petPlugins.type = 'module'
+      petPlugins.src = (base.endsWith('/') ? base : base + '/') + 'study-pet-plugins.js'
+      document.head.append(petPlugins)
       // 测试层次模型：只在带 data-dsh-testlayers 容器的课程页实际渲染。
       const testLayers = document.createElement('script')
       testLayers.type = 'module'
