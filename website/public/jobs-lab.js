@@ -197,7 +197,7 @@ function initializePage() {
     control.addEventListener('change', () => {
       rebuild()
       elements.step.value = elements.step.max
-      elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+      elements.step.dispatchEvent(new (elements.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
     })
   }
 
@@ -208,7 +208,7 @@ function initializePage() {
   const nudgeStep = delta => {
     elements.step.value = String(Math.min(Number(elements.step.max),
       Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
-    elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+    elements.step.dispatchEvent(new (elements.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
