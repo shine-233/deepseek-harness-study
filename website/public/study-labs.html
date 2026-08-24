@@ -38,7 +38,7 @@
       <dl class="metric-grid">
         <div><dt>亲手做过的实验</dt><dd id="metric-labs-done">—</dd></div>
         <div><dt>已读配套课</dt><dd id="metric-lessons-read">—</dd></div>
-        <div><dt>计入进度</dt><dd>29 / 30 个页面</dd></div>
+        <div><dt>计入进度</dt><dd>31 / 32 个页面</dd></div>
       </dl>
       <p class="feedback" id="labs-progress-feedback" role="status" aria-live="polite">进度只写本机浏览器，不上传。</p>
     </section>
@@ -768,6 +768,53 @@
             <p class="lab-card-links">
               <a class="button button-primary" href="./settings-lab.html">打开实验</a>
               <a class="lab-lesson-link" href="./study/lessons/07-HostClient示例测试发布.html">配套课 · Host/Client/发布</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="spill" data-lesson="06-LLM与工具执行">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-bar lm-hi" x="8" y="18" width="104" height="12" rx="2"/>
+            <line x1="70" y1="10" x2="70" y2="58" stroke-width="2" stroke-dasharray="4 3"/>
+            <rect class="lm-cell" x="8" y="40" width="30" height="12" rx="2"/>
+            <rect class="lm-cell" x="42" y="40" width="20" height="12" rx="2"/>
+            <circle class="lm-dot" cx="100" cy="46" r="5"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>溢出转储</h3>
+            <p class="lab-card-question">工具结果超过 maxInlineBytes 之后：完整文本进会话工件，模型拿到预算内的 head/tail 预览加定位符——read 豁免、无后端放行、未配置即 no-op。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">字节预算</li>
+              <li class="schema-pill">read 豁免</li>
+              <li class="schema-pill">尽力而为</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./spill-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/06-LLM与工具执行.html">配套课 · LLM 与工具执行</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="terminal" data-lesson="13-官方工具插件完整契约">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="10" y="14" width="44" height="40" rx="4"/>
+            <rect class="lm-box" x="66" y="14" width="44" height="18" rx="4"/>
+            <rect class="lm-box" x="66" y="36" width="44" height="18" rx="4"/>
+            <path class="lm-arrow" d="M56 34 h8 m-4 -3 l4 3 l-4 3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>终端会话</h3>
+            <p class="lab-card-question">cd /tmp 之后再 pwd 读到哪里？持久会话跨发送延续 cwd 与环境变量；一次性模式每条命令都是新世界。并发第二次发送被拒，kill 等整棵进程树停稳。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">状态延续</li>
+              <li class="schema-pill">单发送位</li>
+              <li class="schema-pill">进程树停稳</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./terminal-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/13-官方工具插件完整契约.html">配套课 · 工具插件契约</a>
             </p>
           </div>
         </li>

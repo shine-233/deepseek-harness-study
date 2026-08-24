@@ -1,0 +1,12 @@
+/* 终端会话实验：状态延续绿、归零灰、并发拒绝红、停稳蓝。 */
+.tm-dot { fill: var(--brand); }
+.tm-dot.is-carried { fill: var(--allow-ink, #2e7d32); }
+.tm-dot.is-reset { fill: var(--muted, #9aa3ad); }
+.tm-dot.is-reject { fill: var(--deny-ink, #c62828); }
+.tm-dot.is-settled { stroke: var(--signal-ink, #b45309); stroke-width: 3; }
+
+.sb-controls .sb-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}

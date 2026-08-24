@@ -39,6 +39,8 @@ const TRACKED_LAB_IDS = new Set([
   'credential',
   'settings',
   'plan-stack',
+  'spill',
+  'terminal',
   'shell-seam',
   'trajectory',
   'skill-catalog',

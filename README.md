@@ -2,7 +2,7 @@
 
 [![Study material quality](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml) [![Deploy documentation](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml)
 
-这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套三十个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。中文镜像：[README.zh.md](README.zh.md)。
+这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套三十二个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。中文镜像：[README.zh.md](README.zh.md)。
 
 ## 三条入口
 
@@ -14,7 +14,7 @@
 
 发现文档事实错误、链接问题、教程无法复现或社区扩展风险时，请使用[按类型填写的 Issue 表单](https://github.com/shine-233/deepseek-harness-study/issues/new/choose)；不要提交密钥、Cookie 或私有运行日志。
 
-## 三十个可以动手的实验
+## 三十二个可以动手的实验
 
 这套教材要求每个关键结论都能落到一个确定性实验里：实验全部离线运行——固定输入、固定输出、独立 oracle、公开 canProve/cannotProve；它们是教学模型，不启动真实 DSH、provider 或模型。完整清单见[实验室总览](https://shine-233.github.io/deepseek-harness-study/study-labs.html)。
 
@@ -49,6 +49,8 @@
 | [技能目录渐进加载](https://shine-233.github.io/deepseek-harness-study/skill-catalog-lab.html) | 摘要信封、digest 驱动的替换退役，以及 skill 工具的三种结局 |
 | [计划栈](https://shine-233.github.io/deepseek-harness-study/plan-stack-lab.html) | Todo 整表替换、Plan 状态机与 Goal 生命周期怎样落在同一份日志上 |
 | [Worker 协议](https://shine-233.github.io/deepseek-harness-study/worker-protocol-lab.html) | workflow 子任务的阶段推进、取消语义与日志边界 |
+| [溢出转储](https://shine-233.github.io/deepseek-harness-study/spill-lab.html) | 超过 maxInlineBytes 的结果全文进工件，模型拿到预算内的预览加定位符 |
+| [终端会话](https://shine-233.github.io/deepseek-harness-study/terminal-lab.html) | 持久会话的状态延续与一次性模式对比，单发送位与进程树停稳 |
 | [研究 ↔ Debug 离线桥](https://shine-233.github.io/deepseek-harness-study/research-debug-bridge.html) | 课程网站与独立 Debug 工具怎样用显式文件交接 |
 
 ## 课程地图

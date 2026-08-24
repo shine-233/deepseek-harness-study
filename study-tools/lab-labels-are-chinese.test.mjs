@@ -114,7 +114,7 @@ test('the ids the scripts bind to are not translated', () => {
   }
   // 新增模型实验页时这里要同步加一：数字是「有几页必须带齐三个 id」的契约，
   // 不是页面总数的自动统计，所以漏登记新页面会在这里失败。
-  assert.equal(checked.length, 29, 'the twenty-nine model labs must each keep all three ids')
+  assert.equal(checked.length, 31, 'the thirty-one model labs must each keep all three ids')
 })
 
 test('a verdict badge carries its state in data-pass, not in its text', () => {

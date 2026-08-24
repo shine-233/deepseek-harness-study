@@ -1,0 +1,16 @@
+/* 溢出转储实验：字节预算图的配色与门槛线。 */
+.sb-controls .sb-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.sp-raw { fill: var(--brand); }
+.sp-head { fill: var(--allow-ink, #2e7d32); }
+.sp-tail { fill: color-mix(in srgb, var(--allow-ink, #2e7d32) 55%, transparent); }
+.sp-omit { fill: var(--muted, #9aa3ad); stroke: var(--deny-ink, #c62828); stroke-dasharray: 4 3; }
+.sp-notice { fill: var(--signal); }
+.sp-artifact { fill: color-mix(in srgb, var(--brand) 40%, transparent); stroke: var(--brand); }
+
+.cap-line { stroke: var(--signal-ink, #b45309); stroke-width: 2; stroke-dasharray: 5 4; }
+.cap-label { fill: var(--signal-ink, #b45309); font-size: 12px; font-weight: 700; }
