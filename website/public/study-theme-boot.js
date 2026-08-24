@@ -12,11 +12,27 @@
 
 (() => {
   const KEY = 'dsh-study-theme'
+  // 把解析出的主题同步到移动端浏览器 UI（地址栏染色）。meta 不存在就补一个，
+  // 这样各实验页不用各自维护这行标签。
+  const paintThemeColor = (dark) => {
+    let meta = document.querySelector('meta[name="theme-color"]')
+    if (meta === null) {
+      meta = document.createElement('meta')
+      meta.setAttribute('name', 'theme-color')
+      document.head.append(meta)
+    }
+    meta.setAttribute('content', dark ? '#0d1117' : '#fbf8f3')
+  }
   try {
     const mode = localStorage.getItem(KEY)
-    // 只有显式选择才写属性；没存过就让 study-tokens.css 的媒体查询接管。
-    if (mode === 'light' || mode === 'dark') {
+    const explicit = mode === 'light' || mode === 'dark'
+    if (explicit) {
       document.documentElement.setAttribute('data-theme', mode)
+    }
+    // 只有显式选择才写属性；没存过就让 study-tokens.css 的媒体查询接管。
+    if (typeof window.matchMedia === 'function') {
+      const dark = explicit ? mode === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+      paintThemeColor(dark)
     }
   } catch {
     // 隐私模式或策略禁用存储时读不到，页面跟随系统偏好，功能不受影响。

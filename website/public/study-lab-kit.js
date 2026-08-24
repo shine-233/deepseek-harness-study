@@ -485,33 +485,57 @@ export function installInputReset(button, form, { onReset } = {}) {
  * 卡片聚光（Linear 式微交互的纸面译版）：
  * 指针划过 .card 时把相对坐标写进 --mx/--my，CSS 用 radial-gradient
  * 画一团暖光跟随。事件委托挂在 document 上，全部实验室页一处生效；
+ * pointermove 用 requestAnimationFrame 合帧：每帧最多读一次布局、
+ * 写一次属性，避免高频移动下的强制同步布局（INP 输入延迟来源）。
  * 无 DOM 的导入环境（纯 Node 测试）不安装。
  */
 if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
-  document.addEventListener('pointermove', (event) => {
-    if (!(event.target instanceof Element)) return
+  let spotlightFrame = 0
+  let spotlightEvent = null
+  const applySpotlight = () => {
+    spotlightFrame = 0
+    const event = spotlightEvent
+    spotlightEvent = null
+    if (event === null || !(event.target instanceof Element)) return
     const card = event.target.closest('.card')
     if (card === null) return
     const box = card.getBoundingClientRect()
     card.style.setProperty('--mx', `${Math.round(event.clientX - box.left)}px`)
     card.style.setProperty('--my', `${Math.round(event.clientY - box.top)}px`)
+  }
+  document.addEventListener('pointermove', (event) => {
+    spotlightEvent = event
+    if (spotlightFrame === 0 && typeof requestAnimationFrame === 'function') {
+      spotlightFrame = requestAnimationFrame(applySpotlight)
+    }
   }, { passive: true })
 }
 /*
  * 磁吸按钮（Apple/Linear 式微交互）：
  * 指针进入按钮周边半径时，按钮向指针平移距离的 24%（半径线性衰减）；
  * 离开半径即卸掉 translate，由 --ease-spring 弹簧回位。
- * 只在「悬停且细指针」的设备上安装，减少动态偏好下直接跳过——
- * 平移走 translate 属性，不与按钮自身的 transform/transition 打架。
+ * 只在「悬停且细指针」的设备上安装；页面没有按钮时完全不装监听器。
+ * pointermove 同样按帧合并：先批量读全部按钮的 rect，再统一写入——
+ * 读写分离消灭逐事件 × 逐按钮的强制同步布局（INP 的头号来源）。
  */
 if (typeof document !== 'undefined' && typeof document.addEventListener === 'function'
   && typeof window.matchMedia === 'function'
-  && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  && document.querySelector('.button') !== null) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-  document.addEventListener('pointermove', (event) => {
-    if (reducedMotion.matches) return
+  let magnetFrame = 0
+  let magnetEvent = null
+  const applyMagnet = () => {
+    magnetFrame = 0
+    const event = magnetEvent
+    magnetEvent = null
+    if (event === null || reducedMotion.matches) return
+    // 读阶段：一次循环拿齐全部 rect；写阶段：一次循环落 translate。
+    const boxes = []
     for (const button of document.querySelectorAll('.button')) {
-      const box = button.getBoundingClientRect()
+      boxes.push([button, button.getBoundingClientRect()])
+    }
+    for (const [button, box] of boxes) {
       const dx = event.clientX - (box.left + box.width / 2)
       const dy = event.clientY - (box.top + box.height / 2)
       const distance = Math.hypot(dx, dy)
@@ -522,6 +546,12 @@ if (typeof document !== 'undefined' && typeof document.addEventListener === 'fun
       } else if (button.style.translate !== '') {
         button.style.removeProperty('translate')
       }
+    }
+  }
+  document.addEventListener('pointermove', (event) => {
+    magnetEvent = event
+    if (magnetFrame === 0 && typeof requestAnimationFrame === 'function') {
+      magnetFrame = requestAnimationFrame(applyMagnet)
     }
   }, { passive: true })
 }

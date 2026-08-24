@@ -44,6 +44,13 @@ function applyMode(mode) {
   else root.setAttribute('data-theme', mode)
 }
 
+/** 同步移动端浏览器 UI 的染色（地址栏 theme-color），与页面主题保持一致。 */
+function syncThemeColor(mode) {
+  const dark = resolved(mode) === 'dark'
+  const meta = document.querySelector('meta[name="theme-color"]')
+  if (meta !== null) meta.setAttribute('content', dark ? '#0d1117' : '#fbf8f3')
+}
+
 function resolved(mode) {
   if (mode !== 'system') return mode
   return typeof window.matchMedia === 'function'
@@ -92,6 +99,7 @@ export function installThemeToggle(button, renderIcon = null) {
       applyMode(mode)
       persist(mode)
       paint()
+      syncThemeColor(mode)
     }
     // 主题切换的圆形扩散（View Transitions，2026 广泛支持）：
     // 新主题快照以点击点为圆心 clip-path 揭示；双层降级——
@@ -113,10 +121,14 @@ export function installThemeToggle(button, renderIcon = null) {
   // 跟随系统时，系统切换要更新按钮上写的「当前为深色/浅色」。
   if (typeof window.matchMedia === 'function') {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (mode === 'system') paint()
+      if (mode === 'system') {
+        paint()
+        syncThemeColor(mode)
+      }
     })
   }
 
   paint()
+  syncThemeColor(mode)
   return () => mode
 }

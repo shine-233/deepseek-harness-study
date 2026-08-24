@@ -658,3 +658,69 @@ svg rect.is-rejected.is-bounce { animation: sig-bounce-y .65s ease both; stroke:
     word-break: break-all;
   }
 }
+
+/* 跨实验导航：概念相邻链接。 */
+.related-labs { margin: var(--space-sm) 0; }
+.related-list { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-top: var(--space-2xs); }
+
+/*
+ * 长页渲染优化（INP presentation delay）：离屏区块跳过渲染，
+ * 接近视口时浏览器才绘制。contain-intrinsic-size 给出估算高度，
+ * 滚动条不跳动；打印时全部展开，不影响输出。
+ */
+@supports (content-visibility: auto) {
+  .lab-shell > section:not(:nth-of-type(-n + 2)) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 520px;
+  }
+}
+
+@media print {
+  .lab-shell > section {
+    content-visibility: visible !important;
+  }
+}
+
+/* === 全局微交互层：hover 弹起 + 按下缩放 + 状态变化脉冲 === */
+
+.card {
+  transition: transform 200ms cubic-bezier(0.22,1,0.36,1),
+              box-shadow 200ms cubic-bezier(0.22,1,0.36,1);
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08), var(--dsh-card-shadow, 0 12px 34px rgba(38,34,26,0.06));
+}
+.card:active {
+  transform: translateY(0) scale(0.995);
+}
+
+.button {
+  transition: transform 150ms cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 150ms ease;
+}
+.button:hover {
+  transform: translateY(-1px);
+}
+.button:active {
+  transform: scale(0.97) translateY(0);
+}
+
+.story-beat:hover,
+.wt-source:hover,
+.jb-step:hover {
+  border-color: var(--brand);
+}
+
+@keyframes dsh-pulse-once {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 40%, transparent); }
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.pulse-once { animation: dsh-pulse-once 500ms ease-out 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .button, .story-beat, .wt-source, .jb-step { transition: none !important; }
+  .card:hover { transform: none; }
+  .pulse-once { animation: none; }
+}
