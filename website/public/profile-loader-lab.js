@@ -11,6 +11,7 @@ import {
   renderOracle,
   renderRows,
   requireElements,
+  svgElement,
   writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
@@ -106,6 +107,144 @@ function renderMatrix(model, target, note) {
         + '这就是顺序为什么是配置的一部分。')
 }
 
+/**
+ * 装配舞台：左列步骤卡、右列配置键，贝塞尔线连「最终写者」，虚线连被覆写的
+ * 历史写入者（vasturiano highlight 模式：悬停/聚焦某张卡时只亮它自己的线）。
+ * 每步的色相从 --brand 旋转得来——颜色仍然只有一个 token 源。
+ */
+function renderStage(model, svg, note) {
+  if (svg === null) return
+  const steps = model.steps
+  const keys = model.keys
+  const cardW = 196
+  const cardH = 50
+  const cardGap = 12
+  const keyRowH = 34
+  const width = 760
+  const height = Math.max(steps.length, keys.length) * (cardH + cardGap) + 28
+
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
+  svg.setAttribute('width', String(width))
+  svg.setAttribute('height', String(height))
+  svg.replaceChildren()
+
+  const brand = getComputedStyle(svg).getPropertyValue('--brand').trim() || '#3157c8'
+  const hex = brand.replace('#', '')
+  const baseHue = (() => {
+    const value = parseInt(hex.length === 3 ? hex.split('').map(ch => ch + ch).join('') : hex, 16)
+    if (Number.isNaN(value)) return 222
+    const r = ((value >> 16) & 255) / 255
+    const g = ((value >> 8) & 255) / 255
+    const b = (value & 255) / 255
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    if (max === min) return 222
+    const d = max - min
+    let h = 0
+    if (max === r) h = ((g - b) / d) % 6
+    else if (max === g) h = (b - r) / d + 2
+    else h = (r - g) / d + 4
+    return ((h * 60) + 360) % 360
+  })()
+  const stepColor = index => `hsl(${(baseHue + index * 52) % 360} 62% 52%)`
+
+  const failedAt = model.failure === null ? null : model.failure.stepIndex
+  const winnerOf = new Map()
+  const ghostWriters = new Map()
+  for (const step of steps) {
+    if (!step.applied) continue
+    for (const key of step.finalFor ?? []) winnerOf.set(key, step.index)
+    for (const key of step.overriddenFor ?? []) {
+      const list = ghostWriters.get(key) ?? []
+      list.push(step.index)
+      ghostWriters.set(key, list)
+    }
+  }
+
+  const cardY = index => 10 + index * (cardH + cardGap)
+  const keyY = index => 18 + index * keyRowH
+
+  // 线画在卡片下层：先线后卡。
+  for (const [keyIndex, key] of keys.entries()) {
+    const winner = winnerOf.get(key)
+    if (winner !== undefined) {
+      const path = svgElement('path', {
+        class: 'pl-line',
+        'data-from': String(winner),
+        d: `M ${cardW + 6} ${cardY(winner) + cardH / 2}`
+          + ` C ${cardW + 90} ${cardY(winner) + cardH / 2},`
+          + ` ${560 - 90} ${keyY(keyIndex)}, ${556} ${keyY(keyIndex)}`,
+      })
+      svg.append(path)
+    }
+    for (const ghost of ghostWriters.get(key) ?? []) {
+      const path = svgElement('path', {
+        class: 'pl-ghost',
+        'data-from': String(ghost),
+        d: `M ${cardW + 6} ${cardY(ghost) + cardH / 2}`
+          + ` C ${cardW + 70} ${cardY(ghost) + cardH / 2},`
+          + ` ${560 - 70} ${keyY(keyIndex)}, ${556} ${keyY(keyIndex)}`,
+      })
+      svg.append(path)
+    }
+  }
+
+  for (const [index, step] of steps.entries()) {
+    const failed = step.applied === false
+    const group = svgElement('g', {
+      class: 'pl-card' + (failed ? ' is-failed' : ''),
+      tabindex: '0',
+      role: 'button',
+      'data-step': String(index),
+      'aria-label': `${step.label}${failed ? '：失败，' + (step.reason ?? '') : ''}`,
+    })
+    group.style.transform = `translate(0px, ${cardY(index)}px)`
+    group.append(svgElement('rect', {
+      x: 4, y: 0, width: cardW, height: cardH, rx: 9,
+      class: 'pl-card-box',
+    }))
+    group.append(svgElement('text', {
+      x: 16, y: 20, class: 'pl-card-title',
+    }, `${failed ? '✕ ' : `#${index} `}${step.label}`))
+    group.append(svgElement('text', {
+      x: 16, y: 38, class: 'pl-card-sub',
+    }, step.wrote.join('、').slice(0, 26) || '（无写入）'))
+    svg.append(group)
+
+    const setHighlight = on => {
+      for (const line of svg.querySelectorAll(`.pl-line[data-from="${index}"], .pl-ghost[data-from="${index}"]`)) {
+        line.classList.toggle('is-hot', on)
+      }
+      svg.classList.toggle('is-highlighting', on)
+    }
+    group.addEventListener('pointerenter', () => setHighlight(true))
+    group.addEventListener('pointerleave', () => setHighlight(false))
+    group.addEventListener('focus', () => setHighlight(true))
+    group.addEventListener('blur', () => setHighlight(false))
+  }
+
+  for (const [keyIndex, key] of keys.entries()) {
+    const finalEntry = model.observations.finalValues.find(entry => entry.key === key)
+    const row = svgElement('g', { class: 'pl-key' })
+    row.style.transform = `translate(0px, ${keyY(keyIndex)}px)`
+    row.append(svgElement('rect', {
+      x: 556, y: -14, width: width - 562, height: 28, rx: 7, class: 'pl-key-box'
+        + (finalEntry?.value == null ? ' is-unset' : ''),
+    }))
+    row.append(svgElement('text', { x: 568, y: 4, class: 'pl-key-name' },
+      finalEntry?.value == null ? `${key}（未声明）` : key))
+    if (finalEntry?.value != null) {
+      row.append(svgElement('text', { x: width - 12, y: 4, class: 'pl-key-value', 'text-anchor': 'end' },
+        `${String(finalEntry.value)} ← ${finalEntry.writtenBy}`))
+    }
+    svg.append(row)
+  }
+
+  writeText(note, model.failure === null
+    ? `实线 ${winnerOf.size} 条指向最终值；虚线是被覆写的旧写入。悬停左列卡片只看单步贡献。`
+    : `解析在第 ${failedAt + 1} 步失败（${model.failure.reason ?? '原因见上'}），其后所有键保持未声明。`)
+}
+
 function initializePage() {
   const elements = {
     form: document.querySelector('#profile-form'),
@@ -115,6 +254,8 @@ function initializePage() {
     feedback: document.querySelector('#profile-feedback'),
     matrix: document.querySelector('#matrix-plot'),
     matrixNote: document.querySelector('#matrix-note'),
+    stage: document.querySelector('#profile-stage'),
+    stageNote: document.querySelector('#stage-note'),
     finalBody: document.querySelector('#final-table-body'),
     finalCaption: document.querySelector('#final-caption'),
     stepsBody: document.querySelector('#steps-table-body'),
@@ -186,6 +327,7 @@ function initializePage() {
       const verdict = evaluateProfileOracle(model)
 
       renderMatrix(model, elements.matrix, elements.matrixNote)
+      renderStage(model, elements.stage, elements.stageNote)
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
 

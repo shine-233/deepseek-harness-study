@@ -22,6 +22,7 @@
         <h1>同一组 Bundle，换个顺序就是另一份配置。</h1>
         <p class="hero-lead">把「严格上限」拖到前面，<code>maxTurns</code> 的最终值就从 4 变成 12——因为决定结果的是最后一个写它的步骤。overlay 永远叠在所有 Bundle patch 之后，所以它能覆盖 Bundle，反过来不行。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/15-BundleProfileLoader与发布安装.html">阅读配套课程</a>
           <a class="button button-secondary" href="./session-log-lab.html">打开日志重放实验</a>
@@ -96,6 +97,21 @@
       </dl>
     </div>
       </section>
+
+    <section class="stage-card card" aria-labelledby="stage-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="layers">装配舞台</p>
+          <h2 id="stage-title">声明顺序怎样变成最终配置</h2>
+        </div>
+        <span class="schema-pill">步骤 → 配置键</span>
+      </div>
+      <p class="section-intro">左列是当前顺序下的每个解析步骤（含 overlay），右列是最终生效的配置键。实线＝这一步的写入成为最终值；虚线＝它写过但被后面的步骤覆写。悬停或键盘聚焦左列卡片，只看它自己的贡献。</p>
+      <div class="stage-scroll">
+        <svg id="profile-stage" role="img" aria-label="Profile 解析的装配流程图"></svg>
+      </div>
+      <p class="chart-note" id="stage-note"></p>
+    </section>
 
     <section class="matrix-card card" aria-labelledby="matrix-title">
       <div class="section-heading">
