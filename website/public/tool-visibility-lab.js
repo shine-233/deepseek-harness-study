@@ -111,6 +111,11 @@ function renderNest(model, target, note) {
       chip.append(svgElement('title', {},
         tool.name + '（' + tool.bundle + ' · ' + tool.access + ' · risk=' + tool.risk + '）：'
         + (tool.executionAllowed ? '允许执行' : '停在' + LEVEL_LABELS[tool.reachedLevel] + '，' + tool.blockedBy)))
+      chip.setAttribute('tabindex', '0')
+      chip.setAttribute('role', 'button')
+      chip.setAttribute('aria-label', tool.name + '：'
+        + (tool.executionAllowed ? '允许执行' : '停在' + LEVEL_LABELS[tool.reachedLevel] + '，' + tool.blockedBy)
+        + '；按回车键追踪它的判定链路')
       svg.append(chip)
     }
   }
@@ -198,9 +203,48 @@ function initializePage() {
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
     resetInputs: document.querySelector('#reset-inputs'),
+    traceNote: document.querySelector('#trace-note'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
+
+  let currentModel = null
+  let tracedTool = null
+
+  // 点击追踪：选中一个工具后，同心图、计数条、圆环和表格行同时高亮同一条判定链路；
+  // 说明文字逐字段取自模型输出，不在这里新编原因。
+  const TRACE_TONES = { 3: 'allow', 2: 'policy', 1: 'scope', 0: 'bundle' }
+  const applyTrace = () => {
+    if (currentModel === null) return
+    const tool = tracedTool === null ? null : currentModel.tools.find(item => item.name === tracedTool) ?? null
+    for (const chip of elements.nest.querySelectorAll('[data-tool]')) {
+      chip.classList.toggle('is-traced', tool !== null && chip.getAttribute('data-tool') === tool.name)
+      chip.classList.toggle('is-dim', tool !== null && chip.getAttribute('data-tool') !== tool.name)
+    }
+    for (const row of elements.tableBody.querySelectorAll('tr[data-key]')) {
+      row.classList.toggle('is-traced', tool !== null && row.dataset.key === tool.name)
+      row.classList.toggle('is-dim', tool !== null && row.dataset.key !== tool.name)
+    }
+    for (const bar of elements.funnel.querySelectorAll('.funnel-bar')) bar.classList.remove('is-traced')
+    const rings = [1, 2, 3].map(index => elements.nest.querySelector('.ring-' + String(index)))
+    for (const ring of rings) ring?.classList.remove('is-block', 'is-dim-ring')
+    if (tool === null) {
+      writeText(elements.traceNote, '点击任意一个工具（同心图色块或表格行），追踪它走到哪一层、被哪道收窄挡下；再点一次取消。')
+      return
+    }
+    if (tool.reachedLevel < 3 && rings[2]) rings[2].classList.add(tool.reachedLevel === 3 ? 'is-pass' : 'is-dim-ring')
+    if (tool.reachedLevel < 3) rings[tool.reachedLevel]?.classList.add('is-block')
+    else if (rings[0]) rings[0].classList.add('is-pass'), rings[1]?.classList.add('is-pass'), rings[2]?.classList.add('is-pass')
+    const tone = TRACE_TONES[tool.reachedLevel]
+    elements.funnel.querySelector('.tone-' + tone)?.classList.add('is-traced')
+    const stepsText = [
+      'Bundle ' + tool.bundle + '：' + (tool.registered ? '已加载 ✓' : '未加载 ✕'),
+      'agent 作用域「' + currentModel.scope.label + '」：' + (tool.modelVisible ? '模型可见 ✓' : '不可见 ✕'),
+      '执行策略「' + currentModel.policy.label + '」：' + (tool.executionAllowed ? '允许执行 ✓' : '不放行 ✕'),
+    ]
+    writeText(elements.traceNote, '追踪 ' + tool.name + '：' + stepsText.join(' → ')
+      + (tool.executionAllowed ? '。它落在最内层。' : '。停在「' + LEVEL_LABELS[tool.reachedLevel] + '」，被 ' + tool.blockedBy + ' 挡下。'))
+  }
 
   for (const bundle of TOOL_BUNDLES) {
     const label = document.createElement('label')
@@ -239,6 +283,7 @@ function initializePage() {
         policy: elements.policy.value,
       })
       const verdict = evaluateToolVisibilityOracle(model)
+      currentModel = model
 
       writeText(elements.scopeNote, model.scope.description)
       writeText(elements.policyNote, model.policy.description)
@@ -266,6 +311,8 @@ function initializePage() {
       setFeedback('已重建三层：' + String(model.observations.registered) + ' 已注册 → '
         + String(model.observations.modelVisible) + ' 模型可见 → '
         + String(model.observations.executionAllowed) + ' 允许执行。', 'success')
+      if (tracedTool !== null && !model.tools.some(tool => tool.name === tracedTool)) tracedTool = null
+      applyTrace()
       persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
@@ -294,6 +341,28 @@ function initializePage() {
   })
   elements.scope.addEventListener('change', rebuild)
   elements.policy.addEventListener('change', rebuild)
+
+  // 追踪交互：点图里的工具色块或表格行都指向同一个名字；键盘回车/空格等效点击。
+  const toggleTrace = (name) => {
+    tracedTool = tracedTool === name ? null : name
+    applyTrace()
+  }
+  elements.nest.addEventListener('click', (event) => {
+    const chip = event.target.closest?.('[data-tool]')
+    if (chip !== null) toggleTrace(chip.getAttribute('data-tool'))
+  })
+  elements.nest.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    const chip = event.target.closest?.('[data-tool]')
+    if (chip !== null) {
+      event.preventDefault()
+      toggleTrace(chip.getAttribute('data-tool'))
+    }
+  })
+  elements.tableBody.addEventListener('click', (event) => {
+    const row = event.target.closest?.('tr[data-key]')
+    if (row !== null) toggleTrace(row.dataset.key)
+  })
 
   // 从状态链接恢复输入；链接缺失或损坏时保持默认（全部勾选 + full/read-only）。
   const restored = readStateFromHash(location.hash, VISIBILITY_STATE_SCHEMA)
@@ -342,6 +411,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'monotonic',
+      hint: '已注册、模型可见、执行允许是三层集合；restrict 只会让可见集合单调缩小。',
     explain: {
       monotonic: '这一页的 COUNTS_MONOTONIC 校验项每次重算都检查这个不等式。',
       'visible-only': '两层都会变：作用域先决定可见集合，执行策略再从可见集合里筛。',

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Trajectory 视角：Session 事件流怎样按呈现契约折叠成用户看到的卡片列表">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Trajectory 投影实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./trajectory-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#tj-main">跳到实验</a>
+  <main class="lab-shell" id="tj-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 客户端投影</p>
+        <h1>UI 不是另一份真相，是事件流的投影。</h1>
+        <p class="hero-lead">客户端没有自己的小本本：用户气泡、打字中的助手块、工具卡的 pending → settled，全部从 Session 事件流按呈现契约折叠出来。工具调用卡只有三种——generic / terminal / diff；search 族在等待态保持 generic，因为那时还没有任何匹配可展示。拖动重放滑杆，看卡片一张张长出来。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./fs-edit-lab.html">打开文件编辑实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 19</span>
+        <strong>左列事件，右列卡片，一一对应。</strong>
+        <p>教学事件流是常量；不启动真实 UI 或 React。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：模型刚发起 grep 调用、结果还没回来时，这张工具卡是什么样？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="no-call">
+            <span>什么都不显示，等结果回来再出现</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="search-early">
+            <span>直接换上 search 结果卡占位</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="search-generic">
+            <span>generic 调用卡——等待态没有匹配可展示</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="traj-form">
+          <div class="stepper" role="group" aria-label="事件重放">
+            <label class="stepper-seek">
+              <span>重放到第 <output id="traj-step-output">0</output> 步</span>
+              <input id="traj-step" type="range" min="0" max="13" step="1" value="0">
+              <small>只改变投影进度，不改变映射规则。键盘：← / → 逐步，Home / End 直达首末。</small>
+            </label>
+            <div class="stepper-buttons">
+              <button class="button button-quiet" id="traj-step-prev" type="button">上一步</button>
+              <button class="button button-quiet" id="traj-step-next" type="button">下一步</button>
+            </div>
+            <p class="step-caption" id="traj-step-caption" role="status" aria-live="polite"></p>
+          </div>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">回到第 0 步</button>
+        </form>
+        <p class="feedback" id="traj-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="投影观测值">
+          <div><dt>卡片数</dt><dd id="metric-cards">—</dd></div>
+          <div><dt>等待中</dt><dd id="metric-pending">—</dd></div>
+          <div><dt>diff 卡</dt><dd id="metric-diff">—</dd></div>
+          <div><dt>定稿文本块</dt><dd id="metric-blocks">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="tj-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">双栏对照</p>
+          <h2 id="tj-title">左边是日志，右边是你看到的界面</h2>
+        </div>
+        <span class="schema-pill">事件 × 投影</span>
+      </div>
+      <p class="section-intro">左列每一条事件的去向都写明「新增卡片」还是「更新已有卡片」；右列就是截至当前步的完整界面。淡出的左列条目尚未发生。</p>
+      <div class="tj-grid">
+        <div class="tj-pane" id="traj-events"></div>
+        <div class="tj-pane tj-pane-right" id="traj-cards"></div>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重新折叠一遍事件流比对卡片，再核对视图类别契约、search 等待态、文本块定稿数量和结算范围。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 双栏对照 · 不连接任何 Host</span>
+      <a href="./study/lessons/05-Session日志与恢复.html">继续读 Session 日志与恢复</a>
+    </footer>
+  </main>
+  <script type="module" src="./trajectory-lab.js"></script>
+</body>
+</html>

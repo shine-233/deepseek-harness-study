@@ -11,17 +11,28 @@ import { installThemeToggle } from './study-lab-theme.js'
 
 const PROGRESS_STORAGE_KEY = 'dsh-study-progress-v2'
 
-/** research-debug-bridge 不在进度名单里，计数时按 9 个算。 */
+/** research-debug-bridge 不在进度名单里，计数时按 20 个算。 */
 const TRACKED_LAB_IDS = new Set([
   'turn-flow',
   'package-graph',
   'profile-loader',
   'session-log',
   'tool-visibility',
+  'fs-edit',
+  'web-tool',
   'code-mode-evidence',
   'compaction',
   'plugin-flow',
   'llm-stream',
+  'prompt-assembly',
+  'hook-flow',
+  'approval-flow',
+  'session-fork',
+  'subagent-delegate',
+  'guard-loop',
+  'shell-seam',
+  'trajectory',
+  'skill-catalog',
 ])
 
 const VALID_GROUPS = new Set(['all', 'main', 'plugin', 'evidence'])

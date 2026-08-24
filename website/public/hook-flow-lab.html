@@ -22,6 +22,7 @@
         <h1>不调用 next，瀑布就停在你这里。</h1>
         <p class="hero-lead">三个监听器按声明顺序挂在同一条瀑布事件上：审计只记录、策略做裁决、默认放行负责兜底。切换策略监听器的返回方式——委托给链条，还是直接 return——看兜底还会不会执行、最终结果由谁写出。仓库不变式说得很短：不调用 next 就短路；这里把它变成可以亲手弄坏的东西。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/14-官方HookBridge与兼容层.html">阅读配套课程</a>
           <a class="button button-secondary" href="./plugin-flow-lab.html">打开插件事件流实验</a>

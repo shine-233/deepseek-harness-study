@@ -12,7 +12,7 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, installDeclaredIcons, bindRangeKeys, bindAutoAdvance, installScrollProgress } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys, bindAutoAdvance, installScrollProgress, bindRowJump } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   TURN_SCENARIOS,
@@ -243,6 +243,8 @@ function initializePage() {
   elements.upTo.addEventListener('input', rebuild)
   // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
   bindRangeKeys(elements.upTo)
+  // 反向联动：点步骤表里的一行，时间轴跳到那一步（linked views 的另一半）。
+  bindRowJump(elements.stepsBody, elements.upTo)
   const playButton = document.querySelector('#frame-play')
   if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.upTo, { stepMs: 700 })
 
@@ -284,6 +286,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'has-event',
+      hint: '没有 Step 的 Turn 真实存在；每条模型可见输入都必须能从日志重建。',
     explain: {
       'has-event': 'DENIED_HAS_NO_BODY 和 EVERY_CALL_HAS_RESULT 两条校验项一起固定了这个组合。',
       nothing: '那样就违反「进了模型请求的东西日志里必须找得到」——拒绝本身也是要重建的事实。',

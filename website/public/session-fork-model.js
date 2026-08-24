@@ -2,20 +2,30 @@
  * Session fork 与崩溃修复的纯模型。
  *
  * 课程 05 的三条规则：fork 时子 Session 继承父日志前缀并记录 parent、seed
- * length 和边界；进程在工具中间崩溃时，恢复阶段根据未闭合事实补出
- * interrupted 状态——不等于假装工具成功；恢复先取回 header 和 event seed。
- * 本模型把「完整一轮」「崩溃后仅恢复」「崩溃后恢复再 fork」三种路径摆成同一
- * 格式的确定性时间线。
+ * length 和边界；进程崩溃时，恢复阶段根据「哪条事实没有闭合」补出对应的
+ * interrupted 状态——不等于假装成功；恢复先取回 header 和 event seed。
+ * 本模型把四种崩溃形态（完整、工具中间、流式中途、Turn 未开步）与 fork 开关
+ * 组合成同一格式的确定性时间线。
  *
- * 教学约定：「结果缺失的工具」修复后记为 unknown，任何时间线都不允许出现
- * 「意图有、结果缺、却标记成功」的幽灵成功。
+ * 教学约定：「结果缺失的工具」修复后记为 unknown；「流式中断」补一条带
+ * interrupted 标记的 assistant/message；「领取输入后未开 Step」补写
+ * interrupted 的 turn/end。任何时间线都不允许出现「意图有、结果缺、却标记
+ * 成功」的幽灵成功。
  * 没有测量：真实 SQLite/JSONL 后端、真实进程崩溃时机、真实 provider 行为。
  */
 
 export const FORK_LANES = Object.freeze(['父 Session', '恢复阶段', '子 Session'])
 
-export const FORK_CRASH_MODES = Object.freeze(['complete', 'crash-mid-tool'])
+export const FORK_CRASH_MODES = Object.freeze(['complete', 'crash-mid-tool', 'crash-mid-stream', 'crash-open-turn'])
 export const FORK_FORK_MODES = Object.freeze(['no-fork', 'fork'])
+
+/** 每种崩溃形态在崩溃前留下的前缀长度与需要的修复类型。 */
+const CRASH_SHAPES = Object.freeze({
+  'complete': Object.freeze({ prefix: 3, repairKind: null }),
+  'crash-mid-tool': Object.freeze({ prefix: 2, repairKind: 'unknown' }),
+  'crash-mid-stream': Object.freeze({ prefix: 3, repairKind: 'interrupted-message' }),
+  'crash-open-turn': Object.freeze({ prefix: 2, repairKind: 'open-turn' }),
+})
 
 /** 组装一条确定性的教学时间线。所有文本和状态都来自固定常量与输入枚举。 */
 function buildSteps(input) {
@@ -25,19 +35,25 @@ function buildSteps(input) {
   }
 
   push('父 Session', 'start', '回合开始：事件按序写入父日志')
-  push('父 Session', 'intent', '工具意图入册：read_file（结果未定）')
 
-  const crashed = input.crash === 'crash-mid-tool'
+  const shape = CRASH_SHAPES[input.crash]
+  let prefixLength = shape.prefix
 
-  let prefixLength
-  if (!crashed) {
+  if (input.crash === 'complete') {
+    push('父 Session', 'intent', '工具意图入册：read_file（结果未定）')
     push('父 Session', 'result', '工具结果落册：ok')
-    prefixLength = 3
-  } else {
+  } else if (input.crash === 'crash-mid-tool') {
+    push('父 Session', 'intent', '工具意图入册：read_file（结果未定）')
     // 崩溃点：intent 之后、result 之前。崩溃本身不是一条可回放的事件，
     // 它表现为「这条 result 永远不会出现」。
     push('父 Session', 'crash', '进程崩溃：这条工具的结果永远不会到来')
-    prefixLength = 2
+  } else if (input.crash === 'crash-mid-stream') {
+    push('父 Session', 'message', 'user/message 写入日志：本轮输入已入册')
+    push('父 Session', 'chunk', 'assistant/chunk 到达一半：模型还在输出')
+    push('父 Session', 'crash', '进程崩溃：流式回复再也没有后续片段')
+  } else {
+    push('父 Session', 'message', 'user/message 写入日志：本轮输入已入册')
+    push('父 Session', 'crash', '进程崩溃：模型请求还没发出，Turn 尚无任何 Step')
   }
 
   if (input.fork === 'fork') {
@@ -46,16 +62,24 @@ function buildSteps(input) {
     })
   }
 
-  if (crashed) {
-    push('恢复阶段', 'repair', '补出 interrupted：该工具结果记为 unknown，不假装成功', {
+  if (input.crash === 'crash-mid-tool') {
+    push('恢复阶段', 'repair', '恢复阶段补出 interrupted：该工具结果记为 unknown，不假装成功', {
       repairedAsUnknown: true,
+    })
+  } else if (input.crash === 'crash-mid-stream') {
+    push('恢复阶段', 'repair', '恢复阶段补出 assistant/message（interrupted: true）：半截回答诚实入册', {
+      repairedAsInterruptedMessage: true,
+    })
+  } else if (input.crash === 'crash-open-turn') {
+    push('恢复阶段', 'repair', '恢复阶段补写 turn/end（reason=interrupted）：这个 Turn 没有任何 Step', {
+      repairedAsOpenTurn: true,
     })
   }
 
   const closingLane = input.fork === 'fork' ? '子 Session' : '父 Session'
-  push(closingLane, 'close', crashed
-    ? (input.fork === 'fork' ? '子工作开始：之后的事件属于子 Session' : '回合以 interrupted 收束')
-    : (input.fork === 'fork' ? '子工作开始：之后的事件属于子 Session' : '回合正常闭合'))
+  push(closingLane, 'close', input.fork === 'fork'
+    ? '子工作开始：之后的事件属于子 Session'
+    : (input.crash === 'complete' ? '回合正常闭合' : '回合以 interrupted 收束'))
   return steps
 }
 
@@ -76,6 +100,7 @@ export function buildSessionForkModel(input) {
     observations: {
       steps: steps.length,
       interruptedRepaired: repairSteps.length === 1,
+      repairKind: repairSteps.length === 1 ? CRASH_SHAPES[crash].repairKind : null,
       eventsInherited: typeof inheritStep?.inherited === 'number' ? inheritStep.inherited : null,
       closingLane: steps[steps.length - 1].lane,
       // 幽灵成功的定义：存在 intent，却没有对应的 result 或 unknown 标记。
@@ -83,7 +108,7 @@ export function buildSessionForkModel(input) {
     },
     canProve: Object.freeze([
       'fork 时子 Session 的第一步是继承父前缀，parent、seed length 和边界都被记录',
-      '崩溃后恢复阶段恰好补出一条 interrupted，工具结果记为 unknown',
+      '崩溃后恢复阶段恰好补出一条修复，类型与未闭合的事实一致',
       '任何时间线都不出现「意图有、结果缺、却标记成功」的幽灵成功',
       '同一输入重建时间线得到完全相同的步骤序列（确定性）',
     ]),
@@ -112,15 +137,22 @@ export function evaluateSessionForkOracle(model) {
     pass: sameSteps,
   })
 
-  const crashed = model.input.crash === 'crash-mid-tool'
-  const repairSteps = model.steps.filter(step =>
-    step.phase === 'repair' && step.repairedAsUnknown === true)
+  const crashed = model.input.crash !== 'complete'
+  const expectedKind = CRASH_SHAPES[model.input.crash].repairKind
+  const repairSteps = model.steps.filter(step => step.phase === 'repair')
+  const kindOf = step => step.repairedAsUnknown === true ? 'unknown'
+    : step.repairedAsInterruptedMessage === true ? 'interrupted-message'
+      : step.repairedAsOpenTurn === true ? 'open-turn' : 'other'
+  const kindsOk = crashed
+    ? repairSteps.length === 1 && kindOf(repairSteps[0]) === expectedKind
+    : repairSteps.length === 0
+  const kindLabel = { 'unknown': 'unknown 结果', 'interrupted-message': 'interrupted 的 assistant/message', 'open-turn': 'interrupted 的 turn/end', [null]: '—' }
   checks.push({
     id: 'REPAIR_HONESTY',
-    label: '崩溃后恰有一条 interrupted 修复，结果记为 unknown',
-    expected: crashed ? '恰好 1 条 unknown 修复' : '0 条（没有崩溃需要修复）',
-    actual: `实际 ${repairSteps.length} 条`,
-    pass: crashed ? repairSteps.length === 1 : repairSteps.length === 0,
+    label: '崩溃后恰有一条修复，且类型与未闭合事实一致',
+    expected: crashed ? `恰好 1 条${kindLabel[expectedKind]}修复` : '0 条（没有崩溃需要修复）',
+    actual: repairSteps.length === 0 ? '实际 0 条' : `实际 ${String(repairSteps.length)} 条（${kindOf(repairSteps[0])}）`,
+    pass: kindsOk,
   })
 
   let ghost = false
@@ -140,7 +172,7 @@ export function evaluateSessionForkOracle(model) {
 
   const inherited = model.observations.eventsInherited
   if (model.input.fork === 'fork') {
-    const expectedPrefix = crashed ? 2 : 3
+    const expectedPrefix = CRASH_SHAPES[model.input.crash].prefix
     checks.push({
       id: 'FORK_PREFIX_RULE',
       label: 'fork 时子 Session 记录 parent、seed length 和边界',

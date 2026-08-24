@@ -307,6 +307,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'unchanged',
+      hint: '压缩替换的是视图，底层日志一条不少——自己重放一遍就有答案。',
     explain: {
       unchanged: 'LOG_APPEND_ONLY 这条校验固定了它：压缩替换的是 surface，日志只追加。',
       fewer: '那样会破坏可重建性——被替换的内容必须仍能从日志逐条找回。',

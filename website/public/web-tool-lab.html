@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="web_fetch 与 web_search 工具管线：HTML→GFM 转换、深度守卫、有效截断脚注与多查询轮转合并">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Web 工具管线实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./fs-edit-lab.css">
+  <link rel="stylesheet" href="./web-tool-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#wt-main">跳到实验</a>
+  <main class="lab-shell" id="wt-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 网络工具与呈现</p>
+        <h1>抓回来的网页变成 Markdown；截没截断，卡片和文本说同一句话。</h1>
+        <p class="hero-lead">web_fetch 把 provider 返回的 HTML 经 turndown 转成 GFM（script/style 整体剔除），嵌套超过 512 层就放弃转换、原文透传——降级页面好过报错。输出以 <code>Fetched &lt;url&gt; (HTTP &lt;s&gt;)</code> 开头；provider 截断、源码切割、超帽三个来源任一为真就追加脚注。web_search 的多查询并发执行、按名次轮转合并、URL 去重、封顶即停。切下面的模式亲手推一遍。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./fs-edit-lab.html">打开文件编辑实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 21</span>
+        <strong>没有网络：页面和搜索结果都是教学常量。</strong>
+        <p>「教学转换器」只覆盖预设标签子集；真实页走 turndown。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：fetch 卡的 truncated 为什么由 meta 携带，而不是 UI 从返回文本重新推断？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="reparse-header">
+            <span>头部行里其实写了，UI 只是懒得解析</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="meta-carried">
+            <span>有效截断依赖部署配置，客户端无法复算——只能随身携带</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="always-false">
+            <span>它基本恒为 false，带着只是习惯</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="web-form">
+          <label>
+            <span>工具模式</span>
+            <select id="web-mode" name="mode">
+              <option value="fetch">web_fetch —— 抓取并转 Markdown</option>
+              <option value="search">web_search —— 多查询合并</option>
+            </select>
+          </label>
+
+          <div id="panel-fetch">
+            <label>
+              <span>教学页面</span>
+              <select id="web-page" name="pageId"></select>
+            </label>
+            <label>
+              <span>request.url</span>
+              <input id="web-url" type="text" spellcheck="false" value="https://example.com/docs/config">
+            </label>
+            <label>
+              <span>maxOutputChars = <output id="web-cap-output">600</output></span>
+              <input id="web-cap" type="range" min="120" max="2000" step="20" value="600">
+              <small>拖到最左看硬切片；拖大看脚注消失的那一刻。</small>
+            </label>
+          </div>
+
+          <div id="panel-search" hidden>
+            <fieldset class="sc-checks">
+              <legend>并发查询（勾两条看轮转合并）</legend>
+              <label class="bundle-check"><input type="checkbox" id="query-a" checked><span>cache policy（3 个来源）</span></label>
+              <label class="bundle-check"><input type="checkbox" id="query-b"><span>prompt caching（2 个来源，含重复 URL）</span></label>
+            </fieldset>
+            <label>
+              <span>maxResults = <output id="web-max-results-output">4</output></span>
+              <input id="web-max-results" type="range" min="1" max="5" step="1" value="4">
+            </label>
+            <label class="bundle-check"><input type="checkbox" id="fail-second"><span>让第二条查询失败（演示中止兄弟）</span></label>
+          </div>
+
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="web-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="管线观测值">
+          <div><dt>阶段数</dt><dd id="metric-stages">—</dd></div>
+          <div><dt>结局</dt><dd id="metric-outcome">—</dd></div>
+          <div><dt>有效截断</dt><dd id="metric-truncated">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="wt-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">工具管线</p>
+          <h2 id="wt-title">从参数校验到封顶输出</h2>
+        </div>
+        <span class="schema-pill">阶段 × 判定</span>
+      </div>
+      <p class="section-intro">每一格对应 fetch.ts / search.ts 里的一段真实逻辑；失败格标红并给出原文报错。</p>
+      <div id="wt-pipeline"></div>
+      <pre class="fe-error-box" id="wt-error-box" hidden></pre>
+      <p class="section-intro" style="margin-top:14px">模型可见文本（tool/result 内容）：</p>
+      <pre class="fe-diff" id="wt-text"></pre>
+      <p class="chart-note" id="wt-text-note"></p>
+      <p class="section-intro" style="margin-top:14px">presentationMeta（随日志重放的卡片载荷）：</p>
+      <pre class="fe-diff" id="wt-meta">—</pre>
+      <ul class="wt-sources" id="wt-sources" hidden></ul>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>六条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重建同一次推演，再核对头部格式、script/style 剔除、深度守卫、脚注规则、meta 一致性，以及搜索侧的去重/封顶/丢弃旗标。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/13-官方工具插件完整契约.html">继续读工具插件完整契约</a>
+    </footer>
+  </main>
+  <script type="module" src="./web-tool-lab.js"></script>
+</body>
+</html>

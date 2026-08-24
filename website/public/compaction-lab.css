@@ -6,7 +6,7 @@
 .ev {
   stroke: var(--line-strong);
   stroke-width: 1;
-  transition: opacity 120ms ease;
+  transition: opacity var(--dur-fast) var(--ease);
 }
 .ev-user { fill: var(--brand); }
 .ev-call { fill: var(--allow); }
@@ -22,7 +22,7 @@
   fill: color-mix(in srgb, var(--surface-strong) 92%, transparent);
   stroke: var(--line-strong);
   stroke-width: 2;
-  transition: stroke-width 120ms ease;
+  transition: stroke-width var(--dur-fast) var(--ease);
 }
 .fold-node:hover { stroke-width: 3; }
 .fold-node.is-summary {

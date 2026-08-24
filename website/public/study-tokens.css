@@ -1,16 +1,16 @@
 @import './study-lab-motion.css';
 
 /*
- * 瀛︿範瀹為獙椤典笌绔欑偣闃呰灞傚叡鐢ㄧ殑 design token銆? *
- * 鍒嗘垚涓ょ粍銆傝涔夌粍锛堣〃闈€佹枃瀛椼€佸搧鐗屻€佺姸鎬侊級鍘熸湰鍦ㄥ洓涓牱寮忚〃閲屽悇瀛樹竴浠藉壇鏈紝
- * 鐜板湪鍙湁杩欓噷涓€浠斤紱鍒嗙骇缁勶紙瀛楀彿銆侀棿璺濄€佸渾瑙掋€侀槾褰便€佹椂闀裤€佺紦鍔級鏄柊鍔犵殑鍒诲害锛? * 璁╂瘡涓〉闈粠鍚屼竴寮犺〃閲屽彇鍊硷紝鑰屼笉鏄悇鍐欏悇鐨勬暟瀛椼€? *
- * 棰滆壊鐨勯獙璇佽褰曠暀鍦ㄥ師澶勶細鍒嗙被鑹?--brand / --signal 鍦ㄤ袱绉嶆ā寮忎笅杩囦簲椤规鏌? * 锛堟槑搴﹀甫銆佸僵搴︿笅闄愩€佽壊鐩插彲鍒嗚鲸銆佸父瑙嗗姏涓嬮檺銆佸琛ㄩ潰瀵规瘮搴︼級锛屼笖涓庣珯鐐? * --vp-c-brand-1 鍚岃壊鐩告棌銆傜姸鎬佽壊浣滀负鍥惧厓楠岃瘉鍒?3:1锛屼綔涓烘枃瀛楀彟鏈?*-ink 涓€妗? * 楠岃瘉鍒?4.5:1鈥斺€旀暟鎹壊鍜屾枃瀛楄壊涓嶈兘娣风敤銆? *
- * 鍒嗙骇鍒诲害鍙畾涔夊€硷紝涓嶈瀹氳皝璇ョ敤鍝竴妗ｃ€傞〉闈㈡寜鐢ㄩ€斿彇锛屽彇閿欎簡鏄〉闈㈢殑闂锛? * 涓嶆槸鍒诲害鐨勯棶棰樸€? */
+ * 学习实验页与站点阅读层共用的 design token。
+ * 分成两组。语义组（表面、文字、品牌、状态）原本在四个样式表里各存一份副本，
+ * 现在只有这里一份；分级组（字号、间距、圆角、阴影、时长、缓动）是新加的刻度，让每个页面从同一张表取值，而不是各写各的数字。
+ * 颜色的验证记录留在原处：分类色 --brand / --signal 在两种模式下过五项检查（明度带、彩度下限、色相可分辨、常视力下限、对表面对比度），并且与站点 --vp-c-brand-1 同色相族。状态色作为图元验证到 3:1，作为文字另有 --ink 一档验证到 4.5:1——数据色和文字色不能混用。
+ * 分级刻度只定义值，不规定谁该用哪一档。页面按用途取，取错了是页面的问题，不是刻度的问题。 */
 
 :root {
   color-scheme: light dark;
 
-  /* 琛ㄩ潰锛氫笁灞傛殩鐧姐€傜函鐧介厤绾伆闀挎枃璇昏捣鏉ュ亸鍐峰亸骞筹紝鏆栬皟鐣欏嚭灞傛銆?*/
+  /* 表面：三层暖白。纯白配纯灰长文读起来偏冷偏平，暖调留出层次。 */
   --page: #faf8f4;
   --surface: rgba(255, 255, 255, 0.92);
   --surface-strong: #ffffff;
@@ -26,7 +26,7 @@
   --brand-soft: #dfe7ff;
 
   --signal: #d46b3e;
-  /* 鏂囧瓧妗ｏ細鍥惧厓鑹查獙璇佸埌 3:1锛屾鏂囬渶瑕?4.5:1锛屾墍浠ユ枃瀛楀彇鍚岃壊鐩哥殑娣变竴妗ｃ€?*/
+  /* 文字档：图元色验证到 3:1，正文需要 4.5:1，所以文字取同色相族的深一档。 */
   --signal-ink: #aa4d26;
   --signal-soft: #f5dfd3;
 
@@ -43,7 +43,7 @@
   --warning-soft: #f6ecd6;
 
   /*
-   * 鏁版嵁搴忓垪鑹诧細鍙湪涓€寮犲浘闇€瑕佸尯鍒嗕笁鏉′互涓婂悓绫诲簭鍒楁椂浣跨敤銆?   * 缁勫埆銆佸垎绫荤瓑楂樺熀鏁扮淮搴︿笉闈犺壊鐩稿尯鍒嗏€斺€旈偅绉嶆儏鍐典笅棰滆壊涓嶅彲闈狅紝鐢ㄧ瓫閫夋垨浣嶇疆銆?   */
+   * 数据序列色只在一张图需要区分三条以上同类序列时使用。分组、分类等高基数维度不靠色相区分——那种情况下颜色不可靠，用筛选或位置。   */
   --series-1: #3157c8;
   --series-2: #d46b3e;
   --series-3: #6b4d9e;
@@ -51,7 +51,7 @@
   --series-2-wash: #f5dfd3;
   --series-3-wash: #e6dff2;
 
-  /* 瀛楀彿锛?0 绾с€傛鏂囧彇 --text-md锛岃鍐?code 鍙?--text-xs銆?*/
+  /* 字号：10 级。正文取 --text-md，行内 code 取 --text-xs。 */
   --text-2xs: 0.6875rem;
   --text-xs: 0.8rem;
   --text-sm: 0.875rem;
@@ -63,7 +63,7 @@
   --text-4xl: 3rem;
   --text-5xl: 4.25rem;
 
-  /* 闂磋窛锛?0 绾э紝4px 鍩哄噯銆?*/
+  /* 间距：10 级，4px 基准。 */
   --space-3xs: 0.25rem;
   --space-2xs: 0.375rem;
   --space-xs: 0.5rem;
@@ -75,7 +75,7 @@
   --space-3xl: 3.5rem;
   --space-4xl: 5rem;
 
-  /* 鍦嗚锛? 绾с€?-radius-pill 鐢ㄤ簬鑳跺泭鎸夐挳锛屼笉鏄竴涓昂瀵歌€屾槸涓€绉嶅舰鐘躲€?*/
+  /* 圆角：8 级。--radius-pill 用于胶囊按钮，不是一个尺寸而是一种形状。 */
   --radius-2xs: 3px;
   --radius-xs: 6px;
   --radius-sm: 8px;
@@ -91,15 +91,15 @@
   --shadow-lg: 0 22px 70px rgba(38, 34, 26, 0.11);
 
   /*
-   * 鍒悕锛岃宸叉湁椤甸潰涓嶅繀鏀硅鍒欍€?-shadow 鏄洓涓疄楠岄〉鍘熸潵鍏辩敤鐨勯偅涓€妗ｏ紝绛変簬
-   * --shadow-lg锛?-danger 鏄?bridge 瀵?--deny 鐨勫彨娉曪紝璇箟鐩稿悓銆?   */
+   * 别名，让已有页面不必改规则。--shadow 是四个实验页原来共用的那一档，等于
+   * --shadow-lg；--danger 是 bridge 对 --deny 的叫法，语义相同。   */
   --shadow: var(--shadow-lg);
   --danger: var(--deny);
   --danger-soft: var(--deny-soft);
 
   /*
-   * 鍥涙。鏃堕暱閰嶄竴鏉℃洸绾裤€傛暣绔欑殑浜や簰鍙嶉璧板悓涓€鏉℃洸绾匡紝鎵嬫劅鎵嶄竴鑷达紱
-   * 鍚勫鍚勫啓涓€涓?transition 鏄箣鍓嶆墜鎰熸暎鐨勫師鍥犮€?   */
+   * 四档时长配一条曲线。整站的交互反馈走同一条曲线，手感才一致；
+   * 各处各写一个 transition 是之前手感散的原因。   */
   --dur-fast: 0.15s;
   --dur: 0.2s;
   --dur-slow: 0.3s;
@@ -111,8 +111,8 @@
     "Liberation Mono", "Sarasa Mono SC", "Noto Sans Mono CJK SC",
     "Microsoft YaHei UI", "Microsoft YaHei", monospace;
   /*
-   * Latin 鏀惧墠闈細CJK 瀛椾綋鑷甫鐨勮タ鏂囧瓧褰㈡瘮涓撶敤 Latin 瀛椾綋鏉撅紝浠ｇ爜鏃佽竟鐨勬爣璇嗙
-   * 鍜屾暟瀛椾細鐪嬪嚭鏉ャ€備竴涓瓧鑺傞兘涓嶄笅杞解€斺€斿疄楠岄〉鐨?default-src 'self' 绂佹瀛椾綋 CDN锛?   * 鑰岃嚜鎵樼涓枃瀛椾綋瑕?17 MB 浠ヤ笂銆?   */
+   * Latin 放前面：CJK 字体自带的西文形比专用 Latin 字体差，代码旁边的标识符
+   * 和数字会看出来。一个字节都不下载——实验页的 default-src 'self' 禁止字体 CDN，而自托管中文字体要 17 MB 以上。   */
   --sans:
     Inter, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI",
     "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans SC", "Noto Sans CJK SC",
@@ -122,11 +122,11 @@
 }
 
 /*
- * 娣辫壊鏉挎湁涓や唤锛氬獟浣撴煡璇㈤偅浠芥湇鍔＄郴缁熷亸濂斤紝涔熸槸鍏虫帀鑴氭湰鏃跺敮涓€鐢熸晥鐨勪竴浠斤紱
- * 灞炴€ч偅浠芥湇鍔＄敤鎴风殑鏄惧紡閫夋嫨銆侰SS 娌℃硶璁╁獟浣撴煡璇綔鐢ㄥ煙鍐呭鐨勪袱涓€夋嫨鍣ㄥ叡鐢? * 鍚屼竴涓０鏄庡潡锛屾墍浠ヨ繖閲屾槸鐪熺殑涓や唤鍓湰銆? *
- * `:not([data-theme="light"])` 璁╂樉寮忛€夋祬鑹叉椂濯掍綋鏌ヨ璁╀綅锛沗[data-theme="dark"]`
- * 璁╂樉寮忛€夋繁鑹叉椂鍦ㄦ祬鑹茬郴缁熶笅涔熺敓鏁堛€? *
- * 涓や唤浼氭紓绉伙紝鎵€浠?study-tools/verify-theme-parity.mjs 閫?token 姣斿瀹冧滑锛? * 鍙敼涓€杈逛細璁╅偅閬撻棬绂佸け璐ャ€? */
+ * 深色板有两份：媒体查询那份服务系统偏好，也是关掉脚本时唯一生效的一份；
+ * 属性那份服务用户的显式选择。CSS 没法让媒体查询作用域内外的两个选择器共用同一个声明块，所以这里是真的两份副本。 *
+ * `:not([data-theme="light"])` 让显式选浅色时媒体查询让位；[data-theme="dark"]
+ * 让显式选深色时在浅色系统下也生效。 *
+ * 两份会漂移，所以 study-tools/verify-theme-parity.mjs 逐 token 比对它们，只改一边会让那道门禁失败。 */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --page: #17171a;
@@ -217,7 +217,7 @@
   --shadow: var(--shadow-lg);
 }
 
-/* 鍑忓皯鍔ㄦ€佹晥鏋滄椂鎶婂洓妗ｆ椂闀夸竴璧峰綊闆讹紝椤甸潰涓嶅繀鍚勮嚜鍒ゆ柇銆?*/
+/* 减少动态效果时把四档时长一起归零，页面不必各自再判断。*/
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-fast: 0s;
@@ -228,8 +228,22 @@
 }
 
 /*
- * 杩涘満鍔ㄧ敾鐨勪袱涓姸鎬併€俿tudy-lab-reveal.js 璐熻矗鎸?class锛岃繖閲屽彧瀹氫箟澶栬銆? *
- * 鍙姩 opacity 鍜?transform鈥斺€擲VG 鐨?r銆亀idth 绛夊嚑浣曞睘鎬у悇娴忚鍣ㄦ敮鎸佷笉涓€锛? * 鑰岃繖涓や釜灞炴€ц蛋鍚堟垚鍣紝涓嶈Е鍙戦噸鎺掋€傚姩鐢荤粨鏉熷悗涓庝笉鍋氬姩鐢诲畬鍏ㄤ竴鑷淬€? */
+ * Motion master switch (kit installMotionPauseToggle maintains data-motion):
+ * "paused" freezes every keyframe animation and makes transitions land
+ * instantly — when the reader asks for stillness, state jumps to its final
+ * value. Static opacity/visibility presentation is untouched, so content
+ * stays readable and print styles keep working.
+ */
+[data-motion="paused"] *,
+[data-motion="paused"] *::before,
+[data-motion="paused"] *::after {
+  animation-play-state: paused !important;
+  transition-duration: 0s !important;
+}
+
+/*
+ * 进场动画的两个状态。study-lab-reveal.js 负责按 class，这里只定义外观。 *
+ * 只动 opacity 和 transform——SVG 的 r、width 等几何属性各浏览器支持不一，而这两个属性走合成器，不触发重排。动画结束后与不做动画完全一致。 */
 [data-reveal] {
   transition:
     opacity var(--dur-enter) var(--ease),
@@ -238,7 +252,7 @@
 
 [data-reveal].awaits-reveal {
   opacity: 0;
-  /* 鐐瑰拰鏌变粠鍚勮嚜鐨勫熀绾挎柟鍚戦暱鍑烘潵锛岀敱 transform-origin 鍐冲畾锛屼笉鏀瑰潗鏍囥€?*/
+  /* 点和柱从各自的基准线方向长出来，由 transform-origin 决定，不改坐标。*/
   transform: scale(0.4);
   transform-box: fill-box;
   transform-origin: center;
@@ -249,14 +263,14 @@
   transform: none;
 }
 
-/* 鏌卞瓙浠庡簳閮ㄩ暱璧凤紝缂╂斁鐨勫師鐐瑰湪涓嬫部銆?*/
+/* 柱子从底部长起，缩放的原点在下沿。*/
 rect[data-reveal].awaits-reveal {
   transform: scaleY(0.02);
   transform-origin: bottom;
 }
 
 /*
- * 鍑忓皯鍔ㄦ€佹晥鏋滄椂锛氭病鏈夎繃娓★紝涔熸病鏈夎捣濮嬫€併€傝繖閲屼笉渚濊禆 JS 鍒ゆ柇锛? * 鎵€浠ヨ剼鏈け鏁堟椂涔熶笉浼氱暀涓嬩竴鎵?opacity:0 鐨勯殣褰㈡爣璁般€? */
+ * 减少动态效果时：没有过渡，也没有起始态。这里不依赖 JS 判断，所以脚本失效时也不会留下一批 opacity:0 的隐形标记。 */
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
   [data-reveal].awaits-reveal,
@@ -268,8 +282,8 @@ rect[data-reveal].awaits-reveal {
 }
 
 /*
- * 涓婚鍒囨崲鎸夐挳銆備笁鎬侊紙璺熼殢绯荤粺锛忔祬鑹诧紡娣辫壊锛夛紝鎵€浠ョ姸鎬佺敱鍙鏂囧瓧鍜?aria-label
- * 鎵挎媴锛宎ria-pressed 鍙姤鍛娿€屾槸鍚﹁鐩栦簡绯荤粺鍋忓ソ銆嶈繖涓€涓竷灏旈噺銆? */
+ * 主题切换按钮。三态（跟随系统／浅色／深色），所以状态由可见文字和 aria-label
+ * 承担，aria-pressed 只报告「是否覆盖了系统偏好」这一个布尔量。 */
 .theme-toggle {
   display: inline-flex;
   min-height: 44px;
@@ -292,7 +306,7 @@ rect[data-reveal].awaits-reveal {
   background: color-mix(in srgb, var(--brand) 8%, var(--surface-strong));
 }
 
-/* 瑕嗙洊浜嗙郴缁熷亸濂芥椂缁欎竴涓彲瑙佹爣璁帮紝涓嶅彧闈?aria-pressed銆?*/
+/* 覆盖了系统偏好时给一个可见标记，不只靠 aria-pressed。*/
 .theme-toggle[aria-pressed="true"] {
   border-color: var(--brand);
   color: var(--brand);
@@ -305,7 +319,7 @@ rect[data-reveal].awaits-reveal {
 }
 
 /*
- * 棰勬祴棰橀棬鎺с€傞棬鎺у彧鎸℃帰绱㈡€ф帶浠讹紝涓嶆尅闃呰鈥斺€斿浘銆佽〃鏍笺€乷racle 鍜岃瘉鎹竟鐣? * 浠庝竴寮€濮嬪氨瀹屾暣鍙锛屾墍浠ヨ繖閲屾病鏈変换浣曢伄缃╂垨妯＄硦銆? */
+ * 预测题门控。门控只挡探索性控件，不挡阅读——图、表格、oracle 和证据边界从一开始就完整可见，所以这里没有任何遮罩或模糊。 */
 .prediction-gate {
   margin-bottom: var(--space-md);
   padding: var(--space-md);
@@ -333,7 +347,7 @@ rect[data-reveal].awaits-reveal {
 .gate-actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin-top: var(--space-sm); }
 
 /*
- * inert 宸茬粡鎸′綇鎸囬拡銆侀敭鐩樺拰杈呭姪鎶€鏈紝杩欓噷鍙妸銆岀幇鍦ㄤ笉鑳界敤銆嶇敾鍑烘潵銆? * 鐢?opacity 鑰屼笉鏄殣钘忥細鎺т欢瑕佺湅寰楄锛岃鑰呮墠鐭ラ亾瑙ｉ攣鍚庝細寰楀埌浠€涔堛€? */
+ * inert 已经挡住指针、键盘和辅助技术，这里只把「现在不能用」画出来。用 opacity 而不是隐藏：控件要看得见，读者才知道解锁后会得到什么。 */
 #gated-controls[data-gated="locked"] {
   opacity: 0.5;
   transition: opacity var(--dur) var(--ease);
@@ -348,7 +362,7 @@ rect[data-reveal].awaits-reveal {
   #gated-controls[data-gated="locked"] { transition: none; }
 }
 
-/* 瑙嗚鎵撶（锛氶娴嬮€夐」鐨勯€変腑鎬併€佺粺涓€缂撳姩銆佹暟瀛楀榻愩€佹粦鍧楀搧鐗岃壊銆?*/
+/* 视觉打磨：预测选项的选中态、统一缓动、数字对齐、滑块品牌色。*/
 :root { --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1); }
 .gate-option { border-radius: 10px; transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, transform 160ms var(--ease-out-soft); }
 .gate-option:hover { transform: translateX(2px); }

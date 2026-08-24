@@ -20,8 +20,9 @@
       <div class="hero-copy">
         <p class="eyebrow">DSH 学习 · 日志与恢复</p>
         <h1>崩溃留下的缺口，由 unknown 诚实补上。</h1>
-        <p class="hero-lead">追加式日志不怕崩溃：工具意图已经入册，结果缺失这件事本身就是可读的事实。打开 fork，子 Session 会先继承父日志的前缀——parent、seed length 和边界都被记录；恢复阶段则把没有结果的工具补成 interrupted 加 unknown，绝不假装成功。切换开关，看三种路径各自怎么收束。</p>
+        <p class="hero-lead">追加式日志不怕崩溃：已经入册的事实不会消失，缺了哪一段本身就是可读的信息。打开 fork，子 Session 会先继承父日志的前缀——parent、seed length 和边界都被记录；恢复阶段则按「哪种事实没有闭合」补出对应的 interrupted——工具缺结果记 unknown，流式中断补 interrupted 消息，Turn 未开步就补写 turn/end，绝不假装成功。切换崩溃点与 fork 开关，看八种组合各自怎么收束。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
           <a class="button button-secondary" href="./hook-flow-lab.html">打开 Hook 瀑布实验</a>
@@ -64,9 +65,11 @@
             <span>崩溃点</span>
             <select id="crash" name="crash">
               <option value="complete">完整一轮（无崩溃）</option>
-              <option value="crash-mid-tool">崩溃：意图已入册、结果永远缺失</option>
+              <option value="crash-mid-tool">崩溃：工具意图已入册、结果永远缺失</option>
+              <option value="crash-mid-stream">崩溃：模型流式回复只到一半</option>
+              <option value="crash-open-turn">崩溃：输入已入册、模型请求还没发出</option>
             </select>
-            <small>崩溃不是一条事件，它表现为「这条结果不会出现」。</small>
+            <small>崩溃不是一条事件，它表现为「这条结果不会出现」。三种缺口各由一种修复补齐。</small>
           </label>
           <label>
             <span>fork 开关</span>

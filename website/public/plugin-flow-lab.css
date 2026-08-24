@@ -8,7 +8,7 @@
   fill: var(--brand);
   stroke: var(--surface-strong);
   stroke-width: 2;
-  transition: r 120ms ease;
+  transition: r var(--dur-fast) var(--ease);
 }
 .pf-dot:hover { r: 11; }
 .pf-dot.is-preview { fill: var(--allow); stroke: var(--line-strong); }

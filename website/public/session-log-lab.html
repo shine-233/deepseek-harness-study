@@ -22,6 +22,7 @@
         <h1>状态是事件的函数，不是页面记住的东西。</h1>
         <p class="hero-lead">拖动重放位置，看状态怎么从日志折叠出来。再换到含未知事件的场景：标了 <code>ignorable</code> 的可以跳过，必需的那条必须让加载停在它之前——悄悄忽略它，后面每条事件都建立在一个没人知道的状态上。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
           <a class="button button-secondary" href="./turn-flow-lab.html">打开 Turn 流程实验</a>
@@ -213,7 +214,7 @@
         <label>
           <span>打包行成员数：<output id="pack-n-output">8</output></span>
           <input id="pack-n" type="range" min="3" max="260" step="1" value="8">
-          <small>拖动看一条 text-chunks 物理行的形状怎么变：dt 增量数随成员数线性增长，data 字节越过 4096 的那一刻就进入压缩分支。</small>
+          <small>拖动滑杆，或直接按住读数左右拖，看一条 text-chunks 物理行的形状怎么变：dt 增量数随成员数线性增长，data 字节越过 4096 的那一刻就进入压缩分支。</small>
         </label>
         <dl class="metric-grid" aria-label="打包形状读数">
           <div><dt>data 字节</dt><dd id="pack-metric-bytes">—</dd></div>

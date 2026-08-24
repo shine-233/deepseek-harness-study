@@ -401,15 +401,55 @@ const CONCEPT_WORDS = new Map([
   ['stream', '流式传输'], ['sse', 'SSE 流'], ['chunk', '分块'], ['history', '历史记录'], ['timeline', '时间线'],
 ])
 
+/**
+ * Scoped corrections where a generic concept word reads wrong for one package.
+ * Keyed by path prefix; the inner map replaces the generic value for one token.
+ * `packages/web` is model-facing web_search/web_fetch tooling, not a browser UI;
+ * `packages/guard` is loop hygiene and tool-timeout protection, not permissions.
+ */
+const SCOPED_CONCEPT_WORDS = new Map([
+  ['packages/web/', new Map([['web', 'Web 能力']])],
+  ['packages/guard/', new Map([['guard', '循环卫生']])],
+])
+
+/** Adjacent segment pairs read as one concept; prevents half-names from
+ *  leaking misleading words (`mcp-client` must not yield 浏览器端 via `client`). */
+const PAIRED_CONCEPT_WORDS = new Map([
+  ['mcp-client', 'MCP 客户端'],
+])
+
 function conceptFor(file) {
   const parts = file
     .replace(/\.[^.]+$/, '')
     .split(/[\/_.-]/)
     .filter(token => token && !['src', 'tests', 'test', 'fixtures', 'fixture', 'packages', 'apps', 'index', 'types', 'type', 'utils', 'util', 'helpers', 'helper', 'common', 'config', 'configs', 'spec', 'e2e', 'compat', 'snapshot', 'stress', 'tsdown', 'vite', 'vitest', 'webpack', 'rollup'].includes(token.toLowerCase()))
+  // Collapse consecutive duplicate segments (`packages/mcp/mcp-client` yields
+  // mcp,mcp,client) so the pair table sees `mcp-client`, not mcp + mcp + client;
+  // duplicates never added a second concept anyway.
+  for (let i = parts.length - 1; i > 0; i--) {
+    if (parts[i] === parts[i - 1]) parts.splice(i, 1)
+  }
+  const normalizedFile = file.replace(/\\/g, '/')
   const concepts = []
-  for (const token of parts) {
-    const value = CONCEPT_WORDS.get(token.toLowerCase())
+  const pushConcept = value => {
     if (value && !concepts.includes(value)) concepts.push(value)
+  }
+  for (let i = 0; i < parts.length; i++) {
+    const pairKey = `${parts[i]}-${parts[i + 1] ?? ''}`.toLowerCase()
+    if (PAIRED_CONCEPT_WORDS.has(pairKey)) {
+      pushConcept(PAIRED_CONCEPT_WORDS.get(pairKey))
+      i++
+      continue
+    }
+    const key = parts[i].toLowerCase()
+    let value
+    for (const [prefix, words] of SCOPED_CONCEPT_WORDS) {
+      if (normalizedFile.startsWith(prefix)) {
+        value = words.get(key)
+        if (value) break
+      }
+    }
+    pushConcept(value ?? CONCEPT_WORDS.get(key))
   }
   if (concepts.length > 0) return concepts.slice(0, 3).join('、')
 

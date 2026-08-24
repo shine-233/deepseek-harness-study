@@ -174,3 +174,9 @@ tbody tr[data-state="failed"] td { color: var(--deny-ink); }
 .pl-key-box.is-unset { stroke-dasharray: 3 3; opacity: .75; }
 .pl-key-name { font-size: 12px; font-weight: 600; fill: var(--ink); }
 .pl-key-value { font-size: 11px; fill: var(--ink-soft); }
+
+/* 逐步回放：未应用到的步骤与连线淡出；当前步描边提示。 */
+.pl-card.is-future { opacity: 0.3; }
+.pl-card.is-current .pl-card-box { stroke-width: 2.5; }
+.pl-line.is-future, .pl-ghost.is-future { opacity: 0.08; }
+.pl-key-box.is-unset { opacity: 0.55; }

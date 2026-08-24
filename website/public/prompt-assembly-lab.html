@@ -9,7 +9,6 @@
   <title>提示词装配实验室</title>
   <link rel="stylesheet" href="./study-tokens.css">
   <link rel="stylesheet" href="./study-lab-shell.css">
-  <link rel="stylesheet" href="./study-lab-motion.css">
   <link rel="stylesheet" href="./prompt-assembly-lab.css">
   <link rel="icon" href="./favicon.svg">
   <script src="./study-theme-boot.js"></script>
@@ -23,6 +22,7 @@
         <h1>变化点之前的前缀，一个字节都不用重算。</h1>
         <p class="hero-lead">系统提示词不是一段话，是按 order 升序拼接的一摞贡献：-100 的平台前导、0 号 persona、115 号审批策略上下文、最后的工具表。provider 按「和上一轮完全相同的前缀」命中缓存——本轮哪个段先变，它之前的字节就照旧便宜，它之后的全部重新计费。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/06-LLM与工具执行.html">阅读配套课程</a>
           <a class="button button-secondary" href="./approval-flow-lab.html">打开审批流实验</a>

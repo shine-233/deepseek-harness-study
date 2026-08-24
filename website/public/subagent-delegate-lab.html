@@ -22,6 +22,7 @@
         <h1>边界不放行，子会话就不存在。</h1>
         <p class="hero-lead">一次委派要过一道深度检查：子深度恒为父深度加一，默认上限是 3——超了就抛 SubagentDepthError，子会话根本不会被创建。没超，子 Agent 在自己的 Session 里执行任务并恰好回报一次，成功摘要或失败原因都算完整结算。深度记在 Session header 上单调取最大：恢复出来的子代理没法把自己算回顶层。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/03-核心文件精读.html">阅读配套课程</a>
           <a class="button button-secondary" href="./session-fork-lab.html">打开 Session fork 实验</a>

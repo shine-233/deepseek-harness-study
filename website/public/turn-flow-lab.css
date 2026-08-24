@@ -6,7 +6,7 @@
   fill: color-mix(in srgb, var(--surface-strong) 92%, transparent);
   stroke: var(--line-strong);
   stroke-width: 2;
-  transition: r 120ms ease;
+  transition: r var(--dur-fast) var(--ease);
 }
 
 /* 三档状态各自有独立的形状线索：进模型请求是实心，写日志是加粗描边，

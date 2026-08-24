@@ -882,6 +882,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'unchanged',
+      hint: '排序只改变阅读顺序；散点的两个坐标都直接来自固定提交的读数。',
     explain: {
       unchanged: '排序是阅读顺序，不是数据变换。散点的两个坐标都直接来自固定提交的读数。',
       rescaled: '坐标轴由数据范围决定，换排序不改变数据范围。',
@@ -1032,24 +1033,41 @@ function installScene(model) {
     spin.setAttribute('aria-pressed', 'true')
   })
 
-  // 拖动旋转。指针事件同时覆盖鼠标、触摸和笔。
+  // 拖动旋转。指针事件同时覆盖鼠标、触摸和笔；松手带惯性滑行（tldraw 手感）。
   let dragging = false
   let lastX = 0
   let lastY = 0
+  let lastDx = 0
+  let lastDy = 0
   canvas.addEventListener('pointerdown', (event) => {
     dragging = true
     lastX = event.clientX
     lastY = event.clientY
+    lastDx = 0
+    lastDy = 0
+    scene?.stopInertia()
     canvas.setPointerCapture(event.pointerId)
   })
   canvas.addEventListener('pointermove', (event) => {
     if (!dragging || scene === null) return
-    scene.nudge((event.clientX - lastX) * 0.006, -(event.clientY - lastY) * 0.005)
+    const dx = event.clientX - lastX
+    const dy = event.clientY - lastY
+    scene.nudge(dx * 0.006, -dy * 0.005)
+    lastDx = dx
+    lastDy = dy
     lastX = event.clientX
     lastY = event.clientY
   })
   for (const type of ['pointerup', 'pointercancel']) {
-    canvas.addEventListener(type, () => { dragging = false })
+    canvas.addEventListener(type, () => {
+      if (dragging && type === 'pointerup' && scene !== null && (lastDx !== 0 || lastDy !== 0)) {
+        // 最近一次位移近似出手速度；系数略低于 1 防止甩过头。
+        scene.fling(lastDx * 0.006 * 0.8, -lastDy * 0.005 * 0.8)
+      }
+      dragging = false
+      lastDx = 0
+      lastDy = 0
+    })
   }
 
   // 键盘等价操作：只能拖动的 3D 场景对键盘用户等于不存在。

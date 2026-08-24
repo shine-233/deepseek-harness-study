@@ -1,0 +1,20 @@
+/* skill-catalog 实验页的少量专属样式。 */
+
+.sc-checks {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sc-checks legend { font-size: 0.82rem; color: var(--muted); padding: 0 4px; }
+
+.sc-envelope-pre:empty { display: none; }
+
+.sc-envelope-pre:not(:empty) { border-color: var(--brand); }
+
+@media (forced-colors: active) {
+  .sc-checks, .sc-envelope-pre { border: 1px solid CanvasText; }
+}

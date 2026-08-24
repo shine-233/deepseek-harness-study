@@ -121,7 +121,11 @@ export function resolveProfile(input = {}) {
     }
     const wrote = Object.keys(bundle.patch)
     config = { ...config, ...bundle.patch }
-    steps.push({ index, kind: 'bundle', source: name, label: bundle.label, wrote, applied: true, reason: null })
+    steps.push({
+      index, kind: 'bundle', source: name, label: bundle.label, wrote,
+      writes: Object.freeze(Object.entries(bundle.patch).map(([key, value]) => ({ key, value }))),
+      applied: true, reason: null,
+    })
   }
 
   if (failure === null && Object.keys(overlay.patch).length > 0) {
@@ -133,6 +137,7 @@ export function resolveProfile(input = {}) {
       source: overlay.id,
       label: overlay.label,
       wrote,
+      writes: Object.freeze(Object.entries(overlay.patch).map(([key, value]) => ({ key, value }))),
       applied: true,
       reason: null,
     })
@@ -150,6 +155,24 @@ export function resolveProfile(input = {}) {
   }
 
   return { input: resolved, overlay: { id: overlay.id, label: overlay.label }, steps, config, failure, finalWriter }
+}
+
+/**
+ * 回放快照：只折叠前 upto 步（含）已应用的写入，返回当时的配置与每键写者。
+ * 与 resolveProfile 用同一份 steps 数据，回放不可能推出和最终解析不同的中间值。
+ */
+export function snapshotProfileAt(model, upto) {
+  if (!Number.isInteger(upto)) throw new TypeError('upto must be an integer')
+  const config = {}
+  const writerOf = new Map()
+  for (const step of model.steps) {
+    if (!step.applied || step.index > upto) continue
+    for (const write of step.writes ?? []) {
+      config[write.key] = write.value
+      writerOf.set(write.key, step)
+    }
+  }
+  return { upto, config, writerOf }
 }
 
 /**

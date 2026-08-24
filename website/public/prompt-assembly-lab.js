@@ -202,6 +202,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'prefix-safe',
+      hint: '第一个变化段之前的字节照旧命中缓存，其后全部重新计费。',
     explain: {
       'prefix-safe': '正确。CACHE_BOUNDARY_ARITHMETIC 算的是「第一个变化段之前」：115 号之前的 -100 和 0 号两段一字未动，全部命中。',
       'all-rebilled': 'CACHE_BOUNDARY_ARITHMETIC 不这么算：缓存边界在第一个变化段，之前的前缀照旧便宜。',

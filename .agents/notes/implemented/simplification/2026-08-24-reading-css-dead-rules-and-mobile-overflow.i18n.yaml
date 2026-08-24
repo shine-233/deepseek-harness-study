@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/simplification/2026-08-24-reading-css-dead-rules-and-mobile-overflow.md
+2026-08-24-reading-css-dead-rules-and-mobile-overflow.md: 5b84430547b809f1c34e3b6855de0bf1cb669fe1
+2026-08-24-reading-css-dead-rules-and-mobile-overflow.zh.md: a6f597fcacb94ef63a444006b4a13b908245753b

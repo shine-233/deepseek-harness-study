@@ -22,6 +22,7 @@
         <h1>订阅决定收不收得到；日志跟订阅无关。</h1>
         <p class="hero-lead">一个只观察 tools/result 的最小插件，三层参与方摆在同一条有序时间线上：工具执行、事件广播、插件动作，外加宿主写的 Session 日志。切场景、开关订阅、拉预览长度——看预览和日志各自服从什么规则。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/11-如何写一个合规插件.html">阅读配套课程</a>
           <a class="button button-secondary" href="./turn-flow-lab.html">打开 Turn 轨迹实验</a>
@@ -84,6 +85,18 @@
           <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。不用账号，不写本机存储。</small>
         </form>
         <p class="feedback" id="flow-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="时间轴步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="flow-step-output">0</output> 步</span>
+            <input id="flow-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数，不改变推演结果；之后的步骤淡出显示。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
+          </label>
+          <div class="stepper-buttons">
+            <button class="button button-quiet" id="flow-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="flow-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="flow-step-caption" role="status" aria-live="polite"></p>
+        </div>
         <dl class="metric-grid" aria-label="事件流观测值">
           <div><dt>步骤</dt><dd id="metric-steps">—</dd></div>
           <div><dt>广播次数</dt><dd id="metric-broadcasts">—</dd></div>

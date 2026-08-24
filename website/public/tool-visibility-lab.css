@@ -93,3 +93,25 @@ tbody tr[data-state="0"] td { opacity: 0.62; }
 @media (forced-colors: active) {
   .nest-scroll, .bundle-check { border: 1px solid CanvasText; }
 }
+
+/* 点击追踪：选中一个工具，高亮它的判定链路；其余淡出一档。 */
+.trace-note {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--signal);
+  border-radius: 0 6px 6px 0;
+  background: color-mix(in srgb, var(--signal) 12%, transparent);
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+.chip { cursor: pointer; }
+.chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.chip.is-dim { opacity: 0.32; }
+.chip.is-traced .chip-box { stroke-width: 2.5; stroke-dasharray: none; }
+.chip.is-traced .chip-text { font-weight: 700; }
+.funnel-bar.is-traced { stroke: var(--ink); stroke-width: 2; }
+.ring.is-block { stroke: var(--deny); stroke-width: 2.5; stroke-dasharray: 5 4; }
+.ring.is-pass { opacity: 1; }
+.ring.is-dim-ring { opacity: 0.35; }
+tbody tr.is-traced td { background: color-mix(in srgb, var(--signal) 14%, transparent); }
+tbody tr.is-dim { opacity: 0.45; }

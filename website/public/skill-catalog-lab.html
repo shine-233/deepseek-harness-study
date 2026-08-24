@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="技能目录渐进加载：name+description 信封、digest 替换规则与 skill 工具的三种结局">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>技能目录实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./skill-catalog-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sc-main">跳到实验</a>
+  <main class="lab-shell" id="sc-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 技能与上下文</p>
+        <h1>目录只给一行摘要；正文要等精确调用。</h1>
+        <p class="hero-lead">每个 pre-step，目录按快照重新生成：排序后的 name 与截断 description，别的什么都不带。digest 覆盖这些条目——改一个字就得到新 digest，下一轮追加完整替换信封；全部删掉则显式退役旧名字。没有可调用技能、或 skill 工具被 restrict／遮蔽时整份省略。模型侧的 skill 工具按精确名加载正文，三种结局互不相同。改下面的输入，看信封怎么变。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/22-工具可见性与非侵入扩展.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./trajectory-lab.html">打开 Trajectory 实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 20</span>
+        <strong>信封文案逐字对齐上游模板。</strong>
+        <p>三个技能是教学常量；没有真实 provider 或文件系统。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：为什么目录里只有一行摘要，不直接把技能全文发给模型？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="full-body">
+            <span>全文一起发，省得再调一次工具</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="summary-only">
+            <span>摘要占位最小成本，正文按需精确加载</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="no-entry">
+            <span>干脆不提技能，需要时用户自己贴</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="skill-form">
+          <fieldset class="sc-checks">
+            <legend>这个 cwd 的快照里有哪些技能</legend>
+            <label class="bundle-check"><input type="checkbox" id="skill-commit" checked><span>commit-helper（可被模型调用）</span></label>
+            <label class="bundle-check"><input type="checkbox" id="skill-release"><span>release-notes（可被模型调用）</span></label>
+            <label class="bundle-check"><input type="checkbox" id="skill-legacy"><span>legacy-migrate（仅用户显式调用）</span></label>
+          </fieldset>
+          <label>
+            <span>改写 commit-helper 的描述（触发 digest 变化）</span>
+            <input id="skill-desc" type="text" spellcheck="false" placeholder="留空用默认描述">
+          </label>
+          <label>
+            <span>skill 工具可见性</span>
+            <select id="skill-visibility" name="toolVisibility"></select>
+            <small>restrict 或同名遮蔽都会让整份目录省略。</small>
+          </label>
+          <label>
+            <span>探测一次 skill 工具调用</span>
+            <select id="skill-probe"></select>
+          </label>
+          <button class="button button-primary" type="submit">重新计算目录</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">回到首轮</button>
+          <small>「上一轮 digest」在页面内存里接续：连续改两次描述，第二次会看到替换而不是首次发布。</small>
+        </form>
+        <p class="feedback" id="skill-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="目录观测值">
+          <div><dt>发布 / 快照</dt><dd id="metric-count">—</dd></div>
+          <div><dt>本轮变化</dt><dd id="metric-transition">—</dd></div>
+          <div><dt>digest 前 12 位</dt><dd id="metric-digest">—</dd></div>
+          <div><dt>省略原因</dt><dd id="metric-omit">—</dd></div>
+          <div><dt>skill 探测</dt><dd id="metric-probe">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="sc-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="terminal">目录信封</p>
+          <h2 id="sc-title">这轮 pre-step 会追加什么</h2>
+        </div>
+        <span class="schema-pill">逐字模板</span>
+      </div>
+      <p class="section-intro">信封按上游模板逐字渲染；省略轮显示原因而不是空壳。digest 变化驱动 initial → replacement → retired 三种生命周期消息。</p>
+      <pre class="fe-diff sc-envelope-pre" id="sc-envelope"></pre>
+      <p class="chart-note" id="sc-envelope-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重算 digest、复核发布/省略条件、扫描正文泄漏，并核对 skill 探测结局与快照及可调用标记的一致性。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 逐字信封模板 · 不连接任何 Host</span>
+      <a href="./study/lessons/22-工具可见性与非侵入扩展.html">继续读工具可见性与非侵入扩展</a>
+    </footer>
+  </main>
+  <script type="module" src="./skill-catalog-lab.js"></script>
+</body>
+</html>

@@ -22,6 +22,7 @@
         <h1>模型看得见，不等于允许执行。</h1>
         <p class="hero-lead">工具要穿过三道收窄才能真的跑起来：Bundle 决定它是否<button type="button" class="term-ref" data-metric="registered">已注册</button>，agent 作用域决定它是否<button type="button" class="term-ref" data-metric="visible">对模型可见</button>，执行策略决定它是否<button type="button" class="term-ref" data-metric="allowed">允许执行</button>。三层是嵌套的，收窄各由不同的东西负责。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/22-工具可见性与非侵入扩展.html">阅读配套课程</a>
           <a class="button button-secondary" href="./package-graph-lab.html">打开包依赖图</a>
@@ -107,6 +108,7 @@
       <p class="section-intro">嵌套本身就是数据结构：一个工具画在它能到达的最内层里。上面三个控件各自收窄一层，可以逐个试：勾掉一个 Bundle，它的工具会掉到最外层；把 agent 作用域换成「只读研究」，write 和 execute 工具会停在「已注册」这一圈；把执行策略换成「只允许读」，它们会停在「模型可见」这一圈。把鼠标停在任意一个工具上会显示它被谁挡住。颜色只分“到达最内层”和“被挡住”两档，不编码 Bundle——Bundle 用文字标出。</p>
       <div class="nest-scroll" id="nest-plot"></div>
       <p class="chart-note" id="nest-note"></p>
+      <p class="trace-note" id="trace-note" role="status" aria-live="polite">点击任意一个工具（同心图色块或表格行），追踪它走到哪一层、被哪道收窄挡下；再点一次取消。</p>
     </section>
 
     <section class="funnel-card card" aria-labelledby="funnel-title">

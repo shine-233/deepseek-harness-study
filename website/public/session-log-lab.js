@@ -12,7 +12,8 @@ import {
   renderRows,
   requireElements,
   svgElement,
-  writeText, animateNumber, installDeclaredIcons, bindRangeKeys, bindAutoAdvance, installScrollProgress } from './study-lab-kit.js'
+  writeText, animateNumber, installDeclaredIcons, bindRangeKeys, bindAutoAdvance, installScrollProgress,
+  installNumberScrub, bindRowJump } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   LOG_SCENARIOS,
@@ -208,6 +209,10 @@ function renderSqlitePanel(elements, persistState = () => {}) {
   }
   elements.packN.addEventListener('input', updatePackScrubber)
   bindRangeKeys(elements.packN)
+  // 读数本身也能左右拖：滑杆管键盘与粗调，读数柄补鼠标/触控的精确操纵。
+  installNumberScrub(elements.packNOutput, elements.packN)
+  // 反向联动：点处置表里的一行，重放位置跳到那条事件。
+  bindRowJump(elements.tableBody, elements.upTo)
   rebuildSqlite()
   updatePackScrubber()
   animateNumber(elements.packCross, firstCompressionBranchMembers() ?? 0, { duration: 700 })
@@ -404,6 +409,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'same-state',
+      hint: '状态只能从事件折叠出来——同一前缀重放两次，结果必然一致。',
     explain: {
       'same-state': 'REPLAY_IS_DETERMINISTIC 每次都重放两次并逐字段比对，就是在钉住这一点。',
       drift: '重放不累积状态：每次都从空状态开始重新折叠这段日志。',

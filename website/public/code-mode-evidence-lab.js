@@ -1326,6 +1326,7 @@ if (typeof document !== 'undefined') {
     locked: document.getElementById('gated-controls'),
     feedback: document.getElementById('gate-feedback'),
     correct: 'deny',
+      hint: '子调用走的是同一条权限管线；deny 分支在工具主体执行之前就返回了。',
     explain: {
       allow: '默认策略是 deny-write，写入调用会被拒绝。',
       deny: 'prepareExecution 在拒绝时返回 post-result 而不是 dispatch，所以没有 body-start。',

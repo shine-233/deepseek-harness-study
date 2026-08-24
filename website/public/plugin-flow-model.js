@@ -30,6 +30,11 @@ export const PLUGIN_SCENARIOS = Object.freeze([
     label: '中途卸载',
     description: '第一轮之后卸载插件；第二次广播不再有人接收，但日志照记。',
   }),
+  Object.freeze({
+    id: 'subscribe-late',
+    label: '中途订阅',
+    description: '第一轮没订阅、广播空过；中途挂上监听后，第二次广播开始收到预览。',
+  }),
 ])
 
 const RESULT_TEXT = 'read_file 完成：共 42 行配置，其中 3 行包含 retry 设置。'
@@ -48,16 +53,19 @@ function buildSteps(input) {
 
   const denied = input.scenario === 'denied'
   const midway = input.scenario === 'unload-midway'
+  const late = input.scenario === 'subscribe-late'
 
   push('观察插件', 'load', 'Bundle 挂载观察插件', {
-    effectChange: input.subscribed ? 'register' : null,
+    effectChange: !late && input.subscribed ? 'register' : null,
   })
   push('工具', 'tool-start', denied ? '策略拦截 read_file，主体未执行' : '执行 read_file')
   push('Session 日志', 'log', 'tool/call 写入日志')
   push('工具', 'tool-end', denied ? '得到 ok:false 的拒绝结果' : '读取完成，得到结果文本')
   push('事件总线', 'broadcast', '广播 tools/result')
 
-  if (input.subscribed) {
+  if (late) {
+    push('观察插件', 'skip', '此刻还没订阅：广播从插件面前经过，无动作')
+  } else if (input.subscribed) {
     const source = denied ? DENIED_TEXT : RESULT_TEXT
     const preview = source.slice(0, clampMaxLength(input.maxLength))
     push('观察插件', 'preview', `写预览（${preview.length} 字）：${preview}`, {
@@ -75,6 +83,24 @@ function buildSteps(input) {
     push('工具', 'tool-start', '第二次调用 write_file')
     push('Session 日志', 'log', '第二次 call 与 result 都写入日志')
     push('事件总线', 'broadcast', '再次广播；没有监听者接收')
+  } else if (late) {
+    push('观察插件', 'subscribe', '中途订阅：ctx.on 登记 tools/result 监听', {
+      effectChange: input.subscribed ? 'register' : null,
+    })
+    push('工具', 'tool-start', '第二次调用 write_file')
+    push('Session 日志', 'log', '第二次 call 与 result 都写入日志')
+    push('事件总线', 'broadcast', '再次广播；这一次监听已就位')
+    if (input.subscribed) {
+      const preview = RESULT_TEXT.slice(0, clampMaxLength(input.maxLength))
+      push('观察插件', 'preview', `写预览（${preview.length} 字）：${preview}`, {
+        previewText: preview,
+      })
+    } else {
+      push('观察插件', 'skip', '仍未订阅：这次广播同样无人接收')
+    }
+    push('观察插件', 'unload', '会话结束，卸载插件并注销监听', {
+      effectChange: input.subscribed ? 'remove' : null,
+    })
   } else {
     push('观察插件', 'unload', '会话结束，卸载插件并注销监听', {
       effectChange: input.subscribed ? 'remove' : null,
@@ -148,7 +174,7 @@ export function evaluatePluginFlowOracle(model) {
 
   // 宿主写日志不依赖插件：每次广播前后都必须能找到 tool/result 的日志步骤。
   const logPhases = model.steps.filter(step => step.phase === 'log').map(step => step.detail)
-  const expectsSecondLog = model.input.scenario === 'unload-midway'
+  const expectsSecondLog = model.input.scenario === 'unload-midway' || model.input.scenario === 'subscribe-late'
   const requiredLogs = expectsSecondLog ? 3 : 2
   checks.push({
     id: 'LOG_COMPLETE',
@@ -160,7 +186,17 @@ export function evaluatePluginFlowOracle(model) {
 
   const maxLen = Math.min(60, Math.max(0, model.input.maxLength))
   const previewFailures = []
-  if (model.input.subscribed) {
+  if (model.input.scenario === 'subscribe-late') {
+    if (model.input.subscribed) {
+      const expected = RESULT_TEXT.slice(0, maxLen)
+      for (const preview of model.previews) {
+        if (preview.text !== expected) previewFailures.push(preview.text)
+      }
+      if (model.previews.length !== 1) previewFailures.push(`预览数应为 1，实际 ${model.previews.length}`)
+    } else if (model.previews.length !== 0) {
+      previewFailures.push('未订阅却产生了预览')
+    }
+  } else if (model.input.subscribed) {
     const source = model.input.scenario === 'denied' ? DENIED_TEXT : RESULT_TEXT
     for (const preview of model.previews) {
       const expected = source.slice(0, maxLen)
@@ -173,10 +209,27 @@ export function evaluatePluginFlowOracle(model) {
   checks.push({
     id: 'PREVIEW_RULE',
     label: '预览严格等于来源文本的截断，且只受订阅开关控制',
-    expected: model.input.subscribed ? '恰好 1 条正确截断的预览' : '0 条预览',
+    expected: (model.input.scenario === 'subscribe-late' || model.input.subscribed)
+      ? '恰好 1 条正确截断的预览'
+      : '0 条预览',
     actual: previewFailures.length === 0 ? '符合' : previewFailures.join('；'),
     pass: previewFailures.length === 0,
   })
+
+  if (model.input.scenario === 'subscribe-late') {
+    const subscribeIndex = model.steps.find(step => step.phase === 'subscribe')?.index ?? -1
+    const beforeCount = model.previews.filter(preview => preview.stepIndex < subscribeIndex).length
+    const afterCount = model.previews.filter(preview => preview.stepIndex > subscribeIndex).length
+    const timingOk = beforeCount === 0
+      && afterCount === (model.input.subscribed ? 1 : 0)
+    checks.push({
+      id: 'SUBSCRIBE_TIMING',
+      label: '订阅时机决定收不收得到：登记前的广播不产生预览',
+      expected: model.input.subscribed ? '登记前 0 条、登记后 1 条' : '两次广播都是 0 条',
+      actual: `登记前 ${beforeCount} 条、登记后 ${afterCount} 条`,
+      pass: timingOk,
+    })
+  }
 
   const registers = model.steps.filter(step => step.effectChange === 'register').length
   const removes = model.steps.filter(step => step.effectChange === 'remove').length

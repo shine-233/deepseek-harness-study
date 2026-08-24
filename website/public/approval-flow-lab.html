@@ -22,6 +22,7 @@
         <h1>没人能批准的时候，批准通道自己变成拒绝。</h1>
         <p class="hero-lead">一次 ask 要经过三层：工具主体发起请求，审批服务按会话策略路由，应答者给出裁决。结局只有四个词——allowed-once、rejected、cancelled、unavailable。策略切到 never 时服务在派发前直接拒绝；请求先一步中止就结算 cancelled；链上没人接住就是 unavailable。每次询问都在 Session 日志里留下一对审计事件。</p>
         <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
           <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
           <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
           <a class="button button-secondary" href="./hook-flow-lab.html">打开 Hook 瀑布实验</a>
