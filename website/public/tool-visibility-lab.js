@@ -213,7 +213,13 @@ function initializePage() {
 
   // 点击追踪：选中一个工具后，同心图、计数条、圆环和表格行同时高亮同一条判定链路；
   // 说明文字逐字段取自模型输出，不在这里新编原因。
+  // 点击追踪：选中一个工具后，同心图、计数条、圆环和表格行同时高亮同一条判定链路；
+  // 说明文字逐字段取自模型输出，不在这里新编原因。
+  // 传播动画：环（0/80/160ms）→ 计数条（200ms）→ 色块脉冲（260ms）；
+  // prefers-reduced-motion 下跳过级联延迟，直接落位。
   const TRACE_TONES = { 3: 'allow', 2: 'policy', 1: 'scope', 0: 'bundle' }
+  const reducedMotion = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const applyTrace = () => {
     if (currentModel === null) return
     const tool = tracedTool === null ? null : currentModel.tools.find(item => item.name === tracedTool) ?? null
@@ -227,16 +233,37 @@ function initializePage() {
     }
     for (const bar of elements.funnel.querySelectorAll('.funnel-bar')) bar.classList.remove('is-traced')
     const rings = [1, 2, 3].map(index => elements.nest.querySelector('.ring-' + String(index)))
-    for (const ring of rings) ring?.classList.remove('is-block', 'is-dim-ring')
+    rings.forEach((ring, index) => {
+      ring?.classList.remove('is-block', 'is-dim-ring')
+      if (ring && !reducedMotion) ring.style.transitionDelay = `${String(index * 80)}ms`
+    })
     if (tool === null) {
       writeText(elements.traceNote, '点击任意一个工具（同心图色块或表格行），追踪它走到哪一层、被哪道收窄挡下；再点一次取消。')
       return
     }
-    if (tool.reachedLevel < 3 && rings[2]) rings[2].classList.add(tool.reachedLevel === 3 ? 'is-pass' : 'is-dim-ring')
-    if (tool.reachedLevel < 3) rings[tool.reachedLevel]?.classList.add('is-block')
-    else if (rings[0]) rings[0].classList.add('is-pass'), rings[1]?.classList.add('is-pass'), rings[2]?.classList.add('is-pass')
+    if (tool.reachedLevel < 3) {
+      const blocker = rings[tool.reachedLevel]
+      if (blocker) {
+        if (!reducedMotion) blocker.style.transitionDelay = '240ms'
+        blocker.classList.add('is-block')
+      }
+      rings.forEach((ring, index) => {
+        if (index !== tool.reachedLevel && index > tool.reachedLevel) ring?.classList.add('is-dim-ring')
+      })
+    } else if (rings[0]) {
+      rings.forEach((ring, index) => {
+        if (!reducedMotion) ring.style.transitionDelay = `${String(index * 80)}ms`
+        ring?.classList.add('is-pass')
+      })
+    }
     const tone = TRACE_TONES[tool.reachedLevel]
-    elements.funnel.querySelector('.tone-' + tone)?.classList.add('is-traced')
+    const bar = elements.funnel.querySelector('.tone-' + tone)
+    if (bar) {
+      if (!reducedMotion) bar.style.transitionDelay = '300ms'
+      bar.classList.add('is-traced')
+    }
+    const tracedChip = elements.nest.querySelector(`[data-tool="${tool.name}"]`)
+    if (tracedChip && !reducedMotion) tracedChip.style.transitionDelay = '260ms'
     const stepsText = [
       'Bundle ' + tool.bundle + '：' + (tool.registered ? '已加载 ✓' : '未加载 ✕'),
       'agent 作用域「' + currentModel.scope.label + '」：' + (tool.modelVisible ? '模型可见 ✓' : '不可见 ✕'),

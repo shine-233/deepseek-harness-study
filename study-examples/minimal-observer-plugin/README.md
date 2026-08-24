@@ -44,7 +44,7 @@ No API key, model call, local DSH process, registry modification, Windows Regist
 
 The example also rejects misspelled configuration keys instead of silently falling back to a default. That makes the "fail early on deployment misconfiguration" responsibility visible to the reader. Its exported Schemastery `Config` gives a real Loader a standard schema to read, while `resolveConfig()` keeps the unknown-key and safe-integer checks for direct calls. The local unit test verifies the example's schema and validation logic, but it is still not a real Loader composition proof.
 
-Cordis records registrations made through `ctx.on()` in the mounting plugin Fiber. On real unload, Cordis removes the listener with that Fiber. The unit test uses a deliberately tiny fake context, so it verifies the plugin's public interaction and output but does not pretend to prove Cordis's implementation.
+Cordis records registrations made through `ctx.on()` in the mounting plugin Fiber. On real unload, Cordis removes the listener with that Fiber. The unit test uses a deliberately tiny fake context, so it verifies the plugin's public interaction and output but does not pretend to prove Cordis's implementation. The full timeline of how subscriptions, policy rejections, and unloading affect one observer plugin is walked step by step in the [plugin subscription and logging lab](/plugin-flow-lab.html).
 
 ### 2. Bounded log data
 

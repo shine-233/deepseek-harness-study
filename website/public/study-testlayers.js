@@ -90,8 +90,10 @@ function ensureStyle(doc) {
 .dsh-testlayers-detail dt:first-child{margin-top:0;}
 .dsh-testlayers-detail dd{margin:0;color:var(--vp-c-text-1);line-height:1.6;}
 .dsh-testlayers-detail dd.caveat{color:var(--vp-c-text-2);}
+.dsh-swap-in{animation:dsh-fade-rise 180ms ease;}
+@keyframes dsh-fade-rise{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 @media (max-width:719px){.dsh-testlayers{grid-template-columns:1fr;}}
-@media (prefers-reduced-motion:reduce){.dsh-testlayers *{transition:none!important;}}
+@media (prefers-reduced-motion:reduce){.dsh-testlayers *{transition:none!important;animation:none!important;}}
 `
   doc.head.append(style)
 }
@@ -152,7 +154,11 @@ function initializeTestLayers(doc) {
       button.setAttribute('aria-pressed', String(button.dataset.layerId === selected.id))
     }
     const detailData = buildLayerDetail(layer)
-    detail.innerHTML = renderLayerDetailHtml(layer, detailData)
+    // 每次绘制换新的内层元素，入场动画随选择变化重新播放。
+    const wrap = doc.createElement('div')
+    wrap.className = 'dsh-swap-in'
+    wrap.innerHTML = renderLayerDetailHtml(layer, detailData)
+    detail.replaceChildren(wrap)
   }
 
   mount.append(stack, detail)

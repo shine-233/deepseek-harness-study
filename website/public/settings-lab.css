@@ -1,0 +1,5 @@
+/* 文件设置热发布实验：热发布用信号色，写入锁描边、外部编辑标红。 */
+.st-dot { fill: var(--brand); }
+.st-dot.is-hot { fill: var(--signal); }
+.st-dot.is-lock { stroke: var(--signal); stroke-width: 2; }
+.st-dot.is-ext { fill: var(--deny-ink, #c62828); }

@@ -13,6 +13,7 @@ import {
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
+import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   OVERLAY_SOURCES,
@@ -444,7 +445,8 @@ function initializePage() {
     }
   }
 
-  elements.replay.addEventListener('input', () => {
+    bindAutoAdvance(document.getElementById('replay-play'), elements.replay, { stepMs: 650, speedSelect: document.getElementById('replay-speed') })
+elements.replay.addEventListener('input', () => {
     syncReplay()
     persistState()
   })

@@ -1,0 +1,17 @@
+/* worker-protocol 实验页的少量专属样式。 */
+
+.wp-msg.is-host { border-left: 3px solid var(--brand); }
+.wp-msg.is-worker { border-left: 3px solid var(--signal); }
+
+.wp-dir {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.wp-msg .jb-step-head code { font-size: 0.8rem; margin-inline-start: var(--space-2xs); }
+
+@media (forced-colors: active) {
+  .wp-msg { border: 1px solid CanvasText; }
+}

@@ -33,3 +33,41 @@ tbody tr[data-state="failed"] td:nth-child(3) { color: var(--signal-ink); }
 @media (prefers-reduced-motion: reduce) {
   .trace-dot { transition: none; }
 }
+
+/*
+ * 沙盒区：五个旋钮排成两列网格，窄屏折成单列；
+ * 红色中止线是本区唯一的新图形元素，配色复用 --deny-ink。
+ */
+.sb-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px 22px;
+  align-items: start;
+}
+
+.sb-controls .sb-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.abort-line {
+  stroke: var(--deny-ink, #c62828);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+/* 中止点之后的步骤尚未发生：整点淡显，拖动红线时它们是可抓的目标。 */
+.trace-dot.is-future { opacity: 0.25; }
+.axis.is-future-label { opacity: 0.4; }
+
+.abort-label {
+  fill: var(--deny-ink, #c62828);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.trace-dot.is-user-input { stroke-width: 3; }
+
+.sb-oracle-details { margin-top: 12px; }
+.sb-oracle-details summary { cursor: pointer; color: var(--ink-soft, #57606a); }

@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write study-examples/minimal-observer-plugin/README.md
-README.md: 2e11575ae0a1d67d38474ce7ae92eb66eeeca29a
-README.zh.md: 33324ac51803a6f51b0937e37a5c83ecb99827a4
+README.md: 09b847bf2f39b8f02a1414af1181086b4687abb9
+README.zh.md: 58115b1669ca56c5dcc6d90e292cae9ec5527dd2

@@ -8,6 +8,7 @@ import {
   installDeclaredIcons, installScrollProgress, installInputReset,
   bindRangeKeys, bindPlotScrub,
 } from './study-lab-kit.js'
+import { bindAutoAdvance } from './study-lab-kit.js'
 import { buildGuardLoopModel, buildKeySandboxModel, evaluateGuardLoopOracle } from './guard-loop-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
@@ -239,7 +240,8 @@ function initializePage() {
   }
   el.stepPrev.addEventListener('click', () => nudgeStep(-1))
   el.stepNext.addEventListener('click', () => nudgeStep(1))
-  bindRangeKeys(el.step)
+    bindAutoAdvance(document.getElementById('gl-play'), el.step, { stepMs: 500, speedSelect: document.getElementById('gl-speed') })
+bindRangeKeys(el.step)
   bindPlotScrub(el.flow, el.step)
 
   const r = readStateFromHash(location.hash, SCHEMA)

@@ -12,6 +12,10 @@
 
 GitHub 官方把 `github.dev` 定义为完全运行在浏览器中的轻量编辑器，把 Codespaces 定义为托管在云端的开发环境。两者不是同一个功能：前者适合阅读和改文字，后者才有虚拟机、容器、终端和运行能力。
 
+<div class="dsh-envcompare" data-dsh-envcompare aria-label="三种环境对比器：切换环境看四栏原文和能力矩阵"></div>
+
+上面的对比器把这张表变成可切换的：选一个环境，右侧列出表格四栏原文和课程正文里的「能做／不能做」清单；左侧能力矩阵的每个记号都来自课程原文（「—」表示原文没有为该环境声称这项能力）。
+
 ## 路线一：直接在 GitHub 网页端阅读
 
 打开[学习仓库首页](https://github.com/shine-233/deepseek-harness-study)，然后依次进入[从零开始读 DSH](00-开始这里.md)、[仓库地图](01-仓库地图.md)和[Cordis 与插件树](02-Cordis与插件树.md)。GitHub 会直接渲染 Markdown，导读中的相对链接也可以继续点击，不需要先把仓库保存到本机。

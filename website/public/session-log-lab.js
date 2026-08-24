@@ -153,6 +153,9 @@ function renderState(model, grid, messageList) {
 }
 
 function renderSqlitePanel(elements, persistState = () => {}) {
+  // 本函数会被「恢复默认」反复调用；监听器只在第一次接线，
+  // 之后只重算渲染，否则每次重置都叠一层 keydown/pointer/click 处理器。
+  const firstWire = elements.sqliteForm.dataset.wired !== 'true'
   // Mathigon 式参数滑杆：成员数一动，物理行形状的三个读数立刻跟着走。
   const updatePackScrubber = () => {
     const n = Number(elements.packN.value)
@@ -200,22 +203,25 @@ function renderSqlitePanel(elements, persistState = () => {}) {
     }
   }
 
-  elements.sqliteForm.addEventListener('submit', (event) => {
-    event.preventDefault()
-    rebuildSqlite()
-  })
-  for (const control of [elements.sqlitePacking, elements.sqlitePayload]) {
-    control.addEventListener('change', rebuildSqlite)
+  if (firstWire) {
+    elements.sqliteForm.dataset.wired = 'true'
+    elements.sqliteForm.addEventListener('submit', (event) => {
+      event.preventDefault()
+      rebuildSqlite()
+    })
+    for (const control of [elements.sqlitePacking, elements.sqlitePayload]) {
+      control.addEventListener('change', rebuildSqlite)
+    }
+    elements.packN.addEventListener('input', updatePackScrubber)
+    bindRangeKeys(elements.packN)
+    // 读数本身也能左右拖：滑杆管键盘与粗调，读数柄补鼠标/触控的精确操纵。
+    installNumberScrub(elements.packNOutput, elements.packN)
+    // 反向联动：点处置表里的一行，重放位置跳到那条事件。
+    bindRowJump(elements.tableBody, elements.upTo)
   }
-  elements.packN.addEventListener('input', updatePackScrubber)
-  bindRangeKeys(elements.packN)
-  // 读数本身也能左右拖：滑杆管键盘与粗调，读数柄补鼠标/触控的精确操纵。
-  installNumberScrub(elements.packNOutput, elements.packN)
-  // 反向联动：点处置表里的一行，重放位置跳到那条事件。
-  bindRowJump(elements.tableBody, elements.upTo)
   rebuildSqlite()
   updatePackScrubber()
-  animateNumber(elements.packCross, firstCompressionBranchMembers() ?? 0, { duration: 700 })
+  if (firstWire) animateNumber(elements.packCross, firstCompressionBranchMembers() ?? 0, { duration: 700 })
 }
 
 function initializePage() {

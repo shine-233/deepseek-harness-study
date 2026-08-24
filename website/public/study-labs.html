@@ -38,7 +38,7 @@
       <dl class="metric-grid">
         <div><dt>亲手做过的实验</dt><dd id="metric-labs-done">—</dd></div>
         <div><dt>已读配套课</dt><dd id="metric-lessons-read">—</dd></div>
-        <div><dt>计入进度</dt><dd>23 / 24 个页面</dd></div>
+        <div><dt>计入进度</dt><dd>29 / 30 个页面</dd></div>
       </dl>
       <p class="feedback" id="labs-progress-feedback" role="status" aria-live="polite">进度只写本机浏览器，不上传。</p>
     </section>
@@ -84,12 +84,12 @@
           </svg>
           <div class="lab-card-body">
             <h3>Turn 流程与日志对应</h3>
-            <p class="lab-card-question">一次 Turn 展开成 20 步、4 次模型请求、9 条日志事件。滑杆停在哪一步，都能对上这一步写进了日志哪一行。</p>
+            <p class="lab-card-question">一次 Turn 展开成 20 步、4 次模型请求、9 条日志事件。滑杆停在哪一步，都能对上这一步写进了日志哪一行。沙盒区五个旋钮连续可调：改消息长度、工具次数、失败位、被拒开关和中止红线，看轨迹当场分叉。</p>
             <p class="lab-card-progress" hidden></p>
             <ul class="lab-card-tags" role="list">
               <li class="schema-pill">步进滑杆</li>
               <li class="schema-pill">场景切换</li>
-              <li class="schema-pill">状态链复制</li>
+              <li class="schema-pill">可调沙盒</li>
             </ul>
             <p class="lab-card-links">
               <a class="button button-primary" href="./turn-flow-lab.html">打开实验</a>
@@ -628,6 +628,146 @@
             <p class="lab-card-links">
               <a class="button button-primary" href="./workflow-node-lab.html">打开实验</a>
               <a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · Session 日志与恢复</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="client" data-lesson="07-HostClient示例测试发布">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="10" y="14" width="46" height="40" rx="3"/>
+            <path class="lm-arrow" d="M60 34 h12 m-4 -4 l4 4 l-4 4"/>
+            <rect class="lm-cell" x="76" y="16" width="34" height="8" rx="2"/>
+            <rect class="lm-cell" x="76" y="30" width="34" height="8" rx="2"/>
+            <rect class="lm-cell" x="76" y="44" width="26" height="8" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>客户端三面镜</h3>
+            <p class="lab-card-question">ui-tool 的卡片状态机、ui-conversation 的折叠引擎、ui-user-questions 的提问接管——三个组件族各配一个可推演面板，契约原文落在每个格子里。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">三面镜</li>
+              <li class="schema-pill">切片状态机</li>
+              <li class="schema-pill">接管规则</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./client-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/07-HostClient示例测试发布.html">配套课 · Host/Client/发布</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="provider" data-lesson="02-Cordis与插件树">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="8" y="26" width="26" height="16" rx="3"/>
+            <path class="lm-arrow" d="M38 34 h10 m-4 -4 l4 4 l-4 4"/>
+            <rect class="lm-cell" x="52" y="14" width="20" height="12" rx="2"/>
+            <rect class="lm-cell" x="76" y="14" width="20" height="12" rx="2"/>
+            <rect class="lm-cell" x="100" y="14" width="14" height="12" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Web 提供者矩阵</h3>
+            <p class="lab-card-question">同一缝隙三种搜索实现：DeepSeek 整轮调用走严格模式、Exa 纯检索、Perplexity 答案+引用。选择表六种情形各有专属错误码；fetch 卫生规则逐条校验。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">选择策略</li>
+              <li class="schema-pill">归一化矩阵</li>
+              <li class="schema-pill">fetch 卫生</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./provider-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/02-Cordis与插件树.html">配套课 · Cordis 与插件树</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="worker-protocol" data-lesson="37-计划栈">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="8" y="10" width="30" height="48" rx="3"/>
+            <rect class="lm-box" x="82" y="10" width="30" height="48" rx="3"/>
+            <path class="lm-arrow" d="M42 20 h36 m-5 -4 l5 4 l-5 4"/>
+            <path class="lm-arrow" d="M78 32 h-36 m-5 -4 l5 4 l5 -4"/>
+            <path class="lm-arrow" d="M42 46 h36 m-5 -4 l5 4 l-5 4"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Worker 协议</h3>
+            <p class="lab-card-question">Ready/Go 握手、ChildStart RPC 配对、Cancel 后 hooks 抛出——workflow-worker-thread 的每条消息逐步推演，验证握手顺序与终局唯一性。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">双向协议</li>
+              <li class="schema-pill">RPC 配对</li>
+              <li class="schema-pill">取消路径</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./worker-protocol-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/37-计划栈.html">配套课 · 计划栈</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="plan-stack" data-lesson="37-计划栈">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="8" y="10" width="30" height="14" rx="3"/>
+            <rect class="lm-box" x="8" y="28" width="30" height="14" rx="3"/>
+            <rect class="lm-box" x="8" y="46" width="30" height="12" rx="3"/>
+            <path class="lm-arrow" d="M44 34 h28 m-5 -4 l5 4 l-5 4"/>
+            <circle class="lm-dot" cx="92" cy="34" r="7"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>计划栈</h3>
+            <p class="lab-card-question">Todo 为什么只能整表替换、Plan 的四态状态机怎样落日志、Goal 从创建到结算走哪几个相位——三个面板共用同一份「状态即日志」的底座。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">整表替换</li>
+              <li class="schema-pill">状态机</li>
+              <li class="schema-pill">生命周期</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./plan-stack-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/37-计划栈.html">配套课 · 计划栈</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="credential" data-lesson="13-官方工具插件完整契约">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-cell" x="10" y="26" width="24" height="16" rx="3"/>
+            <path class="lm-arrow" d="M40 34 h18 m-5 -4 l5 4 l-5 4"/>
+            <circle class="lm-dot" cx="72" cy="34" r="6"/>
+            <path class="lm-line-x" d="M96 26 l14 16 m0 -16 l-14 16"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>凭据解析</h3>
+            <p class="lab-card-question">配置声明了一个凭据引用，来源链上一级都缺席时会发生什么？fail-closed 在解析处拒绝，而不是把空值递给工具主体。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">引用解析</li>
+              <li class="schema-pill">fail-closed</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./credential-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/13-官方工具插件完整契约.html">配套课 · 工具插件契约</a>
+            </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="plugin" data-lab="settings" data-lesson="07-HostClient示例测试发布">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-file" d="M14 18 h20 l6 6 v22 h-26 z"/>
+            <path class="lm-file-fold" d="M34 18 v6 h6"/>
+            <path class="lm-arrow" d="M52 32 h20 m-5 -4 l5 4 l-5 4"/>
+            <circle class="lm-dot lm-accent" cx="90" cy="32" r="7"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>文件设置热发布</h3>
+            <p class="lab-card-question">另一个进程直接改了 settings.yaml：本进程靠 fs 监听器把它汇入同一条热发布路径，写入锁保证同一时刻只有一个写者。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">热发布</li>
+              <li class="schema-pill">写入锁</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./settings-lab.html">打开实验</a>
+              <a class="lab-lesson-link" href="./study/lessons/07-HostClient示例测试发布.html">配套课 · Host/Client/发布</a>
             </p>
           </div>
         </li>

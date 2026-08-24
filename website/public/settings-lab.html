@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="settings.yaml 被外部进程直接改写后，本进程靠什么知道？文件设置热发布的可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>文件设置热发布实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./settings-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#st-main">跳到实验</a>
+  <main class="lab-shell" id="st-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 设置与缝</p>
+        <h1>另一个进程改了 settings.yaml，这一进程不用重启。</h1>
+        <p class="hero-lead">全部命名空间段落共用一份 YAML/JSON 文档；任何写入都经过缝，落盘即热发布给订阅者。外部编辑也不走旁路——fs 监听器把它变成同一次热发布。同一文档同时只有一个写者：写入锁让第二个写者排队等第一个释放。两个进程共享 harness home 时，「对方的保存」就是「本进程的外部编辑」。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/07-HostClient示例测试发布.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./credential-lab.html">打开凭据解析实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 02</span>
+        <strong>纵轴是参与方，横轴是步骤序号。</strong>
+        <p>规则取自上游 settings-file 源码（基线 aa6c361a）；页面不读真实文件，不起 fs 监听。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：外部进程直接改了 settings.yaml——本进程怎么感知到变化？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="hot-publish"><span>fs 监听器触发热发布——不需要重启</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="restart"><span>需要重启进程才能读到新值</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="polling"><span>本进程靠轮询定期重读文件才能发现</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form" id="settings-form">
+          <label><span>命名空间</span><select id="namespace"><option value="model">model</option><option value="tools">tools</option><option value="approval">approval</option></select></label>
+          <label><span>动作</span><select id="action"><option value="write">写入（经缝）</option><option value="external-edit">外部编辑（模拟另一进程）</option></select></label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="settings-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="热发布观测值">
+          <div><dt>动作</dt><dd id="metric-action">—</dd></div>
+          <div><dt>写入锁</dt><dd id="metric-lock">—</dd></div>
+          <div><dt>热发布</dt><dd id="metric-hot">—</dd></div>
+          <div><dt>重读结果</dt><dd id="metric-reread">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="st-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">有序时间线</p>
+          <h2 id="st-title">三条泳道上的一次变更</h2>
+        </div>
+        <span class="schema-pill">步骤 × 参与方</span>
+      </div>
+      <p class="section-intro">读取、写入、热发布三条泳道。外部编辑跳过写入锁直接落在文件上，但仍然汇入同一条热发布泳道——这就是两条路径等价的证据。悬停圆点看每步说明。</p>
+      <div class="plot-scroll" id="settings-plot"></div>
+      <p class="chart-note" id="settings-note"></p>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>两条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验把同一输入整体重建一遍再逐字节比较时间线，并核对热发布必然出现；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="st-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="st-table-title">完整步骤表</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">图里的每一步，这张表都逐行给出：属于哪条泳道、处于哪个阶段、做了什么。</p>
+      <div class="table-scroll">
+        <table>
+          <caption>当前输入的全部步骤</caption>
+          <thead>
+            <tr><th scope="col">#</th><th scope="col">泳道</th><th scope="col">阶段</th><th scope="col">说明</th></tr>
+          </thead>
+          <tbody id="settings-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./credential-lab.html">继续看凭据解析实验</a>
+    </footer>
+  </main>
+  <script type="module" src="./settings-lab.js"></script>
+</body>
+</html>

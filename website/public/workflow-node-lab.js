@@ -9,6 +9,7 @@ import {
   renderOracle,
   requireElements,
   writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
+import { installStoryRail } from './study-lab-story.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   NODE_ENDINGS,
@@ -220,6 +221,7 @@ function initializePage() {
 
 if (typeof document !== 'undefined') {
   initializePage()
+  installStoryRail()
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

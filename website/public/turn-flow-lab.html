@@ -106,6 +106,72 @@
       <p class="chart-note" id="trace-note"></p>
     </section>
 
+    <section class="sandbox-card card" aria-labelledby="sandbox-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="gauge">可改输入的沙盒</p>
+          <h2 id="sandbox-title">拖动旋钮，看同一次 Turn 怎么分叉</h2>
+        </div>
+        <span class="schema-pill">输入 → 轨迹形状</span>
+      </div>
+      <p class="section-intro">上面三个场景是固定剧本；这里换成五个可以连续调节的输入：消息多长、调几次工具、哪一次失败、要不要让首次领取被拒、以及在哪一步中止。每拖一格，下面的轨迹立刻重排——零 Step 的被拒 Turn 和中途中止的 Turn 都能亲手拼出来。图上那条红色竖线可以直接横向拖动。</p>
+      <form class="lab-form sb-controls" id="sandbox-form" aria-label="Turn 沙盒输入">
+        <label>
+          <span>用户消息长度：<output id="sb-words-output">24</output> 词</span>
+          <input id="sb-words" type="range" min="4" max="60" step="1" value="24">
+          <small>教学单位「词」，不是 token；它只改变输入块的宽度，不冒充真实计费。</small>
+        </label>
+        <label>
+          <span>工具调用次数：<output id="sb-tools-output">2</output> 次</span>
+          <input id="sb-tools" type="range" min="0" max="4" step="1" value="2">
+          <small>每多一次调用，轨迹就长出一段「调用 → 执行 → 结果入日志 → 带回模型」。</small>
+        </label>
+        <label>
+          <span>失败发生在第 <output id="sb-fail-output">0</output> 次调用（0 = 无失败）</span>
+          <input id="sb-fail" type="range" min="0" max="4" step="1" value="0">
+          <small>失败的那次会先写失败结果，再重试一次，请求数随之多一次。</small>
+        </label>
+        <label>
+          <span>中止在第 <output id="sb-abort-output">0</output> 步之后（0 = 让 Turn 跑完）</span>
+          <input id="sb-abort" type="range" min="0" max="18" step="1" value="0">
+          <small>也可以直接在图上横向拖红线。红线右侧是尚未发生的淡色步骤；中止只截断未来，已写入的日志全部保留。</small>
+        </label>
+        <label class="sb-check">
+          <input id="sb-rejected" type="checkbox">
+          <span>首次领取被拒——整条 Turn 塌缩成一条结束事件，没有任何 Step</span>
+        </label>
+        <button class="button button-quiet" type="button" id="sb-reset">恢复沙盒默认值</button>
+      </form>
+      <div class="plot-scroll" id="sb-plot"></div>
+      <p class="chart-note" id="sb-note"></p>
+      <dl class="metric-grid" aria-label="沙盒观测值">
+        <div><dt>分叉形态</dt><dd id="sb-shape">—</dd></div>
+        <div><dt>步骤</dt><dd id="sb-metric-steps">—</dd></div>
+        <div><dt>模型请求</dt><dd id="sb-metric-requests">—</dd></div>
+        <div><dt>重试次数</dt><dd id="sb-metric-retries">—</dd></div>
+        <div><dt>不可重建</dt><dd id="sb-metric-orphan">—</dd></div>
+        <div class="metric-oracle"><dt>独立校验</dt><dd id="sb-oracle-badge">—</dd></div>
+      </dl>
+      <div class="table-scroll">
+        <table>
+          <caption id="sb-caption">当前旋钮位置的全部步骤</caption>
+          <thead>
+            <tr>
+              <th scope="col">步</th>
+              <th scope="col">执行通道</th>
+              <th scope="col">阶段</th>
+              <th scope="col">说明</th>
+            </tr>
+          </thead>
+          <tbody id="sb-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定（只读步骤数组，自己重算）</summary>
+        <ul class="oracle-list" id="sb-oracle-list"></ul>
+      </details>
+    </section>
+
     <section class="pair-card card" aria-labelledby="pair-title">
       <div class="section-heading">
         <div>

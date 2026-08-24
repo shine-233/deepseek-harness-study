@@ -91,7 +91,7 @@
             <input id="sd-step" type="range" min="0" max="0" step="1" value="0">
             <small>只改变高亮和读数，不改变推演结果；之后的步骤淡出显示。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
           </label>
-          <div class="stepper-buttons">
+          <div class="stepper-buttons"><button type="button" class="button button-quiet" id="sd-play" aria-pressed="false">播放</button><select id="sd-speed" class="jb-speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
             <button class="button button-quiet" id="sd-step-prev" type="button">上一步</button>
             <button class="button button-quiet" id="sd-step-next" type="button">下一步</button>
           </div>

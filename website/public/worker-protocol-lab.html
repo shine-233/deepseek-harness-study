@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="workflow-worker-thread 的 Host⇄Worker 双向协议：握手、RPC 配对、取消与终局结算">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Worker 协议实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./jobs-lab.css">
+  <link rel="stylesheet" href="./worker-protocol-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#wp-main">跳到实验</a>
+  <main class="lab-shell" id="wp-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · Worker 协议</p>
+        <h1>Ready → Go → ChildStart → … → Result。每一步都闭合。</h1>
+        <p class="hero-lead">workflow-worker-thread 把脚本放进 worker 线程执行，子代理留在宿主侧——两者通过一条双向闭合协议通信：Ready/Go 握手防止启动竞态，ChildStart RPC 让 worker 委派宿主启动子代理（每个 start 恰好一个回复），Cancel 让 hooks 抛出并在有界宽限内强制结算。切下面的场景逐步推。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/37-计划栈.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./orchestration-lab.html">打开编排实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 28</span>
+        <strong>消息标签逐字来自 protocol.ts 枚举。</strong>
+        <p>教学消息是常量；没有真实 worker 线程或子代理。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：host 发出 Cancel 后，正在运行的脚本和已启动的子代理会怎样？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="result-normal">
+            <span>脚本继续跑完，result 正常返回 completed</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="hangs-forever">
+            <span>永远悬挂——没人能停止一个不配合的脚本</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="cancel-hooks-throw">
+            <span>hooks 开始抛出，脚本死在下一个 await；宽限内强制结算为 cancelled</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="wp-form">
+          <label>
+            <span>场景</span>
+            <select id="wp-scenario"></select>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="wp-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="消息步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="wp-step-output">0</output> 条</span>
+            <input id="wp-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数；之后的消息淡出显示。键盘：← / → 逐步。</small>
+          </label>
+          <div class="stepper-buttons">
+            <button class="button button-quiet" id="wp-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="wp-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="wp-step-caption" role="status" aria-live="polite"></p>
+        </div>
+        <dl class="metric-grid" aria-label="协议观测值">
+          <div><dt>总消息数</dt><dd id="metric-total">—</dd></div>
+          <div><dt>ChildStart→回复</dt><dd id="metric-rpcs">—</dd></div>
+          <div><dt>Result 数</dt><dd id="metric-results">—</dd></div>
+          <div><dt>握手</dt><dd id="metric-handshake">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="wp-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">双泳道消息流</p>
+          <h2 id="wp-title">Host ⇄ Worker 的有序对话</h2>
+        </div>
+        <span class="schema-pill">方向 × 标签</span>
+      </div>
+      <p class="section-intro">左对齐的是 Host 发出的消息，右对齐的是 Worker 发出的消息。淡出的条目尚未发生。</p>
+      <ol class="jb-timeline" id="wp-timeline"></ol>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重推同一条消息流，再核对握手顺序、RPC 配对、终局唯一性和收尾位置。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/37-计划栈.html">继续读计划栈课程</a>
+    </footer>
+  </main>
+  <script type="module" src="./worker-protocol-lab.js"></script>
+</body>
+</html>

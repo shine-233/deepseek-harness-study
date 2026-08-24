@@ -113,7 +113,7 @@
           <input id="replay-step" type="range" min="0" max="0" step="1" value="0">
           <small>拖动回放 patch 的应用过程：右列键值会变成「到这一步为止」的中间配置，之后的卡片淡出。键盘：← / → 逐步。</small>
         </label>
-        <div class="stepper-buttons">
+        <div class="stepper-buttons"><button type="button" class="button button-quiet" id="replay-play" aria-pressed="false">播放</button><select id="replay-speed" class="jb-speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
           <button class="button button-quiet" id="replay-prev" type="button">上一步</button>
           <button class="button button-quiet" id="replay-next" type="button">下一步</button>
         </div>

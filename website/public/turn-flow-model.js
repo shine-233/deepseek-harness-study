@@ -227,8 +227,7 @@ export function buildTurnModel(input = {}) {
  *
  * oracle 只读 steps 数组，自己重算两个集合再配对；页面渲染的内容一概不读。
  */
-export function evaluateTurnOracle(model) {
-  if (typeof model !== 'object' || model === null) throw new TypeError('model must be an object')
+export function evaluateTurnOracle(model) {  if (typeof model !== 'object' || model === null) throw new TypeError('model must be an object')
   if (!Array.isArray(model.steps)) throw new TypeError('model.steps must be an array')
   const checks = []
   const add = (id, label, pass, expected, actual) => checks.push({ id, label, pass, expected, actual })
@@ -307,6 +306,276 @@ export function evaluateTurnOracle(model) {
 
   const counted = model.observations
   add('OBSERVATIONS_MATCH', '观测读数与重算一致',
+    counted.steps === model.steps.length
+    && counted.loggedEvents === model.steps.filter(entry => entry.logged && entry.payloadId !== null).length,
+    String(model.steps.length) + ' 步',
+    String(counted.steps) + ' 步')
+
+  return { pass: checks.every(check => check.pass), checks }
+}
+
+/* ------------------------------------------------------------------ */
+/* Turn 沙盒：可调输入怎样让同一条轨迹分叉成不同形状。                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 沙盒的输入范围。messageWords 是教学单位「词」，不是 token；工具调用数
+ * 与失败位决定轨迹长度；中止位直接在图上拖。
+ */
+export const TURN_SANDBOX_LIMITS = Object.freeze({
+  messageWords: Object.freeze({ min: 4, max: 60 }),
+  toolCalls: Object.freeze({ min: 0, max: 4 }),
+  failAtCall: Object.freeze({ min: 0 }), // 上限 = 当前 toolCalls；0 表示没有失败
+})
+
+function sandboxStep(index, lane, phase, detail, options = {}) {
+  return {
+    index,
+    lane,
+    phase,
+    detail,
+    modelVisible: options.modelVisible === true,
+    logged: options.logged === true,
+    payloadId: options.payloadId ?? null,
+    ...(options.extra ?? {}),
+  }
+}
+
+function resolveSandboxInput(input = {}) {
+  const limits = TURN_SANDBOX_LIMITS
+  const intIn = (name, value, min, max) => {
+    if (typeof value !== 'number' || !Number.isInteger(value)) {
+      throw new TypeError(name + ' 必须是整数')
+    }
+    if (value < min || (max !== null && value > max)) {
+      throw new RangeError(name + ' 超出范围：' + String(value))
+    }
+    return value
+  }
+  const messageWords = intIn('messageWords', input.messageWords ?? 24, limits.messageWords.min, limits.messageWords.max)
+  const toolCalls = intIn('toolCalls', input.toolCalls ?? 2, limits.toolCalls.min, limits.toolCalls.max)
+  // failAtCall 的上限依赖 toolCalls，单独校验；0 表示这次 Turn 里没有失败。
+  const failAtCall = intIn('failAtCall', input.failAtCall ?? 0, limits.failAtCall.min, toolCalls)
+  if (input.rejected !== undefined && typeof input.rejected !== 'boolean') {
+    throw new TypeError('rejected 必须是布尔值')
+  }
+  const rejected = input.rejected === true
+  return { messageWords, toolCalls, failAtCall, rejected, abortAtStep: input.abortAtStep ?? 0 }
+}
+
+/**
+ * 展开一次可调输入的 Turn。
+ *
+ * 输入有五个旋钮：消息长度、工具调用次数、失败发生在第几次调用、
+ * 首次领取是否被拒、以及在第几步之后中止。前四个改变 Turn 的生成，
+ * 中止只截断已生成的序列并追加一条 blocked 收尾事件——真实实现还会给
+ * 已送达的回答前缀打 interrupted 标记（见第 05/18 课），本模型不展开它。
+ *
+ * @param input - 见 resolveSandboxInput；abortAtStep 为 0 表示让 Turn 跑完。
+ */
+export function buildTurnSandboxModel(input = {}) {
+  const resolvedInput = resolveSandboxInput(input)
+  const { messageWords, toolCalls, failAtCall, rejected } = resolvedInput
+
+  const allSteps = []
+  let index = 0
+  const push = (lane, phase, detail, options) => {
+    allSteps.push(sandboxStep(index, lane, phase, detail, options))
+    index += 1
+  }
+
+  let generatedTotal
+  if (rejected) {
+    push('session', 'turn-end', '首次领取被拒：Turn 记为 blocked 收尾，没有任何 Step', {})
+    generatedTotal = allSteps.length
+  } else {
+    push('user', 'user-message', '用户输入 ' + String(messageWords) + ' 词的任务',
+      { modelVisible: true, logged: true, payloadId: 'p-user-message' })
+    push('context', 'system-prompt', '装配 system prompt 与工具清单',
+      { modelVisible: true, logged: true, payloadId: 'p-system-prompt' })
+    push('context', 'history', '取回本 Session 之前的事件投影',
+      { modelVisible: true, logged: true, payloadId: 'p-history' })
+    push('model', 'request', '第一次模型请求：携带上面三份输入', {})
+
+    for (let call = 1; call <= toolCalls; call += 1) {
+      const name = 'tool_' + String(call)
+      push('model', 'tool-call', '模型请求调用 ' + name, {})
+      push('session', 'tool-call-logged', name + ' 的调用参数写入日志',
+        { logged: true, payloadId: 'p-call-' + String(call) })
+      if (failAtCall === call) {
+        push('tool', 'tool-failed', name + ' 第一次执行失败', { extra: { failed: true } })
+        push('session', 'tool-result-logged', '失败结果写入日志',
+          { logged: true, payloadId: 'p-result-' + String(call) + '-a' })
+        push('model', 'request', '把失败结果带回模型',
+          { modelVisible: true, payloadId: 'p-result-' + String(call) + '-a' })
+        push('tool', 'tool-run', name + ' 重试并成功', { extra: { retry: true } })
+        push('session', 'tool-result-logged', '重试结果写入日志',
+          { logged: true, payloadId: 'p-result-' + String(call) + '-b' })
+        push('model', 'request', '把重试结果带回模型',
+          { modelVisible: true, payloadId: 'p-result-' + String(call) + '-b' })
+      } else {
+        push('tool', 'tool-run', name + ' 执行并返回结果', {})
+        push('session', 'tool-result-logged', name + ' 的结果写入日志',
+          { logged: true, payloadId: 'p-result-' + String(call) })
+        push('model', 'request', '把 ' + name + ' 的结果带回模型',
+          { modelVisible: true, payloadId: 'p-result-' + String(call) })
+      }
+    }
+
+    push('model', 'response', '模型给出最终回答', {})
+    push('session', 'assistant-message', '回答写入 Session 日志',
+      { logged: true, payloadId: 'p-answer' })
+    push('session', 'turn-end', 'Turn 结束，事件可用于下一轮投影', {})
+    generatedTotal = allSteps.length
+  }
+
+  /*
+   * 中止只作用于已生成的序列：0 表示不中止；k ∈ [1, totalSteps-1] 表示
+   * 保留前 k 步，再追加一条 blocked 收尾。生成顺序保证每份内容的日志事件
+   * 不晚于它的请求步骤，所以任何前缀都不会产生无法重建的载荷。
+   */
+  const abortAtStep = Math.max(0, Math.min(Math.trunc(resolvedInput.abortAtStep), generatedTotal - 1))
+  let steps = allSteps
+  let aborted = false
+  if (!rejected && abortAtStep > 0 && abortAtStep < generatedTotal) {
+    steps = allSteps.slice(0, abortAtStep)
+    steps.push(sandboxStep(steps.length, 'session', 'turn-abort',
+      '在这里中止：已产生的日志保留，回答不会出现', {}))
+    aborted = true
+  }
+
+  const visibleIds = [...new Set(steps
+    .filter(entry => entry.modelVisible && entry.payloadId !== null).map(entry => entry.payloadId))]
+  const pairs = visibleIds.map(payloadId => ({
+    payloadId,
+    visibleAt: steps.filter(entry => entry.modelVisible && entry.payloadId === payloadId).map(entry => entry.index),
+    loggedAt: steps.filter(entry => entry.logged && entry.payloadId === payloadId).map(entry => entry.index),
+    reconstructable: steps.some(entry => entry.logged && entry.payloadId === payloadId),
+  }))
+
+  const requests = steps.filter(entry => entry.phase === 'request').length
+  const forkShape = rejected ? '零 Step 的被拒 Turn'
+    : aborted ? '中途中止的 Turn'
+    : toolCalls === 0 ? '无工具的直接回答'
+    : '带工具调用的完整 Turn'
+
+  return {
+    input: { ...resolvedInput, abortAtStep },
+    lanes: LANES,
+    steps,
+    totalSteps: generatedTotal,
+    aborted,
+    pairs,
+    observations: {
+      forkShape,
+      messageWords,
+      toolCalls,
+      failAtCall,
+      rejected,
+      aborted,
+      steps: steps.length,
+      totalSteps: generatedTotal,
+      modelRequests: requests,
+      toolRuns: steps.filter(entry => entry.phase === 'tool-run').length,
+      toolFailures: steps.filter(entry => entry.failed === true).length,
+      retries: steps.filter(entry => entry.retry === true).length,
+      loggedEvents: steps.filter(entry => entry.logged && entry.payloadId !== null).length,
+      modelVisiblePayloads: pairs.length,
+      unreconstructable: pairs.filter(pair => !pair.reconstructable).map(pair => pair.payloadId),
+      lastStep: steps.at(-1)?.phase ?? '',
+    },
+    canProve: [
+      '首次领取被拒时，Turn 只剩一条结束事件：零 Step 的 Turn 真实存在。',
+      '每多一个带回模型的工具结果，模型请求就多一次；失败重试会再加一次。',
+      '中止只截断未来：任何前缀里，进入模型请求的内容都已有对应的日志事件。',
+      '同一组旋钮位置永远重建出同一条轨迹（确定性）。',
+    ],
+    cannotProve: [
+      '不能证明真实 token 数：词数只是教学单位，不是 tokenizer 的输出。',
+      '不能证明真实耗时或真实重试间隔；横轴是步骤序号，不是时间。',
+      '不能证明真实 DSH 在中止时的事件字段与这里相同；interrupted 标记见第 05 课。',
+      '不能证明真实模型对更长输入会给出更好的回答。',
+    ],
+  }
+}
+
+/**
+ * 沙盒的独立校验：只读返回的 steps 与 observations，自己重算每一件事。
+ *
+ * @param model - buildTurnSandboxModel 的返回值。
+ */
+export function evaluateTurnSandboxOracle(model) {
+  if (typeof model !== 'object' || model === null) throw new TypeError('model must be an object')
+  if (!Array.isArray(model.steps)) throw new TypeError('model.steps must be an array')
+  const checks = []
+  const add = (id, label, pass, expected, actual) => checks.push({ id, label, pass, expected, actual })
+
+  const ordered = model.steps.every((entry, position) => entry.index === position)
+  add('SB_STEPS_ORDERED', '步骤序号连续且从 0 开始',
+    ordered, '0..' + String(model.steps.length - 1), ordered ? '连续' : '有跳号或重复')
+
+  const badLane = model.steps.filter(entry => !LANES.includes(entry.lane))
+  add('SB_LANES_KNOWN', '每一步都落在已声明的 lane 上',
+    badLane.length === 0, '0 个未知 lane',
+    badLane.map(entry => entry.lane).join('、') || '0 个未知 lane')
+
+  const visibleIds = [...new Set(model.steps
+    .filter(entry => entry.modelVisible && entry.payloadId !== null).map(entry => entry.payloadId))]
+  const loggedIds = new Set(model.steps
+    .filter(entry => entry.logged && entry.payloadId !== null).map(entry => entry.payloadId))
+  const orphan = visibleIds.filter(payloadId => !loggedIds.has(payloadId))
+  add('SB_VISIBLE_IS_LOGGED', '任何前缀里，进入模型请求的内容都有日志事件',
+    orphan.length === 0, '0 份无法重建', orphan.join('、') || '0 份无法重建')
+
+  if (model.input.rejected) {
+    const onlyEnd = model.steps.length === 1 && model.steps[0]?.phase === 'turn-end'
+    add('SB_REJECTED_ZERO_STEP', '被拒的 Turn 只有一条结束事件，没有任何 Step',
+      onlyEnd && model.observations.modelRequests === 0,
+      '1 步 · 0 次请求',
+      String(model.steps.length) + ' 步 · ' + String(model.observations.modelRequests) + ' 次请求')
+  } else {
+    /*
+     * 下面三条是收尾类检查，全部做前缀感知：中止在第一次请求之前时，
+     * 「还没有请求」「调用还没结算」都是正常中间态，不能判成违反。
+     * 这与 evaluateTurnOracle 对 INPUTS_PRECEDE_REQUEST / EVERY_CALL_HAS_RESULT
+     * 的处理保持同一套规则。
+     */
+    const atEnd = !model.aborted
+
+    const firstRequest = model.steps.findIndex(entry => entry.phase === 'request')
+    const inputsBefore = firstRequest === -1 ? 0 : model.steps
+      .slice(0, firstRequest).filter(entry => entry.modelVisible).length
+    add('SB_INPUTS_PRECEDE_REQUEST', '第一次模型请求之前已经装配好输入',
+      firstRequest === -1 || (firstRequest > 0 && inputsBefore >= 3),
+      firstRequest === -1 ? '第一次请求出现后才判定' : '请求前至少 3 份输入',
+      firstRequest === -1
+        ? '尚未推进到第一次模型请求'
+        : String(inputsBefore) + ' 份输入，请求在第 ' + String(firstRequest) + ' 步')
+
+    const calls = model.steps.filter(entry => entry.phase === 'tool-call-logged')
+    const results = model.steps.filter(entry => entry.phase === 'tool-result-logged')
+    add('SB_EVERY_CALL_HAS_RESULT', '每次被记录的工具调用都有结果事件',
+      !atEnd || results.length >= calls.length,
+      atEnd ? '结果数 ≥ 调用数' : '推进到末尾后才判定',
+      String(results.length) + ' ≥ ' + String(calls.length) + (atEnd ? '' : '（尚未推进到末尾）'))
+
+    const failedCount = model.steps.filter(entry => entry.failed === true).length
+    const retryCount = model.steps.filter(entry => entry.retry === true).length
+    const wantsFailure = model.input.failAtCall > 0
+    add('SB_FAILURE_MATCHES_KNOB', '失败旋钮的位置决定失败与重试各出现一次',
+      !atEnd || (wantsFailure ? failedCount === 1 && retryCount === 1 : failedCount === 0 && retryCount === 0),
+      !atEnd ? '推进到末尾后才判定' : wantsFailure ? '失败 ×1，重试 ×1' : '无失败无重试',
+      '失败 ×' + String(failedCount) + '，重试 ×' + String(retryCount) + (atEnd ? '' : '（尚未推进到末尾）'))
+  }
+
+  const expectedLast = model.aborted ? 'turn-abort' : 'turn-end'
+  add('SB_END_SHAPE', model.aborted ? '中止的 Turn 以 blocked 收尾' : '完整的 Turn 以结束事件收尾',
+    model.steps.at(-1)?.phase === expectedLast,
+    expectedLast,
+    String(model.steps.at(-1)?.phase))
+
+  const counted = model.observations
+  add('SB_OBSERVATIONS_MATCH', '观测读数与重算一致',
     counted.steps === model.steps.length
     && counted.loggedEvents === model.steps.filter(entry => entry.logged && entry.payloadId !== null).length,
     String(model.steps.length) + ' 步',

@@ -1,0 +1,23 @@
+/*
+ * 计划栈实验室的少量专属样式：页面主体复用 study-lab-shell.css，
+ * 时间线与速度档复用 jobs-lab.css；这里只补 jobs 里没有的三块。
+ */
+
+/* 三面板共用的「来源徽章」小表：todo / plan / goal 各自带一条。 */
+.bundle-check {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bundle-check li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-small, 13px);
+  color: var(--ink-soft, #57606a);
+}

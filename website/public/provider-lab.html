@@ -1,0 +1,177 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="web 缝隙的提供者选择策略与归一化矩阵：DeepSeek/Exa/Perplexity 同缝隙对照，fetch-http 卫生规则">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Web 提供者矩阵实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./fs-edit-lab.css">
+  <link rel="stylesheet" href="./web-tool-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#pv-main">跳到实验</a>
+  <main class="lab-shell" id="pv-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 同一缝隙不同提供者</p>
+        <h1>三家搜索引擎，一份归一化契约。</h1>
+        <p class="hero-lead">ctx.web 是搜索与抓取共用的中缝：DeepSeek 走整轮模型调用（服务端工具，严格模式绝不刮正文）、Exa 是纯检索、Perplexity 返回答案加引用。它们的返回形状天差地别，归一化后却都是「url 必填、其余可选」；maxResults 由缝隙统一裁剪。选择永不依赖注册顺序——配置、可用性、唯一性各有一条专属错误码。切下面的面板亲手推。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/02-Cordis与插件树.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./web-tool-lab.html">打开 Web 工具实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 26</span>
+        <strong>错误码与映射规则逐字来自四个包的 README。</strong>
+        <p>原始载荷是教学切片；没有真实网络请求。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：没配置 searchProvider，但 Exa 和 Perplexity 都已注册且可用——ctx.web.search() 会怎么做？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="first-wins-registration">
+            <span>按注册顺序取第一个</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="ambiguous-explicit">
+            <span>显式失败：WEB_PROVIDER_AMBIGUOUS</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="merge-all">
+            <span>三家并发跑完合并结果</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="prov-form">
+          <label>
+            <span>面板</span>
+            <select id="prov-mode" name="mode">
+              <option value="selection">选择策略——谁被执行</option>
+              <option value="normalization">归一化矩阵——三种载荷进同一份 sources</option>
+              <option value="fetch-hygiene">fetch 卫生——URL 校验规则</option>
+            </select>
+          </label>
+
+          <div id="panel-selection" hidden>
+            <label>
+              <span>config.searchProvider</span>
+              <select id="sel-configured"></select>
+            </label>
+            <label class="bundle-check"><input type="checkbox" id="reg-deepseek"><span>已注册 web-search-deepseek（凭据在）</span></label>
+            <label class="bundle-check"><input type="checkbox" id="reg-exa" checked><span>已注册 web-search-exa（EXA_API_KEY 在）</span></label>
+            <label class="bundle-check"><input type="checkbox" id="reg-px"><span>已注册 web-search-perplexity</span></label>
+            <p class="section-intro">裁决结果：</p>
+            <pre class="fe-diff" id="sel-decision">—</pre>
+            <ul class="wt-sources" id="sel-avail"></ul>
+          </div>
+
+          <div id="panel-normalize" hidden>
+            <label>
+              <span>提供者</span>
+              <select id="norm-provider" name="providerId"></select>
+            </label>
+            <label>
+              <span>maxResults = <output id="norm-max-output">5</output></span>
+              <input id="norm-max" type="range" min="1" max="10" step="1" value="5">
+              <small>由 ctx.web.search() 在缝隙层统一裁剪。</small>
+            </label>
+            <label class="bundle-check"><input type="checkbox" id="norm-no-blocks"><span>仅 DeepSeek：模拟响应缺少结构块（触发严格模式）</span></label>
+          </div>
+
+          <div id="panel-hygiene" hidden>
+            <label>
+              <span>待校验 URL（每行一条）</span>
+              <textarea id="hyg-urls" rows="4" spellcheck="false">https://example.com/page
+http://user:pass@secret.example.com
+ftp://files.example.com/pub</textarea>
+            </label>
+            <small>规则：仅 http/https；内嵌凭据拦截；超长或畸形拒绝；跨域重定向要求重新调用。</small>
+          </div>
+
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="prov-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="提供者观测值">
+          <div><dt>结局</dt><dd id="metric-outcome">—</dd></div>
+          <div><dt>错误码 / 决定</dt><dd id="metric-code">—</dd></div>
+          <div><dt>保留来源数</dt><dd id="metric-kept">—</dd></div>
+          <div><dt>有效截断</dt><dd id="metric-truncated">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="pv-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">管线 / 载荷对照</p>
+          <h2 id="pv-title">选择三步走；归一化两列对照</h2>
+        </div>
+        <span class="schema-pill">阶段 × 契约</span>
+      </div>
+      <p class="section-intro">选择面板显示读配置→查注册表→执行/抛错的三步；归一化面板左列是各家原始线形状，右列是映射后的缝隙来源。</p>
+      <div id="sel-pipeline" class="fe-pipeline"></div>
+      <pre class="fe-diff" id="norm-wire-shape">—</pre>
+      <p class="section-intro">原始载荷：</p>
+      <ul class="wt-sources" id="norm-raw"></ul>
+      <p class="section-intro">归一化后的 sources：</p>
+      <ul class="wt-sources" id="norm-result"></ul>
+      <p class="chart-note" id="norm-strict"></p>
+      <ul class="wt-sources" id="hyg-verdicts"></ul>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>四条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重跑选择表与归一化映射，核对自动选择的唯一性条件、两种配置错误码、URL 必填、缝隙级裁剪与 Perplexity 的 URL-only 引用。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/02-Cordis与插件树.html">继续读 Cordis 与插件树</a>
+    </footer>
+  </main>
+  <script type="module" src="./provider-lab.js"></script>
+</body>
+</html>

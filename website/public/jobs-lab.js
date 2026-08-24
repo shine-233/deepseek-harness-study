@@ -9,6 +9,8 @@ import {
   renderOracle,
   requireElements,
   writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
+import { installStoryRail } from './study-lab-story.js'
+import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   JOBS_ENDINGS,
@@ -212,7 +214,8 @@ function initializePage() {
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
-  bindRangeKeys(elements.step)
+    bindAutoAdvance(document.getElementById('jb-play'), elements.step, { stepMs: 650, speedSelect: document.getElementById('jb-speed') })
+bindRangeKeys(elements.step)
 
   elements.step.max = String(Number.MAX_SAFE_INTEGER)
 
@@ -242,6 +245,7 @@ function initializePage() {
 
 if (typeof document !== 'undefined') {
   initializePage()
+  installStoryRail()
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))

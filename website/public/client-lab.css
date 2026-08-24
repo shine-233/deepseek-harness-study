@@ -1,0 +1,13 @@
+/* client-lab 实验页的少量专属样式；时间线复用 jobs-lab.css，节拍带复用 shell。 */
+
+#panel-tool, #panel-fold, #panel-questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.wn-phase { border-style: dashed; }
+
+@media (forced-colors: active) {
+  .jb-step { border: 1px solid CanvasText; }
+}

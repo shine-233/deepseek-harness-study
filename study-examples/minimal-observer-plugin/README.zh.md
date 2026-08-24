@@ -43,7 +43,7 @@ pnpm --dir study-examples/minimal-observer-plugin run lint
 
 正常情况下你会先看到一行 demo 输出，随后 Node 测试全部通过，最后 lint 命令以退出码 0 结束。报告文字和 oxlint 版本可以变化；关键是三个命令都没有报错。这只证明示例自己的行为和语法规则，不证明真实 DSH 已经加载它。
 
-这两项检查不需要 API key、模型调用、本地 DSH 进程、registry 修改、Windows Registry 改写或进程注入。
+这两项检查不需要 API key，也不会启动本地 DSH 进程；它们同样不涉及 registry 修改或进程注入这类宿主层动作（原因见上面的证据表）。
 
 ## 三个教学点
 
@@ -53,7 +53,7 @@ pnpm --dir study-examples/minimal-observer-plugin run lint
 
 示例还会拒绝拼写错误的配置键，而不是静默退回默认值。导出的 Schemastery `Config` 让真实 Loader 有标准 schema 可以读取；`resolveConfig()` 继续负责直接调用时的未知键和安全整数检查。这个本地单元测试验证的是插件自己的 schema 和校验逻辑，仍然不等于真实 Loader 组合验证。
 
-Cordis 会把通过 `ctx.on()` 做出的登记记录到挂载插件的 Fiber。真实卸载时，Cordis 会随这个 Fiber 移除监听器。单元测试使用的是特意做得很小的 fake context，所以它验证了插件自己的公开交互和输出，却不冒充证明 Cordis 的实现已经运行。
+Cordis 会把通过 `ctx.on()` 做出的登记记录到挂载插件的 Fiber。真实卸载时，Cordis 会随这个 Fiber 移除监听器。单元测试使用的是特意做得很小的 fake context，所以它验证了插件自己的公开交互和输出，却不冒充证明 Cordis 的实现已经运行。「订阅、策略拒绝和卸载怎样影响一个观察插件」的完整时间线，可以在[插件订阅与日志实验](/plugin-flow-lab.html)里逐步推演。
 
 ### 2. 有边界的日志数据
 

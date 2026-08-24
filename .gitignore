@@ -44,3 +44,11 @@ worktrees/
 # untracked. Keeping the directory ignored means a stray note cannot reach the
 # public site through a directory scan.
 /research-notes/
+# One-off homepage redesign workspace: drafts, screenshots, and standalone
+# preview tooling for JournalHome. The shipped component lives in
+# website/.vitepress/theme/JournalHome.vue; the approved direction is recorded
+# in design-demos/direction-approved.md.
+/design-demos/
+
+# Local VitePress build and run logs captured during website debugging.
+/website/dsh-*.log

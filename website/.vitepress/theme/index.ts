@@ -44,6 +44,34 @@ export default {
       companion.type = 'module'
       companion.src = (base.endsWith('/') ? base : base + '/') + 'study-companion.js'
       document.head.append(companion)
+      // 测试层次模型：只在带 data-dsh-testlayers 容器的课程页实际渲染。
+      const testLayers = document.createElement('script')
+      testLayers.type = 'module'
+      testLayers.src = (base.endsWith('/') ? base : base + '/') + 'study-testlayers.js'
+      document.head.append(testLayers)
+      // 目标路线选择器（20 课）与研究优先级看板（26 课）：同样按容器存在才渲染。
+      const routes = document.createElement('script')
+      routes.type = 'module'
+      routes.src = (base.endsWith('/') ? base : base + '/') + 'study-routes.js'
+      document.head.append(routes)
+      const researchBoard = document.createElement('script')
+      researchBoard.type = 'module'
+      researchBoard.src = (base.endsWith('/') ? base : base + '/') + 'study-research-board.js'
+      document.head.append(researchBoard)
+      // 仓库地图探索器（01 课）与三种环境对比器（21 课）：同样按容器存在才渲染。
+      const repomap = document.createElement('script')
+      repomap.type = 'module'
+      repomap.src = (base.endsWith('/') ? base : base + '/') + 'study-repomap.js'
+      document.head.append(repomap)
+      const envCompare = document.createElement('script')
+      envCompare.type = 'module'
+      envCompare.src = (base.endsWith('/') ? base : base + '/') + 'study-envcompare.js'
+      document.head.append(envCompare)
+      // 索引卡片字段注解器（08 课）：同样按容器存在才渲染。
+      const indexCard = document.createElement('script')
+      indexCard.type = 'module'
+      indexCard.src = (base.endsWith('/') ? base : base + '/') + 'study-indexcard.js'
+      document.head.append(indexCard)
     }
   },
 } satisfies Theme

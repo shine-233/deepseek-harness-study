@@ -319,8 +319,12 @@ const AUTO_ADVANCE_STOPPERS = new Set()
  * @param options.stepMs 每帧间隔；按实验节奏给值——读阶段说明的页面慢些，
  *   模拟流式到达的页面快些。不给则用 650ms 的通用值。
  */
-export function bindAutoAdvance(playButton, slider, { stepMs = 650 } = {}) {
+export function bindAutoAdvance(playButton, slider, { stepMs = 650, speedSelect = null } = {}) {
+  if (playButton.dataset.wired === 'true') return
+  playButton.dataset.wired = 'true'
   let timer = 0
+  let speed = 1
+  const effectiveMs = () => Math.max(Math.round(stepMs / speed), 120)
   const setPlaying = playing => {
     playButton.setAttribute('aria-pressed', String(playing))
     writeText(playButton, playing ? '暂停' : '播放')
@@ -328,6 +332,10 @@ export function bindAutoAdvance(playButton, slider, { stepMs = 650 } = {}) {
   const stop = () => {
     if (timer !== 0) { clearInterval(timer); timer = 0 }
     setPlaying(false)
+  }
+  const start = () => {
+    if (timer !== 0) clearInterval(timer)
+    timer = setInterval(() => { if (!stepOnce()) stop() }, effectiveMs())
   }
   // 总闸（installMotionPauseToggle）冻结全页动效时，连播也一并停。
   AUTO_ADVANCE_STOPPERS.add(stop)
@@ -357,11 +365,70 @@ export function bindAutoAdvance(playButton, slider, { stepMs = 650 } = {}) {
     }
     if (endsNow) { slider.value = String(slider.min ?? 0); dispatchInput() }
     setPlaying(true)
-    timer = setInterval(() => { if (!stepOnce()) stop() }, Math.max(stepMs, 120))
+    start()
   })
+  if (speedSelect !== null) {
+    speedSelect.addEventListener('change', () => {
+      const parsed = Number(speedSelect.value)
+      speed = Number.isFinite(parsed) && parsed > 0 ? parsed : 1
+      // 播放中换档：立即按新速度重启节拍；暂停中只记住档位。
+      if (timer !== 0) start()
+    })
+  }
   slider.addEventListener('input', () => {
     if (!selfDispatch && timer !== 0) stop()
   })
+}
+
+/** 动画总闸偏好的存储键；study-theme-boot.js 在首帧前读同一个键提前冻结。 */
+const MOTION_PAUSE_KEY = 'dsh-study-motion'
+
+/**
+ * 「暂停动画」总闸：data-motion 置 paused 后，CSS 冻结全部关键帧动画、把过渡时长
+ * 归零（见 study-tokens.css），同时停掉本页所有 bindAutoAdvance 连播。
+ * 偏好写入 localStorage，后续页面由 study-theme-boot.js 在首次绘制前恢复，
+ * 避免先动一帧再停下的闪烁。按钮不存在或已接线时安静返回。
+ */
+export function installMotionPauseToggle(button = null) {
+  const target = button ?? (typeof document === 'undefined' ? null : document.getElementById('motion-toggle'))
+  if (target === null || typeof target.addEventListener !== 'function') return
+  if (target.dataset.wiredMotion === 'true') return
+  target.dataset.wiredMotion = 'true'
+  const pausedNow = () => document.documentElement.getAttribute('data-motion') === 'paused'
+  const render = () => {
+    target.setAttribute('aria-pressed', String(pausedNow()))
+    writeText(target, pausedNow() ? '恢复动画' : '暂停动画')
+  }
+  target.addEventListener('click', () => {
+    const nextPaused = !pausedNow()
+    if (nextPaused) {
+      document.documentElement.setAttribute('data-motion', 'paused')
+      // 连播定时器不受 CSS 冻结影响，必须显式停掉；恢复播放由读者再点一次。
+      for (const stop of AUTO_ADVANCE_STOPPERS) stop()
+    } else {
+      document.documentElement.removeAttribute('data-motion')
+    }
+    try {
+      localStorage.setItem(MOTION_PAUSE_KEY, nextPaused ? 'paused' : 'running')
+    } catch {
+      // 隐私模式拒绝存储时只作用于当前页，切换本身照常工作。
+    }
+    render()
+  })
+  render()
+}
+
+/*
+ * 每个 lab 页都有 #motion-toggle 按钮，而每页脚本都会导入本模块——
+ * 在这里统一接线，省去三十个页面各写一遍。无 DOM 的 Node 测试环境跳过。
+ */
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+  const wireWhenReady = () => { installMotionPauseToggle(document.getElementById('motion-toggle')) }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireWhenReady, { once: true })
+  } else {
+    wireWhenReady()
+  }
 }
 
 /**
@@ -457,4 +524,46 @@ if (typeof document !== 'undefined' && typeof document.addEventListener === 'fun
       }
     }
   }, { passive: true })
+}
+/*
+ * Metric 补间（TF Playground 式实时反馈）：
+ * 观察 .metric-grid dd 的文本变化，旧值和新值都可解析为数字时用
+ * animateNumber 滚动补间；否则直接写入。自举一次，全部实验室页生效。
+ */
+if (typeof document !== 'undefined' && typeof MutationObserver === 'function') {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+  const parseNum = text => {
+    const cleaned = text.replace(/,/g, '').trim()
+    if (/^-?\d+(\.\d+)?$/.test(cleaned)) return parseFloat(cleaned)
+    return null
+  }
+  const metricObserver = new MutationObserver(mutationList => {
+    for (const mutation of mutationList) {
+      const target = mutation.target
+      if (!(target instanceof Element)) continue
+      if (target.dataset.tweening === 'true') continue
+      const oldRaw = mutation.oldValue?.trim() ?? ''
+      const newRaw = target.textContent?.trim() ?? ''
+      const oldNum = parseNum(oldRaw)
+      const newNum = parseNum(newRaw)
+      if (oldNum === null || newNum === null || reducedMotion.matches) continue
+      if (oldNum === newNum) continue
+      target.dataset.tweening = 'true'
+      animateNumber(target, newNum, { duration: 360 })
+      setTimeout(() => { delete target.dataset.tweening }, 400)
+    }
+  })
+  let metricsObserved = false
+  const observeMetrics = () => {
+    if (metricsObserved) return
+    metricsObserved = true
+    for (const dd of document.querySelectorAll('.metric-grid dd')) {
+      metricObserver.observe(dd, { characterData: true, childList: true, subtree: true })
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { observeMetrics() }, { once: true })
+  } else {
+    observeMetrics()
+  }
 }

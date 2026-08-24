@@ -1,0 +1,182 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="客户端三面镜：ui-tool 卡片状态机、ui-conversation 折叠引擎、ui-user-questions 提问接管">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>客户端三面镜实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./jobs-lab.css">
+  <link rel="stylesheet" href="./client-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#cl-main">跳到实验</a>
+  <main class="lab-shell" id="cl-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 客户端组件族</p>
+        <h1>界面是会话的投影：状态来自切片，分组来自事实。</h1>
+        <p class="hero-lead">三个组件族撑起 Web 界面：<b>ui-tool</b> 把每次调用渲染成卡片——生命周期四态只出自冻结的 call/result 切片；<b>ui-conversation</b> 按日志序折叠出聊天流——压缩行、上下文注入披露、思考行各有各的规矩；<b>ui-user-questions</b> 用提问接管输入条——plan-review 只在五个条件齐备时才换成审阅卡。切下面的模式逐个推。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/07-HostClient示例测试发布.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./workflow-node-lab.html">打开节点折叠实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 25</span>
+        <strong>契约来自三个包的 README 与源码。</strong>
+        <p>教学数据是常量；没有真实 React 渲染或宿主回调。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：结果事件永远没到达时，工具卡的最终状态是什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="stays-running">
+            <span>一直显示「运行中」——毕竟没有证据说它停了</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="interrupted-no-change">
+            <span>interrupted——切片缺失本身就是可读的事实</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="corrupt-log">
+            <span>整条记录按损坏处理并隐藏</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="client-form">
+          <label>
+            <span>组件面板</span>
+            <select id="client-mode" name="mode"></select>
+          </label>
+
+          <div id="panel-tool" hidden>
+            <label>
+              <span>工具名（未知名字演示回落）</span>
+              <select id="ct-tool" name="tool">
+                <option value="read_file">read_file</option>
+                <option value="bash">bash</option>
+                <option value="str_replace_editor">str_replace_editor</option>
+                <option value="grep">grep</option>
+                <option value="mystery_tool">mystery_tool（未注册）</option>
+              </select>
+            </label>
+            <label class="bundle-check"><input type="checkbox" id="ct-fails"><span>结果为失败</span></label>
+            <label class="bundle-check"><input type="checkbox" id="ct-interrupted"><span>结果事件缺失（中断）</span></label>
+          </div>
+
+          <div id="panel-fold" hidden>
+            <label class="bundle-check"><input type="checkbox" id="cf-summary" checked><span>compaction/summary 在加载窗口内</span></label>
+            <label class="bundle-check"><input type="checkbox" id="cf-producer" checked><span>注入记录带有生产者名</span></label>
+          </div>
+
+          <div id="panel-questions" hidden>
+            <label>
+              <span>呈现意图</span>
+              <select id="cq-intent" name="intent"></select>
+            </label>
+            <label>
+              <span>问题数</span>
+              <select id="cq-count" name="questionCount">
+                <option value="1">1 个</option>
+                <option value="2">2 个（批量）</option>
+              </select>
+            </label>
+            <label class="bundle-check"><input type="checkbox" id="cq-binary" checked><span>二元单选（批准 + 一个备选）</span></label>
+            <label class="bundle-check"><input type="checkbox" id="cq-approve-label" checked><span>存在批准标签</span></label>
+            <label class="bundle-check"><input type="checkbox" id="cq-plan-detail" checked><span>detail 里带计划文本</span></label>
+          </div>
+
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="client-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="客户端观测值">
+          <div><dt>接表面 / 阶段数</dt><dd id="metric-surface">—</dd></div>
+          <div><dt>节点数</dt><dd id="metric-nodes">—</dd></div>
+          <div><dt>原工具卡</dt><dd id="metric-tool-card">不变</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="cl-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">当前面板推演</p>
+          <h2 id="cl-title">契约原文落到每个格子</h2>
+        </div>
+        <span class="schema-pill" id="cl-mode-pill">tool-card</span>
+      </div>
+
+      <div id="out-tool">
+        <p class="section-intro">四个阶段的状态只来自冻结切片；未知名字与失败/中断都会改变最后一列。</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">阶段</th><th scope="col">状态</th><th scope="col">卡片</th><th scope="col">锚点键</th></tr></thead>
+            <tbody id="ct-stages-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <ol class="jb-timeline" id="cf-nodes" hidden></ol>
+
+      <div id="out-questions" hidden>
+        <p class="section-intro">接管后的动作按钮：</p>
+        <div class="story-rail" id="cq-actions"></div>
+        <p class="section-intro">跳过提交空 <code>{ selected: [] }</code>；关闭以 ASK_CANCELLED 拒绝整个等待。</p>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>三条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重建同一次投影，再核对状态词表封闭性、未知名回落、压缩行展开条件与 plan-review 接管规则。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/07-HostClient示例测试发布.html">继续读 Host、Client 与发布</a>
+    </footer>
+  </main>
+  <script type="module" src="./client-lab.js"></script>
+</body>
+</html>

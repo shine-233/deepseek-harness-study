@@ -13,6 +13,7 @@ import {
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
+import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset, bindRangeKeys, bindPlotScrub } from './study-lab-kit.js'
 import {
   PLUGIN_LANES,
@@ -279,7 +280,8 @@ function initializePage() {
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
-  bindRangeKeys(elements.step)
+    bindAutoAdvance(document.getElementById('flow-play'), elements.step, { stepMs: 650, speedSelect: document.getElementById('flow-speed') })
+bindRangeKeys(elements.step)
   bindPlotScrub(elements.flow, elements.step)
 
   // 恢复前先放宽滑杆上界，避免 max=0 时 hash 步进被钳掉；真实上界由 syncStep 写回。

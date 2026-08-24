@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="计划栈三层状态机：todo_write 整表替换、plan/mode 协作状态、goal 生命周期迁移">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>计划栈实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./jobs-lab.css">
+  <link rel="stylesheet" href="./plan-stack-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#ps-main">跳到实验</a>
+  <main class="lab-shell" id="ps-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 计划栈</p>
+        <h1>Todo 换整表，Plan 走日志，Goal 有版本号。</h1>
+        <p class="hero-lead">计划栈三层各管一件事：<b>todo_write</b> 每次替换整表快照（没有增量接口）；<b>plan/mode</b> 是 logged 布尔加可选 pending——闲即提交、忙即排队；<b>goal</b> 用 revision CAS 栅栏驱动生命周期——pause/block/clear 都撤权、resume 受轮次上限约束。切下面的面板逐层推。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/37-计划栈.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./orchestration-lab.html">打开编排实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 27</span>
+        <strong>错误文案逐字来自三个包的 README。</strong>
+        <p>清单是教学常量；没有真实 agent 会话或注册表。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：模型提交了一份含两条相同 content 的 todo_write——会发生什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="partial-update">
+            <span>只写入第一处，第二处忽略</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="ignored-silent">
+            <span>静默忽略重复，正常写入其余</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="rejected-wholesale">
+            <span>整次调用被拒绝，给出重复项原文</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="stack-form">
+          <label>
+            <span>层级</span>
+            <select id="stack-mode" name="mode">
+              <option value="todo">todo —— 整表替换快照机</option>
+              <option value="plan">plan —— 协作状态机</option>
+              <option value="goal">goal —— 生命周期机</option>
+            </select>
+          </label>
+
+          <div id="panel-todo">
+            <label>
+              <span>预设清单</span>
+              <select id="todo-preset"></select>
+            </label>
+            <label>
+              <span>allowParallelInProgress</span>
+              <select id="todo-strict"></select>
+              <small>部署选择：并行工作合法与否由组合决定，不由工具硬编码。</small>
+            </label>
+          </div>
+
+          <div id="panel-plan" hidden>
+            <label class="bundle-check"><input type="checkbox" id="plan-logged"><span>logged 状态：计划已激活</span></label>
+            <label class="bundle-check"><input type="checkbox" id="plan-busy"><span>agent 正在跑一个回合（忙）</span></label>
+            <label>
+              <span>动作</span>
+              <select id="plan-action"></select>
+            </label>
+          </div>
+
+          <div id="panel-goal" hidden>
+            <label>
+              <span>当前 phase</span>
+              <select id="goal-phase"></select>
+            </label>
+            <label>
+              <span>动词</span>
+              <select id="goal-verb"></select>
+            </label>
+            <label class="bundle-check"><input type="checkbox" id="goal-cap"><span>轮次上限已打满（限制 resume）</span></label>
+          </div>
+
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="stack-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="计划栈观测值">
+          <div><dt>判定 / 结果</dt><dd id="todo-verdict">—</dd></div>
+          <div><dt>错误</dt><dd id="todo-error-metric">—</dd></div>
+          <div><dt>计数 / 迁移</dt><dd id="metric-counts">—</dd></div>
+          <div><dt>追加事件</dt><dd id="metric-event">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="ps-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">状态投影</p>
+          <h2 id="ps-title">当前层的完整状态</h2>
+        </div>
+        <span class="schema-pill">契约 × 判定</span>
+      </div>
+
+      <div id="out-todo">
+        <pre class="fe-error-box" id="todo-error-box" hidden></pre>
+        <ul class="wt-sources" id="todo-list"></ul>
+      </div>
+
+      <div id="out-plan-metrics" hidden>
+        <dl class="metric-grid" aria-label="plan 迁移结果">
+          <div><dt>结果词</dt><dd id="plan-result">—</dd></div>
+          <div><dt>logged 之后</dt><dd id="plan-logged-after">—</dd></div>
+          <div><dt>pending 之后</dt><dd id="plan-pending-after">—</dd></div>
+        </dl>
+      </div>
+
+      <div id="out-goal-metrics" hidden>
+        <dl class="metric-grid" aria-label="goal 迁移结果">
+          <div><dt>起始 phase</dt><dd id="goal-from">—</dd></div>
+          <div><dt>迁移到</dt><dd id="goal-to">—</dd></div>
+          <div><dt>激活权</dt><dd id="goal-armed">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>三条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重跑同一份校验/迁移逻辑，再核对错误文案逐字一致、封闭词表与版本单调性。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/37-计划栈.html">继续读计划栈课程</a>
+    </footer>
+  </main>
+  <script type="module" src="./plan-stack-lab.js"></script>
+</body>
+</html>

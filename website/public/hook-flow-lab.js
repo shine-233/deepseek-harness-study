@@ -14,6 +14,7 @@ import {
   requireElements,
   svgElement,
   writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
+import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset, bindPlotScrub } from './study-lab-kit.js'
 import {
   HOOK_LANES,
@@ -252,7 +253,8 @@ function initializePage() {
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
   // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
-  bindRangeKeys(elements.step)
+    bindAutoAdvance(document.getElementById('hf-play'), elements.step, { stepMs: 650, speedSelect: document.getElementById('hf-speed') })
+bindRangeKeys(elements.step)
   bindPlotScrub(elements.flow, elements.step)
 
   // 恢复前先放宽滑杆上界：max=0 时赋值会被浏览器钳回 0，hash 里的步进会丢；

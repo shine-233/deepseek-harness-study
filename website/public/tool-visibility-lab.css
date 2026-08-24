@@ -115,3 +115,17 @@ tbody tr[data-state="0"] td { opacity: 0.62; }
 .ring.is-dim-ring { opacity: 0.35; }
 tbody tr.is-traced td { background: color-mix(in srgb, var(--signal) 14%, transparent); }
 tbody tr.is-dim { opacity: 0.45; }
+
+/* Playground 式追踪传播：环 → 计数条 → 色块分级点亮，各带 80ms 级联延迟。 */
+.ring, .funnel-bar, .chip-box { transition: opacity 160ms var(--ease, ease), stroke-width 160ms var(--ease, ease), stroke 160ms var(--ease, ease); }
+.chip.is-dim, tbody tr.is-dim { transition: opacity 160ms var(--ease, ease); }
+@keyframes wn-trace-pulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+.chip.is-traced .chip-box { animation: wn-trace-pulse 300ms var(--ease, ease) 1; transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: reduce) {
+  .ring, .funnel-bar, .chip-box { transition: none; }
+  .chip.is-traced .chip-box { animation: none; }
+}

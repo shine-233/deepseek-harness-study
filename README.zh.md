@@ -2,7 +2,7 @@
 
 [![Study material quality](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml) [![Deploy documentation](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml)
 
-这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套十五个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。English mirror: [README.md](README.md)。
+这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套三十个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。English mirror: [README.md](README.md)。
 
 ## 三条入口
 
@@ -14,19 +14,22 @@
 
 发现文档事实错误、链接问题、教程无法复现或社区扩展风险时，请使用[按类型填写的 Issue 表单](https://github.com/shine-233/deepseek-harness-study/issues/new/choose)；不要提交密钥、Cookie 或私有运行日志。
 
-## 十五个可以动手的实验
+## 三十个可以动手的实验
 
-教材的核心不是"看过"，而是每个关键结论都能在一个确定性实验里验证或证伪。实验全部离线运行：固定输入、固定输出、独立 oracle、公开 canProve/cannotProve；它们是教学模型，不启动真实 DSH、provider 或模型。
+这套教材要求每个关键结论都能落到一个确定性实验里：实验全部离线运行——固定输入、固定输出、独立 oracle、公开 canProve/cannotProve；它们是教学模型，不启动真实 DSH、provider 或模型。完整清单见[实验室总览](https://shine-233.github.io/deepseek-harness-study/study-labs.html)。
 
 | 实验 | 回答什么问题 |
 | --- | --- |
 | [Turn 流程与日志对应](https://shine-233.github.io/deepseek-harness-study/turn-flow-lab.html) | 一次 Turn 怎样从输入走到 Session 日志；步进滑杆能停在任意一步；输入写进 URL hash，刷新不丢 |
-| [包依赖图证据](https://shine-233.github.io/deepseek-harness-study/package-graph-lab.html) | 227 个包、50 个组的依赖形状；含可选的 3D 组体量场景（带 2D 表格回退） |
+| [包依赖图证据](https://shine-233.github.io/deepseek-harness-study/package-graph-lab.html) | 227 个包、50 个组的依赖形状；散点/柱状/排序表三视图联动，含可选的 3D 组体量场景（带 2D 表格回退） |
 | [Profile 解析顺序](https://shine-233.github.io/deepseek-harness-study/profile-loader-lab.html) | Bundle 声明顺序怎样决定最终装配出的配置 |
-| [Session 日志重放](https://shine-233.github.io/deepseek-harness-study/session-log-lab.html) | 为什么模型可见内容必须能从事件日志重建 |
+| [Session 日志重放](https://shine-233.github.io/deepseek-harness-study/session-log-lab.html) | 为什么模型可见内容必须能从事件日志重建；含 SQLite 物理行打包面板 |
 | [LLM 流式拼装](https://shine-233.github.io/deepseek-harness-study/llm-stream-lab.html) | chunk 按到达顺序怎样拼成一条消息；finish 之后的迟到重复块为什么必须丢弃 |
+| [提示词装配与缓存边界](https://shine-233.github.io/deepseek-harness-study/prompt-assembly-lab.html) | 系统提示词按 order 升序装配后，变化点之前的前缀为什么照旧命中缓存 |
+| [文件编辑管线](https://shine-233.github.io/deepseek-harness-study/fs-edit-lab.html) | str_replace 编辑管线的阶段条与行级 diff；多义匹配为什么被拒绝 |
+| [Web 工具管线](https://shine-233.github.io/deepseek-harness-study/web-tool-lab.html) | web_fetch/web_search 的嵌套上限、封顶截断与 truncated 标记 |
 | [工具可见性三层集合](https://shine-233.github.io/deepseek-harness-study/tool-visibility-lab.html) | "已注册、模型可见、执行允许"为什么是三件事 |
-| [Code Mode 权限管线](https://shine-233.github.io/deepseek-harness-study/code-mode-evidence-lab.html) | Code Mode 子调用为什么仍要经过完整权限管线 |
+| [Code Mode 权限管线](https://shine-233.github.io/deepseek-harness-study/code-mode-evidence-lab.html) | Code Mode 子调用为什么仍要经过完整权限管线；逐帧时间轴与并发阶梯图 |
 | [上下文压缩](https://shine-233.github.io/deepseek-harness-study/compaction-lab.html) | 压缩前后各保留什么、丢什么、oracle 怎样核对 |
 | [插件订阅与日志](https://shine-233.github.io/deepseek-harness-study/plugin-flow-lab.html) | 订阅、策略拒绝和卸载怎样影响一个观察插件；插件动作与 Session 日志为什么是两回事 |
 | [Hook 瀑布短路](https://shine-233.github.io/deepseek-harness-study/hook-flow-lab.html) | 瀑布监听器直接 return 而不调用 next 会怎样；被跳过的兜底和最终结果的作者 |
@@ -34,6 +37,18 @@
 | [Session fork 与修复](https://shine-233.github.io/deepseek-harness-study/session-fork-lab.html) | fork 怎样继承父日志前缀；崩溃后的 interrupted 修复为什么记为 unknown 而不是成功 |
 | [subagent 委派](https://shine-233.github.io/deepseek-harness-study/subagent-delegate-lab.html) | 深度上限如何在边界拦下委派；子工作的回报结算与父子泳道隔离 |
 | [循环卫生](https://shine-233.github.io/deepseek-harness-study/guard-loop-lab.html) | 重复调用的阈值拦截；为什么后置结算撤不回 guard 的拒绝、执行账目如何保持平衡 |
+| [Shell 解析缝隙](https://shine-233.github.io/deepseek-harness-study/shell-seam-lab.html) | shell 请求解析成 Spec 时缺省字段留下什么 |
+| [凭据解析](https://shine-233.github.io/deepseek-harness-study/credential-lab.html) | 没有 Provider 能供应凭据引用时，fail-closed 怎样在解析处拒绝 |
+| [文件设置热发布](https://shine-233.github.io/deepseek-harness-study/settings-lab.html) | 另一个进程改了 settings.yaml 后，本进程靠 fs 监听器走同一条热发布路径 |
+| [后台任务生命周期](https://shine-233.github.io/deepseek-harness-study/jobs-lab.html) | completed/failed/late-completed 三种终局怎样竞速收场 |
+| [编排：定时与工作流](https://shine-233.github.io/deepseek-harness-study/orchestration-lab.html) | after/at/every 锚点怎样对齐定时触发，workflow agent 怎样配对推进 |
+| [工作流节点折叠](https://shine-233.github.io/deepseek-harness-study/workflow-node-lab.html) | workflow 持久记录折叠成聊天节点时保住哪些不变量 |
+| [Client 三面镜](https://shine-233.github.io/deepseek-harness-study/client-lab.html) | 工具卡状态机、会话折叠、提问接管三个 UI 契约各自承诺什么 |
+| [Provider 三面板](https://shine-233.github.io/deepseek-harness-study/provider-lab.html) | provider 选择策略、结果归一化矩阵与 fetch 卫生检查 |
+| [Trajectory 投影](https://shine-233.github.io/deepseek-harness-study/trajectory-lab.html) | 持久事件流怎样折叠成 pending/settled 的 UI 卡片 |
+| [技能目录](https://shine-233.github.io/deepseek-harness-study/skill-catalog-lab.html) | 技能信封 digest 的首次装载、替换、退役转移 |
+| [计划栈](https://shine-233.github.io/deepseek-harness-study/plan-stack-lab.html) | Todo 整表替换、Plan 状态机与 Goal 生命周期怎样落在同一份日志上 |
+| [Worker 协议](https://shine-233.github.io/deepseek-harness-study/worker-protocol-lab.html) | workflow 子任务的阶段推进、取消语义与日志边界 |
 | [研究 ↔ Debug 离线桥](https://shine-233.github.io/deepseek-harness-study/research-debug-bridge.html) | 课程网站与独立 Debug 工具怎样用显式文件交接 |
 
 ## 课程地图
@@ -54,7 +69,7 @@
 ## 与上游的边界
 
 - 上游固定提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec` 的 Git tree 有 7,903 个文件；本仓库不复制它们，每条源码链接都回到该 commit。要逐行构建时按 [UPSTREAM.md](UPSTREAM.md) 下载同一提交。
-- 官方架构与开发文档仍在 [`docs/`](docs/)；`study/` 是额外的中文学习层，不改写官方实现。
+- 官方架构与开发文档仍在 [`docs/`](docs/)；`study/` 是额外的中文学习层。本仓库对上游代码只做过两类已登记的改动：给 `ToolRuntime` 加只读 [`debugSnapshot()` 观测接口](https://github.com/shine-233/deepseek-harness-study/blob/master/.agents/notes/implemented/feature/2026-08-16-tool-runtime-debug-snapshot.zh.md)供第 23 课的离线 A/B 使用，以及少量 CI/测试适配；除此之外不改写官方实现，源码解释一律以固定提交为准。
 - [`vendor/`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/README.md) 是 Cordis 等第三方项目的固定副本，DSH 对其有本地修改；不能把每项实现都归因于上游或 DSH 原创。
 - 本仓库的导读、索引和生成器不是官方 API，不承诺跟随 DSH 未来兼容性。
 

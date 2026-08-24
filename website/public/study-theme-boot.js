@@ -21,4 +21,13 @@
   } catch {
     // 隐私模式或策略禁用存储时读不到，页面跟随系统偏好，功能不受影响。
   }
+  // 动画总闸同理：上一页按了「暂停动画」，这一页首帧就保持静止，
+  // 否则会先播一段再停。键名与 study-lab-kit.js 的 MOTION_PAUSE_KEY 一致。
+  try {
+    if (localStorage.getItem('dsh-study-motion') === 'paused') {
+      document.documentElement.setAttribute('data-motion', 'paused')
+    }
+  } catch {
+    // 读不到偏好就正常播放，与未做过选择的页面行为一致。
+  }
 })()

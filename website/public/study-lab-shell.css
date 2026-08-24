@@ -556,3 +556,105 @@ svg rect.is-rejected.is-bounce { animation: sig-bounce-y .65s ease both; stroke:
   .plot-scroll [data-step].is-thud,
   svg rect.is-rejected.is-bounce { animation: none; }
 }
+
+/* 播放速度档位：跟随 stepper-buttons 的高度与静音按钮气质。 */
+.jb-speed {
+  min-height: 30px;
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.8rem;
+}
+
+/* 叙事节拍带：Distill 式滚动位置感。粘性、可点击、当前拍高亮。 */
+.story-rail {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: var(--space-2xs);
+  overflow-x: auto;
+  padding: var(--space-2xs) 0;
+  margin: 0 0 var(--space-sm);
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  backdrop-filter: blur(10px);
+}
+.story-beat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.story-beat-num {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--brand);
+}
+.story-beat.is-active {
+  border-color: var(--brand);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-rail { scroll-behavior: auto; }
+}
+
+/* Spring 过渡：状态 pill 和徽标的颜色/背景变化不再硬切。 */
+.schema-pill,
+.tj-view-chip,
+.wn-status,
+.story-beat,
+.jb-transition {
+  transition: background-color 240ms cubic-bezier(0.34,1.56,0.64,1),
+              border-color 240ms cubic-bezier(0.34,1.56,0.64,1),
+              color 240ms cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* Metric dd 的补间期间微微放大再回弹（TF Playground 式实时感）。 */
+.metric-grid dd {
+  transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1);
+}
+.metric-grid dd[data-tweening='true'] {
+  transform: scale(1.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  .schema-pill, .tj-view-chip, .wn-status, .story-beat, .jb-transition { transition: none; }
+  .metric-grid dd[data-tweening='true'] { transform: none; }
+}
+
+/* 移动端防溢出：metric-grid 在窄屏下从固定列改为单列堆叠。 */
+@media (max-width: 640px) {
+  .metric-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .table-scroll, .plot-scroll, .nest-scroll, .stage-scroll {
+    max-width: calc(100vw - 32px);
+  }
+  /* 防溢出：所有卡片和主区域不允许子元素撑宽 */
+  .card, .trace-card, .control-strip {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+  .lab-form label {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+  svg[role="img"] {
+    max-width: 100%;
+    height: auto;
+  }
+  pre, code {
+    max-width: 100%;
+    overflow-x: auto;
+    word-break: break-all;
+  }
+}

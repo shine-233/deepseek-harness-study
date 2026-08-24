@@ -8,7 +8,8 @@ import {
   renderBoundary,
   renderOracle,
   requireElements,
-  writeText, installDeclaredIcons, bindRangeKeys, bindPlotScrub, installScrollProgress } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
+import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   TRAJECTORY_EVENTS,
@@ -37,6 +38,8 @@ function renderEvents(model, target) {
     const item = document.createElement('li')
     item.className = 'tj-event ' + (entry.applied ? 'is-applied' : 'is-future')
     item.dataset.index = String(entry.index)
+    // 事件序号就是步进滑杆的步号；带上 data-step，图上拖拽才能联动滑杆。
+    item.dataset.step = String(entry.index)
     const event = model.events[entry.index]
     const title = document.createElement('strong')
     writeText(title, '#' + String(entry.index) + ' ' + event.kind)
@@ -184,8 +187,14 @@ function initializePage() {
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
+  bindAutoAdvance(document.getElementById('traj-play'), elements.step, { stepMs: 650, speedSelect: document.getElementById('traj-speed') })
   bindRangeKeys(elements.step)
-  bindPlotScrub(elements.events, elements.step)
+  // 事件列表是纵向排布的，横向「拖到最近点」没有意义；改成点击任意一行直接跳到那一步。
+  elements.events.addEventListener('click', (event) => {
+    const item = event.target instanceof Element ? event.target.closest('[data-step]') : null
+    if (item === null) return
+    nudgeStep(Number(item.dataset.step) - Number(elements.step.value))
+  })
 
   const restored = readStateFromHash(location.hash, { step: { integerRange: [0, Number.MAX_SAFE_INTEGER] } })
   if (restored !== null && restored.ok) elements.step.value = String(restored.value.step)
