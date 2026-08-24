@@ -451,7 +451,7 @@ function initializePage() {
   const nudgeReplay = delta => {
     elements.replay.value = String(Math.min(Number(elements.replay.max),
       Math.max(Number(elements.replay.min), Number(elements.replay.value) + delta)))
-    elements.replay.dispatchEvent(new (replay?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+    elements.replay.dispatchEvent(new (elements.replay?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   document.querySelector('#replay-prev')?.addEventListener('click', () => nudgeReplay(-1))
   document.querySelector('#replay-next')?.addEventListener('click', () => nudgeReplay(1))

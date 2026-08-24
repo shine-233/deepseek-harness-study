@@ -226,7 +226,7 @@ function initializePage() {
     // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
     rebuild()
     el.step.value = el.step.max
-    el.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+    el.step.dispatchEvent(new (el.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   })
 
   // 时间轴步进：只改高亮和读数，不改推演结果。
@@ -235,7 +235,7 @@ function initializePage() {
   const nudgeStep = delta => {
     el.step.value = String(Math.min(Number(el.step.max),
       Math.max(Number(el.step.min), Number(el.step.value) + delta)))
-    el.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+    el.step.dispatchEvent(new (el.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   el.stepPrev.addEventListener('click', () => nudgeStep(-1))
   el.stepNext.addEventListener('click', () => nudgeStep(1))

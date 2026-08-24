@@ -230,7 +230,7 @@ function initializePage() {
       // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
       rebuild()
       elements.step.value = elements.step.max
-      elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+      elements.step.dispatchEvent(new (elements.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
     })
   }
 
@@ -241,7 +241,7 @@ function initializePage() {
   const nudgeStep = delta => {
     elements.step.value = String(Math.min(Number(elements.step.max),
       Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
-    elements.step.dispatchEvent(new (step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+    elements.step.dispatchEvent(new (elements.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
   }
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
