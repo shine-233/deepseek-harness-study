@@ -1,0 +1,23 @@
+/* shell-seam 实验页的少量专属样式。 */
+
+.ss-source {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--line);
+}
+
+.ss-source.is-request { border-color: var(--brand); color: var(--brand); }
+.ss-source.is-config-default { border-color: var(--signal); color: var(--signal-ink, var(--signal)); }
+.ss-source.is-clamped { border-color: var(--deny); color: var(--deny-ink); }
+.ss-source.is-executor-stamp { border-color: var(--allow); color: var(--allow-ink); background: color-mix(in srgb, var(--allow) 10%, transparent); }
+.ss-source.is-executor-inert { border-color: var(--muted); color: var(--muted); }
+
+.ss-exit-output { margin-top: 14px; }
+
+@media (forced-colors: active) {
+  .ss-source { border: 1px solid CanvasText; }
+}

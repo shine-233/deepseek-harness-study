@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="dsh-shell 的显式解析缝隙：resolve(request) 如何把省略值补成可执行的 Spec，沙箱执行器又如何盖章">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Shell 解析缝隙实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./shell-seam-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#ss-main">跳到实验</a>
+  <main class="lab-shell" id="ss-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 能力缝隙</p>
+        <h1>请求说「做什么」，Spec 说「确切怎么做」。</h1>
+        <p class="hero-lead">dsh-shell 把 Service Definition 拆成一道显式解析缝隙：<code>abstract resolve(request): Spec</code>。workdir、timeoutMs、stdoutMaxBytes 在这里补默认、被封顶；sandboxPolicy 要么由调用方给、要么被沙箱执行器盖默认章、要么在本地执行器上保持惰性 undefined。run/start 只收 Spec——它们永远不会再碰默认值。换一个执行器，看同一份请求怎样解析出不同的 Spec。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/02-Cordis与插件树.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./fs-edit-lab.html">打开文件编辑实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 18</span>
+        <strong>默认值逐字取自 bash-local 的 Config。</strong>
+        <p>没有真实子进程；退出码面板演示的是渲染契约的往返。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：请求里没给 sandboxPolicy，执行器换成 bash-sandbox——解析出的 Spec 里这个键是什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="rejected">
+            <span>解析直接报错：缺策略不许启动</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="stamped-by-executor">
+            <span>由沙箱执行器的 resolve 盖上默认章</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="passed-null">
+            <span>原样带 null，运行时再补</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="shell-form">
+          <label>
+            <span>执行器（同一个 Service Definition）</span>
+            <select id="shell-executor" name="executor"></select>
+          </label>
+          <label>
+            <span>request.workdir</span>
+            <select id="shell-workdir" name="workdir">
+              <option value="omit">省略——交给 resolve 补默认</option>
+              <option value="/custom/dir">/custom/dir（显式给出）</option>
+            </select>
+          </label>
+          <label>
+            <span>request.timeoutMs</span>
+            <select id="shell-timeout" name="timeoutMs">
+              <option value="omit">省略——配置默认 120000</option>
+              <option value="300000">300000</option>
+              <option value="900000">900000（超过 maxTimeoutMs，看封顶）</option>
+            </select>
+          </label>
+          <label>
+            <span>request.sandboxPolicy</span>
+            <select id="shell-policy" name="policy">
+              <option value="omit">省略</option>
+              <option value="read-only">read-only @ /workspace（显式给出）</option>
+              <option value="danger-full-access">danger-full-access @ /workspace</option>
+            </select>
+          </label>
+          <button class="button button-primary" type="submit">重新解析</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="shell-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="解析观测值">
+          <div><dt>Spec 键数</dt><dd id="metric-filled">—</dd></div>
+          <div><dt>必需键缺口</dt><dd id="metric-missing">—</dd></div>
+          <div><dt>被封顶字段</dt><dd id="metric-clamped">—</dd></div>
+          <div><dt>沙箱策略 sandboxPolicy</dt><dd id="metric-policy">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="seam-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="layers">请求 → Spec</p>
+          <h2 id="seam-title">每个键从哪里来</h2>
+        </div>
+        <span class="schema-pill">来源徽章</span>
+      </div>
+      <p class="section-intro">左列是 Spec 的键，中列是解析后的值，右列徽章标出来源：请求显式给出、配置补默认、封顶，或沙箱执行器在 resolve 里盖的章。run/start 只看这张表的最左两列。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="seam-table-caption">当前输入的 Spec</caption>
+          <thead>
+            <tr>
+              <th scope="col">Spec 键</th>
+              <th scope="col">解析值</th>
+              <th scope="col">来源</th>
+              <th scope="col">备注</th>
+            </tr>
+          </thead>
+          <tbody id="seam-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重跑一次解析比对条目，再核对 Spec 无缺口、封顶规则、沙箱盖章与惰性透传的分界，以及请求对象不可变。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="exit-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="terminal">渲染契约</p>
+          <h2 id="exit-title">run() 不拒绝非零退出：标记怎么往返</h2>
+        </div>
+        <span class="schema-pill">退出码标记 · parseExitStatus 往返</span>
+      </div>
+      <p class="section-intro">前台运行的超时击杀与非零退出都 resolve 成带描述的 ShellRunResult，只有基础设施故障才 reject。工具层把结果渲染成正文加一行 <code>[exit code: N]</code> / <code>[killed by signal: X]</code> 标记，presentResult 再用 parseExitStatus 把它拆回输出体和状态徽章。改下面的值看这趟往返。</p>
+      <form class="lab-form" onsubmit="return false">
+        <label>
+          <span>模拟退出状态</span>
+          <select id="exit-code">
+            <option value="0">0（成功）</option>
+            <option value="1">1（非零退出）</option>
+            <option value="127">127（命令未找到）</option>
+            <option value="SIGTERM">SIGTERM（超时击杀）</option>
+          </select>
+        </label>
+      </form>
+      <pre class="fe-diff ss-exit-output" id="exit-output">—</pre>
+      <p class="chart-note">拆出的状态徽章：<code id="exit-pill">—</code></p>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/02-Cordis与插件树.html">继续读 Cordis 与插件树</a>
+    </footer>
+  </main>
+  <script type="module" src="./shell-seam-lab.js"></script>
+</body>
+</html>

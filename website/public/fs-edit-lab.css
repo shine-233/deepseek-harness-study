@@ -1,0 +1,65 @@
+/* fs-edit 实验页的少量专属样式；骨架复用 study-lab-shell。 */
+
+.fe-pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--space-2xs);
+}
+
+.fe-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 128px;
+  max-width: 220px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.fe-stage strong { font-size: 0.86rem; }
+.fe-stage small { color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
+
+.fe-stage.is-ok { border-color: var(--allow); background: color-mix(in srgb, var(--allow) 10%, transparent); }
+.fe-stage.is-fail { border-color: var(--deny); background: color-mix(in srgb, var(--deny) 10%, transparent); }
+.fe-stage.is-fail strong { color: var(--deny-ink); }
+
+.fe-arrow { align-self: center; color: var(--muted); }
+
+.fe-diff {
+  display: block;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.fe-diff span { display: block; white-space: pre; }
+.fe-diff .is-add { color: var(--allow-ink, var(--allow)); background: color-mix(in srgb, var(--allow) 14%, transparent); }
+.fe-diff .is-del { color: var(--deny-ink); background: color-mix(in srgb, var(--deny) 12%, transparent); text-decoration: line-through; text-decoration-thickness: 1px; }
+.fe-diff .is-ctx { color: var(--muted); }
+
+.fe-error-box {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--deny);
+  border-left-width: 4px;
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--deny) 8%, transparent);
+  color: var(--deny-ink, var(--deny));
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.fe-empty-diff { color: var(--muted); margin: 10px 0 0; }
+
+@media (forced-colors: active) {
+  .fe-stage, .fe-diff, .fe-error-box { border: 1px solid CanvasText; }
+}

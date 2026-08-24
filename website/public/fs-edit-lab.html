@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="str_replace_editor 的唯一匹配替换、失败语义与沙箱策略检查：可交互的文件编辑管线实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>文件编辑管线实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./fs-edit-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#fe-main">跳到实验</a>
+  <main class="lab-shell" id="fe-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 文件工具与呈现</p>
+        <h1>old_str 必须逐字、唯一；不唯一就一次都不写。</h1>
+        <p class="hero-lead">str_replace_editor 的写入走一条固定管线：解析路径 → fs/edit-intent 预检 → stat → 读原文 → 数 old_str 的逐字出现 → 写入（replaceIfVersion 版本号 + 沙箱执行）。零次匹配和多于一次匹配都会在写入前停下；沙箱在写入这一步执法，拒绝被映射成一行 marker。改下面的输入，看管线在哪一格停住。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./tool-visibility-lab.html">打开工具可见性实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 17</span>
+        <strong>报错文案逐字来自上游源码。</strong>
+        <p>教学文件是固定常量；不读写真实磁盘，也不启动任何进程。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：把 <code>retries: 3</code> 替换成 <code>retries: 5</code>——这份配置文件里它出现了两次，上游会怎么做？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="first-wins">
+            <span>替换第一处，第二处保留</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="ambiguous">
+            <span>整次拒绝并报出行号——一次都不写</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="merged">
+            <span>两处都替换成 retries: 5</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="fsedit-form">
+          <label>
+            <span>目标文件</span>
+            <select id="fs-target" name="target"></select>
+            <small>/tmp/notes.txt 在 workspace 外：配合 workspace-write 档位演示越界拒绝。</small>
+          </label>
+          <label>
+            <span>沙箱档位</span>
+            <select id="fs-sandbox" name="sandboxMode"></select>
+            <small>read-only 全拒；workspace-write 只放行 workspace 内；danger-full-access 不设防。</small>
+          </label>
+          <label>
+            <span>old_str（必须逐字匹配）</span>
+            <textarea id="fs-old-str" name="oldStr" rows="2" spellcheck="false">timeout: 30s</textarea>
+          </label>
+          <label>
+            <span>new_str（留空即删除）</span>
+            <textarea id="fs-new-str" name="newStr" rows="2" spellcheck="false">timeout: 45s</textarea>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="fs-preset-ambiguous">填入多义示例</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="fsedit-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="编辑观测值">
+          <div><dt>匹配次数</dt><dd id="metric-matches">—</dd></div>
+          <div><dt>命中行</dt><dd id="metric-match-line">—</dd></div>
+          <div><dt>结局</dt><dd id="metric-outcome">—</dd></div>
+          <div><dt>版本号</dt><dd id="metric-version">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="fe-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">编辑管线</p>
+          <h2 id="fe-title">从 resolve 到 write 的六格流水线</h2>
+        </div>
+        <span class="schema-pill">阶段 × 判定</span>
+      </div>
+      <p class="section-intro">每一格对应 replaceInFile 里的一段真实代码。失败的那一格会标红并给出上游原文报错；后面的格子显示「没有到达」。</p>
+      <div id="fs-pipeline"></div>
+      <p class="chart-note" id="fs-diff-note"></p>
+      <pre class="fe-error-box" id="fs-error-box" hidden></pre>
+      <div id="fs-diff"></div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五条规则逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重跑同一份匹配算法，再核对结果类型与匹配次数的对应、多义行号复算、沙箱门、失败不落盘和 diff 载荷；它不读渲染层的任何中间量。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-card card" aria-labelledby="fe-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="fe-table-title">管线判定表</h2>
+        </div>
+        <span class="schema-pill">不用脚本也能读</span>
+      </div>
+      <p class="section-intro">管线的每一格在这张表里逐行给出：阶段、是否通过、细节、匹配次数和是否被沙箱拒绝。</p>
+      <div class="table-scroll">
+        <table>
+          <caption id="fs-table-caption">当前输入的全部阶段</caption>
+          <thead>
+            <tr>
+              <th scope="col">阶段</th>
+              <th scope="col">通过</th>
+              <th scope="col">细节</th>
+              <th scope="col">匹配数</th>
+              <th scope="col">沙箱</th>
+            </tr>
+          </thead>
+          <tbody id="fs-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/13-官方工具插件完整契约.html">继续读工具插件完整契约</a>
+    </footer>
+  </main>
+  <script type="module" src="./fs-edit-lab.js"></script>
+</body>
+</html>
