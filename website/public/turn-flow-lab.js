@@ -117,6 +117,8 @@ function renderTrace(model, target, note) {
     if (entry.logged) classes.push('is-logged')
     if (entry.denied === true) classes.push('is-denied')
     if (entry.failed === true) classes.push('is-failed')
+    // 当前推进位置（upTo 对应的步）高亮为活跃点
+    if (entry.index === model.input.upTo && !model.aborted) classes.push('is-current-step')
     const dot = svgElement('circle', {
       'data-reveal': '',
       cx: x, cy: y, r: 8, class: classes.join(' '), 'data-step': String(entry.index),

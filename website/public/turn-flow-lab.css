@@ -18,12 +18,32 @@
 .trace-dot.is-failed { stroke: var(--signal); stroke-dasharray: 3 2; }
 .trace-dot:hover { r: 11; }
 
-/* 连线是关系而不是数值，所以用虚线，且不参与任何长度比较。 */
+/* 连线是关系而不是数值，所以用虚线，且不参与任何长度比较。
+ * 流动动画：stroke-dashoffset 递增让虚线沿路径方向"行进"，
+ * 直观表达数据从日志事件流向模型请求。 */
 .pair-link {
   fill: none;
   stroke: color-mix(in srgb, var(--allow) 62%, transparent);
   stroke-dasharray: 5 4;
   stroke-width: 2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pair-link {
+    animation: pair-flow 1.2s linear infinite;
+  }
+}
+@keyframes pair-flow {
+  to { stroke-dashoffset: -18; } /* 5+4=9, 走两个周期回到原点 */
+}
+
+/* 活跃步骤的圆点脉冲环：当前推进到的步骤有呼吸感 */
+.trace-dot.is-current-step {
+  animation: dot-pulse-ring 1.5s ease-out infinite;
+}
+@keyframes dot-pulse-ring {
+  0% { stroke-width: 3; r: 10; opacity: 1; }
+  100% { stroke-width: 0; r: 16; opacity: 0; }
 }
 
 tbody tr[data-state="orphan"] td { color: var(--deny-ink); font-weight: 700; }
@@ -32,6 +52,8 @@ tbody tr[data-state="failed"] td:nth-child(3) { color: var(--signal-ink); }
 
 @media (prefers-reduced-motion: reduce) {
   .trace-dot { transition: none; }
+  .pair-link { animation: none !important; }
+  .trace-dot.is-current-step { animation: none !important; }
 }
 
 /*
