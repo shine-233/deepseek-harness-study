@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Web GUI 宿主半区：路由表扫描、回退座位与目录选择器接缝替换">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>宿主路由与接缝实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./host-gateway-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#hg-main">跳到实验</a>
+  <main class="lab-shell" id="hg-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 宿主半区</p>
+        <h1>没人认领的请求才轮到回退座位；接缝换了后端，消费方的契约原样不动。</h1>
+        <p class="hero-lead">webserver 是所有客户端形态共用的 HTTP 载体。请求进来先扫已注册路由，命中即由注册插件应答；全部未命中时，坐在回退座位上的 frontend-static 才把 SPA dist 发出去。目录选择走另一条思路：ctx.directoryPicker 是一条共享接缝，native 与 browse 两个后端互相替换，auto 按宿主能力装配其一——消费方的请求契约一个字都不改。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/07-HostClient示例测试发布.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./client-lab.html">打开客户端组件实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 07</span>
+        <strong>契约来自 host/README 与各包 README。</strong>
+        <p>路由表是教学示例，不是 apiproxy 生产清单。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：GET / 这个 SPA 文档请求进来时，frontend-static 什么时候出手？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="first-look">
+            <span>最先出手：静态文件服务是默认处理者</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="after-miss">
+            <span>最后出手：所有已注册路由都没认领才轮到它</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="never-doc">
+            <span>不出手：文档请求直接 404</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="host-form">
+          <label>
+            <span>进来的请求</span>
+            <select id="host-request" name="request"></select>
+            <small id="host-request-note"></small>
+          </label>
+          <label>
+            <span>目录选择器后端</span>
+            <select id="host-picker" name="picker"></select>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="host-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="请求路径步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="hg-step-output">0</output> 步</span>
+            <input id="hg-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数；之后的步骤淡出显示。键盘：← / → 逐步，Home / End 直达首末。</small>
+          </label>
+          <div class="stepper-buttons"><button type="button" class="button button-quiet" id="hg-play" aria-pressed="false">播放</button><select id="hg-speed" class="hg-speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+            <button class="button button-quiet" id="hg-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="hg-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="hg-step-caption" role="status" aria-live="polite"></p>
+        </div>
+        <dl class="metric-grid" aria-label="请求观测值">
+          <div><dt>应答方</dt><dd id="metric-responder">—</dd></div>
+          <div><dt>扫描步数</dt><dd id="metric-scan">—</dd></div>
+          <div><dt>走了回退座位</dt><dd id="metric-fallback">—</dd></div>
+          <div><dt>接缝后面的注册者</dt><dd id="metric-backend">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="hg-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">请求路径</p>
+          <h2 id="hg-title">从载体进入到应答离开的每一步</h2>
+        </div>
+        <span class="schema-pill">载体 × 扫描 × 应答</span>
+      </div>
+      <p class="section-intro">每一格是一次宿主动作：扫描格逐条比较路由表，应答格标出是谁出的手——已注册路由还是回退座位。</p>
+      <ol class="hg-timeline" id="hg-timeline"></ol>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验只读模型：核对单载体、短路、回退时机、接缝契约不变和确定性重放。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/07-HostClient示例测试发布.html">继续读 Host/Client 示例测试发布</a>
+    </footer>
+  </main>
+  <script type="module" src="./host-gateway-lab.js"></script>
+</body>
+</html>

@@ -57,6 +57,10 @@ const TRACKED_LAB_IDS = new Set([
   'trajectory',
   'skill-catalog',
   'context',
+  'code-run',
+  'host-gateway',
+  'invariant',
+  'storage-hub',
 ])
 
 const VALID_GROUPS = new Set(['all', 'main', 'plugin', 'evidence'])

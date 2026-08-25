@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Code 运行结果分类学：error 是字段不是 reject，六种失败类彼此正交，binding 命名空间三道检查">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Code 运行结果分类实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./code-run-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#cr-main">跳到实验</a>
+  <main class="lab-shell" id="cr-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 基础设施</p>
+        <h1>程序失败不是异常路径：error 住在结果字段里。</h1>
+        <p class="hero-lead">CodeRuntime 把一段程序交给执行基底跑：run() 永远 resolve 一个 { value?, logs, error? }。六种失败类彼此正交——exception、timeout、abort、worker-exit、invalid-output、output-limit，谁先到就报哪一种，互不混用。binding 命名空间要过三道检查：标识符形状、非保留字、不占后端自有槽位；$tools 这类 JS 专属拼写在任何后端都被拒绝。切剧本和命名空间，逐步推时间线。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./code-mode-evidence-lab.html">打开 Code Mode 权限实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 33</span>
+        <strong>契约逐条来自 code-runtime/src/types.ts 的类型注释。</strong>
+        <p>时间戳用步序号代替；没有真实 worker 线程或进程。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：程序抛了 TypeError，调用 run() 的那一侧会看到什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="rejects">
+            <span>run() 被 reject，调用方要 try/catch</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="error-field">
+            <span>run() 照常 resolve，错误是结果上的 error 字段</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="silent-null">
+            <span>返回值里 value 为 null，其余什么都没有</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="code-run-form">
+          <label>
+            <span>运行剧本</span>
+            <select id="code-run-scenario" name="scenario"></select>
+            <small id="code-run-scenario-note"></small>
+          </label>
+          <label>
+            <span>binding 命名空间</span>
+            <select id="code-run-binding" name="binding"></select>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="code-run-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="运行时间线步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="cr-step-output">0</output> 步</span>
+            <input id="cr-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数；之后的步骤淡出显示。键盘：← / → 逐步，Home / End 直达首末。</small>
+          </label>
+          <div class="stepper-buttons"><button type="button" class="button button-quiet" id="cr-play" aria-pressed="false">播放</button><select id="cr-speed" class="cr-speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+            <button class="button button-quiet" id="cr-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="cr-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="cr-step-caption" role="status" aria-live="polite"></p>
+        </div>
+        <dl class="metric-grid" aria-label="运行观测值">
+          <div><dt>失败类</dt><dd id="metric-failure">—</dd></div>
+          <div><dt>日志条数</dt><dd id="metric-logs">—</dd></div>
+          <div><dt>run() 是否 resolve</dt><dd id="metric-resolved">—</dd></div>
+          <div><dt>启动前被拒</dt><dd id="metric-blocked">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="cr-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">运行时间线</p>
+          <h2 id="cr-title">从 bindings 校验到结果结算的每一步</h2>
+        </div>
+        <span class="schema-pill">校验 × 执行 × 结算</span>
+      </div>
+      <p class="section-intro">每一格是一次运行时动作：非法命名空间会让时间线停在第一步——装配在任何程序执行之前大声失败。</p>
+      <ol class="cr-timeline" id="cr-timeline"></ol>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>四条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验只读模型：核对 error 字段语义、失败类与剧本一一对应、无损 JSON 边界和确定性重放。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">继续读确定性可视化实验协议</a>
+    </footer>
+  </main>
+  <script type="module" src="./code-run-lab.js"></script>
+</body>
+</html>

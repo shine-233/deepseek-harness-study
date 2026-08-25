@@ -613,7 +613,12 @@ if (typeof document !== 'undefined' && typeof MutationObserver === 'function') {
 if (typeof document !== 'undefined' && typeof IntersectionObserver === 'function') {
   const sentinel = document.createElement('div')
   sentinel.setAttribute('aria-hidden', 'true')
-  sentinel.style.cssText = 'position:absolute;top:0;height:' + (window.innerHeight * 2) + 'px;width:1px;pointer-events:none'
+  // 逐属性赋值走 CSSOM，不触发 style-src 'self' 对内联样式的拦截；cssText 会。
+  sentinel.style.position = 'absolute'
+  sentinel.style.top = '0'
+  sentinel.style.height = (window.innerHeight * 2) + 'px'
+  sentinel.style.width = '1px'
+  sentinel.style.pointerEvents = 'none'
   const btn = document.createElement('a')
   btn.href = '#'
   btn.className = 'back-to-top'

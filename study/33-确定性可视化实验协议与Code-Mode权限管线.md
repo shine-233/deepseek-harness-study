@@ -26,6 +26,8 @@
 
 “拒绝后主体不执行”也不是动画作者凭经验补的。`prepareExecution` 在策略或 guard 产生 denial 时返回 `post-result`，而不是 `dispatch`；真正调用工具主体的 `dispatchToolBody` 只有在调度器拿到 `dispatch` 后才会运行。可以对照 [``index.ts`` 的 prepare 路径](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts#L1463-L1507)和[主体调用路径](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/packages/core/tools/src/index.ts#L1527-L1560)。
 
+被调度的程序真正跑起来之后，结局还有一套自己的分类学：`run()` 对失败的程序也不 reject，错误住在结果字段的 `error` 上；exception、timeout、abort、worker-exit、invalid-output、output-limit 六种失败类彼此正交；binding 命名空间要过标识符形状、非保留字、非后端槽位三道检查。[Code 运行结果分类实验](/code-run-lab.html)按剧本 × 命名空间推演这条时间线，非法命名空间会让时间线停在第一步——装配在任何程序执行之前大声失败。
+
 ## 三层证据不要混在一起
 
 | 层 | 本页使用的证据 | 能说什么 | 不能说什么 |

@@ -19,6 +19,10 @@ import { buildGuardLoopModel } from '../website/public/guard-loop-model.js'
 import { buildSubagentDelegateModel } from '../website/public/subagent-delegate-model.js'
 import { buildHookFlowModel } from '../website/public/hook-flow-model.js'
 import { buildSessionForkModel } from '../website/public/session-fork-model.js'
+import { buildCodeRunModel } from '../website/public/code-run-model.js'
+import { buildHostGatewayModel } from '../website/public/host-gateway-model.js'
+import { buildInvariantModel } from '../website/public/invariant-model.js'
+import { buildStorageModel } from '../website/public/storage-hub-model.js'
 
 const PUBLIC_DIR = new URL('../website/public/', import.meta.url)
 const read = name => readFileSync(new URL(name, PUBLIC_DIR), 'utf8')
@@ -113,6 +117,82 @@ const LABS = [
     ranges: {},
     expectedSteps: input => buildSessionForkModel(input).steps.length,
     modelInput: picked => ({ crash: picked.crash, fork: picked.fork }),
+  },
+  {
+    id: 'code-run',
+    page: 'code-run-lab.html',
+    script: 'code-run-lab.js',
+    feedback: '#code-run-feedback',
+    step: '#cr-step',
+    caption: '#cr-step-caption',
+    selects: {
+      'code-run-scenario': ['success', 'exception', 'timeout', 'abort', 'worker-exit', 'invalid-output', 'output-limit'],
+      'code-run-binding': ['tools', 'app_data', '$tools', 'console', '__dsh_main__', 'for'],
+    },
+    ranges: {},
+    expectedSteps: input => buildCodeRunModel(input).steps.length,
+    modelInput: picked => ({
+      scenario: picked['code-run-scenario'],
+      binding: picked['code-run-binding'],
+    }),
+  },
+  {
+    id: 'host-gateway',
+    page: 'host-gateway-lab.html',
+    script: 'host-gateway-lab.js',
+    feedback: '#host-feedback',
+    step: '#hg-step',
+    caption: '#hg-step-caption',
+    selects: {
+      'host-request': ['inventory-api', 'picker-api', 'spa-doc', 'spa-asset'],
+      'host-picker': ['native', 'browse', 'auto'],
+    },
+    ranges: {},
+    expectedSteps: input => buildHostGatewayModel(input).steps.length,
+    modelInput: picked => ({
+      request: picked['host-request'],
+      picker: picked['host-picker'],
+    }),
+  },
+  {
+    id: 'invariant',
+    page: 'invariant-lab.html',
+    script: 'invariant-lab.js',
+    feedback: '#invariant-feedback',
+    step: '#iv-step',
+    caption: '#iv-step-caption',
+    selects: {
+      'invariant-package': ['@deepseek-ai/dsh-jobs', '@deepseek-ai/dsh-invariants'],
+      'invariant-filter': ['unfiltered', 'allowlist-match', 'allowlist-miss', 'blocklist-hit', 'disabled'],
+      'invariant-outcome': ['pass', 'violation', 'startup-error'],
+    },
+    ranges: {},
+    expectedSteps: input => buildInvariantModel(input).steps.length,
+    modelInput: picked => ({
+      packageName: picked['invariant-package'],
+      filter: picked['invariant-filter'],
+      outcome: picked['invariant-outcome'],
+    }),
+  },
+  {
+    id: 'storage-hub',
+    page: 'storage-hub-lab.html',
+    script: 'storage-hub-lab.js',
+    feedback: '#storage-feedback',
+    step: '#sh-step',
+    caption: '#sh-step-caption',
+    selects: {
+      'storage-backend': ['json', 'sqlite', 'nofacet'],
+      'storage-scenario': ['happy-path', 'version-mismatch', 'malformed-medium', 'double-open', 'closed-unit', 'missing-key-delete'],
+      'storage-unit': ['todos_v2', 'Todos-V2'],
+    },
+    ranges: {},
+    expectedSteps: input => buildStorageModel(input).steps.length,
+    modelInput: picked => ({
+      backend: picked['storage-backend'],
+      scenario: picked['storage-scenario'],
+      unitName: picked['storage-unit'],
+    }),
   },
 ]
 

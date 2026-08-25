@@ -1,0 +1,56 @@
+/* invariant-lab 页面专属样式：注册时间线。 */
+
+.iv-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.iv-step {
+  border: 1px solid var(--lm-line, var(--vp-c-divider));
+  border-left-width: 4px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--vp-c-bg) 88%, transparent);
+  transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.iv-step.is-registered {
+  border-left-color: var(--vp-c-green-1);
+}
+
+.iv-step.is-hit {
+  border-left-color: var(--vp-c-brand-1);
+}
+
+.iv-step.is-fallback {
+  border-left-color: var(--vp-c-yellow-1);
+}
+
+.iv-step.is-current {
+  transform: translateX(4px);
+}
+
+.iv-step.is-future {
+  opacity: 0.42;
+}
+
+.iv-step-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.iv-step-detail {
+  margin: 6px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--vp-c-text-2);
+}
+
+.iv-speed {
+  min-width: 72px;
+}

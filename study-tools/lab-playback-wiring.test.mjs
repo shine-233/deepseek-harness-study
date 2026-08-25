@@ -24,6 +24,10 @@ const STEPPER_LABS = [
   ['session-fork', 'sf'],
   ['subagent-delegate', 'sd'],
   ['trajectory', 'traj'],
+  ['code-run', 'cr'],
+  ['host-gateway', 'hg'],
+  ['invariant', 'iv'],
+  ['storage-hub', 'sh'],
 ]
 
 test('every stepper lab offers a play button and a speed select', () => {

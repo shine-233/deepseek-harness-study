@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="存储后端契约：切面缺位大声失败、单元名正则门、版本戳与关闭语义">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>存储后端契约实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./storage-hub-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sh-main">跳到实验</a>
+  <main class="lab-shell" id="sh-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 基础设施</p>
+        <h1>写完即持久；关了就别想再写。</h1>
+        <p class="hero-lead">存储枢纽把「介质」交给后端：一个后端独占一种介质，kv 这类切面可选——缺位就在解析点大声失败。单元名同时充当文件名和 SQL 标识符段，所以 UNIT_NAME_RE 直接拒绝大写和连字符，不做转义。打开时版本戳对不上按 version-mismatch 拒绝；putRecord 一旦 resolve 即持久；deleteRecord 对缺失键幂等；close 排空在途写入，之后的一切调用报 closed。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/05-Session日志与恢复.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./session-log-lab.html">打开 Session 日志实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 05</span>
+        <strong>契约来自 storage/storage/src/backend.ts 与 registry.ts。</strong>
+        <p>没有真实文件系统或 SQLite 文件；物理行布局见第 05 课面板。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：deleteRecord('records', 'ghost')，键不存在时会发生什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="rejects-missing">
+            <span>拒绝并报 key-not-found，让调用方重试</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="idempotent-noop">
+            <span>幂等空操作：照常 resolve，什么都不删</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="tombstone">
+            <span>写入一条墓碑记录，下次读取时报删除</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="storage-form">
+          <label>
+            <span>后端</span>
+            <select id="storage-backend" name="backend"></select>
+            <small id="storage-backend-note"></small>
+          </label>
+          <label>
+            <span>剧本</span>
+            <select id="storage-scenario" name="scenario"></select>
+          </label>
+          <label>
+            <span>单元名</span>
+            <select id="storage-unit" name="unitName"></select>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。</small>
+        </form>
+        <p class="feedback" id="storage-feedback" role="status" aria-live="polite"></p>
+        <div class="stepper" role="group" aria-label="单元生命周期步进">
+          <label class="stepper-seek">
+            <span>推进到第 <output id="sh-step-output">0</output> 步</span>
+            <input id="sh-step" type="range" min="0" max="0" step="1" value="0">
+            <small>只改变高亮和读数；之后的步骤淡出显示。键盘：← / → 逐步，Home / End 直达首末。</small>
+          </label>
+          <div class="stepper-buttons"><button type="button" class="button button-quiet" id="sh-play" aria-pressed="false">播放</button><select id="sh-speed" class="sh-speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+            <button class="button button-quiet" id="sh-step-prev" type="button">上一步</button>
+            <button class="button button-quiet" id="sh-step-next" type="button">下一步</button>
+          </div>
+          <p class="step-caption" id="sh-step-caption" role="status" aria-live="polite"></p>
+        </div>
+        <dl class="metric-grid" aria-label="存储观测值">
+          <div><dt>错误码</dt><dd id="metric-errorcode">—</dd></div>
+          <div><dt>打开的单元</dt><dd id="metric-openunit">—</dd></div>
+          <div><dt>写入即持久</dt><dd id="metric-durable">—</dd></div>
+          <div><dt>删除幂等</dt><dd id="metric-idempotent">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="sh-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">单元生命周期</p>
+          <h2 id="sh-title">从解析后端到读回快照的每一步</h2>
+        </div>
+        <span class="schema-pill">解析 × 打开 × 写入 × 关闭</span>
+      </div>
+      <p class="section-intro">每一格是一次存储动作：错误格带出上游词汇表里的稳定错误码——version-mismatch、malformed-medium、closed 都是原文。</p>
+      <ol class="sh-timeline" id="sh-timeline"></ol>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>六条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验只读模型：核对失败点顺序、名字门、错误码词汇、持久语义、幂等与确定性重放。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/05-Session日志与恢复.html">继续读 Session 日志与恢复</a>
+    </footer>
+  </main>
+  <script type="module" src="./storage-hub-lab.js"></script>
+</body>
+</html>

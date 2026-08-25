@@ -1,0 +1,56 @@
+/* host-gateway-lab 页面专属样式：请求路径时间线。 */
+
+.hg-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.hg-step {
+  border: 1px solid var(--lm-line, var(--vp-c-divider));
+  border-left-width: 4px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--vp-c-bg) 88%, transparent);
+  transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.hg-step.is-hit {
+  border-left-color: var(--vp-c-brand-1);
+}
+
+.hg-step.is-registered {
+  border-left-color: var(--vp-c-green-1);
+}
+
+.hg-step.is-fallback {
+  border-left-color: var(--vp-c-yellow-1);
+}
+
+.hg-step.is-current {
+  transform: translateX(4px);
+}
+
+.hg-step.is-future {
+  opacity: 0.42;
+}
+
+.hg-step-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hg-step-detail {
+  margin: 6px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--vp-c-text-2);
+}
+
+.hg-speed {
+  min-width: 72px;
+}

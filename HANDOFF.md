@@ -1,6 +1,6 @@
 # DeepSeek Harness 研究项目交接总册
 
-更新时间：2026-08-22
+更新时间：2026-08-25
 交接状态：工作树干净，全部改动已提交并推送；两条 CI 工作流绿色。
 权威范围：本文件负责解释当前仓库状态、验证入口和下一步；历史研究取证（参考站浏览器记录、外部项目矩阵、许可证边界、去 AI 味来源）已归档到 [research-notes/](research-notes/)，结论本身已毕业到 study 课程页。
 
@@ -16,7 +16,7 @@
 
 - 分支：`work`，推送目标 `origin/master`，两者始终同步。
 - 教材固定上游提交：`aa6c361a972c8369148dea7380bb5c21c24e07ec`（`release(dsh): 0.1.1-rc.2`，2026-08-21）。换基线流程见 study/18。
-- 规模：120 个中文学习页面、2,973 个源文件索引（78 页，含 1 页 packages/client 总览与 11 页分页）、24 个离线实验、190 个学习工具测试 + 8 个示例测试。
+- 规模：120 个中文学习页面、2,973 个源文件索引（78 页，含 1 页 packages/client 总览与 11 页分页）、54 个离线实验（48 张在册卡 + query/sandbox/session-projection 三个不进进度的实验 + 研究桥工作台）、study-tools 测试 812 条。
 
 ## 2. 仓库分工
 
@@ -33,6 +33,8 @@
 - GitHub Actions：Study material quality 与 Deploy documentation 双绿；线上 https://shine-233.github.io/deepseek-harness-study/ 返回 200。
 
 ## 4. 今天落地的八类改动（2026-08-21/22）
+
+0. （2026-08-25 补记）基础设施接缝四实验室收尾上游覆盖：code-run（运行结局分类学）、host-gateway（路由载体与回退座位、选择器接缝）、invariant（包名保留与归属报错）、storage-hub（后端契约）；RELATED 扩到全部在册实验；修掉两处 CSP 内联样式违规；38 课页 + 56 实验页 + 61 次移动端走查零错误。见 [Agent Note](.agents/notes/implemented/feature/2026-08-25-infra-seam-labs.md)。
 
 1. workflow spec 重写为锁定 fork 自己的两条 workflow（修掉连续红 CI 的根因）。
 2. 上游基线从 rc.5 重固定到 0.1.1-rc.2：索引重生成（2,973/67）、包图重生成（227 包/50 组/1124 边）、201 处链接与全部派生数字更新。

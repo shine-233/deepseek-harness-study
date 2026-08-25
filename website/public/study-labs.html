@@ -19,7 +19,7 @@
     <header class="hero-panel">
       <div class="hero-copy">
         <p class="eyebrow">DSH 学习 · 实验室总览</p>
-        <h1><span data-lab-count-all>44</span> 个能上手拆的实验。</h1>
+        <h1><span data-lab-count-all>48</span> 个能上手拆的实验。</h1>
         <p class="hero-lead">每个实验固定输入、固定输出、自带 oracle；不联网、不调模型，结论当场可查。先按目的挑一个，做完再回配套课对答案。</p>
         <div class="hero-actions">
           <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
@@ -1015,6 +1015,72 @@
               <a class="button button-primary" href="./research-debug-bridge.html">打开实验</a>
               <a class="lab-lesson-link" href="./study/lessons/36-研究与-Debug-协作.html">配套课 · 研究与 Debug 协作</a>
             </p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="code-run" data-lesson="33-确定性可视化实验协议与Code-Mode权限管线">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="8" y="12" width="104" height="14" rx="3"/>
+            <rect class="lm-cell" x="8" y="34" width="22" height="10" rx="2"/>
+            <rect class="lm-cell" x="34" y="34" width="30" height="10" rx="2"/>
+            <rect class="lm-bar lm-hi" x="8" y="50" width="70" height="10" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Code 运行结果分类</h3>
+            <p class="lab-card-question">程序失败时 run() 照常 resolve：error 是结果上的字段。六种失败类彼此正交——exception、timeout、abort、worker-exit、invalid-output、output-limit；binding 命名空间要过三道检查，$tools 这类 JS 拼写在任何后端都被拒。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">error 字段</li><li class="schema-pill">六类正交</li><li class="schema-pill">三道检查</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./code-run-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">配套课 · 可视化协议与 Code Mode</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="host-gateway" data-lesson="07-HostClient示例测试发布">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <circle class="lm-dot" cx="12" cy="34" r="6"/>
+            <path class="lm-arrow" d="M20 34 h18 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-box" x="42" y="10" width="40" height="12" rx="3"/>
+            <rect class="lm-box" x="42" y="26" width="40" height="12" rx="3"/>
+            <rect class="lm-bar lm-hi" x="42" y="44" width="40" height="12" rx="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>宿主路由与接缝</h3>
+            <p class="lab-card-question">webserver 是唯一的 HTTP 载体：请求先扫已注册路由，全部未命中才轮到 frontend-static 的回退座位。目录选择走 ctx.directoryPicker 接缝——native 与 browse 互换后端，消费方的契约一个字不改。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">回退座位</li><li class="schema-pill">接缝替换</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./host-gateway-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/07-HostClient示例测试发布.html">配套课 · Host/Client/发布</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="evidence" data-lab="invariant" data-lesson="19-插件测试卸载与版本证据">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <path class="lm-file" d="M20 16 h16 v36 h-16 z"/>
+            <path class="lm-arrow" d="M42 34 h24 m-6 -4 l6 4 l-6 4"/>
+            <circle class="lm-dot lm-accent" cx="84" cy="34" r="10"/>
+            <path d="M80 34 l3 3 l6 -7" stroke-width="2.5"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>运行时不变量</h3>
+            <p class="lab-card-question">每个包从自己的 ./invariant 伴生插件注册检查：包名第一步就被保留——关掉检查也占住名字；fail() 抛出的错误带完整包名归属；失败的子 fiber 被销毁、保留位释放。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">名字保留</li><li class="schema-pill">包归属报错</li><li class="schema-pill">失败释放</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./invariant-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/19-插件测试卸载与版本证据.html">配套课 · 测试卸载与证据</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="storage-hub" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box" x="8" y="14" width="30" height="14" rx="3"/>
+            <rect class="lm-box" x="8" y="32" width="30" height="14" rx="3"/>
+            <rect class="lm-box" x="8" y="50" width="30" height="10" rx="3"/>
+            <path class="lm-arrow" d="M42 38 h20 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-bar lm-hi" x="66" y="24" width="46" height="18" rx="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>存储后端契约</h3>
+            <p class="lab-card-question">一个后端独占一种介质，kv 切面缺位就大声失败。单元名同时当文件名和 SQL 标识符，大写连字符直接被拒；版本戳对不上按 version-mismatch 拒开；写完即持久，删缺失键幂等，close 之后一切报 closed。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">切面可选</li><li class="schema-pill">名字门</li><li class="schema-pill">resolve 即持久</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./storage-hub-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · Session 日志与恢复</a></p>
           </div>
         </li>
 
