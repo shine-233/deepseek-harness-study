@@ -74,6 +74,10 @@ function readProgress() {
 function fillChipCounts(cards) {
   const counts = { all: cards.length, main: 0, plugin: 0, evidence: 0 }
   for (const card of cards) counts[card.dataset.group] += 1
+  // 大标题里的数字也由这里供给：实验室数量每周在变，硬编码会像上面那样过期。
+  for (const node of document.querySelectorAll('[data-lab-count-all]')) {
+    node.textContent = String(counts.all)
+  }
   for (const node of document.querySelectorAll('.lab-chip-count')) {
     const key = node.dataset.count
     if (key in counts) node.textContent = String(counts[key])
