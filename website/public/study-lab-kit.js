@@ -10,6 +10,9 @@ import { prefixIcon } from './study-lab-icons.js'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
+/** 进行中的数字补间链：元素 → rAF 句柄，用于新目标到来时取消旧链。 */
+const TWEEN_FRAMES = new WeakMap()
+
 /** 一律用 textContent 赋值：导入的字符串永远当文本，不当标记。 */
 export function bindRowJump(tableBody, slider) {
   if (tableBody === null || slider === null) return
@@ -56,6 +59,12 @@ export function animateNumber(target, value, { digits = 0, duration = 360 } = {}
   const from = Number.isFinite(current) ? current : 0
   const text = n => n.toFixed(digits)
   const frame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null
+  // 同一元素上一次补间还没走完就来了新目标：取消旧链，避免两条链互相覆写。
+  const pendingFrame = TWEEN_FRAMES.get(target)
+  if (pendingFrame !== undefined && typeof cancelAnimationFrame === 'function') {
+    cancelAnimationFrame(pendingFrame)
+  }
+  TWEEN_FRAMES.delete(target)
   if (frame === null || prefersReducedMotion() || duration <= 0 || from === next) {
     writeText(target, text(next))
     return
@@ -65,9 +74,10 @@ export function animateNumber(target, value, { digits = 0, duration = 360 } = {}
     const progress = Math.min(1, (now - start) / duration)
     const eased = 1 - (1 - progress) ** 3
     writeText(target, text(from + (next - from) * eased))
-    if (progress < 1) frame(tick)
+    if (progress < 1) TWEEN_FRAMES.set(target, frame(tick))
+    else TWEEN_FRAMES.delete(target)
   }
-  frame(tick)
+  TWEEN_FRAMES.set(target, frame(tick))
 }
 
 export function svgElement(name, attributes = {}, textValue = null) {
@@ -559,6 +569,10 @@ if (typeof document !== 'undefined' && typeof document.addEventListener === 'fun
  * Metric 补间（TF Playground 式实时反馈）：
  * 观察 .metric-grid dd 的文本变化，旧值和新值都可解析为数字时用
  * animateNumber 滚动补间；否则直接写入。自举一次，全部实验室页生效。
+ *
+ * 实现注记：textContent 赋值产生的是 childList 记录，其 oldValue 恒为 null，
+ * 所以旧值由本模块自己用 WeakMap 记账——此前依赖 mutation.oldValue 的版本
+ * 两个分支（滚动、闪光）从未触发过。
  */
 if (typeof document !== 'undefined' && typeof MutationObserver === 'function') {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -567,13 +581,19 @@ if (typeof document !== 'undefined' && typeof MutationObserver === 'function') {
     if (/^-?\d+(\.\d+)?$/.test(cleaned)) return parseFloat(cleaned)
     return null
   }
+  const lastValues = new WeakMap()
   const metricObserver = new MutationObserver(mutationList => {
+    const touched = new Set()
     for (const mutation of mutationList) {
-      const target = mutation.target
-      if (!(target instanceof Element)) continue
-      if (target.dataset.tweening === 'true') continue
-      const oldRaw = mutation.oldValue?.trim() ?? ''
+      const node = mutation.target instanceof Element ? mutation.target : mutation.target.parentElement
+      const dd = node?.closest('.metric-grid dd')
+      if (dd !== null && dd !== undefined) touched.add(dd)
+    }
+    for (const target of touched) {
+      const oldRaw = (lastValues.get(target) ?? '').trim()
+      lastValues.set(target, target.textContent ?? '')
       const newRaw = target.textContent?.trim() ?? ''
+      if (target.dataset.tweening === 'true') continue
       // 数值变化：数字滚动 + 背景闪光
       const oldNum = parseNum(oldRaw)
       const newNum = parseNum(newRaw)
@@ -595,6 +615,7 @@ if (typeof document !== 'undefined' && typeof MutationObserver === 'function') {
     if (metricsObserved) return
     metricsObserved = true
     for (const dd of document.querySelectorAll('.metric-grid dd')) {
+      lastValues.set(dd, dd.textContent ?? '')
       metricObserver.observe(dd, { characterData: true, childList: true, subtree: true })
     }
   }

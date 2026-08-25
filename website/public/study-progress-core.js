@@ -14,8 +14,10 @@
  * 可以在 Node 里单独测试；DOM 层只做薄接线。
  */
 
-/** 已知实验页名单：最后一段形如 <id>-lab 的页面按 'lab:<id>' 计入进度。 */
-export const LAB_PAGE_IDS = ['turn-flow', 'package-graph', 'profile-loader', 'session-log', 'tool-visibility', 'fs-edit', 'web-tool', 'code-mode-evidence', 'compaction', 'plugin-flow', 'llm-stream', 'prompt-assembly', 'hook-flow', 'approval-flow', 'session-fork', 'subagent-delegate', 'guard-loop', 'jobs', 'orchestration', 'worker-protocol', 'workflow-node', 'client', 'provider', 'shell-seam', 'trajectory', 'skill-catalog', 'context', 'session-projection', 'spill', 'terminal', 'mcp', 'selfmod', 'lsp', 'wire', 'tokenmeter', 'preset', 'checkpoint', 'identity', 'time', 'attachment', 'feedback']
+/** 已知实验页名单：最后一段形如 <id>-lab 的页面按 'lab:<id>' 计入进度。
+ *  这份名单必须覆盖 public 下每个 *-lab.html；study-tools/lab-progress-pages.test.mjs
+ *  按文件系统钉住这条规则——新增实验室页时忘了登记会在这里红。 */
+export const LAB_PAGE_IDS = ['turn-flow', 'package-graph', 'profile-loader', 'session-log', 'tool-visibility', 'fs-edit', 'web-tool', 'code-mode-evidence', 'compaction', 'plugin-flow', 'llm-stream', 'prompt-assembly', 'hook-flow', 'approval-flow', 'session-fork', 'subagent-delegate', 'guard-loop', 'jobs', 'orchestration', 'worker-protocol', 'workflow-node', 'client', 'provider', 'shell-seam', 'trajectory', 'skill-catalog', 'context', 'session-projection', 'spill', 'terminal', 'mcp', 'selfmod', 'lsp', 'wire', 'tokenmeter', 'preset', 'checkpoint', 'identity', 'time', 'attachment', 'feedback', 'credential', 'settings', 'plan-stack', 'subprocess', 'query', 'sandbox', 'typert', 'workspace', 'code-run', 'host-gateway', 'invariant', 'storage-hub']
 
 export const PROGRESS_VERSION = 2
 
