@@ -159,6 +159,13 @@ function initializePage() {
   elements.stepPrev.addEventListener('click', () => nudge(-1))
   elements.stepNext.addEventListener('click', () => nudge(1))
   bindRangeKeys(elements.step)
+  // 图形即控制器：点事件流的任意一条，滑杆直接重放到那一步。
+  elements.eventList.addEventListener('click', event => {
+    const item = event.target instanceof Element ? event.target.closest('[data-index]') : null
+    if (item === null) return
+    elements.step.value = item.dataset.index
+    elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+  })
 
   elements.step.max = String(Number.MAX_SAFE_INTEGER)
   const restored = readStateFromHash(location.hash, { step: { integerRange: [0, Number.MAX_SAFE_INTEGER] } })

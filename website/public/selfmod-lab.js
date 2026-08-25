@@ -1,6 +1,6 @@
 import { buildSelfModModel, evaluateSelfModOracle } from './selfmod-model.js'
 import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements,
-  svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
+  svgElement, writeText, installDeclaredIcons, installScrollProgress, pulseSignal } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
 import { revealOnScroll } from './study-lab-reveal.js'
@@ -35,6 +35,8 @@ function initializePage() {
   }
   if (!requireElements(el)) return
   const fb = makeFeedback(el.feedback)
+
+  let currentModel = null
 
   const persistState = () => {
     try {
@@ -78,7 +80,7 @@ function initializePage() {
       if (s.phase === 'guard-denied') cls.push('is-reject')
       const c = svgElement('circle', {
         cx: left + i * slot + 30, cy: top + LANES.indexOf(s.lane) * lh + lh / 2,
-        r: 9, class: cls.join(' '), 'data-reveal': '',
+        r: 9, class: cls.join(' '), 'data-reveal': '', 'data-step': String(i),
       })
       c.append(svgElement('title', {}, `${i} ${s.phase}: ${s.detail}`))
       svg.append(c)
@@ -102,6 +104,7 @@ function initializePage() {
         actionId: el.action.value,
         guardDenies: el.guard.checked,
       })
+      currentModel = model
       const verdict = evaluateSelfModOracle(model)
       renderTimeline(model, el.plot)
       renderSchema(model)
@@ -123,6 +126,16 @@ function initializePage() {
   el.action.addEventListener('change', rebuild)
   el.guard.addEventListener('change', rebuild)
   installInputReset(el.resetInputs, el.form, { onReset: rebuild })
+
+  // 图形即控制器：点泳道圆点，图下说明行换成那一步的原文。
+  el.plot.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return
+    const dot = event.target.closest('[data-step]')
+    if (dot === null) return
+    pulseSignal(dot, 'is-picked')
+    const step = currentModel?.steps[Number(dot.getAttribute('data-step'))]
+    if (step !== undefined) writeText(el.note, `第 ${dot.getAttribute('data-step')} 步 · ${step.lane} · ${step.phase}：${step.detail}`)
+  })
 
   const restored = readStateFromHash(location.hash, STATE_SCHEMA)
   if (restored !== null && restored.ok) {

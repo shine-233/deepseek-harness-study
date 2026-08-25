@@ -457,6 +457,18 @@ elements.replay.addEventListener('input', () => {
   }
   document.querySelector('#replay-prev')?.addEventListener('click', () => nudgeReplay(-1))
   document.querySelector('#replay-next')?.addEventListener('click', () => nudgeReplay(1))
+  // 图形即控制器：点（或回车/空格激活）舞台上的任意一张卡，回放直接跳到那一步。
+  const seekReplayTo = target => {
+    const card = target instanceof Element ? target.closest('[data-step]') : null
+    if (card === null) return
+    elements.replay.value = card.getAttribute('data-step')
+    elements.replay.dispatchEvent(new (elements.replay?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+  }
+  elements.stage.addEventListener('click', event => seekReplayTo(event.target))
+  elements.stage.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    seekReplayTo(event.target)
+  })
   // 焦点不在表单控件时，← / → 步进回放。
   elements.replay.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft') { event.preventDefault(); nudgeReplay(-1) }

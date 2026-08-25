@@ -216,6 +216,13 @@ function initializePage() {
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
     bindAutoAdvance(document.getElementById('jb-play'), elements.step, { stepMs: 650, speedSelect: document.getElementById('jb-speed') })
 bindRangeKeys(elements.step)
+  // 图形即控制器：点时间线的任意一步，滑杆直接跳到那一步。
+  elements.timeline.addEventListener('click', event => {
+    const item = event.target instanceof Element ? event.target.closest('[data-index]') : null
+    if (item === null) return
+    elements.step.value = item.dataset.index
+    elements.step.dispatchEvent(new (elements.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+  })
 
   elements.step.max = String(Number.MAX_SAFE_INTEGER)
 

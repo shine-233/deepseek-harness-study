@@ -8,7 +8,8 @@ import {
   renderBoundary,
   renderOracle,
   requireElements,
-  writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress } from './study-lab-kit.js'
+  writeText, installDeclaredIcons, bindRangeKeys, installScrollProgress,
+  bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   SCHEDULE_KINDS,
@@ -91,9 +92,38 @@ function initializePage() {
     stopReason: document.querySelector('#metric-stop'),
     oracle: document.querySelector('#metric-oracle'),
     resetInputs: document.querySelector('#reset-inputs'),
+    step: document.querySelector('#orch-step'),
+    stepOutput: document.querySelector('#orch-step-output'),
+    stepPrev: document.querySelector('#orch-step-prev'),
+    stepNext: document.querySelector('#orch-step-next'),
+    stepCaption: document.querySelector('#orch-step-caption'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
+
+  let currentModel = null
+
+  const syncStep = () => {
+    if (currentModel === null) return
+    const total = currentModel.steps.length
+    elements.step.max = String(total - 1)
+    if (Number(elements.step.value) > total - 1 || Number(elements.step.value) < 0) {
+      elements.step.value = String(total - 1)
+    }
+    const index = Number(elements.step.value)
+    writeText(elements.stepOutput, String(index))
+    for (const item of elements.timeline.querySelectorAll('.jb-step')) {
+      item.classList.toggle('is-current', Number(item.dataset.index) === index)
+      item.classList.toggle('is-future', Number(item.dataset.index) > index)
+    }
+    const entry = currentModel.steps[index]
+    if (entry !== undefined) {
+      writeText(elements.stepCaption, '第 ' + String(index) + ' 步 · ' + entry.op
+        + (entry.event !== undefined ? ' · ' + entry.event : ''))
+    }
+    elements.stepPrev.disabled = index <= 0
+    elements.stepNext.disabled = index >= total - 1
+  }
 
   for (const kind of SCHEDULE_KINDS) {
     const option = document.createElement('option')
@@ -139,6 +169,7 @@ function initializePage() {
         })
       }
       const verdict = evaluateOrchestrationOracle(model)
+      currentModel = model
 
       renderTimeline(model, elements.timeline)
       renderOracle(verdict, elements.oracleList, elements.oracle)
@@ -160,6 +191,7 @@ function initializePage() {
         setFeedback('已推演：' + String(model.observations.stopReason)
           + '；agent 配对 ' + String(model.observations.agentEnds) + '/' + String(model.observations.agentStarts) + '。', 'success')
       }
+      syncStep()
     } catch (error) {
       console.error('[orchestration] rebuild failed', error)
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
@@ -173,10 +205,32 @@ function initializePage() {
     rebuild()
   })
   for (const control of [elements.mode, elements.kind, elements.sessionState, elements.ending, elements.shape]) {
-    control.addEventListener('change', rebuild)
+    control.addEventListener('change', () => {
+      rebuild()
+      elements.step.value = elements.step.max
+      syncStep()
+    })
   }
 
   rebuild()
+
+  elements.step.addEventListener('input', syncStep)
+  const nudgeStep = delta => {
+    elements.step.value = String(Math.min(Number(elements.step.max),
+      Math.max(Number(elements.step.min), Number(elements.step.value) + delta)))
+    elements.step.dispatchEvent(new (elements.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+  }
+  elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
+  elements.stepNext.addEventListener('click', () => nudgeStep(1))
+  bindAutoAdvance(document.getElementById('orch-play'), elements.step, { stepMs: 650, speedSelect: document.getElementById('orch-speed') })
+  bindRangeKeys(elements.step)
+  // 图形即控制器：点时间线的任意一步，滑杆直接跳到那一步。
+  elements.timeline.addEventListener('click', event => {
+    const item = event.target instanceof Element ? event.target.closest('[data-index]') : null
+    if (item === null) return
+    elements.step.value = item.dataset.index
+    elements.step.dispatchEvent(new (elements.step?.ownerDocument?.defaultView?.Event ?? Event)('input', { bubbles: true }))
+  })
 }
 
 if (typeof document !== 'undefined') {

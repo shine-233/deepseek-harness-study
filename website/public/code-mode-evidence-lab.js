@@ -1267,6 +1267,29 @@ function initializePage() {
     pause()
     setFrame(Number(seek.value))
   })
+  // 图形即控制器：点时间轴、并发图、相位矩阵里的任意事件点，或事件表的
+  // 任意一行，播放头直接跳到那个 tick 的第一帧。
+  const seekToTick = requestedTick => {
+    if (simulation === null) return
+    let landed = simulation.frames.length - 1
+    for (const [index, frame] of simulation.frames.entries()) {
+      if (frame.tick >= requestedTick) { landed = index; break }
+    }
+    pause()
+    setFrame(landed)
+  }
+  const bindTickSeek = container => {
+    container.addEventListener('click', event => {
+      if (!(event.target instanceof Element)) return
+      const marked = event.target.closest('[data-tick]')
+      if (marked === null) return
+      seekToTick(Number(marked.getAttribute('data-tick')))
+    })
+  }
+  bindTickSeek(timeline)
+  bindTickSeek(concurrencyTarget)
+  bindTickSeek(phaseMatrixTarget)
+  bindTickSeek(tableBody)
   document.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey) return
     const target = event.target

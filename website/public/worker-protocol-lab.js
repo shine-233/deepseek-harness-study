@@ -161,6 +161,13 @@ function initializePage() {
   elements.stepPrev.addEventListener('click', () => nudgeStep(-1))
   elements.stepNext.addEventListener('click', () => nudgeStep(1))
   bindRangeKeys(elements.step)
+  // 图形即控制器：点时间线的任意一条消息，滑杆直接跳到那一步。
+  elements.timeline.addEventListener('click', event => {
+    const item = event.target instanceof Element ? event.target.closest('[data-index]') : null
+    if (item === null) return
+    elements.step.value = item.dataset.index
+    elements.step.dispatchEvent(new Event('input', { bubbles: true }))
+  })
 
   elements.step.max = String(Number.MAX_SAFE_INTEGER)
 

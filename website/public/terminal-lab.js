@@ -1,6 +1,6 @@
 import { buildTerminalModel, evaluateTerminalOracle, TERM_SCRIPTS } from './terminal-model.js'
 import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements,
-  svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
+  svgElement, writeText, installDeclaredIcons, installScrollProgress, pulseSignal } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
 import { revealOnScroll } from './study-lab-reveal.js'
@@ -133,6 +133,29 @@ function initializePage() {
     c.addEventListener('change', rebuild)
   }
   installInputReset(el.resetInputs, el.form, { onReset: rebuild })
+
+  // 图形即控制器：点泳道圆点，步骤表滚到并闪亮那一行；点行也点亮圆点。
+  const flashRow = row => {
+    row.classList.remove('metric-flash')
+    void row.offsetWidth
+    row.classList.add('metric-flash')
+    row.scrollIntoView({ block: 'nearest' })
+  }
+  el.plot.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return
+    const dot = event.target.closest('[data-step]')
+    if (dot === null) return
+    pulseSignal(dot, 'is-picked')
+    const row = el.stepsBody.querySelector('tr[data-key="' + dot.getAttribute('data-step') + '"]')
+    if (row !== null) flashRow(row)
+  })
+  el.stepsBody.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return
+    const row = event.target.closest('tr[data-key]')
+    if (row === null) return
+    const dot = el.plot.querySelector('[data-step="' + row.dataset.key + '"]')
+    if (dot !== null) pulseSignal(dot, 'is-picked')
+  })
 
   const restored = readStateFromHash(location.hash, STATE_SCHEMA)
   if (restored !== null && restored.ok) {

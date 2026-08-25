@@ -115,6 +115,18 @@
         <span class="schema-pill">操作 × 契约依据</span>
       </div>
       <p class="section-intro">每一格是一次注册表或引擎操作，说明行给出上游契约依据；事件格带视图徽章标出 workflow/* 事件名。</p>
+      <div class="stepper" role="group" aria-label="编排步进">
+        <label class="stepper-seek">
+          <span>推进到第 <output id="orch-step-output">0</output> 步</span>
+          <input id="orch-step" type="range" min="0" max="0" step="1" value="0">
+          <small>只改变高亮；之后的步骤淡出显示，读数不变。键盘：← / → 逐步，Home / End 直达首末。</small>
+        </label>
+        <div class="stepper-buttons"><button type="button" class="button button-quiet" id="orch-play" aria-pressed="false">播放</button><select id="orch-speed" class="jb-speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+          <button class="button button-quiet" id="orch-step-prev" type="button">上一步</button>
+          <button class="button button-quiet" id="orch-step-next" type="button">下一步</button>
+        </div>
+        <p class="step-caption" id="orch-step-caption" role="status" aria-live="polite"></p>
+      </div>
       <ol class="jb-timeline" id="orch-timeline"></ol>
     </section>
 

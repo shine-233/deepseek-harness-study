@@ -1,9 +1,14 @@
 /* 自我修改实验：Fiber 生命周期点与 schema 芯片。 */
-.sm-dot { fill: var(--brand); }
+.sm-dot { fill: var(--brand); cursor: pointer; }
 .sm-dot.is-grow { fill: var(--allow-ink, #2e7d32); }
 .sm-dot.is-shrink { fill: var(--allow-ink, #2e7d32); stroke: var(--signal-ink, #b45309); stroke-width: 3; }
 .sm-dot.is-fail { fill: var(--deny-ink, #c62828); }
 .sm-dot.is-reject { stroke: var(--deny-ink, #c62828); stroke-width: 3; }
+.sm-dot.is-picked { animation: sm-dot-pick 700ms ease-out 1; }
+@keyframes sm-dot-pick {
+  0% { stroke: var(--ink, #1f2228); stroke-width: 6; }
+  100% { stroke: transparent; stroke-width: 0; }
+}
 
 .sb-controls .sb-check {
   flex-direction: row;
