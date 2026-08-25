@@ -105,20 +105,20 @@ function ensureStyle(doc) {
 .dsh-research-filter{padding:5px 12px;border:1px solid var(--vp-c-divider);border-radius:999px;background:var(--vp-c-bg-soft);
   color:var(--vp-c-text-1);font:inherit;font-size:0.84rem;cursor:pointer;}
 .dsh-research-filter[aria-pressed="true"]{border-color:var(--vp-c-brand-1);background:var(--vp-c-brand-soft);color:var(--vp-c-brand-1);font-weight:600;}
-.dsh-research-filter:focus-visible{outline:3px solid var(--vp-c-brand-1);outline-offset:2px;}
+.dsh-research-filter:hover{translate:0 -1px;}.dsh-research-filter:focus-visible{outline:3px solid var(--vp-c-brand-1);outline-offset:2px;}
 .dsh-research-items,.vp-doc .dsh-research-items{display:grid;gap:6px;margin:0;padding:0;list-style:none;}
 .dsh-research-items li{list-style:none;}
 .dsh-research-item{display:flex;align-items:baseline;gap:9px;width:100%;padding:9px 12px;border:1px solid var(--vp-c-divider);
   border-radius:8px;background:var(--vp-c-bg-soft);color:var(--vp-c-text-1);font:inherit;text-align:left;cursor:pointer;}
 .dsh-research-item[aria-pressed="true"]{border-color:var(--vp-c-brand-1);background:var(--vp-c-brand-soft);box-shadow:inset 0 0 0 1px var(--vp-c-brand-1);}
-.dsh-research-item:focus-visible{outline:3px solid var(--vp-c-brand-1);outline-offset:2px;}
+.dsh-research-item:hover{translate:0 -1px;}.dsh-research-item:focus-visible{outline:3px solid var(--vp-c-brand-1);outline-offset:2px;}
 .dsh-research-item b{flex:none;font-size:0.78rem;color:var(--vp-c-brand-1);}
 .dsh-research-detail{padding:16px 18px;border:1px solid var(--vp-c-divider);border-radius:8px;background:var(--vp-c-bg-soft);}
 .dsh-research-detail dt{margin:10px 0 3px;color:var(--vp-c-brand-1);font-size:0.76rem;font-weight:700;}
 .dsh-research-detail dt:first-child{margin-top:0;}
 .dsh-research-detail dd{margin:0;line-height:1.65;}
-.dsh-swap-in{animation:dsh-fade-rise 180ms ease;}
-@keyframes dsh-fade-rise{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.dsh-swap-in{animation:dsh-swap-spring 0.35s cubic-bezier(0.34,1.28,0.64,1) both;}
+@keyframes dsh-swap-spring{from{opacity:0;transform:translateY(5px) scale(0.985)}to{opacity:1;transform:none}}
 @media (max-width:719px){.dsh-research{grid-template-columns:1fr;}}
 @media (prefers-reduced-motion:reduce){.dsh-research *{transition:none!important;animation:none!important;}}
 `

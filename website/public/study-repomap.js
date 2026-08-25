@@ -93,7 +93,7 @@ function ensureStyle(doc) {
 .dsh-repomap-dir{padding:6px 11px;border:1px solid var(--vp-c-divider);border-radius:8px;background:var(--vp-c-bg-soft);
   color:var(--vp-c-text-1);font:inherit;font-size:0.86rem;font-family:var(--vp-font-family-mono);cursor:pointer;}
 .dsh-repomap-dir[aria-pressed="true"]{border-color:var(--vp-c-brand-1);background:var(--vp-c-brand-soft);color:var(--vp-c-brand-1);font-weight:600;}
-.dsh-repomap-dir:focus-visible{outline:3px solid var(--vp-c-brand-1);outline-offset:2px;}
+.dsh-repomap-dir:hover{translate:0 -1px;}.dsh-repomap-dir:focus-visible{outline:3px solid var(--vp-c-brand-1);outline-offset:2px;}
 .dsh-repomap-chain{border:1px solid var(--vp-c-divider);border-radius:8px;background:var(--vp-c-bg-soft);padding:8px 10px;}
 .dsh-repomap-chain svg{display:block;width:100%;height:auto;}
 .dsh-repomap-chain .node{fill:var(--vp-c-bg);stroke:var(--vp-c-divider);}
@@ -105,8 +105,8 @@ function ensureStyle(doc) {
 .dsh-repomap-detail dt{margin:10px 0 3px;color:var(--vp-c-brand-1);font-size:0.76rem;font-weight:700;}
 .dsh-repomap-detail dt:first-child{margin-top:0;}
 .dsh-repomap-detail dd{margin:0;line-height:1.65;}
-.dsh-swap-in{animation:dsh-fade-rise 180ms ease;}
-@keyframes dsh-fade-rise{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.dsh-swap-in{animation:dsh-swap-spring 0.35s cubic-bezier(0.34,1.28,0.64,1) both;}
+@keyframes dsh-swap-spring{from{opacity:0;transform:translateY(5px) scale(0.985)}to{opacity:1;transform:none}}
 @media (max-width:719px){.dsh-repomap{grid-template-columns:1fr;}}
 @media (prefers-reduced-motion:reduce){.dsh-repomap *{transition:none!important;animation:none!important;}}
 `
