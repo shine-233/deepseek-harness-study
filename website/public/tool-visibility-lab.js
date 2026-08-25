@@ -264,6 +264,30 @@ function initializePage() {
     }
     const tracedChip = elements.nest.querySelector(`[data-tool="${tool.name}"]`)
     if (tracedChip && !reducedMotion) tracedChip.style.transitionDelay = '260ms'
+    // SVG 路径描边：从工具色块到被挡环的连接线
+    const svg = elements.nest.querySelector('svg')
+    if (svg) {
+      svg.querySelectorAll('.tv-trace-path').forEach(p => p.remove())
+      if (tool.reachedLevel < 3) {
+        const chipBox = tracedChip?.querySelector('.chip-box')
+        if (chipBox) {
+          const cx = Number(chipBox.getAttribute('x') ?? 0) + Number(chipBox.getAttribute('width') ?? 0) / 2
+          const cy = Number(chipBox.getAttribute('y') ?? 0) + Number(chipBox.getAttribute('height') ?? 0) / 2
+          const targetRing = rings[tool.reachedLevel]
+          if (targetRing) {
+            const rx = Number(targetRing.getAttribute('x') ?? 0) + 14
+            const ry = Number(targetRing.getAttribute('y') ?? 0) + Number(targetRing.getAttribute('height') ?? 0) / 2
+            const lineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+            lineEl.setAttribute('x1', String(cx))
+            lineEl.setAttribute('y1', String(cy))
+            lineEl.setAttribute('x2', String(rx))
+            lineEl.setAttribute('y2', String(ry))
+            lineEl.setAttribute('class', 'tv-trace-path is-drawing')
+            svg.append(lineEl)
+          }
+        }
+      }
+    }
     const stepsText = [
       'Bundle ' + tool.bundle + '：' + (tool.registered ? '已加载 ✓' : '未加载 ✕'),
       'agent 作用域「' + currentModel.scope.label + '」：' + (tool.modelVisible ? '模型可见 ✓' : '不可见 ✕'),

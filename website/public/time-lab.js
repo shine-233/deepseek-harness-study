@@ -8,7 +8,7 @@ if (typeof document !== 'undefined') {
       'kept': 'TC_DURABLE_IN_HISTORY 校验钉住了它：入册的消息随日志重放回来，开关管的是「以后还注入吗」。',
       'gone': 'durable 的意思是不可撤回——这正是第 05 课那条不变式。',
       'partial': '不存在选择性删除；要么都在，要么不再新增。',
-      },
+    },
     hint: '线索：「durable 用户消息」这五个字怎么读？',
   })
 }

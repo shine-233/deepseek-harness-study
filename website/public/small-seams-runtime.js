@@ -39,17 +39,23 @@ export async function bootSmallSeam(labId, gateOverride = {}) {
       ...(gateOverride.hint !== undefined ? { hint: gateOverride.hint } : {}),
     },
   }
-  await initializePage(config)
+  const modelModule = await import(config.modelModule)
+  await initializePage(config, modelModule)
 }
 
-async function initializePage(config) {
+async function initializePage(config, modelModule) {
   const build = modelModule[config.buildFn]
   const oracle = modelModule[config.oracleFn]
 
   // 用配置回填外壳文案与链接：单一事实来源在 small-seams-configs.js。
-  writeText(document.querySelector('#ss-eyebrow'), config.eyebrow)
-  writeText(document.querySelector('#ss-h1'), config.h1)
-  writeText(document.querySelector('#ss-lead'), config.lead)
+  // writeText 对 null 目标安全跳过（由调用方决定哪些元素必须存在）。
+  const safeWrite = (selector, text) => {
+    const el = document.querySelector(selector)
+    if (el !== null) el.textContent = text
+  }
+  safeWrite('#ss-eyebrow', config.eyebrow)
+  safeWrite('#ss-h1', config.h1)
+  safeWrite('#ss-lead', config.lead)
   const warning = document.querySelector('#ss-warning-text')
   if (warning !== null) writeText(warning, config.warning)
   const lessonLink = document.querySelector('#ss-lesson-link')
@@ -58,7 +64,7 @@ async function initializePage(config) {
   if (siblingLink !== null) { siblingLink.href = config.siblingHref; writeText(siblingLink, config.siblingLabel) }
 
   // 预测门的问题与三个选项（选项由生成器静态写入；这里只回填问题文案）。
-  writeText(document.querySelector('#gate-question'), config.gate.q)
+  safeWrite('#gate-question', config.gate.q)
 
   // 控件按配置构建。
   const form = document.querySelector('#seam-form')

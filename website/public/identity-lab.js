@@ -8,7 +8,7 @@ if (typeof document !== 'undefined') {
       'memo': 'ID_PROCESS_MEMO 校验钉住了它：一个进程只碰一次磁盘。',
       'fresh': '那是下一次启动的行为；运行中的进程有记忆。',
       'error': '缺失文件在首次读取时会铸造新 id，永远不会抛错。',
-      },
+    },
     hint: '线索：顶注说结果是「memoized per resolved file path」。',
   })
 }

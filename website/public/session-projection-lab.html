@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Session 投影：四种事件流独立折叠到各自的投影状态，步进重放验证独立性">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Session 投影实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./jobs-lab.css">
+  <link rel="stylesheet" href="./session-projection-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sp-main">跳到实验</a>
+  <main class="lab-shell" id="sp-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · Session 投影</p>
+        <h1>四条投影管线并行折叠同一条事件流，互不干扰。</h1>
+        <p class="hero-lead">SessionProjectionMap 的每个键对应一个独立的折叠单元：todos 只看 todo/write、planMode 只看 plan/mode、goal 只看 goal/change。无关事件返回同一个引用——下游零开销。拖动滑杆逐条重放，看四个投影各自怎样响应（或不响应）。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/37-计划栈.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./plan-stack-lab.html">打开计划栈实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 29</span>
+        <strong>事件流是教学常量。</strong>
+        <p>没有真实持久化缓存或变更通知分发。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：一条 assistant/chunk 事件经过四个投影单元时会发生什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="shared-state">
+            <span>所有投影共享一个可变状态对象</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="recompute-all">
+            <span>每个投影都重新计算全部状态</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="independent-folds">
+            <span>不关心的单元返回原引用——零开销跳过</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="sp-form">
+          <div class="stepper" role="group" aria-label="事件重放">
+            <label class="stepper-seek">
+              <span>重放到第 <output id="sp-step-output">0</output> 条事件</span>
+              <input id="sp-step" type="range" min="0" max="7" step="1" value="0">
+              <small>只改变投影进度。键盘：← / → 逐步。</small>
+            </label>
+            <div class="stepper-buttons">
+              <button class="button button-quiet" id="sp-step-prev" type="button">上一步</button>
+              <button class="button button-quiet" id="sp-step-next" type="button">下一步</button>
+            </div>
+            <p class="step-caption" id="sp-step-caption" role="status" aria-live="polite"></p>
+          </div>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">回到第 0 条</button>
+        </form>
+        <p class="feedback" id="sp-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="投影观测值">
+          <div><dt>已处理 / 总数</dt><dd id="metric-events">—</dd></div>
+          <div><dt>Todo 投影</dt><dd id="metric-todos">—</dd></div>
+          <div><dt>Plan 投影</dt><dd id="metric-plan">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="sp-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="timeline">双栏对照</p>
+          <h2 id="sp-title">左边是日志，右边是四列投影状态</h2>
+        </div>
+        <span class="schema-pill">事件 × 投影</span>
+      </div>
+      <p class="section-intro">左列每条事件的去向写明哪些投影被更新；右列显示截至当前步的四个投影状态并排。</p>
+      <div class="sp-grid">
+        <div class="tj-pane"><ol class="jb-timeline" id="sp-events"></ol></div>
+        <div class="tj-pane tj-pane-right sp-columns-wrap"><div class="sp-columns-grid" id="sp-columns"></div></div>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重放同一段事件流比对四列投影，再核对整值替换、last-write-wins、revision 追踪与无关事件零副作用。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 双栏对照 · 不连接任何 Host</span>
+      <a href="./study/lessons/37-计划栈.html">继续读计划栈课程</a>
+    </footer>
+  </main>
+  <script type="module" src="./session-projection-lab.js"></script>
+</body>
+</html>

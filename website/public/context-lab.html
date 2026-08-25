@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="AGENTS.md 发现链与上下文注入：去重、作用域排序与 DisclosureRow 呈现">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>上下文注入实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./jobs-lab.css">
+  <link rel="stylesheet" href="./context-lab.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#cx-main">跳到实验</a>
+  <main class="lab-shell" id="cx-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 上下文注入</p>
+        <h1>从全局到工作目录，逐层发现、逐条去重。</h1>
+        <p class="hero-lead">agent-instructions 在每个 pre-step 从项目根到 cwd 扫描指令文件候选名（AGENTS.md、CLAUDE.md 等），同目录内字节相同的内容去重取最早。发现的指令以 durable user-role 消息注入（system-reminder 包裹），在 ChatFlow 中渲染为默认折叠的 DisclosureRow——标题区分角色和生产者。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/37-计划栈.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./skill-catalog-lab.html">打开技能目录实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 30</span>
+        <strong>教学文件系统是固定常量。</strong>
+        <p>没有真实 fs 或 provider 调用。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：packages/app/CLAUDE.md 和 packages/app/AGENTS.md 内容完全相同时，发现链怎么处理？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="inject-all">
+            <span>两条都注入——每个文件都重要</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="dedup-identical">
+            <span>去重取最早候选，只注入一条</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="skip-nested">
+            <span>跳过嵌套目录的指令文件</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <form class="lab-form" id="ctx-form">
+          <label>
+            <span>cwd 深度（packages → packages/app）</span>
+            <select id="ctx-cwd-depth">
+              <option value="0">0 — 项目根</option>
+              <option value="1" selected>1 — packages/</option>
+              <option value="2">2 — packages/app/</option>
+            </select>
+          </label>
+          <label class="bundle-check"><input type="checkbox" id="ctx-time"><span>time-context 插件激活</span></label>
+          <label class="bundle-check"><input type="checkbox" id="ctx-session-ref"><span>跨会话召回注入</span></label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+        </form>
+        <p class="feedback" id="ctx-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="上下文观测值">
+          <div><dt>发现文件数</dt><dd id="metric-files">—</dd></div>
+          <div><dt>去重丢弃</dt><dd id="metric-dedup">—</dd></div>
+          <div><dt>活跃生产者</dt><dd id="metric-producers">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="cx-chain-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="layers">发现链</p>
+          <h2 id="cx-chain-title">从全局到 cwd 的扫描顺序</h2>
+        </div>
+        <span class="schema-pill">路径 × 内容摘要</span>
+      </div>
+      <ul class="wt-sources" id="ctx-chain-list"></ul>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="cx-inject-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="terminal">ChatFlow 投影</p>
+          <h2 id="cx-inject-title">DisclosureRow 注入预览</h2>
+        </div>
+        <span class="schema-pill">角色 × 生产者</span>
+      </div>
+      <div id="ctx-injections"></div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>三条不变量逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">流程校验</span>
+        </div>
+        <p class="section-intro">独立校验重跑发现算法，核对确定性、内容去重和全局优先排序。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study/lessons/37-计划栈.html">继续读计划栈课程</a>
+    </footer>
+  </main>
+  <script type="module" src="./context-lab.js"></script>
+</body>
+</html>

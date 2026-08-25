@@ -5,7 +5,7 @@
 ## Host 和 Client
 
 - **Host** 在 Node 侧运行，负责 profile、Session、Agent、工具执行、HTTP API、Web Server 和持久化。
-- **Client** 在浏览器侧运行，负责会话界面、工具卡片、消息节点、设置和交互。三个核心组件族各有可推演的契约面板：[客户端三面镜实验](/client-lab.html)覆盖 ui-tool 的卡片状态机（状态只来自冻结切片）、ui-conversation 的折叠引擎（压缩行与披露行的规矩）和 ui-user-questions 的提问接管（plan-review 五条件）。
+- **Client** 在浏览器侧运行，负责会话界面、工具卡片、消息节点、设置和交互。三个核心组件族各有可推演的契约面板：[客户端三面镜实验](/client-lab.html)覆盖 ui-tool 的卡片状态机（状态只来自冻结切片）、ui-conversation 的折叠引擎（压缩行与披露行的规矩）和 ui-user-questions 的提问接管（plan-review 五条件）。凭据解析与设置管理也有对应实验入口。
 - 两边通过 API／远程协议和 Session 事件传递信息；Client 不应该直接访问 Node 的文件系统或模型密钥。
 
 官方文档把它们放在不同的 TypeScript aggregate 中。原因是 Host 和 Client 会给 Cordis `Context` 合并不同服务，如果把两套程序强行放进一个 TypeScript program，声明可能发生冲突。读 `docs/development.md` 中的 `tsconfig.host.json`、`tsconfig.client.json` 说明，可以理解这种边界。

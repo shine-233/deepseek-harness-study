@@ -36,7 +36,7 @@ for (const id of ids) {
     '    explain: {',
     ...Object.entries(config.gate.explain).map(([value, text]) =>
       `      ${sq(value)}: ${sq(text)},`),
-    '      },',
+    '    },',
     `    hint: ${sq(config.gate.hint)},`,
     '  })',
     '}',

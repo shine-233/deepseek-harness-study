@@ -1,0 +1,7 @@
+/* context-lab 实验页的少量专属样式；时间线复用 jobs-lab.css。 */
+
+#ctx-chain-list:empty::after { content: '（无发现）'; color: var(--muted); }
+
+@media (forced-colors: active) {
+  .wt-source { border: 1px solid CanvasText; }
+}

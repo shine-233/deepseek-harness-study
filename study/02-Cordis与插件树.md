@@ -113,7 +113,7 @@ Consumer            使用接口，不关心具体实现
 - Agent scoped 服务只对某个 Agent 的子树可见。
 - 测试可以在隔离 Context 中安装 fake provider，不影响另一个测试。
 
-这就是“能力扩展边界（seam）”的直观版本：接口和实现之间留一个插座，插件通过这个预留边界协作。它标记的是位置而非某一次调用，所以实现可以整体换掉，调用点跟着换。这条缝在 dsh-shell 里长成了显式的 `resolve(request): Spec`——[Shell 解析缝隙实验](/shell-seam-lab.html)展示同一份请求在本地执行器和沙箱执行器上怎样解析出不同的 Spec。
+这就是“能力扩展边界（seam）”的直观版本：接口和实现之间留一个插座，插件通过这个预留边界协作。它标记的是位置而非某一次调用，所以实现可以整体换掉，调用点跟着换。这条缝在 dsh-shell 里长成了显式的 `resolve(request): Spec`——[Shell 解析缝隙实验](/shell-seam-lab.html)展示同一份请求在本地执行器和沙箱执行器上怎样解析出不同的 Spec。web 缝隙同理：[Web 提供者矩阵实验](/provider-lab.html)对照 DeepSeek/Exa/Perplexity 三家搜索实现怎样归一化到同一份 sources。
 
 ## Event：插件之间的通知和拦截点
 

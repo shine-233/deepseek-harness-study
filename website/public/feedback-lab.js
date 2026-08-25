@@ -8,7 +8,7 @@ if (typeof document !== 'undefined') {
       'one': 'FB_LIFECYCLE_BOUND 校验钉住了它：upsert 语义让重复评价收敛为一条记录。',
       'three': '追加式会让「撤销反馈」变成猜谜；设计选择了更新。',
       'zero': '反馈随操作即时持久化，不是批处理。',
-      },
+    },
     hint: '线索：如果允许追加，「取消反馈」该怎么表达？',
   })
 }

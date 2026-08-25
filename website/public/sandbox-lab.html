@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="沙箱策略：三模式判定表、会话覆盖事件入册、拒绝带升级指引——可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>沙箱策略实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sbx-main">跳到实验</a>
+  <main class="lab-shell" id="sbx-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 沙箱策略</p>
+        <h1>三种模式画三条边界，越界写入当场被拒。</h1>
+        <p class="hero-lead">read-only 只许读；workspace-write 放行工作区内与平台临时区；danger-full-access 不设限。会话可用 sandbox/mode 事件覆盖模式——事件作为模型历史入册，重放时重建出同一策略。拒绝不是终点：工具自己的升级指引随结果返回。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/13-官方工具插件完整契约.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./shell-seam-lab.html">打开 Shell 解析缝隙实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界"><span class="warning-index">MODEL / SS</span><strong>路径按三类枚举。</strong><p>规则取自上游 sandbox-policy 源码（基线 aa6c361a）；页面不碰真实文件系统或内核。</p></aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：workspace-write 模式下，往平台临时区写一个文件——放行还是拒绝？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="denied"><span>拒绝——工作区之外一律不许写</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="allowed"><span>放行——临时区是 workspace-write 的白名单之一</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="ask"><span>弹窗询问用户后再定</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form sb-controls" id="sandbox-form">
+          <label><span>沙箱模式</span><select id="sbx-mode">
+            <option value="read-only">read-only</option>
+            <option value="workspace-write" selected>workspace-write</option>
+            <option value="danger-full-access">danger-full-access</option>
+          </select></label>
+          <label><span>操作类型</span><select id="sbx-op">
+            <option value="read">读取文件</option>
+            <option value="write-in-workspace">写入工作区内</option>
+            <option value="write-temp">写入平台临时区</option>
+            <option value="write-outside">写入工作区外</option>
+          </select></label>
+          <label class="sb-check"><input id="sbx-override" type="checkbox"><span>本会话曾以 sandbox/mode 事件覆盖模式</span></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="sandbox-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="沙箱观测值">
+          <div><dt>分叉形态</dt><dd id="metric-shape">—</dd></div>
+          <div><dt>有效模式</dt><dd id="metric-mode">—</dd></div>
+          <div><dt>结局</dt><dd id="metric-verdict">—</dd></div>
+          <div><dt>覆盖入册</dt><dd id="metric-override">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="sbx-steps-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="table">完整文字替代</p><h2 id="sbx-steps-title">有序推演表</h2></div><span class="schema-pill">不用脚本也能读</span></div>
+      <div class="table-scroll">
+        <table>
+          <caption id="sbx-caption">当前输入的全部步骤</caption>
+          <thead><tr><th scope="col">#</th><th scope="col">泳道</th><th scope="col">阶段</th><th scope="col">说明</th></tr></thead>
+          <tbody id="sbx-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定</summary>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </details>
+    </section>
+
+    <section class="evidence-grid" aria-label="证据边界">
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不连接任何 Host</span><a href="./terminal-lab.html">继续看终端会话实验</a></footer>
+  </main>
+  <script type="module" src="./sandbox-lab.js"></script>
+</body>
+</html>
