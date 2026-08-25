@@ -1,0 +1,86 @@
+/* 学习进度总览页（progress.html）的专属样式。
+   面板骨架来自 study-review.css / study-lab-shell.css；这里只补进度格。 */
+
+.progress-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px;
+}
+
+.progress-row {
+  margin: 0;
+}
+
+.progress-row a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 11px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  font-size: 0.82rem;
+  transition: border-color var(--dur-fast, 0.15s) ease, background var(--dur-fast, 0.15s) ease;
+}
+
+.progress-row a:hover {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+
+.progress-row a:focus-visible {
+  outline: 3px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
+.progress-state {
+  flex: none;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 50%;
+  color: var(--vp-c-text-3);
+  font-size: 0.72rem;
+}
+
+.progress-row[data-done="true"] .progress-state {
+  border: 1px solid var(--vp-c-brand-1);
+  border-style: solid;
+  color: var(--vp-c-brand-1);
+}
+
+.progress-row[data-done="true"] .progress-name {
+  color: var(--vp-c-text-2);
+  text-decoration: line-through solid rgba(90, 110, 133, 0.45);
+}
+
+.progress-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-grid li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.progress-quiz {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.7rem;
+  color: var(--vp-c-brand-1);
+  font-variant-numeric: tabular-nums;
+}

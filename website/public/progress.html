@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="全部课程与实验的学习进度总览：只读本机存储，不上传。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>学习进度总览</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="stylesheet" href="./study-review.css">
+  <link rel="stylesheet" href="./study-progress-view.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#progress-main">跳到进度总览</a>
+  <main class="lab-shell" id="progress-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 进度</p>
+        <h1>整本手账，一页看完。</h1>
+        <p class="hero-lead">课程、实验、自测、错题——四本账都在这一页对齐。数据只来自本机浏览器，不上传；换设备用课程页右下角的导出/导入搬走。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-secondary" href="/">回到课程</a>
+          <a class="button button-secondary" href="./study-review.html">错题本</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="数据边界">
+        <p class="eyebrow">LOCAL / 01</p>
+        <p><strong>名单来自 sitemap，进度来自本机。</strong>两边对不上的课（名单有、本机没有）显示为未读——这不是丢失，是你还没读到。</p>
+      </aside>
+    </header>
+
+    <section class="review-panel" aria-label="总览数字">
+      <dl class="metric-grid">
+        <div><dt>已读课程</dt><dd id="sum-lessons">—</dd></div>
+        <div><dt>亲手做过的实验</dt><dd id="sum-labs">—</dd></div>
+        <div><dt>自测满分课</dt><dd id="sum-perfect">—</dd></div>
+        <div><dt>今天该复习的错题</dt><dd id="sum-due">—</dd></div>
+      </dl>
+      <p class="review-note">「未读」不是批评——名单里有一大半课，本来就不是给第一天读完的。</p>
+    </section>
+
+    <section class="review-panel" aria-label="课程进度">
+      <h2>课程（38 篇按序排）</h2>
+      <ul class="progress-grid" id="lesson-grid"></ul>
+      <p class="review-note" id="lesson-fallback" hidden>名单获取失败（比如在 file:// 下打开）——这里只显示你标记过的课。</p>
+    </section>
+
+    <section class="review-panel" aria-label="实验进度">
+      <h2>实验（按模块排）</h2>
+      <ul class="progress-grid" id="lab-grid"></ul>
+      <p class="review-note">实验页的「亲手做过」标记来自预测门提交或跳过的那一次。</p>
+    </section>
+  </main>
+  <script type="module" src="./study-progress-view.js"></script>
+</body>
+</html>
