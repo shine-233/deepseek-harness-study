@@ -955,6 +955,14 @@ html { scroll-behavior: smooth; }
 .metric-grid dd.is-failed { color: var(--deny-ink); }
 .metric-grid dd.is-none { color: var(--muted); }
 
+/* 时间线步骤可点击寻址（图形即控制器）：指针形态提示可点。 */
+.cr-timeline .cr-step,
+.hg-timeline .hg-step,
+.iv-timeline .iv-step,
+.sh-timeline .sh-step {
+  cursor: pointer;
+}
+
 /* 减少动态偏好下全部禁用 */
 @media (prefers-reduced-motion: reduce) {
   .metric-oracle dd[data-pass="true"],
