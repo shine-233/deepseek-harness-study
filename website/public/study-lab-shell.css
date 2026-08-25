@@ -928,6 +928,33 @@ html { scroll-behavior: smooth; }
   100% { background: transparent; }
 }
 
+/*
+ * 状态徽章与终局色调：此前只有 trajectory-lab.css / jobs-lab.css 各自定义了
+ * .tj-view-chip，其余实验室页挂这些类时没有任何样式（死类名）。这里给出
+ * shell 级默认值；页面级 CSS 同名规则按加载顺序自然覆盖。
+ */
+.tj-view-chip {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--signal-ink, var(--signal));
+  border: 1px solid color-mix(in srgb, var(--signal, var(--vp-c-brand-1)) 45%, transparent);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
+.tj-view-chip.is-suppressed {
+  color: var(--muted);
+  border-color: var(--line);
+}
+
+.metric-grid dd.is-running { color: var(--brand); }
+.metric-grid dd.is-stopping { color: var(--warning-ink); }
+.metric-grid dd.is-completed { color: var(--allow-ink); }
+.metric-grid dd.is-killed { color: var(--warning-ink); }
+.metric-grid dd.is-failed { color: var(--deny-ink); }
+.metric-grid dd.is-none { color: var(--muted); }
+
 /* 减少动态偏好下全部禁用 */
 @media (prefers-reduced-motion: reduce) {
   .metric-oracle dd[data-pass="true"],

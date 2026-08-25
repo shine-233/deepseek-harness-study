@@ -64,13 +64,17 @@ export function buildHostGatewayModel(input = {}) {
     { kind: 'carrier' })
 
   let matchedIndex = -1
-  ROUTE_TABLE.forEach((route, order) => {
+  for (let order = 0; order < ROUTE_TABLE.length; order += 1) {
+    const route = ROUTE_TABLE[order]
     const hit = route.path === requestPath
-    if (hit) matchedIndex = order
     push(`路由扫描 #${order + 1}：${route.path}`,
       hit ? `命中——处理权交给注册方：${route.owner}` : '未命中——继续向下扫，回退座位先不动',
       { kind: 'scan', hit })
-  })
+    if (hit) {
+      matchedIndex = order
+      break
+    }
+  }
 
   if (matchedIndex >= 0) {
     const route = ROUTE_TABLE[matchedIndex]
@@ -130,13 +134,11 @@ export function evaluateHostGatewayOracle(model) {
     '1 次', `${String(model.steps.filter(step => step.kind === 'carrier').length)} 次`)
 
   const scans = model.steps.filter(step => step.kind === 'scan')
-  const hitsBeforeEnd = scans.findIndex(step => step.hit === true)
-  const missesAfterHit = hitsBeforeEnd >= 0
-    ? scans.slice(hitsBeforeEnd + 1).some(step => step.hit === true || true) && scans.slice(hitsBeforeEnd + 1).some(step => step.kind === 'scan' && step.hit === true)
-    : false
-  add('REGISTERED_SHORTCIRCUITS', '命中即停止认领竞争：命中的是第一个匹配项，其后没有再命中',
-    hitsBeforeEnd < 0 ? true : !missesAfterHit,
-    '至多一次命中', hitsBeforeEnd < 0 ? '0 次' : '1 次')
+  const firstHit = scans.findIndex(step => step.hit === true)
+  add('REGISTERED_SHORTCIRCUITS', '命中即短路：命中的是首个匹配项，其后不再有扫描步骤',
+    firstHit < 0 || scans.slice(firstHit + 1).every(step => step.kind !== 'scan'),
+    firstHit < 0 ? '扫完整表' : `第 ${String(firstHit + 1)} 次比较后短路`,
+    firstHit < 0 ? '扫完整表' : scans.slice(firstHit + 1).some(step => step.kind === 'scan') ? '命中后仍在扫描' : `第 ${String(firstHit + 1)} 次比较后短路`)
 
   add('FALLBACK_ONLY_ON_TOTAL_MISS', '回退座位只在全部未命中时出现',
     model.observations.usedFallback === !model.observations.matchedRoute,

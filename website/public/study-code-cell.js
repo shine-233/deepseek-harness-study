@@ -84,7 +84,16 @@ function replaceWithCell(pre, source) {
   pre.replaceWith(cell)
 
   let frame = null
-  const closeFrame = () => { frame?.remove(); frame = null }
+  let onMessage = null
+  const closeFrame = () => {
+    // 每次运行注册一个监听器；不随 frame 一起移除的话，旧监听器会永久累积。
+    if (onMessage !== null) {
+      removeEventListener('message', onMessage)
+      onMessage = null
+    }
+    frame?.remove()
+    frame = null
+  }
 
   runButton.addEventListener('click', () => {
     closeFrame()
@@ -101,7 +110,7 @@ function replaceWithCell(pre, source) {
     frame.style.display = 'none'
     frame.srcdoc = buildRunnerDocument(editor.value)
 
-    const onMessage = (event) => {
+    const onMessageForRun = (event) => {
       if (frame === null || event.source !== frame.contentWindow) return
       const data = event.data ?? {}
       if (data.source !== 'dsh-code-cell') return
@@ -117,6 +126,7 @@ function replaceWithCell(pre, source) {
         closeFrame()
       }
     }
+    onMessage = onMessageForRun
     addEventListener('message', onMessage)
     document.body.append(frame)
   })
