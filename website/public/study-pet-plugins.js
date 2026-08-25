@@ -118,6 +118,7 @@ function ensureStyle(doc) {
     '.dsh-pp-log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
     '.dsh-pp-log div:first-child{color:var(--vp-c-brand-1);}',
     '.dsh-pp-foot{margin:8px 0 0;font-size:0.66rem;color:var(--vp-c-text-2);line-height:1.5;}',
+    '.dsh-pp-freeze-eyes .dsh-comp-eye{animation:none!important;}',
     '@media (prefers-reduced-motion:reduce){.dsh-pp-zzz{animation:none;}#dsh-companion{transition:none;}}',
   ].join('\n')
   doc.head.append(style)
@@ -217,14 +218,18 @@ function initializePetPlugins(doc) {
     renderLog()
   }
 
-  // ---- 巡游：沿底部缓慢平移，走路帧与待机帧交替，转身翻转 ----
+  // ---- 巡游：沿底部缓慢平移，走路帧与待机帧交替，转身翻转；拖拽期间让路 ----
+  const shared = { dragging: false, pauseUntil: 0 }
   let wanderTimer = null
   let walkSwap = null
   let facing = 1
   const mountWander = api => {
     if (reducedMotion) return () => {}
     const step = () => {
-      if (baseFrame === 'nap') { wanderTimer = setTimeout(step, 4000); return }
+      if (baseFrame === 'nap' || shared.dragging || Date.now() < shared.pauseUntil) {
+        wanderTimer = setTimeout(step, 4000)
+        return
+      }
       setBase('walk')
       walkSwap = setTimeout(() => { if (baseFrame === 'walk') setFrame('idle') }, 700)
       api.root.style.translate = `${facing * (40 + Math.round(Math.random() * 90))}px 0`
@@ -295,7 +300,7 @@ function initializePetPlugins(doc) {
     }
   }
 
-  // ---- 拖拽：pointer 拖动 + localStorage 持久化 ----
+  // ---- 拖拽：pointer 拖动 + localStorage 持久化；拖拽期间巡游暂停 ----
   const mountDrag = api => {
     let startX = 0, startY = 0, baseX = 0, baseY = 0, dragging = false
     const saved = doc.defaultView.localStorage.getItem('dsh-pet-offset')
@@ -308,6 +313,7 @@ function initializePetPlugins(doc) {
     const down = event => {
       if (!event.composedPath().includes(api.root)) return
       dragging = true
+      shared.dragging = true
       startX = event.clientX; startY = event.clientY
       const current = getComputedStyle(api.root).translate.split(' ')
       baseX = parseFloat(current[0]) || 0
@@ -317,9 +323,12 @@ function initializePetPlugins(doc) {
       if (!dragging) return
       api.root.style.translate = `${baseX + event.clientX - startX}px ${baseY + event.clientY - startY}px`
     }
-    const up = () => {
+    const up = event => {
       if (!dragging) return
       dragging = false
+      shared.dragging = false
+      // 放下手后给一段安定期，巡游不会立刻把阿溟拽离你放的位置。
+      shared.pauseUntil = Date.now() + 12000
       doc.defaultView.localStorage.setItem('dsh-pet-offset',
         JSON.stringify({ x: baseX + event.clientX - startX, y: baseY + event.clientY - startY }))
     }
@@ -335,15 +344,11 @@ function initializePetPlugins(doc) {
     }
   }
 
-  // ---- 眨眼：伴侣模块的 CSS 循环，卸载 = 停用视觉效果 ----
-  const mountBlinkOff = api => () => {
-    api.root.classList.add('dsh-pp-nap-freeze-eyes')
-    const style = doc.getElementById('dsh-petplugins-style')
-    if (style && !style.textContent.includes('freeze-eyes')) {
-      style.textContent += '\n.dsh-pp-freeze-eyes .dsh-comp-eye{animation:none!important;}'
-    }
+  // ---- 眨眼：伴侣模块的 CSS 循环；卸载插件 = 冻结眨眼（dispose 视觉效果） ----
+  const mountBlink = api => {
+    api.root.classList.remove('dsh-pp-freeze-eyes')
     return () => {
-      api.root.classList.remove('dsh-pp-freeze-eyes')
+      api.root.classList.add('dsh-pp-freeze-eyes')
     }
   }
 
@@ -352,7 +357,7 @@ function initializePetPlugins(doc) {
     eyetrack: mountEyeTrack,
     nap: mountNap,
     drag: mountDrag,
-    blinkoff: mountBlinkOff,
+    blinkoff: mountBlink,
   }
 
   const runtime = createPetRuntime(FACTORIES, { root, log })
