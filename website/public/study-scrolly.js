@@ -260,5 +260,11 @@ if (typeof document !== 'undefined') {
   }
   mount()
   // VitePress 单页路由切换后正文整体替换，重新扫描一遍容器。
-  new MutationObserver(() => mount()).observe(document.body, { childList: true, subtree: true })
+  // 与其余元课组件同一套 150ms 去抖：动画期间的成串 body 变更
+  // 不必每次都同步全文档扫描。
+  let scrollyTimer = 0
+  new MutationObserver(() => {
+    clearTimeout(scrollyTimer)
+    scrollyTimer = setTimeout(mount, 150)
+  }).observe(document.body, { childList: true, subtree: true })
 }
