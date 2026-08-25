@@ -82,6 +82,17 @@ test('有键盘等价操作', () => {
   assert.match(html, /id="scene-canvas"[^>]*tabindex="0"/s, 'canvas 必须可聚焦')
 })
 
+test('相机词汇完整：滚轮缩放、键盘缩放等价、双击复位', () => {
+  assert.match(script, /addEventListener\('wheel'/, '3D canvas 必须响应滚轮缩放')
+  assert.match(script, /'\+'/, '键盘必须有 + 缩放键')
+  assert.match(script, /'-'/, '键盘必须有 - 缩放键')
+  assert.match(script, /addEventListener\('dblclick'/, '3D canvas 必须支持双击复位')
+  assert.match(scene, /zoomBy/, 'scene 必须暴露 zoomBy')
+  assert.match(scene, /resetView/, 'scene 必须暴露 resetView')
+  assert.match(scene, /DISTANCE_MIN/, '缩放必须有下限夹持')
+  assert.match(scene, /DISTANCE_MAX/, '缩放必须有上限夹持')
+})
+
 test('自动旋转尊重减少动态效果', () => {
   assert.match(scene, /options\.reducedMotion === true \|\| spinning/,
     'startSpin 必须在 reducedMotion 下直接返回')

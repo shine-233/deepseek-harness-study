@@ -22,6 +22,9 @@ const INNER_RING_GROUPS = 12
 const INERTIA_STOP = 1e-4
 /** 每帧（16.7ms）保留的速度比例；越接近 1 滑得越远。 */
 const INERTIA_DECAY_DEFAULT = 0.9
+/** 相机距离的缩放范围：贴太近会穿进柱子，拉太远双环缩成一条线。 */
+const DISTANCE_MIN = 2.6
+const DISTANCE_MAX = 9
 
 const inertiaDecayPerFrame = value => typeof value === 'number' && value > 0 && value < 1
   ? value
@@ -496,6 +499,18 @@ export function createPackageScene(canvas, model, options = {}) {
     },
     setYaw(value) { camera.yaw = value; render() },
     setPitch(value) { camera.pitch = Math.max(0.05, Math.min(1.35, value)); render() },
+    /** 滚轮/键盘缩放：factor>1 拉远；夹在距离范围内，惯性让位给明确的缩放意图。 */
+    zoomBy(factor) {
+      stopInertia()
+      camera.distance = Math.min(DISTANCE_MAX, Math.max(DISTANCE_MIN, camera.distance * factor))
+      render()
+    },
+    /** 双击复位：清掉组聚焦，相机飞回默认视角。 */
+    resetView() {
+      focusedGroup = null
+      syncFlowLoop()
+      animateCameraTo(HOME_VIEW, () => syncFlowLoop())
+    },
     nudge(dYaw, dPitch) {
       camera.yaw = (camera.yaw + dYaw + TAU) % TAU
       camera.pitch = Math.max(0.05, Math.min(1.35, camera.pitch + dPitch))

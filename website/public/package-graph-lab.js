@@ -1073,6 +1073,7 @@ function installScene(model) {
   }
 
   // 键盘等价操作：只能拖动的 3D 场景对键盘用户等于不存在。
+  // 方向键转视角，+ / - 缩放，与滚轮、双击复位共同构成完整的相机词汇。
   canvas.addEventListener('keydown', (event) => {
     if (scene === null) return
     const step = event.shiftKey ? 0.24 : 0.08
@@ -1081,10 +1082,26 @@ function installScene(model) {
       ArrowUp: [0, step], ArrowDown: [0, -step],
     }
     const move = moves[event.key]
-    if (move === undefined) return
-    event.preventDefault()
-    scene.nudge(move[0], move[1])
+    if (move !== undefined) {
+      event.preventDefault()
+      scene.nudge(move[0], move[1])
+      return
+    }
+    const zoom = { '+': 1 / 1.12, '=': 1 / 1.12, '-': 1.12, _: 1.12 }[event.key]
+    if (zoom !== undefined) {
+      event.preventDefault()
+      scene.zoomBy(zoom)
+    }
   })
+  // 滚轮缩放（3d-force-graph 同款词汇）：指数步进保证远近手感一致；
+  // preventDefault 阻止页面跟随滚动，passive 必须显式关掉。
+  canvas.addEventListener('wheel', (event) => {
+    if (scene === null) return
+    event.preventDefault()
+    scene.zoomBy(Math.exp(event.deltaY * 0.0012))
+  }, { passive: false })
+  // 双击回到默认视角；单击留给组聚焦，不冲突。
+  canvas.addEventListener('dblclick', () => { scene?.resetView() })
 
   window.addEventListener('resize', () => { if (!stage.hidden) scene?.resize() })
 }

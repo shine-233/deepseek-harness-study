@@ -8,6 +8,18 @@
  * the 4.5:1 body-text floor.
  */
 
+/*
+ * 跨文档视图过渡（View Transitions）：课程页之间的导航做一次轻交叉淡入。
+ * 纯 CSS 声明、无内联脚本，CSP 友好；不支持的浏览器就是普通跳页，
+ * 天然渐进增强。减少动态效果的用户保持即时切换。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+
 .lesson-widget {
   margin: 32px 0;
   border: 1px solid var(--vp-c-divider);
