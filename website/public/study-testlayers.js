@@ -85,6 +85,7 @@ function ensureStyle(doc) {
 .dsh-testlayers-band[aria-pressed="true"]{border-color:var(--vp-c-brand-1);background:var(--vp-c-brand-soft);box-shadow:inset 0 0 0 1px var(--vp-c-brand-1);}
 .dsh-testlayers-band:focus-visible{outline:3px solid var(--vp-c-brand-1);outline-offset:2px;}
 .dsh-testlayers-band small{margin-left:auto;color:var(--vp-c-text-2);font-size:0.78rem;}
+.dsh-testlayers-band[aria-pressed="true"] small{color:var(--vp-c-brand-1);}
 .dsh-testlayers-detail{padding:16px 18px;border:1px solid var(--vp-c-divider);border-radius:8px;background:var(--vp-c-bg-soft);}
 .dsh-testlayers-detail dt{margin:10px 0 2px;color:var(--vp-c-brand-1);font-size:0.76rem;font-weight:700;}
 .dsh-testlayers-detail dt:first-child{margin-top:0;}
