@@ -950,6 +950,8 @@ function installScene(model) {
       scene = createPackageScene(canvas, model, {
         reducedMotion,
         onFrame: positionHotspots,
+        // 双环 50 个组密度高，衰减略慢于默认值，甩动后多滑一小段再停。
+        inertiaDecay: 0.92,
       })
       if (scene === null) {
         // canvas 不可用时手动二维地图和表格仍然完整可用

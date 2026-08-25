@@ -18,6 +18,14 @@
 
 const TAU = Math.PI * 2
 const INNER_RING_GROUPS = 12
+/** 角速度低于该值（弧度/帧）视为滑行结束。 */
+const INERTIA_STOP = 1e-4
+/** 每帧（16.7ms）保留的速度比例；越接近 1 滑得越远。 */
+const INERTIA_DECAY_DEFAULT = 0.9
+
+const inertiaDecayPerFrame = value => typeof value === 'number' && value > 0 && value < 1
+  ? value
+  : INERTIA_DECAY_DEFAULT
 
 /** 透视投影：把世界坐标压到屏幕坐标，同时返回深度用于排序。 */
 function project(point, camera, width, height) {
@@ -101,6 +109,7 @@ function heightFor(lines, maxLines) {
  * @param canvas 目标 canvas；不传或拿不到 2d 上下文就返回 null，调用方保持二维视图。
  * @param model 含 nodes、edges 的模型对象。
  * @param options.reducedMotion 为 true 时不自动旋转。
+ * @param options.inertiaDecay 惯性滑行每帧（16.7ms）保留的速度比例，0-1 开区间；越大滑得越远。
  * @returns 控制器，含 render、setYaw、dispose；canvas 不可用时为 null。
  */
 export function createPackageScene(canvas, model, options = {}) {
@@ -126,10 +135,12 @@ export function createPackageScene(canvas, model, options = {}) {
   let flowRaf = 0
   let lastFrameTime = 0
   // 惯性滑行（tldraw/excalidraw 手感）：拖放后的速度按帧衰减，直到低于阈值。
+  // 衰减比例走 options.inertiaDecay，调用方按场景内容密度调手感。
   let inertiaRaf = 0
   let inertiaLast = 0
   let inertiaVYaw = 0
   let inertiaVPitch = 0
+  const decayPerFrame = inertiaDecayPerFrame(options.inertiaDecay)
   // 离屏挂起：场景滚出视口时停掉自转与惯性，回到视口再恢复自转。
   let sceneVisible = true
   let suspendSpinOnHide = false
@@ -173,29 +184,31 @@ export function createPackageScene(canvas, model, options = {}) {
     flowRaf = requestAnimationFrame(flowTick)
   }
 
+  /** fling 与离屏恢复共用的滑行帧：推进、衰减、渲染、停判全在这一处。 */
+  function runInertiaTick(now) {
+    if (!sceneVisible) { inertiaSuspended = true; inertiaRaf = 0; return }
+    if (inertiaLast === 0) inertiaLast = now
+    const dt = Math.min(64, now - inertiaLast)
+    inertiaLast = now
+    syncFlowLoop()
+    camera.yaw = (camera.yaw + inertiaVYaw * dt / 16.7 + TAU) % TAU
+    camera.pitch = Math.max(0.05, Math.min(1.35, camera.pitch + inertiaVPitch * dt / 16.7))
+    const decay = Math.pow(decayPerFrame, dt / 16.7)
+    inertiaVYaw *= decay
+    inertiaVPitch *= decay
+    render()
+    if (Math.abs(inertiaVYaw) < INERTIA_STOP && Math.abs(inertiaVPitch) < INERTIA_STOP) { stopInertia(); return }
+    inertiaRaf = requestAnimationFrame(runInertiaTick)
+  }
+
   function fling(vYaw, vPitch) {
     if (options.reducedMotion === true || !sceneVisible) return
     stopInertia()
     inertiaVYaw = vYaw
     inertiaVPitch = vPitch
-    if (Math.abs(inertiaVYaw) < 1e-4 && Math.abs(inertiaVPitch) < 1e-4) return
+    if (Math.abs(inertiaVYaw) < INERTIA_STOP && Math.abs(inertiaVPitch) < INERTIA_STOP) return
     inertiaLast = 0
-    const tick = (now) => {
-      if (!sceneVisible) { inertiaSuspended = true; inertiaRaf = 0; return }
-      if (inertiaLast === 0) inertiaLast = now
-      const dt = Math.min(64, now - inertiaLast)
-      inertiaLast = now
-      syncFlowLoop()
-      camera.yaw = (camera.yaw + inertiaVYaw * dt / 16.7 + TAU) % TAU
-      camera.pitch = Math.max(0.05, Math.min(1.35, camera.pitch + inertiaVPitch * dt / 16.7))
-      const decay = Math.pow(0.9, dt / 16.7)
-      inertiaVYaw *= decay
-      inertiaVPitch *= decay
-      render()
-      if (Math.abs(inertiaVYaw) < 1e-4 && Math.abs(inertiaVPitch) < 1e-4) { stopInertia(); return }
-      inertiaRaf = requestAnimationFrame(tick)
-    }
-    inertiaRaf = requestAnimationFrame(tick)
+    inertiaRaf = requestAnimationFrame(runInertiaTick)
   }
 
   if (typeof IntersectionObserver === 'function') {
@@ -215,23 +228,9 @@ export function createPackageScene(canvas, model, options = {}) {
       }
       if (inertiaSuspended) {
         inertiaSuspended = false
-        if (Math.abs(inertiaVYaw) >= 1e-4 || Math.abs(inertiaVPitch) >= 1e-4) {
+        if (Math.abs(inertiaVYaw) >= INERTIA_STOP || Math.abs(inertiaVPitch) >= INERTIA_STOP) {
           inertiaLast = 0
-          inertiaRaf = requestAnimationFrame(function resumeTick(now) {
-            if (!sceneVisible) { inertiaSuspended = true; inertiaRaf = 0; return }
-            if (inertiaLast === 0) inertiaLast = now
-            const dt = Math.min(64, now - inertiaLast)
-            inertiaLast = now
-            syncFlowLoop()
-      camera.yaw = (camera.yaw + inertiaVYaw * dt / 16.7 + TAU) % TAU
-            camera.pitch = Math.max(0.05, Math.min(1.35, camera.pitch + inertiaVPitch * dt / 16.7))
-            const decay = Math.pow(0.9, dt / 16.7)
-            inertiaVYaw *= decay
-            inertiaVPitch *= decay
-            render()
-            if (Math.abs(inertiaVYaw) < 1e-4 && Math.abs(inertiaVPitch) < 1e-4) { stopInertia(); return }
-            inertiaRaf = requestAnimationFrame(resumeTick)
-          })
+          inertiaRaf = requestAnimationFrame(runInertiaTick)
         }
       }
     })
