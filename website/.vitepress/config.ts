@@ -418,6 +418,15 @@ export default withMermaid({
   title: 'DSH 社区源码学习与生态导读',
   description: '面向 DSH 社区的非官方中文源码学习、插件实践与生态研究材料',
   base,
+  sitemap: {
+    hostname: 'https://shine-233.github.io/deepseek-harness-study',
+    // VitePress 1.6 的 sitemap 条目不含 base 路径（项目页站点会全部 404），
+    // 在这里把 base 补回到每个 URL 前面。
+    transformItems: items => items.map(item => ({
+      ...item,
+      url: '/deepseek-harness-study/' + item.url.replace(/^\//, ''),
+    })),
+  },
   // 索引导航页一屏排着几十个大 chunk 链接。VitePress 1.6 的视口预取默认开启
   // （router.prefetchLinks 缺省为 true），会在无点击时后台拉取约 4MB 的索引页
   // chunk。关掉它：页间切换改为点击时加载，静态站点单页 100–500KB，CDN 首字
