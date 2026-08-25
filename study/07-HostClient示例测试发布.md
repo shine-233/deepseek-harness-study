@@ -5,7 +5,7 @@
 ## Host 和 Client
 
 - **Host** 在 Node 侧运行，负责 profile、Session、Agent、工具执行、HTTP API、Web Server 和持久化。
-- **Client** 在浏览器侧运行，负责会话界面、工具卡片、消息节点、设置和交互。三个核心组件族各有可推演的契约面板：[客户端三面镜实验](/client-lab.html)覆盖 ui-tool 的卡片状态机（状态只来自冻结切片）、ui-conversation 的折叠引擎（压缩行与披露行的规矩）和 ui-user-questions 的提问接管（plan-review 五条件）。凭据解析与设置管理也有对应实验入口。
+- **Client** 在浏览器侧运行，负责会话界面、工具卡片、消息节点、设置和交互。三个核心组件族各有可推演的契约，[客户端三面镜实验](/client-lab.html)逐个展开：ui-tool 的卡片状态机，生命周期每个状态都从冻结的 call/result 事件切片推导出来，组件自己不留第二份状态；ui-conversation 的折叠引擎，连续消息按日志序折成压缩行，披露后一字不改地展开；ui-user-questions 的提问接管，一条提问要同时满足五个条件才会换成审阅卡——意图是 plan-review、只有一个问题、二元单选、选项里有批准标签、detail 附带计划正文，缺任何一个都留在通用提问流。凭据解析与设置管理也有对应实验入口。
 - 两边通过 API／远程协议和 Session 事件传递信息；Client 不应该直接访问 Node 的文件系统或模型密钥。
 
 宿主半区的 HTTP 面也有一条可推演的路径：webserver 是唯一的路由载体，frontend-static 坐在回退座位上——只在没有任何已注册路由认领时才把 SPA dist 发出去；目录选择走 `ctx.directoryPicker` 共享接缝，native 与 browse 两个后端互相替换而消费方契约不变。[宿主路由与接缝实验](/host-gateway-lab.html)把「载体接收 → 路由扫描 → 应答」做成逐步推进的时间线，可以切换请求形态和接缝后端。
