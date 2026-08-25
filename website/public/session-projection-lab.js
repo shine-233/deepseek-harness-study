@@ -34,7 +34,6 @@ function initializePage() {
     canProve: document.querySelector('#can-prove-list'),
     cannotProve: document.querySelector('#cannot-prove-list'),
     eventsMetric: document.querySelector('#metric-events'),
-    changed: document.querySelector('#metric-changed'),
     todos: document.querySelector('#metric-todos'),
     planMode: document.querySelector('#metric-plan'),
     oracle: document.querySelector('#metric-oracle'),

@@ -151,11 +151,12 @@ export function makeFeedback(element) {
 
 /**
  * 页面用到的所有元素必须齐全才开始渲染；缺一个就整体不渲染，而不是渲染出半张图。
+ * 接受任意 Element：有的页面把 SVG 场景（如 #profile-stage）也放进必查清单。
  *
  * @returns 全部存在返回 true。
  */
 export function requireElements(elements) {
-  return Object.values(elements).every(value => value instanceof HTMLElement)
+  return Object.values(elements).every(value => value instanceof Element)
 }
 
 /** 减少动态效果时关掉自动推进，逐帧控件保持可用。 */
