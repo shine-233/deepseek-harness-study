@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="ACP 桥实验室：自动化客户端怎样经 JSON-RPC stdio 驱动一次 Turn——准入、流式通知、取消时机与 stopReason 词表，可交互实验">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>ACP 桥实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css"><link rel="stylesheet" href="./acp-lab.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#acp-main">跳到实验</a>
+  <main class="lab-shell" id="acp-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 自动化接口</p>
+        <h1>自动化客户端看到的 Turn，是被桥精心删减过的。</h1>
+        <p class="hero-lead">ACP 桥把会话暴露给受信任的程序化客户端：stdin/stdout 上按行走 JSON-RPC。原始 chunk、推理、工具、计划留在线内；只有提交后的助手文本变成 agent_message_chunk 通知上线。一次 prompt 从准入到结算有三次取消窗口，每一窗在线上的可观察结果不同——cancelled 这个词，只有显式取消和连接处置配得上。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/07-HostClient示例测试发布.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./wire-lab.html">先看线协议基础</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界"><span class="warning-index">MODEL / 10</span><strong>消息序列钉在固定提交上。</strong><p>规则逐条取自上游 packages/acp/acp/src 的 index.ts 与 codec.ts（基线 aa6c361a）；页面不做真实 stdio IO。</p></aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：Turn 因 token 上限收尾（max-tokens），session/prompt 回应里的 stopReason 是什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="max-tokens"><span>max_tokens——Turn 怎么结束，线上就怎么报</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="end-turn"><span>end_turn——prompt 级词表比 Turn 级窄</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="cancelled"><span>cancelled——没跑完一律算取消</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <form class="lab-form" id="acp-form">
+          <label><span>内容块数</span><input type="range" id="acp-chunks" min="1" max="8" step="1" value="3"><output id="acp-chunks-out" for="acp-chunks">3 块</output></label>
+          <label><span>取消时机</span><select id="acp-cancel">
+            <option value="off">不取消：让 prompt 自然走完</option>
+            <option value="admission">admission：准入校验进行中</option>
+            <option value="queued">queued：已入持久 inbox、未被认领</option>
+            <option value="claimed">claimed：模型流式运行中</option>
+          </select></label>
+          <label><span>Turn 结局（仅不取消时生效）</span><select id="acp-ending">
+            <option value="completed">completed：正常完成</option>
+            <option value="max-tokens">max-tokens：token 上限收尾</option>
+            <option value="aborted">aborted：被 hook 中止</option>
+            <option value="interrupted">interrupted：进程中断恢复</option>
+            <option value="error">error：Turn 内部错误</option>
+          </select></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>
+        </form>
+        <p class="feedback" id="acp-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="ACP 桥观测值">
+          <div><dt>当前帧</dt><dd id="metric-frames">—</dd></div>
+          <div><dt>已上线通知</dt><dd id="metric-notes">—</dd></div>
+          <div><dt>最终 stopReason</dt><dd id="metric-stop">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="acp-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="route">三线时序</p><h2 id="acp-title">一拍一帧，箭头只在提交后上行</h2></div><span class="schema-pill">方向 × 时机</span></div>
+      <p class="section-intro">左线是客户端，中线是 ACP 桥，右线是 DSH Agent。实线是线上消息，虚线是宿主内部事件；绿色通知是唯一上行的数据。拖动步进滑杆或点右侧日志跳帧。</p>
+      <div class="stepper-row">
+        <button type="button" class="button button-quiet" id="acp-play" aria-label="连播或暂停">▶ 连播</button>
+        <label class="step-slider"><span>步进</span><input type="range" id="acp-step" min="0" max="9" step="1" value="0" aria-describedby="acp-step-caption"></label>
+        <label><span>速度</span><select id="acp-speed">
+          <option value="1400">0.5×</option>
+          <option value="720" selected>1×</option>
+          <option value="360">2×</option>
+          <option value="160">4×</option>
+        </select></label>
+      </div>
+      <p class="chart-note" id="acp-step-caption" role="status" aria-live="polite"></p>
+      <div class="plot-scroll" id="acp-plot"></div>
+      <p class="chart-note" id="acp-note"></p>
+    </section>
+
+    <section class="card log-card" aria-labelledby="acp-log-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="list">消息日志</p><h2 id="acp-log-title">点任意一行，时间轴跳到那一拍</h2></div><span class="schema-pill">可跳转</span></div>
+      <ol class="acp-log" id="acp-log"></ol>
+    </section>
+
+    <section class="card rule-card" aria-labelledby="acp-rule-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="map">词表速查</p><h2 id="acp-rule-title">结局到 stopReason 的完整映射</h2></div><span class="schema-pill">源码对照</span></div>
+      <p class="section-intro">这张表由模型的规则数组渲染，与上方时序共用同一份事实。cancelled 是保留字：只有显式 session/cancel 与连接处置能产生它。</p>
+      <div class="plot-scroll"><table class="stoprules" id="acp-stoprules">
+        <thead><tr><th scope="col">Turn 结局</th><th scope="col">线上 stopReason</th><th scope="col">为什么</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>规则逐条重算</h2></div><span class="schema-pill schema-oracle">协议校验</span></div>
+        <p class="section-intro">独立校验直接对模型输出重算四条规则；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不建立真实传输</span><a href="./approval-flow-lab.html">继续看审批流实验</a></footer>
+  </main>
+  <script type="module" src="./acp-lab.js"></script>
+</body>
+</html>

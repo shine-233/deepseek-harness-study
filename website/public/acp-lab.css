@@ -1,0 +1,79 @@
+/* ACP 桥实验室：三线时序与消息日志。壳层样式来自 study-lab-shell.css，这里只放本页增量。 */
+
+.acp-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  display: grid;
+  gap: 6px;
+}
+
+.log-row {
+  display: grid;
+  grid-template-columns: 3.5em 1fr;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 8px 12px;
+  border: 1px solid var(--dsh-border, rgba(0, 0, 0, 0.12));
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.log-row small { grid-column: 2; color: var(--vp-c-text-2); }
+.log-row.is-current {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 0 0 1px var(--vp-c-brand-soft);
+}
+.log-kind {
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  padding: 0 7px;
+  text-align: center;
+}
+
+.stepper-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.stepper-row .step-slider { display: flex; align-items: center; gap: 8px; flex: 1 1 220px; min-width: 200px; }
+.stepper-row .step-slider input[type="range"] { flex: 1; }
+
+.phase-label {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--vp-c-text-2);
+}
+
+.msg.is-internal { stroke-dasharray: 5 5; opacity: 0.85; }
+.msg.is-note { stroke: var(--vp-c-brand-1); stroke-width: 2.4; }
+.msg.is-live { stroke-dasharray: 7 5; animation: acp-dash 900ms linear infinite; }
+.msg.is-note.is-live { animation-duration: 700ms; }
+
+@keyframes acp-dash { to { stroke-dashoffset: -24; } }
+
+.stoprules { width: 100%; border-collapse: collapse; }
+.stoprules th, .stoprules td {
+  text-align: left;
+  vertical-align: top;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+.stoprules code { white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .log-row { grid-template-columns: 1fr; }
+  .log-row small { grid-column: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msg.is-live,
+  .msg.is-note.is-live { animation: none; }
+  .acp-log { scroll-behavior: auto; }
+}

@@ -16,6 +16,8 @@
 
 示例把真实组合压缩成可以运行的最小场景：headless agent 展示无服务器运行，ACP／JSON-RPC 展示进程外接口，web-cordis 展示浏览器组合。读示例时关注 profile、Bundle、环境变量和依赖，而不是只看最终输出。
 
+ACP 这条进程外接口有专属的[桥实验](/acp-lab.html)：一次 prompt 的准入、流式通知与三个取消时机被摆成三线时序，逐帧可跳；stopReason 词表里「cancelled 是保留字、max-tokens 在 prompt 级报 end_turn」这类反直觉规则，先押注再看答案。
+
 ## 测试的层次
 
 | 测试 | 它回答什么问题 |

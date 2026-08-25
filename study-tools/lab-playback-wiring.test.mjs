@@ -28,6 +28,7 @@ const STEPPER_LABS = [
   ['host-gateway', 'hg'],
   ['invariant', 'iv'],
   ['storage-hub', 'sh'],
+  ['acp', 'acp'],
 ]
 
 test('every stepper lab offers a play button and a speed select', () => {
