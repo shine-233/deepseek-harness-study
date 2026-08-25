@@ -80,6 +80,18 @@ Agent 有 inbox。直接用户消息、注入的运行时上下文和 goal conti
 
 取消有来源：用户、父 agent、hook 或 dispose。工具可能在真正启动前被取消，也可能已经启动后被取消；这两种结果需要区分。LLM 的认证、限流、网络和流截断也会变成结构化 `LlmFailure`，最终由 Turn 记录原因。
 
+## 打开 agent.ts 时值得停留的三处
+
+教材到这里给了你流程图和扩展点的地图。下面三处是你自己打开 `packages/core/agent-loop/src/agent.ts` 时容易走过但值得停下来的地方——每处只告诉你它是什么，不替你读。
+
+**三态生命周期。** Agent 不只是"在跑"和"没跑"。`Phase` 类型有三个分支：`idle`、`maintenance` 和 `running`。maintenance 阶段处理恢复和清理，不接受新的 Step。如果你只看 Turn 事件，会以为 Agent 只有两种状态；打开源码看 `setPhase` 才能发现中间态的存在和它为什么必要。
+
+**插件提议前的默认值剥离。** `requestProposal` 函数在插件提出下一次请求配置之前，把 adapter 写入的 `reasoningEffort` 和 `maxTokens` 从 header 中删掉。这确保插件看到的是用户可配置的参数，而不是 adapter 的内部实现细节。如果你在日志里发现这两个字段"消失了"，这就是原因。
+
+**请求锚点的防重入。** `requestHeaderLogged` 布尔标志保证 initial/resume 请求的锚点事件只写一次。没有这个标志，每次 Agent 从日志恢复都会重复写一条锚点，日志里就会出现无法配对的孤儿事件。
+
+这三处都不影响 Turn 流程的主干——但如果你在调试"为什么恢复后行为不对"或"为什么插件看不到某个配置"，答案大概率在这三个地方。
+
 ## 推荐阅读和验证
 
 先读[核心文件精读](03-核心文件精读.md)里的 `packages/core/agent-loop/src/agent.ts`、`packages/core/agent-loop/src/tool-calls.ts` 和 `packages/core/agent-loop/src/runtime-context.ts`，再读官方[架构中的 Turn flow](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/docs/architecture.md#turn-flow)。测试从这些开始：
