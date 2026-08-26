@@ -49,7 +49,9 @@
 
 - ~~状态链接目前只有 turn-flow 接入~~ 已闭合：全部实验室经 `study-lab-state.js` 写 URL hash；Playwright 实测 compaction/hook/approval/session-log 四个实验室刷新后输入回填。
 - ~~浏览器级 QA 矩阵未闭合~~ 已闭合（自动化走查，2026-08-24）：375px 移动端首页/课程/实验室/索引横向溢出 0px（修掉首页 `.dj-page` 负边距导致的 16px 溢出，`reading.css` 给 `.VPPage` 加 `overflow-x: clip`）；键盘 focus-visible 规则与 tablist ARIA 在位；`prefers-reduced-motion` 下首页与课程页伴侣动画停用（实测 `animation: none`）；package-graph 3D 画布带 2D 表格回退。标题锚点等 VitePress 原生小触控目标按上游原样保留。
-- rc.5 → 0.1.1-rc.2 只验证了引用路径存在性，未逐行复审语义差异。
+- ~~rc.5 → 0.1.1-rc.2 只验证了引用路径存在性，未逐行复审语义差异。~~ 已闭合（2026-08-26）：从课程抽 14 条最硬断言到上游源码逐条核对，14/14 属实、零版本漂移；唯一结构差异是上游多出 `packages/experimental/`（本就不在教材范围）。
+- **剩余包组实验室化路线**（2026-08-26 审计后遗留，约 11 组）：api、boot、e2b、examples、extensions、goal、runtime-diagnostics、schedule、sdk（wire 已部分覆盖）、todo、util。建议优先级：goal（37 课最薄，Ralph 循环可做成生成树模拟）> schedule/time（定时触发时序动画）> boot（profile 装配已有 profile-loader 可借用视角）> 其余按文档边界评估是否值得建。每个新实验沿用 acp-lab 模式：纯 model + 三线/树状视图 + 预测门 + oracle + 双语 Agent Note。
+- **移动端两件小事**：(1) 各 `*-lab.html` 的 meta viewport 缺 `viewport-fit=cover`（iOS 刘海屏安全区），批量一行修复即可；(2) 真机走查矩阵未跑过——iOS Safari / 鸿蒙浏览器 / Android Chrome 各过一遍 lab 播放控件与 iframe 嵌入。根 node_modules 无 Playwright，需先安装或复用 CI 的走查工作流。
 - ~~reading.css 死规则可清理~~ 已清理：36 个死类族（dsh-home-contract/dsh-proof-strip/dsh-learning-map/dsh-route-*/dsh-status-*/dsh-stuck-* 等）连同随附注释移除，1593 行 → 966 行；重建后首页 0.05%（吉祥物眨眼帧差）、课程页 0.00% 像素差，28 个 doc-sync 门禁与 407 个 study-tools 测试全绿。
 
 ## 6. 安全红线
