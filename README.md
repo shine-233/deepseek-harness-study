@@ -2,7 +2,7 @@
 
 [![Study material quality](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/study-quality.yml) [![Deploy documentation](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml/badge.svg)](https://github.com/shine-233/deepseek-harness-study/actions/workflows/docs-pages.yml)
 
-这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套四十个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。中文镜像：[README.zh.md](README.zh.md)。
+这是 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) 的社区学习型 fork：把官方 DSH 固定在提交 `aa6c361a972c8369148dea7380bb5c21c24e07ec`（根包 `0.1.1-rc.2`），为 2,973 个源文件提供中文逐文件导读，并配套五十八个可动手的确定性实验。它不属于 DeepSeek AI，不代表官方立场；"官方"在本文中只指上游来源，不表示本仓库获得授权。中文镜像：[README.zh.md](README.zh.md)。
 
 ## 三条入口
 
@@ -14,7 +14,7 @@
 
 发现文档事实错误、链接问题、教程无法复现或社区扩展风险时，请使用[按类型填写的 Issue 表单](https://github.com/shine-233/deepseek-harness-study/issues/new/choose)；不要提交密钥、Cookie 或私有运行日志。
 
-## 四十个可以动手的实验
+## 五十八个可以动手的实验
 
 这套教材要求每个关键结论都能落到一个确定性实验里：实验全部离线运行——固定输入、固定输出、独立 oracle、公开 canProve/cannotProve；它们是教学模型，不启动真实 DSH、provider 或模型。完整清单见[实验室总览](https://shine-233.github.io/deepseek-harness-study/study-labs.html)。
 
@@ -63,7 +63,19 @@
 | [时间上下文](https://shine-233.github.io/deepseek-harness-study/time-lab.html) | 选择性加入的带归因时间读数，durable 入册重放原样回来 |
 | [图片附件](https://shine-233.github.io/deepseek-harness-study/attachment-lab.html) | 尺寸限制在保存处强制执行，拒收时零引用 |
 | [消息反馈](https://shine-233.github.io/deepseek-harness-study/feedback-lab.html) | 按消息 id upsert，绑定已定稿生命周期，重复即更新 |
+| [Code 运行结果分类](https://shine-233.github.io/deepseek-harness-study/code-run-lab.html) | run() 失败也照常 resolve：error 是结果字段；六类失败彼此正交，binding 命名空间过三道检查 |
+| [上下文指令发现](https://shine-233.github.io/deepseek-harness-study/context-lab.html) | pre-step 从项目根到 cwd 扫描指令文件候选名；同目录同字节内容去重取最早，durable 消息注入 |
+| [宿主路由与接缝](https://shine-233.github.io/deepseek-harness-study/host-gateway-lab.html) | 路由未命中才轮到回退座位；directoryPicker 接缝换后端，消费方契约原样不动 |
+| [运行时不变量](https://shine-233.github.io/deepseek-harness-study/invariant-lab.html) | ./invariant 伴生插件注册检查：关掉检查也占住名字；fail 带包名归属，失败释放保留位 |
+| [Session 日志查询](https://shine-233.github.io/deepseek-harness-study/query-lab.html) | 序号闭区间窗口加大写不敏感子串搜索，逐条合取；纯读不改日志 |
+| [沙箱策略边界](https://shine-233.github.io/deepseek-harness-study/sandbox-lab.html) | 三种模式三条边界；sandbox/mode 事件入册，重放重建同一策略；拒绝带升级指引 |
+| [会话投影折叠](https://shine-233.github.io/deepseek-harness-study/session-projection-lab.html) | 四条投影并行折叠同一条事件流；无关事件返回同一引用，下游零开销 |
+| [存储后端契约](https://shine-233.github.io/deepseek-harness-study/storage-hub-lab.html) | 单元名同时当文件名和 SQL 标识符；版本戳对不上拒开；写完即持久，close 后报 closed |
+| [Typert 类型图](https://shine-233.github.io/deepseek-harness-study/typert-lab.html) | TS 源抽成编译器无关的类型图；registry 两阶段提交，冲突在变更前抛错零残留 |
+| [工作区注册表](https://shine-233.github.io/deepseek-harness-study/workspace-lab.html) | realpath 规范化后去重，先到者排前；header 校验挂靠，非法移动抛错原记录不动
+| [ACP 桥实验室](https://shine-233.github.io/deepseek-harness-study/acp-lab.html) | 自动化客户端看到的 Turn 怎样被桥删减：stdin/stdout 按行 JSON-RPC，只有提交后的助手文本过线 |
 | [研究 ↔ Debug 离线桥](https://shine-233.github.io/deepseek-harness-study/research-debug-bridge.html) | 课程网站与独立 Debug 工具怎样用显式文件交接 |
+| [工具预算收窄实验室](https://shine-233.github.io/deepseek-harness-study/tool-budget-lab.html) | 已注册的工具要过注册、restrict、原生呈现、宿主能力、审批五层才轮得到模型：18 个最后剩几个，当场算给你看 |
 
 ## 课程地图
 
@@ -74,7 +86,7 @@
 | 插件与生态 | [10 扩展边界](study/10-社区生态与扩展边界.md) · [11 写合规插件](study/11-如何写一个合规插件.md) · [12 生态检索核验](study/12-GitHub生态检索与插件实战核验.md) · [13 工具插件契约](study/13-官方工具插件完整契约.md) · [14 Hook Bridge](study/14-官方HookBridge与兼容层.md) · [15 Bundle/Loader](study/15-BundleProfileLoader与发布安装.md) · [22 工具可见性](study/22-工具可见性与非侵入扩展.md) · [35 最小插件工作台](study/35-最小插件工作台.md) |
 | 实验与治理 | [16 工作簿](study/16-学习工作簿与首个实验.md) · [19 测试卸载证据](study/19-插件测试卸载与版本证据.md) · [21 网页/Codespaces 路线](study/21-GitHub网页与Codespaces学习路线.md) · [29 质量检查与审阅](study/29-学习仓库的质量检查与审阅.md) · [30 安全告警与发布维护](study/30-安全告警与网页发布维护.md) · [31 学习工具箱](study/31-学习工具箱.md) · [32 渐进式设计](study/32-源码学习项目的渐进式设计.md) · [33 可视化协议](study/33-确定性可视化实验协议与Code-Mode权限管线.md) |
 
-其余专题（索引读法 [08](study/08-逐文件索引怎么读.md)、业界案例 [09](study/09-业界案例与写法.md)、观测实验 [23](study/23-工具可见集合观测与性能实验.md)、人工抽查 [24](study/24-高风险索引人工抽查.md)、完成度审计 [17](study/17-完成度审计与证据矩阵.md)、维护迁移 [18](study/18-维护更新与版本迁移.md)、实际使用手册 [20](study/20-学习仓库实际使用手册.md)、后续研究 [26](study/26-后续研究路线.md)、Debug 协作与作者判断 [29/34](study/34-作者的判断与理由.md)）都从 [START-HERE](START-HERE.md) 可达。
+其余专题（索引读法 [08](study/08-逐文件索引怎么读.md)、业界案例 [09](study/09-业界案例与写法.md)、观测实验 [23](study/23-工具可见集合观测与性能实验.md)、人工抽查 [24](study/24-高风险索引人工抽查.md)、完成度审计 [17](study/17-完成度审计与证据矩阵.md)、维护迁移 [18](study/18-维护更新与版本迁移.md)、实际使用手册 [20](study/20-学习仓库实际使用手册.md)、后续研究 [26](study/26-后续研究路线.md)、Debug 协作 [36](study/36-研究与-Debug-协作.md) 与作者判断 [34](study/34-作者的判断与理由.md)）都从 [START-HERE](START-HERE.md) 可达。
 
 ## 逐文件索引
 

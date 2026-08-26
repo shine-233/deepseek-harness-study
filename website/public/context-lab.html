@@ -61,6 +61,10 @@
       </form>
 
       <div id="gated-controls">
+        <section class="card" aria-labelledby="ctx-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="ctx-ladder-title">三级台阶，指令从哪来</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form" id="ctx-form">
           <label>
             <span>cwd 深度（packages → packages/app）</span>
@@ -72,6 +76,7 @@
           </label>
           <label class="bundle-check"><input type="checkbox" id="ctx-time"><span>time-context 插件激活</span></label>
           <label class="bundle-check"><input type="checkbox" id="ctx-session-ref"><span>跨会话召回注入</span></label>
+          <label class="bundle-check"><input type="checkbox" id="ctx-dup-nested"><span>在 packages/app 放一对内容相同的 AGENTS.md 与 CLAUDE.md</span></label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
         </form>

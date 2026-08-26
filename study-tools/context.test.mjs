@@ -16,6 +16,29 @@ test('discovery deduplicates identical content across candidates', () => {
   assert.equal(new Set(contents).size, contents.length, 'duplicate content found')
 })
 
+test('same-directory candidates with byte-identical content keep only the earliest name', () => {
+  const model = buildContextInjectionModel({ cwdDepth: 2, sameDirDuplicate: true })
+  assert.equal(model.observations.deduplicated, 1)
+  assert.ok(model.chain.some(item => item.path === 'packages/app/AGENTS.md'), 'AGENTS.md 应保留')
+  assert.ok(!model.chain.some(item => item.path === 'packages/app/CLAUDE.md'), 'CLAUDE.md 应被去重丢弃')
+  const contents = model.chain.map(item => item.content)
+  assert.equal(new Set(contents).size, contents.length)
+})
+
+test('the duplicate pair has no effect before cwd reaches that directory', () => {
+  const shallow = buildContextInjectionModel({ cwdDepth: 1, sameDirDuplicate: true })
+  assert.equal(shallow.observations.deduplicated, 0)
+  const plain = buildContextInjectionModel({ cwdDepth: 1 })
+  assert.equal(JSON.stringify(shallow.chain), JSON.stringify(plain.chain))
+})
+
+test('oracle accepts an honest dedup projection and rejects a tampered one', () => {
+  const model = buildContextInjectionModel({ cwdDepth: 2, sameDirDuplicate: true })
+  assert.equal(evaluateContextOracle(model).pass, true)
+  const tampered = { ...model, observations: { ...model.observations, deduplicated: 0 } }
+  assert.equal(evaluateContextOracle(tampered).pass, false)
+})
+
 test('global instructions always come first when present', () => {
   const model = buildContextInjectionModel({ cwdDepth: 0, hasTimeContext: false, hasSessionRef: false })
   if (model.chain.length > 0) {
