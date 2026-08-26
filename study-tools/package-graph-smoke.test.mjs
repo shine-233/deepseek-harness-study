@@ -30,7 +30,12 @@ function installDom() {
     location: dom.window.location,
     history: dom.window.history,
     getComputedStyle: dom.window.getComputedStyle.bind(dom.window),
-    requestAnimationFrame: callback => setTimeout(() => callback(performance.now()), 0),
+    // unref 让出退出权：帧链在断言结束后不得钉住冒烟进程。
+    requestAnimationFrame: callback => {
+      const id = setTimeout(() => callback(performance.now()), 0)
+      id?.unref?.()
+      return id
+    },
     cancelAnimationFrame: id => clearTimeout(id),
     DOMPoint: dom.window.DOMPoint,
     Event: dom.window.Event,
