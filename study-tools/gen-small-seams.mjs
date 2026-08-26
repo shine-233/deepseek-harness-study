@@ -77,14 +77,24 @@ function metricsMarkup(config) {
   return rows.join('\n')
 }
 
+/** 阶梯挂载点：只有声明了 ladder 配置的页面才展开这一节。 */
+function ladderMarkup(ladder) {
+  return `        <section class="card" aria-labelledby="seam-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="seam-ladder-title">${ladder.title}</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
+`
+}
+
 function renderPage(id, config) {
   const radios = gateOptionsMarkup(config)
   const controls = controlsMarkup(config)
   const metrics = metricsMarkup(config)
+  const ladderSection = config.ladder === undefined ? '' : ladderMarkup(config.ladder)
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="color-scheme" content="light dark">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>${config.title}</title>
   <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css">
@@ -122,7 +132,7 @@ ${radios}
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
-        <form class="lab-form sb-controls" id="seam-form">
+${ladderSection}        <form class="lab-form sb-controls" id="seam-form">
 ${controls}
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
           <small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>

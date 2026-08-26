@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements
   svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -181,6 +183,33 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildSpillModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'spill-ladder',
+      rungs: replayRungs([
+        {
+          title: '没超限：结果原样进上下文',
+          text: '300 字节对上 1500 上限：不需要任何转储，工具结果原样成为模型上下文的一部分。预算内的路径最短。',
+          traces: [{ id: 'inline', label: '300 / 1500', steps: trace({ resultBytes: 300, maxInlineBytes: 1500 }) }],
+        },
+        {
+          title: '超限：全文落工件，模型只读有界预览',
+          text: '4000 字节对上 800 上限：完整文本逐字存进会话作用域工件，模型看到 head+tail 拼的有界预览加一个定位符。上下文有界，证据不丢。',
+          traces: [{ id: 'dump', label: '4000 / 800', steps: trace({ resultBytes: 4000, maxInlineBytes: 800 }), focusPhases: ['save-full', 'compose-preview', 'model-sees'] }],
+        },
+        {
+          title: '定位符是回程票：预览里带着取回指引',
+          text: '预览末尾的 spill:// 定位符连同取回指引一起交给模型。想要全文，按引用取回即可——上下文的边界挡不住后续的证据检索。',
+          traces: [{ id: 'readback', label: '带取回指引', steps: trace({ resultBytes: 4000, maxInlineBytes: 800, read: true }), focusPhases: ['model-sees'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

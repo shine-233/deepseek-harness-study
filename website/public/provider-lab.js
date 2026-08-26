@@ -14,6 +14,8 @@ import { installStoryRail } from './study-lab-story.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import {
   PROVIDER_IDS,
   buildFetchHygieneModel,
@@ -214,6 +216,56 @@ if (typeof document !== 'undefined') {
   installScrollProgress()
   installStoryRail()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 选择策略模型自带 steps；归一化与 fetch 卫生由载荷/判定枚举成轨迹。
+    const selectionTrace = input => buildProviderSelectionModel(input).steps.map((step, index) => ({
+      lane: '选择策略', phase: step.stage, index, detail: step.detail,
+    }))
+    const normTrace = input => {
+      const model = buildNormalizationModel(input)
+      const steps = model.rawSources.map((raw, index) => ({
+        lane: '归一化', phase: model.providerId, index,
+        detail: `${raw.url}：原始载荷重排为「url 必填，title/snippet/publishedAt 可选」的统一形状`,
+      }))
+      steps.push({
+        lane: '出口', phase: 'cap', index: steps.length,
+        detail: `maxResults=${String(model.input.maxResults)}：出口保留 ${String(model.normalized.length)} 条${model.strictTriggered ? '（deepseek 无 blocks 触发 strict 处理）' : ''}`,
+      })
+      return steps
+    }
+    const hygieneTrace = input => buildFetchHygieneModel(input).verdicts.map((verdict, index) => ({
+      lane: 'URL 校验', phase: verdict.code, index, detail: `${verdict.url}：${verdict.detail}`,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'provider-ladder',
+      rungs: replayRungs([
+        {
+          title: '选择 = 配置声明 × 注册表实况',
+          text: '配置说「我要用谁」，注册表的 available() 说「谁能用」。两者对不上时给出明确错误码——选择永不依赖注册顺序或 HMR 时序。',
+          traces: [
+            { id: 'ok', label: '配置命中', steps: selectionTrace({ configured: 'web-search-exa', registered: { 'web-search-exa': true } }) },
+            { id: 'missing', label: '配置了但没注册', steps: selectionTrace({ configured: 'web-search-perplexity', registered: {} }), focusPhases: ['执行'] },
+          ],
+        },
+        {
+          title: '归一化矩阵：三种载荷进同一个 sources 出口',
+          text: '三家 provider 的返回字段各不相同，出口只有一个统一形状。maxResults 在出口截断；deepseek 无 blocks 时触发 strict 处理。',
+          traces: [{ id: 'norm', label: 'exa 载荷', steps: normTrace({ providerId: 'web-search-exa', maxResults: 5 }) }],
+        },
+        {
+          title: 'fetch 卫生：校验发生在请求之前',
+          text: '协议不认识的 scheme 直接判无效；明文 http 放行但附生产建议。校验是纯函数——URL 进、结论出，不发任何网络请求。',
+          traces: [{
+            id: 'hygiene',
+            label: '三种 URL',
+            steps: hygieneTrace({ urls: ['https://ok.example.com/a', 'http://plain.example.com/b', 'ftp://odd/x'] }),
+          }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

@@ -47,6 +47,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="settings-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="settings-ladder-title">三级台阶，从写入到热发布</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form" id="settings-form">
           <label><span>命名空间</span><select id="namespace"><option value="model">model</option><option value="tools">tools</option><option value="approval">approval</option></select></label>
           <label><span>动作</span><select id="action"><option value="write">写入（经缝）</option><option value="external-edit">外部编辑（模拟另一进程）</option></select></label>

@@ -25,6 +25,8 @@ import {
 } from './host-gateway-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -240,6 +242,40 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型步骤用 op 命名阶段，另有 kind 短标签：轨迹引擎取 kind 作相位。
+    const trace = input => buildHostGatewayModel(input).steps.map((step, index) => ({
+      lane: 'webserver', phase: step.kind ?? step.op, detail: step.detail, index: step.index ?? index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'host-gateway-ladder',
+      rungs: replayRungs([
+        {
+          title: '唯一载体，顺序扫描',
+          text: '无论哪种客户端形态，请求都从 webserver 这条载体进来。路由表按注册顺序逐条比较，命中即由属主应答——插件清单接口就是这么被找到的。',
+          traces: [{ id: 'api', label: 'inventory-api', steps: trace({ request: 'inventory-api', picker: 'auto' }), focusPhases: ['serve'] }],
+        },
+        {
+          title: '回退座位：谁都不认领时才轮到它',
+          text: 'SPA 文档与静态资源在注册表里三次未命中，最后由 frontend-static 应答。回退座位不参与竞争——它只在没有任何已注册路由命中时出场。',
+          traces: [
+            { id: 'doc', label: 'GET /', steps: trace({ request: 'spa-doc', picker: 'auto' }) },
+            { id: 'asset', label: 'GET /assets/app.css', steps: trace({ request: 'spa-asset', picker: 'browse' }) },
+          ],
+        },
+        {
+          title: '共享接缝：换后端不改契约',
+          text: 'directory-picker 是一条共享接缝：native 与 browse 两个后端互相替换，auto 按宿主能力装配其一。消费方发出的请求契约始终不变。',
+          traces: [
+            { id: 'native', label: 'native 后端', steps: trace({ request: 'picker-api', picker: 'native' }), focusPhases: ['seam'] },
+            { id: 'browse', label: 'browse 后端', steps: trace({ request: 'picker-api', picker: 'browse' }), focusPhases: ['seam'] },
+          ],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

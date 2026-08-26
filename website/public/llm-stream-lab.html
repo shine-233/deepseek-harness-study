@@ -61,6 +61,14 @@
             <input id="upto" type="range" min="0" max="6" step="1" value="6">
             <small>拖回前面可以看任意前缀的装配状态；拖到末尾处理迟到增量。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
           </label>
+          <label>
+            <span>篡改实验（亲手制造违规）</span>
+            <select id="fault-type" name="faultType">
+              <option value="none">不注入</option>
+              <option value="honor-after-finish">让 finish 后的迟到块照常装配</option>
+            </select>
+            <small>选中后装配器的防线被拆掉：迟到的重复增量照常拼进正文，同一段话出现两遍，独立校验会当场变红。迟到块只在含迟到重复的场景里出现。</small>
+          </label>
           <button class="button button-quiet" id="frame-play" type="button" aria-pressed="false">播放</button>
           <button class="button button-primary" type="submit">重新装配</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
@@ -76,6 +84,10 @@
           <div><dt>工具调用</dt><dd id="metric-tools">—</dd></div>
           <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
         </dl>
+        <section class="card" aria-labelledby="stream-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="stream-ladder-title">三级台阶，从分块到拒绝</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
       </div>
     </section>
 

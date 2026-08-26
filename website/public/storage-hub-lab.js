@@ -26,6 +26,8 @@ import {
 } from './storage-hub-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -267,6 +269,45 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 存储步骤没有天然泳道，统一放进一条「存取」泳道按序重放。
+    const toSteps = model => model.steps.map(step => ({
+      lane: '存取',
+      phase: step.op,
+      detail: `${step.op}：${step.detail}`,
+      index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'storage-hub-ladder',
+      rungs: replayRungs([
+        {
+          title: '最小闭环：开、写、关、重开读回',
+          text: '持久化的全部语义先在这一条轨迹里看全：打开单元、写入、关闭、再打开时读到刚才那份。',
+          traces: [{ id: 'happy-json', label: 'JSON 后端', steps: toSteps(buildStorageModel({ backend: 'json', scenario: 'happy-path', unitName: 'todos_v2' })) }],
+        },
+        {
+          title: '版本戳对不上：拒绝而不是猜',
+          text: '重开时版本戳对不上，加载当场停下。格式演进靠显式版本号，静默兼容才是事故来源。',
+          traces: [{ id: 'mismatch', label: '版本不匹配', steps: toSteps(buildStorageModel({ backend: 'json', scenario: 'version-mismatch', unitName: 'todos_v2' })) }],
+        },
+        {
+          title: '介质内容坏了：在最早的解析点大声失败',
+          text: '文件内容不是本单元的格式时不做任何抢救性解读——misconfiguration fails loud 在存储缝上的样子。',
+          traces: [{ id: 'malformed', label: '介质损坏', steps: toSteps(buildStorageModel({ backend: 'json', scenario: 'malformed-medium', unitName: 'todos_v2' })) }],
+        },
+        {
+          title: '换后端：接缝语义不变',
+          text: '把 JSON 换成 SQLite 再走一遍同样的剧本——调用方看到的步骤顺序和结论保持一致，这就是接缝两侧解耦的含义。',
+          traces: [
+            { id: 'json', label: 'JSON', steps: toSteps(buildStorageModel({ backend: 'json', scenario: 'happy-path', unitName: 'todos_v2' })) },
+            { id: 'sqlite', label: 'SQLite', steps: toSteps(buildStorageModel({ backend: 'sqlite', scenario: 'happy-path', unitName: 'todos_v2' })) },
+          ],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

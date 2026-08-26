@@ -41,6 +41,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="seam-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="seam-ladder-title">三级台阶，从落盘时机到可恢复边界</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form sb-controls" id="seam-form">
           <label><span>在第几拍崩溃（0 = 不崩溃）：<output id="ctl-crashAt-output">3</output></span><input id="ctl-crashAt" type="range" min="0" max="6" step="1" value="3"></label>
           <label class="sb-check"><input id="ctl-checkpointsEnabled" type="checkbox" checked><span>启用检查点策略</span></label>

@@ -256,3 +256,72 @@
     transition: none;
   }
 }
+
+/* ---------- 卡片活感层：悬停微交互（纯 CSS，零依赖） ----------
+   借鉴 awwwards 系滚动叙事站的微交互语法：卡体抬升 + 阴影加深 +
+   缩微图生长。全部走 token；reduced-motion 下整层静默。 */
+
+.lab-card {
+  transition: transform var(--dur-fast, 150ms) var(--ease, ease),
+    box-shadow var(--dur-fast, 150ms) var(--ease, ease),
+    border-color var(--dur-fast, 150ms) var(--ease, ease);
+}
+
+.lab-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift, 0 10px 24px rgb(0 0 0 / 12%));
+}
+
+.lab-card:hover .lab-mini {
+  filter: saturate(1.25);
+}
+
+.lab-card:hover .lm-bar {
+  transform: scaleY(1.18);
+  transform-origin: bottom;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lab-card:hover .lm-bar.lm-hi {
+  transform: scaleY(1.32);
+}
+
+.lab-card:hover .lm-dot {
+  animation: lm-pulse 1.2s ease-in-out infinite;
+}
+
+.lab-card:hover .lm-arrow {
+  stroke-dasharray: 6 4;
+  animation: lm-march 900ms linear infinite;
+}
+
+.lab-card:focus-within {
+  border-color: var(--brand, #3157c8);
+  box-shadow: 0 0 0 2px var(--brand-soft, rgb(49 87 200 / 25%));
+}
+
+@keyframes lm-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes lm-march {
+  to { stroke-dashoffset: -20; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-card,
+  .lab-card .lm-bar {
+    transition: none;
+  }
+
+  .lab-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .lab-card:hover .lm-dot,
+  .lab-card:hover .lm-arrow {
+    animation: none;
+  }
+}

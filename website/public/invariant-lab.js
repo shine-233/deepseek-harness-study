@@ -26,6 +26,8 @@ import {
 } from './invariant-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -268,6 +270,34 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildInvariantModel(input).steps.map(step => ({
+      lane: step.lane ?? '校验', phase: step.phase ?? step.kind ?? 'step', detail: step.detail ?? '', index: step.index,
+    }))
+    const base = outcome => ({ packageName: '@deepseek-ai/dsh-jobs', filter: 'unfiltered', outcome })
+    createConceptLadder(ladderRoot, {
+      storageKey: 'invariant-ladder',
+      rungs: replayRungs([
+        {
+          title: '全绿：每条不变量都通过',
+          text: '包启动、逐条校验、全部放行——先看不变量机制安静时的样子。',
+          traces: [{ id: 'pass', label: 'pass', steps: trace(base('pass')) }],
+        },
+        {
+          title: '违规：在运行时被拦下',
+          text: '一条不变量被打破：违规当场报告并进入结算。运行时不变量断言的是被拥有的关系。',
+          traces: [{ id: 'violation', label: 'violation', steps: trace(base('violation')), focusPhases: ['violation'] }],
+        },
+        {
+          title: '启动即报错：fail loud 的第一道门',
+          text: '有些问题等不到运行——配置层面就错时，包在启动路径上大声失败，根本不进入校验循环。',
+          traces: [{ id: 'startup', label: 'startup-error', steps: trace(base('startup-error')) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

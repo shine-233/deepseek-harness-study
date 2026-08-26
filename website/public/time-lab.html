@@ -41,6 +41,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="seam-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="seam-ladder-title">三级台阶，从注入到入册</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form sb-controls" id="seam-form">
           <label><span>时区</span><select id="ctl-timezone"><option value="Asia/Shanghai">Asia/Shanghai</option><option value="UTC">UTC</option><option value="America/New_York">America/New_York</option></select></label>
           <label><span>时钟偏差（分钟）：<output id="ctl-clockDriftMinutes-output">0</output></span><input id="ctl-clockDriftMinutes" type="range" min="-720" max="720" step="15" value="0"></label>

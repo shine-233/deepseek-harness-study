@@ -11,6 +11,7 @@ import {
   writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installStoryRail } from './study-lab-story.js'
 import { installInputReset } from './study-lab-kit.js'
+import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import {
   SHELL_EXECUTORS,
   buildShellSeamModel,
@@ -18,6 +19,8 @@ import {
 } from './shell-seam-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -27,6 +30,15 @@ const SOURCE_LABELS = {
   'clamped': '被 maxTimeoutMs 封顶',
   'executor-stamp': '执行器盖章',
   'executor-inert': '惰性透传（undefined）',
+}
+
+/** 进 URL hash 的输入字段；枚举与 HTML 里的选项一一对应。 */
+const SHELL_STATE_SCHEMA = {
+  executor: { enum: [...SHELL_EXECUTORS] },
+  workdir: { enum: ['omit', '/custom/dir'] },
+  timeoutMs: { enum: ['omit', '300000', '900000'] },
+  policy: { enum: ['omit', 'read-only', 'danger-full-access'] },
+  exitStatus: { enum: ['0', '1', '127', 'SIGTERM'] },
 }
 
 function renderTable(model, body) {
@@ -113,6 +125,34 @@ function initializePage() {
     elements.executor.append(option)
   }
 
+  // 状态链接：hash 里带 #state= 时先还原输入，再按还原后的值渲染。
+  // 坏状态按默认输入处理，与其它实验页一致。
+  const restored = readStateFromHash(location.hash, SHELL_STATE_SCHEMA)
+  if (restored !== null && restored.ok) {
+    elements.executor.value = restored.value.executor
+    elements.workdir.value = restored.value.workdir
+    elements.timeout.value = restored.value.timeoutMs
+    elements.policy.value = restored.value.policy
+    elements.exitCode.value = restored.value.exitStatus
+  }
+
+  // 输入写进 URL hash：复制状态链接、刷新、换设备都能带回同一份输入。
+  // replaceState 在 file:// 或沙箱环境下可能被拒；写不进去时页面行为不变。
+  const persistState = () => {
+    try {
+      const nextHash = writeStateToHash(location.hash, {
+        executor: elements.executor.value,
+        workdir: elements.workdir.value,
+        timeoutMs: elements.timeout.value,
+        policy: elements.policy.value,
+        exitStatus: elements.exitCode.value,
+      }, SHELL_STATE_SCHEMA)
+      history.replaceState(null, '', nextHash)
+    } catch {
+      // 保持安静：hash 写不进去时页面行为不变。
+    }
+  }
+
   const rebuild = () => {
     try {
       const request = { command: 'npm test' }
@@ -137,6 +177,7 @@ function initializePage() {
         + String(model.observations.missingRequiredKeys.length) + ' 个；run/start 只收这份 Spec。',
       'success')
       renderExitPanel(elements.exitCode, elements.exitOutput, elements.exitPill)
+      persistState()
     } catch (error) {
       console.error('[shell-seam] rebuild failed', error)
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
@@ -157,11 +198,12 @@ function initializePage() {
   rebuild()
 
   elements.copyLink.addEventListener('click', async () => {
+    persistState()
     try {
       await navigator.clipboard.writeText(location.href)
-      setFeedback('已复制当前实验状态的链接。', 'success')
+      setFeedback('已复制当前实验状态的链接；粘贴到地址栏就能回到同一份输入。', 'success')
     } catch {
-      setFeedback('复制失败：手动复制地址栏里的整条链接即可。', 'error')
+      setFeedback('复制失败：手动复制地址栏里的整条链接即可，状态就在 #state= 后面。', 'error')
     }
   })
 }
@@ -172,6 +214,42 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型产出 spec 条目 {key,value,source,note}：source 就是「值从哪来」的相位。
+    const trace = input => buildShellSeamModel(input).entries.map((entry, index) => ({
+      lane: entry.key,
+      phase: entry.source,
+      index,
+      detail: `${entry.key} = ${typeof entry.value === 'object' ? JSON.stringify(entry.value) : String(entry.value)}${entry.note ? `（${entry.note}）` : ''}`,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'shell-seam-ladder',
+      rungs: replayRungs([
+        {
+          title: '只给命令，其余由执行器配置补齐',
+          text: '请求里只有 command：workdir、超时、输出上限都标着 config-default。非沙箱执行器的 sandboxPolicy 字段存在但不起作用——原样携带 undefined。',
+          traces: [{ id: 'local', label: 'bash-local', steps: trace({ executor: 'bash-local', request: { command: 'ls -la' } }), focusPhases: ['config-default'] }],
+        },
+        {
+          title: '沙箱执行器在 resolve 里盖默认章',
+          text: '同一个请求交给 bash-sandbox：sandboxPolicy 被盖上具体档位与根目录的默认章。调用方没写的安全字段，必须由执行器显式补上。',
+          traces: [{ id: 'stamped', label: 'bash-sandbox', steps: trace({ executor: 'bash-sandbox', request: { command: 'ls -la' } }), focusPhases: ['executor-stamp'] }],
+        },
+        {
+          title: '每个键都说得出「值从哪来」',
+          text: '请求显式给出的键标 request；超限的超时被封顶并注明 clamped。解析是纯函数：同一请求永远得到同一条规格。',
+          traces: [{
+            id: 'explicit',
+            label: '全显式 + 超时封顶',
+            steps: trace({ executor: 'bash-local', request: { command: 'ls -la', workdir: '/repo/app', timeoutMs: 999999, stdoutMaxBytes: 4096 } }),
+            focusPhases: ['request', 'clamped'],
+          }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

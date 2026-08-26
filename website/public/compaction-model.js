@@ -13,6 +13,9 @@
  *   2. 摘要必须引用来源：被替换节点的每一条事件序号都要出现在 sourceEventSeqs 里；
  *   3. 最近 K 轮逐字保留：压缩不许动它们。
  *
+ * 篡改实验 fault='lossy-summary'：生成的摘要悄悄漏掉最早一条被替换序号的引用，
+ * 其余读数照常，让读者能亲手触发第 2 条规则的失败并被独立校验指认。
+ *
  * 每个视觉维度的含义：
  *   上排 = 原始事件序号（离散顺序，不是时间戳）
  *   下排 = surface 节点，矩形长度 = 该节点的估算 token（启发式估计值，不是真实分词）
@@ -153,7 +156,7 @@ function foldChunks(turns) {
  * 第二层折叠：最近 keepRecent 轮逐字保留，更早的节点替换成一个摘要节点。
  * keepRecent 不小于总轮数时什么都不替换——这也是一种合法结果，不是错误。
  */
-function compact(nodes, turns, keepRecent) {
+function compact(nodes, turns, keepRecent, fault) {
   const keptFromTurn = Math.max(0, turns.length - keepRecent)
   const kept = nodes.filter(node => node.turnIndex >= keptFromTurn)
   const replaced = nodes.filter(node => node.turnIndex < keptFromTurn)
@@ -161,11 +164,15 @@ function compact(nodes, turns, keepRecent) {
     return { nodes: kept, summary: null }
   }
   const replacedTokens = replaced.reduce((total, node) => total + node.tokens, 0)
+  const replacedSeqs = replaced.flatMap(node => node.sourceEventSeqs)
+  // 篡改实验：lossy-summary 让摘要悄悄漏掉最早一条被替换序号的引用；
+  // token、节点数等其余读数一律照常，好让独立校验单独抓住这一处违规。
+  const citedSeqs = fault === 'lossy-summary' ? replacedSeqs.slice(1) : replacedSeqs
   const summary = {
     kind: 'compaction-summary',
     label: '压缩摘要（替换 ' + String(replaced.length) + ' 个节点）',
     tokens: SUMMARY_BASE_TOKENS + Math.round(replacedTokens * SUMMARY_RATE),
-    sourceEventSeqs: replaced.flatMap(node => node.sourceEventSeqs),
+    sourceEventSeqs: citedSeqs,
     turn: keptFromTurn < turns.length ? turns[keptFromTurn].label + ' 之前' : '全部历史',
   }
   return { nodes: [summary, ...kept], summary }
@@ -181,6 +188,10 @@ export function buildCompactionModel(input) {
   if (scenario === undefined) throw new RangeError('未知场景：' + String(input.scenario))
   if (!Number.isInteger(input.keepRecent)) throw new TypeError('保留轮数必须是整数')
   if (input.keepRecent < 0) throw new RangeError('保留轮数不能为负')
+  const fault = input.fault ?? 'none'
+  if (fault !== 'none' && fault !== 'lossy-summary') {
+    throw new RangeError('未知篡改实验：' + String(fault))
+  }
 
   const turns = numberEvents(buildTurns(scenario.id))
   const withIndex = turns.map((turn, index) => ({
@@ -190,12 +201,12 @@ export function buildCompactionModel(input) {
   }))
   const folded = foldChunks(withIndex)
   const before = recount(folded)
-  const { nodes, summary } = compact(folded, withIndex, input.keepRecent)
+  const { nodes, summary } = compact(folded, withIndex, input.keepRecent, fault)
   const after = recount(nodes)
   const eventCount = withIndex.reduce((total, turn) => total + turn.events.length, 0)
 
   return {
-    input: { scenario: scenario.id, keepRecent: input.keepRecent },
+    input: { scenario: scenario.id, keepRecent: input.keepRecent, fault },
     scenario,
     turns: withIndex,
     surfaceNodes: nodes,
@@ -250,27 +261,25 @@ export function evaluateCompactionOracle(model) {
     pass: model.observations.eventCount === eventCount,
   })
 
-  const citedSeqs = new Set(model.summary?.sourceEventSeqs ?? [])
-  const missing = []
   if (model.summary !== null) {
-    for (const node of model.surfaceNodes) {
-      if (node === model.summary) continue
-      for (const seq of node.sourceEventSeqs) {
-        if (citedSeqs.has(seq)) missing.push(seq)
-      }
-    }
+    const citedSeqs = new Set(model.summary.sourceEventSeqs)
     const expectedSeqs = model.turns
       .slice(0, Math.max(0, model.turns.length - model.input.keepRecent))
       .flatMap(turn => turn.events.map(entry => entry.sequence))
-    const covered = expectedSeqs.every(seq => citedSeqs.has(seq))
+    // 漏引：被替换事件的序号没出现在摘要里；越界：摘要引了不在替换范围内的序号。
+    const absent = expectedSeqs.filter(seq => !citedSeqs.has(seq))
+    const extra = [...citedSeqs].filter(seq => !expectedSeqs.includes(seq))
+    const problems = []
+    if (absent.length > 0) problems.push('缺少对序号 ' + absent.join('、') + ' 的引用')
+    if (extra.length > 0) problems.push('多引了未替换的序号 ' + extra.join('、'))
     checks.push({
       id: 'SUMMARY_CITES_SOURCES',
-      label: '摘要恰好引用被替换事件的序号',
-      expected: '覆盖 ' + String(expectedSeqs.length) + ' 条被替换事件，且不多引未替换事件',
-      actual: covered && missing.length === 0
-        ? '覆盖 ' + String(citedSeqs.size) + ' 条，无越界引用'
-        : '覆盖不全或多引了 ' + String(missing.length) + ' 条保留事件',
-      pass: covered && missing.length === 0,
+      label: '摘要应恰好引用全部被替换事件',
+      expected: '恰好引用这 ' + String(expectedSeqs.length) + ' 条被替换序号：' + expectedSeqs.join('、'),
+      actual: problems.length === 0
+        ? '恰好引用这 ' + String(expectedSeqs.length) + ' 条序号，无越界引用'
+        : problems.join('；'),
+      pass: problems.length === 0,
     })
   }
 

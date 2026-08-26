@@ -12,6 +12,8 @@ import { bindAutoAdvance } from './study-lab-kit.js'
 import { buildGuardLoopModel, buildKeySandboxModel, evaluateGuardLoopOracle } from './guard-loop-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -269,6 +271,33 @@ bindRangeKeys(el.step)
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildGuardLoopModel({ resetMode: 'none', ...input }).steps.map(step => ({
+      lane: step.lane, phase: step.phase ?? step.kind ?? 'step', detail: step.detail ?? '', index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'guard-loop-ladder',
+      rungs: replayRungs([
+        {
+          title: '阈值之下：安静地重复',
+          text: '两次同样的调用在提醒阈值以下，循环照常跑。守卫不是不许重复，而是量入为出地开口。',
+          traces: [{ id: 'quiet', label: '两次调用', steps: trace({ attempts: 2, guard: 'on' }) }],
+        },
+        {
+          title: '跨过阈值：分级提醒登场',
+          text: '同一签名反复出现，守卫先给轻提醒，再给详细说明——把「你在循环里」这件事递到模型面前。',
+          traces: [{ id: 'remind', label: '触发提醒', steps: trace({ attempts: 6, guard: 'on' }), focusPhases: ['remind', 'interject'] }],
+        },
+        {
+          title: '改写也算数：键序重置骗不过规范化',
+          text: '参数键序被打乱再重发，规范化之后仍是同一次调用，计数继续累加。守卫认的是语义，不是字面。',
+          traces: [{ id: 'reorder', label: '键序重置', steps: trace({ attempts: 8, guard: 'on', resetMode: 'key-reorder' }) }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

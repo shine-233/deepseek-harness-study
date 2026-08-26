@@ -14,6 +14,8 @@ import { installStoryRail } from './study-lab-story.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import {
   CLIENT_MODES,
   QUESTION_INTENTS,
@@ -192,6 +194,50 @@ if (typeof document !== 'undefined') {
   installScrollProgress()
   installStoryRail()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 三个组件面板都不产 steps：把各自的状态序列枚举成轨迹，文字引用模型字段。
+    const cardTrace = input => buildToolCardModel(input).stages.map((stage, index) => ({
+      lane: '工具卡', phase: stage.stage, index,
+      detail: `${stage.stage}：state=${stage.state} · ${stage.card}`,
+    }))
+    const foldTrace = input => {
+      const model = buildConversationFoldModel(input)
+      return model.nodes.map((node, index) => ({
+        lane: '会话流', phase: node.type, index,
+        detail: `${node.title}${node.collapsed ? '（默认折叠）' : ''}：按日志序放置`,
+      }))
+    }
+    const questionsTrace = input => {
+      const model = buildUserQuestionsModel(input)
+      return [
+        { lane: '提问', phase: 'intent', index: 0, detail: `意图=${model.input.intent}：问题占用 composer 输入区。` },
+        { lane: '选项', phase: 'actions', index: 1, detail: `渲染 ${String(model.actions.length)} 个动作按钮${model.input.binaryChoice ? '，二元选择' : ''}。` },
+        { lane: '结算', phase: 'claim', index: 2, detail: `composer 归属者 ${String(model.observations.composerOwnerCount)} 个：一次只有一个请求占用输入区。` },
+      ]
+    }
+    createConceptLadder(ladderRoot, {
+      storageKey: 'client-ladder',
+      rungs: replayRungs([
+        {
+          title: '工具卡四态：只由冻结的切片决定',
+          text: 'call-accepted → running → done/fails：生命周期状态只从日志里的 call/result 切片推导。展示层不自造状态，也不预测未来。',
+          traces: [{ id: 'card', label: '失败收尾', steps: cardTrace({ fails: true }), focusPhases: [] }],
+        },
+        {
+          title: '折叠与署名：节点按日志序就座',
+          text: '用户气泡、助手消息、折叠摘要各有座位；折叠行是否可展开取决于摘要是否在窗口内，注入行署名 producer。',
+          traces: [{ id: 'fold', label: '标准会话', steps: foldTrace({ summaryInWindow: true, injectionHasProducer: true }) }],
+        },
+        {
+          title: '提问接管 composer：一个输入区只伺候一个请求',
+          text: '计划审阅类提问带二元选择和批准按钮时才被认作接管。其余意图只是普通消息，不动输入区。',
+          traces: [{ id: 'ask', label: '计划审阅提问', steps: questionsTrace({ intent: 'plan-review' }) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

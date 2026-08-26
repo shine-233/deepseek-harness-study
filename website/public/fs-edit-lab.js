@@ -19,6 +19,8 @@ import {
 } from './fs-edit-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -254,6 +256,37 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型步骤用 stage 命名管线阶段，ok 标记成败；沙箱拒绝在 write 步发生并映射成 marker。
+    const trace = input => buildFsEditModel(input).steps.map((step, index) => ({
+      lane: step.ok ? 'fs 缝' : '拒绝路径',
+      phase: step.stage,
+      index,
+      detail: `${step.detail}${step.ok ? '' : ' ✕'}`,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'fs-edit-ladder',
+      rungs: replayRungs([
+        {
+          title: '编辑管线六步：resolve 一路走到 write',
+          text: 'str_replace 先把路径解析成 FsTarget，经 waterfall 预检写意图，stat 确认文件存在，读入后计数匹配，最后写入新版本。每一步都是显式阶段。',
+          traces: [{ id: 'success', label: '唯一匹配成功', steps: trace({ target: 'config', sandboxMode: 'workspace-write', oldStr: 'timeout: 30s', newStr: 'timeout: 45s' }) }],
+        },
+        {
+          title: '匹配数即命运：两处命中就写不进去',
+          text: 'old_str 命中两处时，write 步落下的不是修改而是拒绝说明：文件保持原样，歧义原因回到模型。模糊匹配绝不猜。',
+          traces: [{ id: 'ambiguous', label: '匹配多处', steps: trace({ target: 'config', sandboxMode: 'workspace-write', oldStr: 'retries: 3', newStr: 'retries: 5' }), focusPhases: ['match ×2', 'write（沙箱执行）'] }],
+        },
+        {
+          title: '版本记账：每次成功编辑都推进 observed 版本',
+          text: '成功路径以 fs/observed 收尾：before/after 与版本号一起入账。后续编辑靠这个版本做并发核对——过期引用会被拒之门外。',
+          traces: [{ id: 'versioned', label: '成功后看记账', steps: trace({ target: 'config', sandboxMode: 'workspace-write', oldStr: 'timeout: 30s', newStr: 'timeout: 45s' }), focusPhases: ['fs/observed'] }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

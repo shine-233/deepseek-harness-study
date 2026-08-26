@@ -23,6 +23,8 @@ import {
 } from './tool-visibility-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -457,6 +459,47 @@ if (typeof document !== 'undefined') {
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 
   // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 每个工具一级：泳道是所属 bundle，相位是它在三层门上的位置。
+    const toSteps = model => model.tools.map(tool => {
+      const phase = !tool.registered ? 'unregistered'
+        : !tool.modelVisible ? 'scope-hidden'
+        : !tool.executionAllowed ? 'policy-blocked'
+        : 'executable'
+      return {
+        lane: tool.bundle ?? 'tools',
+        phase,
+        detail: `${tool.name}：注册=${tool.registered} 可见=${tool.modelVisible} 允许执行=${tool.executionAllowed}`,
+        index: tool.index ?? 0,
+      }
+    })
+    const FULL_BUNDLES = ['core-fs', 'session', 'shell', 'todo', 'web']
+    createConceptLadder(ladderRoot, {
+      storageKey: 'tool-visibility-ladder',
+      rungs: replayRungs([
+        {
+          title: '三层门：注册、可见、允许',
+          text: '已注册的工具还要过两道门才到得了模型和执行器：scope 决定可见性，policy 决定可执行性。重放默认组合，看每个工具停在哪一层。',
+          traces: [{ id: 'default', label: 'reader + 高风险需批准', steps: toSteps(buildToolVisibilityModel({})) , focusPhases: ['executable'] }],
+        },
+        {
+          title: '未注册即不存在',
+          text: '把 bundles 收窄到 core-fs——其余工具连进入讨论的资格都没有。注册是第一道门，门外的工具不占模型一个 token。',
+          traces: [
+            { id: 'narrow', label: '只装 core-fs', steps: toSteps(buildToolVisibilityModel({ bundles: ['core-fs'] })) },
+            { id: 'full', label: '全部安装', steps: toSteps(buildToolVisibilityModel({ bundles: FULL_BUNDLES })) },
+          ],
+        },
+        {
+          title: '可见不等于允许',
+          text: '同一份输入里，高风险工具对模型可见，却被 policy 拦在待批准——呈现与放行是两个独立决定。',
+          traces: [{ id: 'blocked', label: '聚焦被拦条目', steps: toSteps(buildToolVisibilityModel({})), focusPhases: ['policy-blocked'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

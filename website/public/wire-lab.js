@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, requireElements,
   svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -98,6 +100,33 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildWireModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'wire-ladder',
+      rungs: replayRungs([
+        {
+          title: 'initialize 先行：一次能力协商',
+          text: '干净对话从 initialize 开始：客户端声明版本与能力，服务端应答确认。之后的 request/response 按 id 配对，notification 单向送达不需要回应。',
+          traces: [{ id: 'clean', label: '干净对话', steps: trace({ scriptId: 'clean' }) }],
+        },
+        {
+          title: '错误回应是一等公民',
+          text: '服务端处理不了时返回带 id 的 error-response：错误对象走同一条行传输回到客户端，连接保持可用。错误不是异常，是协议内的普通消息。',
+          traces: [{ id: 'error', label: '服务端错误', steps: trace({ scriptId: 'error' }), focusPhases: ['error-response'] }],
+        },
+        {
+          title: '乱序调用立刻被拒',
+          text: 'initialize 之前的业务请求得到协议级错误：能力还没协商，方法没有意义。带内拒绝让客户端自己纠正顺序，传输层不断开。',
+          traces: [{ id: 'unordered', label: 'request 先于 initialize', steps: trace({ scriptId: 'unordered' }), focusPhases: ['error-response'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

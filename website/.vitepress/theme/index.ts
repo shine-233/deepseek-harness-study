@@ -96,6 +96,12 @@ export default {
       pipeline.type = 'module'
       pipeline.src = (base.endsWith('/') ? base : base + '/') + 'study-pipeline.js'
       document.head.append(pipeline)
+      // 全站滚动编排：标题/表格/引用块进入视口时按组错峰入场。
+      // 无 JS、reduced-motion 时内容原样可见（隐藏态由脚本自己加）。
+      const motion = document.createElement('script')
+      motion.type = 'module'
+      motion.src = (base.endsWith('/') ? base : base + '/') + 'study-motion.js'
+      document.head.append(motion)
     }
   },
 } satisfies Theme

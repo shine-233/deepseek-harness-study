@@ -23,6 +23,8 @@ import {
 } from './plugin-flow-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -318,6 +320,37 @@ if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
   installScrollProgress()
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const laneLabels = { '工具': '工具', '事件总线': '事件总线', '观察插件': '观察插件', 'Session 日志': 'Session 日志' }
+    createConceptLadder(ladderRoot, {
+      storageKey: 'plugin-flow-ladder',
+      rungs: replayRungs([
+        {
+          title: '一轮完整链：执行、入册、广播、预览',
+          text: '工具跑完，宿主把 call 与 result 写进日志，事件沿总线广播，已订阅的插件写下预览。先看这条正常轨迹——后面每一级都只改动其中一个环节。',
+          traces: [{ id: 'normal', label: '正常一轮', steps: buildPluginFlowModel({ scenario: 'normal', subscribed: true, maxLength: 20 }).steps, focusPhases: ['tool-start', 'preview'] }],
+        },
+        {
+          title: '日志由宿主写，与订阅无关',
+          text: '策略拒绝时主体没有执行，但 call 与 result 两条日志照写。广播可以没人听，日志不能缺页。',
+          traces: [{ id: 'denied', label: '策略拒绝', steps: buildPluginFlowModel({ scenario: 'denied', subscribed: true, maxLength: 20 }).steps, focusPhases: ['log', 'tool-end'] }],
+        },
+        {
+          title: '中途订阅：错过第一轮，赶上第二轮',
+          text: '第一轮广播经过时插件还没注册监听，什么都没收到；ctx.on 登记之后，第二轮广播准时到达。收不收得到，取决于注册顺序。',
+          traces: [{ id: 'subscribe-late', label: '中途订阅', steps: buildPluginFlowModel({ scenario: 'subscribe-late', subscribed: true, maxLength: 20 }).steps, focusPhases: ['skip', 'subscribe', 'broadcast'] }],
+        },
+        {
+          title: '中途卸载：注销即退场',
+          text: '卸载注销了 tools/result 监听，此后的广播继续发生，只是再也没有接收者。效果清零是卸载语义的一半，另一半是日志里仍然留着全部历史。',
+          traces: [{ id: 'unload-midway', label: '中途卸载', steps: buildPluginFlowModel({ scenario: 'unload-midway', subscribed: true, maxLength: 20 }).steps, focusPhases: ['unload', 'skip'] }],
+        },
+      ]),
+    })
+  }
+
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 

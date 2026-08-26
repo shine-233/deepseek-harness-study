@@ -3,7 +3,7 @@
  *
  * 每个页面用 <script type="module" src="./small-seams-runtime.js"
  * data-lab="<id>"></script> 引入本模块；差异全部在 small-seams-configs.js 里。
- * 行为：预测门 → 控件读取 → 纯模型重建 → 指标/步骤表/oracle/边界渲染 → hash 持久化。
+ * 行为：预测门 → 控件读取 → 纯模型重建 → 指标/步骤表/阶段阶梯/oracle/边界渲染 → hash 持久化。
  */
 
 import {
@@ -18,10 +18,37 @@ import {
 } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 import { SMALL_SEAMS_LABS } from './small-seams-configs.js'
+
+/**
+ * 阶段阶梯的样式表：首次启动时注入一次 <link>，重复调用幂等。
+ * 六个壳页共用同一份场景层，外壳不必各自引用；CSP style-src 'self' 放行同源样式表。
+ */
+function ensureSceneStyles(doc = document) {
+  if (doc.getElementById('ss-scene-styles') !== null) return
+  const link = doc.createElement('link')
+  link.id = 'ss-scene-styles'
+  link.rel = 'stylesheet'
+  link.href = './study-small-seams-scene.css'
+  doc.head.append(link)
+}
+
+/**
+ * 阶段阶梯对一个按键的下一个索引；不是本组件处理的键返回 null。
+ * 纯函数，与 study-lab-kit 的 nextRangeValue 同一约定。
+ */
+export function nextLadderIndex(key, current, count) {
+  if (!(count > 0)) return null
+  const actions = { ArrowLeft: current - 1, ArrowRight: current + 1, Home: 0, End: count - 1 }
+  const next = actions[key]
+  if (next === undefined) return null
+  return Math.min(count - 1, Math.max(0, next))
+}
 
 /**
  * 启动一个小缝实验页：按 id 取配置，回填外壳、构建控件并接线。
@@ -40,10 +67,10 @@ export async function bootSmallSeam(labId, gateOverride = {}) {
     },
   }
   const modelModule = await import(config.modelModule)
-  await initializePage(config, modelModule)
+  await initializePage(labId, config, modelModule)
 }
 
-async function initializePage(config, modelModule) {
+async function initializePage(labId, config, modelModule) {
   const build = modelModule[config.buildFn]
   const oracle = modelModule[config.oracleFn]
 
@@ -157,6 +184,85 @@ async function initializePage(config, modelModule) {
   })) return
   const fb = makeFeedback(document.querySelector('#seam-feedback'))
 
+  // 阶段阶梯：步骤表上方的节点条，图形即控制器——点击或键盘把「当前步」拨到任意一步。
+  // 节点数跟随每次重建的实际步数；标签按 phase 从配置查，缺了就退回 phase 原文。
+  ensureSceneStyles()
+  const ladderLabelByPhase = new Map(config.stepLabels ?? [])
+  const tableBox = elements.stepsBody.closest('.table-scroll') ?? elements.stepsBody.closest('table')
+  let currentStep = Number.POSITIVE_INFINITY
+  let stepCount = 0
+
+  const ladder = document.createElement('div')
+  ladder.className = 'ss-ladder'
+  ladder.setAttribute('role', 'group')
+  ladder.setAttribute('aria-label', '阶段阶梯')
+
+  // reveal 只在用户拨动时为真：重建后的首次渲染不许抢滚页面。
+  const applyStepView = reveal => {
+    for (const node of ladder.children) {
+      const index = Number(node.dataset.index)
+      if (index < currentStep) node.dataset.state = 'done'
+      else if (index === currentStep) {
+        node.dataset.state = 'current'
+        node.setAttribute('aria-current', 'step')
+      } else {
+        node.dataset.state = 'future'
+        node.removeAttribute('aria-current')
+      }
+    }
+    for (const row of elements.stepsBody.rows) {
+      const index = Number(row.dataset.key)
+      row.classList.toggle('is-current', index === currentStep)
+      row.classList.toggle('is-future', index > currentStep)
+      if (reveal && index === currentStep) row.scrollIntoView({ block: 'nearest' })
+    }
+  }
+
+  const setCurrentStep = index => {
+    if (stepCount === 0) return
+    currentStep = Math.min(stepCount - 1, Math.max(0, index))
+    applyStepView(true)
+  }
+
+  const renderLadder = phases => {
+    ladder.replaceChildren()
+    phases.forEach((phase, index) => {
+      const label = ladderLabelByPhase.get(phase) ?? phase
+      const node = document.createElement('button')
+      node.type = 'button'
+      node.className = 'ss-ladder-node'
+      node.dataset.index = String(index)
+      node.textContent = String(index + 1)
+      node.title = '第 ' + String(index + 1) + ' 步：' + label
+      node.setAttribute('aria-label', '第 ' + String(index + 1) + ' 步：' + label)
+      ladder.append(node)
+    })
+  }
+
+  ladder.addEventListener('click', event => {
+    const node = event.target instanceof Element ? event.target.closest('.ss-ladder-node') : null
+    if (node === null) return
+    setCurrentStep(Number(node.dataset.index))
+  })
+
+  // 键盘步进：焦点不在输入控件时 ←/→ 逐步、Home/End 直达；焦点落在阶梯自己的
+  // 节点上时继续接管，其余按钮沿用 bindRangeKeys 的约定跳过。
+  document.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return
+    const target = event.target
+    if (target instanceof HTMLInputElement
+      || target instanceof HTMLSelectElement
+      || target instanceof HTMLTextAreaElement) return
+    if (typeof target === 'object' && target !== null && target.isContentEditable === true) return
+    if (target instanceof HTMLButtonElement && !ladder.contains(target)) return
+    const next = nextLadderIndex(event.key, currentStep, stepCount)
+    if (next === null) return
+    event.preventDefault()
+    setCurrentStep(next)
+  })
+
+  if (tableBox !== null) tableBox.insertAdjacentElement('beforebegin', ladder)
+
   const readInput = () => {
     const input = {}
     for (const { control, node } of controls) {
@@ -195,6 +301,12 @@ async function initializePage(config, modelModule) {
         state: /reject|crash|parse-fail|limit-rejected|conflict-rejected|nothing-published/.test(step.phase) ? 'fail' : 'plain',
         cells: [String(step.index), step.lane, step.phase, step.detail],
       })))
+      // 当前步夹到新时间线内：首次重建从无穷大落到最后一步，默认整条线全部完成。
+      stepCount = model.steps.length
+      if (stepCount === 0) currentStep = 0
+      else if (currentStep >= stepCount) currentStep = stepCount - 1
+      renderLadder(model.steps.map(step => step.phase))
+      applyStepView(false)
       writeText(elements.caption, '当前输入的 ' + String(model.steps.length) + ' 步')
       fb(String(model.observations.forkShape), 'success')
       persistState()
@@ -221,6 +333,16 @@ async function initializePage(config, modelModule) {
   }
 
   rebuild()
+
+  // 零跳步概念阶梯：轨迹定义在 config.ladder（small-seams-configs.js），
+  // 每级一条固定输入推演出的泳道轨迹，重放完整走完一次即解锁下一级。
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null && config.ladder !== undefined) {
+    createConceptLadder(ladderRoot, {
+      storageKey: labId + '-ladder',
+      rungs: replayRungs(config.ladder.rungs),
+    })
+  }
 
   installDeclaredIcons()
   installScrollProgress()

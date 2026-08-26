@@ -21,6 +21,8 @@ import {
 } from './session-fork-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -299,6 +301,33 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildSessionForkModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase ?? step.kind ?? 'step', detail: step.detail ?? '', index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'session-fork-ladder',
+      rungs: replayRungs([
+        {
+          title: '基线：一条活到最后的 Session',
+          text: '消息、工具、流式块全部落册，会话完整走完。先记住这条健康轨迹的样子。',
+          traces: [{ id: 'healthy', label: '无崩溃', steps: trace({ crash: 'complete', fork: 'no-fork' }) }],
+        },
+        {
+          title: '中途崩溃：已入册的部分照常可读',
+          text: '工具跑到一半进程没了——崩掉的是「接下来」，不是「已经写下的」。日志重放仍然一致。',
+          traces: [{ id: 'mid-crash', label: '工具中崩溃', steps: trace({ crash: 'crash-mid-tool', fork: 'no-fork' }), focusPhases: ['crash'] }],
+        },
+        {
+          title: 'fork：从历史长出新分支',
+          text: 'fork 不改动原 Session 一字一句，而是带着完整历史开出新分支——两条线从此各自记账。',
+          traces: [{ id: 'forked', label: 'fork', steps: trace({ crash: 'complete', fork: 'fork' }) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

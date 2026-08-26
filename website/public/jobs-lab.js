@@ -20,6 +20,8 @@ import {
 } from './jobs-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -256,6 +258,33 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildJobsModel(input).steps.map(step => ({
+      lane: step.lane ?? '任务', phase: step.phase ?? step.kind ?? 'step', detail: step.detail ?? '', index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'jobs-ladder',
+      rungs: replayRungs([
+        {
+          title: '正常收尾：drain 到 settled',
+          text: 'producer 完结、队列排干、任务结算——一条从头到尾都顺利的生命周期。',
+          traces: [{ id: 'ok', label: 'reader·completed', steps: trace({ script: 'reader', ending: 'completed' }) }],
+        },
+        {
+          title: '失败也结算：failed 不是悬挂',
+          text: '脚本失败时任务同样走到终态。生命周期协议保证每种结局都有名字、有记录。',
+          traces: [{ id: 'fail', label: 'killer·failed', steps: trace({ script: 'killer', ending: 'failed' }), focusPhases: ['failed'] }],
+        },
+        {
+          title: '迟到的完成：late-completed 的归宿',
+          text: '取消之后结果才回来——迟到不等于丢失，协议给这类完成单独的归宿。',
+          traces: [{ id: 'late', label: 'teardown·late-completed', steps: trace({ script: 'teardown', ending: 'late-completed' }) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

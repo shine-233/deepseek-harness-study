@@ -38,6 +38,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="lsp-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="lsp-ladder-title">三级台阶，从预留到路由</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form sb-controls" id="lsp-form">
           <label class="sb-check"><input id="lsp-conflict" type="checkbox"><span>加入冲突场景：deno-lsp 也申请 .ts</span></label>
           <label class="sb-check"><input id="lsp-invalid" type="checkbox"><span>某 provider 声明了非法扩展名（空串）</span></label>

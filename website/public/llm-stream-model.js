@@ -25,6 +25,12 @@ const BASE_CHUNKS = Object.freeze([
 const LATE_DUPLICATE = Object.freeze({ kind: 'text', text: '好的，' })
 const FINISHED_AT = BASE_CHUNKS.length - 1
 
+/** finish 发生在最后一个基础块之后；迟到块的到达序号都大于它。 */
+export const STREAM_FINISH_AT = FINISHED_AT
+
+/** 教学故障注入：honor-after-finish 把「finish 后照常丢弃」改成照常装配。 */
+export const STREAM_FAULT_TYPES = Object.freeze(['none', 'honor-after-finish'])
+
 export const STREAM_SCENARIOS = Object.freeze([
   Object.freeze({ id: 'clean', label: '干净到达', description: '五个 chunk 按序到达，全部接受。' }),
   Object.freeze({
@@ -47,32 +53,46 @@ export function listArrivals(scenarioId) {
   return buildArrivals(scenarioId)
 }
 
-/** 接受规则独立成函数：迟到（finish 后）且与更早到达内容相同的增量被拒绝。 */
-function acceptArrivals(arrivals, upTo) {
+/**
+ * 接受规则独立成函数：迟到（finish 后）且与更早到达内容相同的增量被拒绝。
+ * fault = 'honor-after-finish' 时这条防线被拆掉：迟到重复照常装配，
+ * duplicatedSegments 记下因此重复出现的文本片段数。
+ */
+function acceptArrivals(arrivals, upTo, fault) {
   const accepted = []
   const rejected = []
+  let duplicatedSegments = 0
   for (const chunk of arrivals) {
     if (chunk.arrival > upTo) break
     const afterFinish = chunk.arrival > FINISHED_AT
     const duplicateOfEarlier = arrivals.some(earlier =>
       earlier.arrival < chunk.arrival && earlier.text === chunk.text && earlier.kind === chunk.kind)
     if (afterFinish && duplicateOfEarlier) {
+      if (fault === 'honor-after-finish') {
+        accepted.push(chunk)
+        duplicatedSegments += 1
+        continue
+      }
       rejected.push({ arrival: chunk.arrival, reason: 'finish 后的迟到重复' })
       continue
     }
     accepted.push(chunk)
   }
-  return { accepted, rejected }
+  return { accepted, rejected, duplicatedSegments }
 }
 
 export function buildStreamModel(input) {
+  const fault = input.fault ?? 'none'
+  if (!STREAM_FAULT_TYPES.includes(fault)) {
+    throw new RangeError('未知故障类型：' + String(fault))
+  }
   const scenario = STREAM_SCENARIOS.find(item => item.id === input.scenario)
   if (scenario === undefined) throw new RangeError('未知场景：' + String(input.scenario))
   if (!Number.isInteger(input.upTo)) throw new TypeError('推进步数必须是整数')
   if (input.upTo < 0) throw new RangeError('推进步数不能为负')
 
   const arrivals = buildArrivals(scenario.id)
-  const { accepted, rejected } = acceptArrivals(arrivals, input.upTo)
+  const { accepted, rejected, duplicatedSegments } = acceptArrivals(arrivals, input.upTo, fault)
   const visibleArrivals = arrivals.filter(chunk => chunk.arrival <= input.upTo)
   const messageText = accepted
     .filter(chunk => chunk.kind === 'text')
@@ -80,7 +100,7 @@ export function buildStreamModel(input) {
     .join('')
 
   return {
-    input: { ...input },
+    input: { ...input, fault },
     scenario,
     arrivals: visibleArrivals,
     accepted,
@@ -94,6 +114,7 @@ export function buildStreamModel(input) {
       messageChars: messageText.length,
       toolCalls: accepted.filter(chunk => chunk.kind === 'tool-call').length,
       finished: input.upTo >= FINISHED_AT,
+      duplicatedSegments,
     },
     canProve: Object.freeze([
       '同一段到达序列重放到同一位置，得到完全相同的消息（确定性）',
@@ -146,6 +167,19 @@ export function evaluateStreamOracle(model) {
       : '本推演位置没有迟到增量需要处理',
     actual: lateArrivedAndReplayed ? `实际出现 ${occurrences} 次` : `已推进 ${model.input.upTo} 步`,
     pass: lateArrivedAndReplayed ? occurrences === 1 : true,
+  })
+
+  const lateAccepted = model.accepted.filter(chunk => chunk.arrival > FINISHED_AT).length
+  const duplicated = model.observations.duplicatedSegments ?? 0
+  checks.push({
+    id: 'LATE_ARRIVALS_REJECTED',
+    label: 'finish 之后到达的增量一个都不进消息',
+    expected: '接受 0 个',
+    actual: lateAccepted === 0
+      ? '接受 0 个'
+      : '接受了 ' + String(lateAccepted) + ' 个增量，重复片段 ' + String(duplicated)
+        + ' 处——finish 已过仍然装配',
+    pass: lateAccepted === 0,
   })
 
   const toolCalls = model.accepted.filter(chunk => chunk.kind === 'tool-call').length

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="工具预算收窄实验室：注册、restrict、原生呈现、宿主能力、审批五层漏斗当场重算，挡下名单逐行可查">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>工具预算收窄实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css">
+  <link rel="stylesheet" href="./study-lab-shell.css">
+  <link rel="icon" href="./favicon.svg">
+  <script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#tb-main">跳到实验</a>
+  <main class="lab-shell" id="tb-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 工具预算</p>
+        <h1>预算是算出来的，不是拍出来的。</h1>
+        <p class="hero-lead">拨动插件数、agent 作用域、原生呈现名额和审批策略，五层收窄当场重算：18 个已注册工具最后有几个被模型看见、几个能真正执行，每一层挡下了谁都有名单。它只做教学模型的计数推演，不测真实 token、延迟或模型行为。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/27-工具预算与插件责任决策卡.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./tool-visibility-lab.html">打开三层集合实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / 27</span>
+        <strong>五层机制名来自第 22、27 课对固定提交的源码解读。</strong>
+        <p>插件名、工具类别和审批结果是本组件的教学设定；页面不启动真实 DSH 或 provider。</p>
+      </aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：6 个插件各注册 3 个工具，共 18 个已注册。restrict 只保留任务需要的 3 个之后，模型一定收到这 3 个的原生 schema 吗？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="always-schema">
+            <span>会——能解析的工具 schema 全部随请求发出</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="depends-present">
+            <span>不一定——还要看 presentAs 呈现方式与最终组装给了谁名额</span>
+          </label>
+          <label class="gate-option">
+            <input type="radio" name="prediction" value="none-left">
+            <span>不会——restrict 之后一个 schema 都发不出去</span>
+          </label>
+        </div>
+        <div class="gate-actions">
+          <button class="button button-primary" type="submit">提交预测，解锁控件</button>
+          <button class="button button-quiet" type="button" data-gate-skip>跳过</button>
+        </div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="gated-controls">
+        <section class="card" aria-labelledby="tb-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="tb-ladder-title">三级台阶，从注册到可执行</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
+        <form class="lab-form" id="tb-form">
+          <label>
+            <span>已装插件数（2–12）<output id="tb-plugins-out">6</output></span>
+            <input id="tb-plugins" type="range" min="2" max="12" step="1" value="6">
+          </label>
+          <label>
+            <span>每插件注册工具数（1–6）<output id="tb-tools-out">3</output></span>
+            <input id="tb-tools" type="range" min="1" max="6" step="1" value="3">
+          </label>
+          <label>
+            <span>agent 作用域 restrict()</span>
+            <select id="tb-restrict" name="restrict">
+              <option value="narrow" selected>收窄：任务三类别（读文件、搜索、查看状态）各留 1 个</option>
+              <option value="all">全部放行：已注册即全部可解析</option>
+            </select>
+          </label>
+          <label>
+            <span>原生呈现名额<output id="tb-native-out">3</output></span>
+            <input id="tb-native" type="range" min="0" max="18" step="1" value="3">
+            <small>名额按可解析清单的固定顺序发放；没拿到名额的工具改走 Code Mode（run_code＋SDK）。</small>
+          </label>
+          <label>
+            <span>审批策略</span>
+            <select id="tb-approval" name="approval">
+              <option value="ask" selected>ask：写文件／网络访问每次先问人</option>
+              <option value="never">never：不询问，按宿主能力直接放行</option>
+            </select>
+          </label>
+          <button class="button button-primary" type="submit">重新推演</button>
+          <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前输入写进地址栏 #state= 后面：刷新不丢，发给别人打开的是同一份输入。焦点不在控件上时按 ← / → 调插件数。</small>
+        </form>
+        <p class="feedback" id="tb-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="五层收窄读数">
+          <div><dt>① 已注册</dt><dd id="metric-registered">—</dd></div>
+          <div><dt>② restrict 后可见</dt><dd id="metric-visible">—</dd></div>
+          <div><dt>③ 有原生呈现</dt><dd id="metric-native-count">—</dd></div>
+          <div><dt>④ 宿主能力放行</dt><dd id="metric-capable">—</dd></div>
+          <div><dt>⑤ 审批后可执行</dt><dd id="metric-approved">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="tb-funnel-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="layers">五层漏斗</p>
+          <h2 id="tb-funnel-title">条宽＝该层剩下的工具数，箭头标出每层挡下几个</h2>
+        </div>
+        <span class="schema-pill">注册 → 可见 → 呈现 → 能力 → 审批</span>
+      </div>
+      <p class="section-intro">每一层对应一个真实机制：restrict() 决定查找面，presentAs 与最终组装决定 schema 面，宿主能力和审批在执行侧各管一道——可见性到不了那里。</p>
+      <div class="plot-scroll" id="tb-funnel"></div>
+      <p class="chart-note">原生呈现名额按可解析清单的固定顺序发放；没拿到名额的工具改走 Code Mode（run_code＋SDK），仍可解析、没有删除。「删除路径／跑子进程」由宿主能力拒绝，「写文件／网络抓取」在 ask 策略下停在待批准——分级是教学设定。完整数字见下面的判定表。</p>
+    </section>
+
+    <section class="card" aria-labelledby="tb-table-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label" data-icon="table">完整文字替代</p>
+          <h2 id="tb-table-title">每个已注册工具的止步层级与原因</h2>
+        </div>
+        <span class="schema-pill">图里每个数都能在这里对上行</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <caption>当前输入下全部已注册工具的逐行判定；顺序与注册顺序一致</caption>
+          <thead><tr><th scope="col">工具名</th><th scope="col">能力类别</th><th scope="col">止步层级</th><th scope="col">原因（机制）</th></tr></thead>
+          <tbody id="tb-tools-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="beaker">独立校验</p>
+            <h2>五层账目逐条重算</h2>
+          </div>
+          <span class="schema-pill schema-oracle">守恒校验</span>
+        </div>
+        <p class="section-intro">独立校验只读模型：注册数守恒、五层单调、每层差值等于止步在该层的工具数、原生名额与重建一致性。</p>
+        <ul class="oracle-list" id="oracle-list"></ul>
+      </article>
+
+      <article class="boundary-card card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-icon="shield">证据边界</p>
+            <h2>哪些结论可以带走</h2>
+          </div>
+        </div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer">
+      <span>纯函数模型 · 独立校验 · 完整表格替代 · 不连接任何 Host</span>
+      <a href="./study-labs.html">返回实验室总览</a>
+    </footer>
+  </main>
+  <script type="module" src="./tool-budget-lab.js"></script>
+</body>
+</html>

@@ -12,6 +12,7 @@ import {
 import { installInputReset } from './study-lab-kit.js'
 import {
   STREAM_SCENARIOS,
+  STREAM_FINISH_AT,
   buildStreamModel,
   evaluateStreamOracle,
   listArrivals,
@@ -21,8 +22,19 @@ import { installPredictionGate } from './study-lab-gate.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
+
+const FAULT_ENUM = ['none', 'honor-after-finish']
 
 const STREAM_STATE_SCHEMA = {
+  scenario: { enum: STREAM_SCENARIOS.map(scenario => scenario.id) },
+  upTo: { integerRange: [0, 99] },
+  faultType: { enum: FAULT_ENUM },
+}
+
+// 只带场景和推进位置的老链接：恢复时篡改开关留在默认值，不报错打断阅读。
+const LEGACY_STREAM_STATE_SCHEMA = {
   scenario: { enum: STREAM_SCENARIOS.map(scenario => scenario.id) },
   upTo: { integerRange: [0, 99] },
 }
@@ -98,15 +110,20 @@ function renderStream(model, target, note) {
   target.append(svg)
   revealOnScroll(target)
   const late = model.input.scenario === 'late-duplicate'
+  const faulted = model.input.fault === 'honor-after-finish'
   writeText(note, late && model.observations.finished
-    ? '迟到的那份「好的，」到达了但被拒绝——正文里它只出现一次，这就是装配器的防线。'
+    ? faulted
+      ? '迟到的那份「好的，」也被拼进了正文：同一段话出现两遍，独立校验已经抓住这个增量。'
+      : '迟到的那份「好的，」到达了但被拒绝——正文里它只出现一次，这就是装配器的防线。'
     : '拖动滑块推进到达序列；迟到增量在最后一步才出现。')
 }
 
 function renderStreamTable(model, body, caption) {
+  const faulted = model.input.fault === 'honor-after-finish'
   const verdictFor = (chunk, arrived, rejectedHere) => {
     if (!arrived) return '尚未到达'
     if (rejectedHere) return '拒绝：finish 后的迟到重复'
+    if (faulted && chunk.arrival > STREAM_FINISH_AT) return '接受：finish 后的迟到块照常装配（篡改路径）'
     if (chunk.kind === 'text') return '接受：拼入正文'
     if (chunk.kind === 'tool-call') return '接受：单独计为工具调用'
     return '接受：不进入正文'
@@ -156,6 +173,7 @@ function initializePage() {
     oracle: document.querySelector('#metric-oracle'),
     copyLink: document.querySelector('#copy-state-link'),
     resetInputs: document.querySelector('#reset-inputs'),
+    faultType: document.querySelector('#fault-type'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -169,9 +187,11 @@ function initializePage() {
 
   const rebuild = () => {
     try {
+      const faultActive = elements.faultType.value === 'honor-after-finish'
       const model = buildStreamModel({
         scenario: elements.scenario.value,
         upTo: Number(elements.upto.value),
+        fault: elements.faultType.value,
       })
       const verdict = evaluateStreamOracle(model)
 
@@ -192,7 +212,10 @@ function initializePage() {
       writeText(elements.tools, String(model.observations.toolCalls))
       setFeedback('已装配到第 ' + String(model.input.upTo) + ' 个到达：接受 '
         + String(model.observations.acceptedCount) + '、拒绝 '
-        + String(model.observations.rejectedCount) + '。', 'success')
+        + String(model.observations.rejectedCount) + '。'
+        + (faultActive && model.observations.duplicatedSegments > 0
+          ? '篡改已生效：finish 后的增量被照常装配。'
+          : ''), 'success')
       persistState()
     } catch (error) {
       console.error('[stream] rebuild failed', error)
@@ -205,6 +228,7 @@ function initializePage() {
       history.replaceState(null, '', writeStateToHash(location.hash, {
         scenario: elements.scenario.value,
         upTo: Number(elements.upto.value),
+        faultType: elements.faultType.value,
       }, STREAM_STATE_SCHEMA))
     } catch {
       // 状态链接是增强，不是前提。
@@ -220,15 +244,24 @@ function initializePage() {
     rebuild()
   })
   elements.upto.addEventListener('input', rebuild)
+  // 篡改实验：改动走 change → 重新装配。
+  elements.faultType.addEventListener('change', rebuild)
   // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
   bindRangeKeys(elements.upto)
   const playButton = document.querySelector('#frame-play')
   if (playButton instanceof HTMLButtonElement) bindAutoAdvance(playButton, elements.upto, { stepMs: 320 })
 
   const restored = readStateFromHash(location.hash, STREAM_STATE_SCHEMA)
+  const legacy = restored !== null && !restored.ok
+    ? readStateFromHash(location.hash, LEGACY_STREAM_STATE_SCHEMA)
+    : null
   if (restored !== null && restored.ok) {
     elements.scenario.value = restored.value.scenario
     elements.upto.value = String(restored.value.upTo)
+    elements.faultType.value = restored.value.faultType
+  } else if (legacy !== null && legacy.ok) {
+    elements.scenario.value = legacy.value.scenario
+    elements.upto.value = String(legacy.value.upTo)
   }
 
   rebuild()
@@ -252,6 +285,41 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const lastArrival = scenarioId => listArrivals(scenarioId).length - 1
+    // 到达序即步骤：accepted 用分块类型做相位，被拒的迟到重复单独成相位。
+    const toSteps = model => {
+      const rejectedAt = new Map(model.rejected.map(entry => [entry.arrival, entry.reason]))
+      return model.arrivals
+        .filter(chunk => chunk.arrival <= model.input.upTo)
+        .map(chunk => {
+          const reason = rejectedAt.get(chunk.arrival)
+          return {
+            lane: 'chunk',
+            phase: reason !== undefined ? 'rejected' : chunk.kind,
+            detail: `#${chunk.arrival} ${chunk.kind}「${chunk.text.slice(0, 24)}」${reason ?? '已接受'}`,
+            index: chunk.arrival,
+          }
+        })
+    }
+    createConceptLadder(ladderRoot, {
+      storageKey: 'llm-stream-ladder',
+      rungs: replayRungs([
+        {
+          title: '回答是一块一块到达的',
+          text: '流式接口不等你点完发送才回话：推理块、正文块、工具调用块按到达顺序逐个落地。重放这条干净轨迹，看块的种类在变。',
+          traces: [{ id: 'clean', label: '干净流', steps: toSteps(buildStreamModel({ scenario: 'clean', upTo: lastArrival('clean') })), focusPhases: ['tool-call'] }],
+        },
+        {
+          title: 'finish 之后到的块：拒绝而不是合并',
+          text: 'finish 已宣告结束，迟到的重复块不能再拼进正文——装配协议选择丢弃并记录原因。确定性来自协议，不来自运气。',
+          traces: [{ id: 'late', label: '迟到重复', steps: toSteps(buildStreamModel({ scenario: 'late-duplicate', upTo: lastArrival('late-duplicate') })), focusPhases: ['rejected'] }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

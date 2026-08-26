@@ -6,6 +6,12 @@
  * 文件尾部的浏览器守卫里（与 study-progress.js 同一约定，无 DOM 导入门禁会
  * 检查这一点）。触发源：study-progress.js 在判分与"标记本课已读"时分发的
  * dsh-study-delight 事件；点击精灵本身也会随机说一句台词。
+ *
+ * 2.5D 深度层：主 svg 外再包三片 preserve-3d 层（背景晕影/身体/前景眼神高光），
+ * 滚动速度驱动倾斜角，光标驱动分层视差，判分满分/标记已读时弹跳一次。
+ * study-pet-plugins.js 会抓按钮里第一个 svg 做换帧——所以身体层 svg 必须保持在
+ * DOM 首位，帧变化经 MutationObserver 镜像到两个副本层；reduced-motion 下
+ * 监听器不安装、CSS 把位移归零，页面保持完全静止。
  */
 
 import {
@@ -80,10 +86,30 @@ function ensureStyle(doc) {
   opacity: 0; translate: 0 4px; transition: opacity .22s ease, translate .22s ease; pointer-events: none;
 }
 #dsh-companion .dsh-comp-bubble.is-open { opacity: 1; translate: 0 0; }
+#dsh-companion .dsh-comp-btn { perspective: 300px; }
+#dsh-companion .dsh-comp-scene {
+  position: relative; display: block; transform-style: preserve-3d;
+  transition: transform .26s ease-out; will-change: transform;
+}
+#dsh-companion.is-delight .dsh-comp-scene { animation: dsh-pop .46s ease-out 1; }
+@keyframes dsh-pop { 0%, 100% { scale: 1; } 35% { scale: 1.09; } }
+#dsh-companion .dsh-comp-layer { display: block; transition: transform .18s ease-out; will-change: transform; }
+#dsh-companion .dsh-comp-layer--back {
+  position: absolute; inset: 0; opacity: .32;
+  transform: translate3d(calc(var(--nx, 0) * -6px), calc(var(--ny, 0) * -4px), -22px) scale(1.12);
+}
+#dsh-companion .dsh-comp-layer--back svg { filter: blur(1px); }
+#dsh-companion .dsh-comp-layer--body { position: relative; }
+#dsh-companion .dsh-comp-layer--front {
+  position: absolute; inset: 0;
+  transform: translate3d(calc(var(--nx, 0) * 7px), calc(var(--ny, 0) * 5px), 20px);
+}
 @media (max-width: 640px) { #dsh-companion svg { width: 54px; } }
 @media (prefers-reduced-motion: reduce) {
   #dsh-companion .dsh-comp-eye { animation: none; }
   #dsh-companion.is-cheer svg { animation: none; }
+  #dsh-companion .dsh-comp-scene,
+  #dsh-companion .dsh-comp-layer { transform: none !important; transition: none; animation: none; }
 }
 @media print { #dsh-companion { display: none !important; } }
 `
@@ -106,6 +132,56 @@ function buildSpriteSvg(doc, rects) {
     svg.append(node)
   }
   return svg
+}
+
+/**
+ * 眼神高光格的判定：白色且不超过 2 格宽。帽子白带（12 格宽）和闭眼帧
+ * （happy/nap 只有深色 E 格）都不会被误收进前景层。
+ */
+const GLINT_FILL = '#ffffff'
+const GLINT_MAX_CELLS = 2
+
+function isGlintRect(rectNode) {
+  return rectNode.getAttribute('fill') === GLINT_FILL &&
+    Number(rectNode.getAttribute('width')) <= GLINT_MAX_CELLS
+}
+
+/** 把身体层 svg 的当前帧镜像进两个副本层：背景取全部矩形，前景只取眼神高光。 */
+function syncDepthCopies(scene) {
+  const bodySvg = scene.querySelector('.dsh-comp-layer--body svg')
+  if (bodySvg === null) return
+  const rects = [...bodySvg.querySelectorAll('rect')]
+  const viewBox = bodySvg.getAttribute('viewBox')
+  for (const [layerName, picked] of [
+    ['back', () => true],
+    ['front', node => isGlintRect(node)],
+  ]) {
+    const svg = scene.querySelector(`.dsh-comp-layer--${layerName} svg`)
+    if (svg === null) continue
+    svg.setAttribute('viewBox', viewBox)
+    svg.replaceChildren(...rects.filter(picked).map(rect => rect.cloneNode()))
+  }
+}
+
+/**
+ * 三片深度层：身体层在 DOM 首位——study-pet-plugins.js 用
+ * root.querySelector('svg') 定位换帧目标，顺序不能动。
+ */
+function buildDepthScene(doc) {
+  const scene = doc.createElement('span')
+  scene.className = 'dsh-comp-scene'
+  const makeLayer = (name, hidden) => {
+    const layer = doc.createElement('span')
+    layer.className = `dsh-comp-layer dsh-comp-layer--${name}`
+    if (hidden) layer.setAttribute('aria-hidden', 'true')
+    layer.append(buildSpriteSvg(doc, []))
+    return layer
+  }
+  const bodyLayer = doc.createElement('span')
+  bodyLayer.className = 'dsh-comp-layer dsh-comp-layer--body'
+  bodyLayer.append(buildSpriteSvg(doc, buildMascotRects()))
+  scene.append(bodyLayer, makeLayer('front', true), makeLayer('back', true))
+  return scene
 }
 
 let bubbleTimer = 0
@@ -141,6 +217,15 @@ function cheer(root, reducedMotion) {
   setTimeout(() => root.classList.remove('is-cheer'), 1400)
 }
 
+/** 深度层的一次性弹跳：scale 属性独立于 transform，不与滚动倾斜互相覆盖。 */
+function pop(root, reducedMotion) {
+  if (reducedMotion) return
+  root.classList.remove('is-delight')
+  void root.offsetWidth
+  root.classList.add('is-delight')
+  setTimeout(() => root.classList.remove('is-delight'), 520)
+}
+
 function initializeCompanion(doc) {
   ensureStyle(doc)
   const root = doc.createElement('div')
@@ -149,7 +234,8 @@ function initializeCompanion(doc) {
   button.type = 'button'
   button.className = 'dsh-comp-btn'
   button.setAttribute('aria-label', '戳一下吉祥物阿溟')
-  button.append(buildSpriteSvg(doc, buildMascotRects()))
+  const scene = buildDepthScene(doc)
+  button.append(scene)
   const bubble = doc.createElement('div')
   bubble.className = 'dsh-comp-bubble'
   bubble.setAttribute('role', 'status')
@@ -157,6 +243,61 @@ function initializeCompanion(doc) {
   doc.body.append(root)
 
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // 深度副本层跟随换帧：pet-plugins 改写身体层 svg 的子节点或 viewBox 时重镜像。
+  const bodySvg = scene.querySelector('.dsh-comp-layer--body svg')
+  if (bodySvg !== null) {
+    let syncScheduled = false
+    const scheduleSync = () => {
+      if (syncScheduled) return
+      syncScheduled = true
+      requestAnimationFrame(() => {
+        syncScheduled = false
+        syncDepthCopies(scene)
+      })
+    }
+    new MutationObserver(scheduleSync).observe(bodySvg, {
+      childList: true,
+      attributes: true,
+      attributeFilter: ['viewBox'],
+    })
+    syncDepthCopies(scene)
+  }
+
+  if (!reducedMotion) {
+    // 滚动速度 → 倾斜角：rAF 合并同一帧内的多次 scroll，停止滚动后缓回正。
+    let lastY = scrollY
+    let lastT = performance.now()
+    let settleTimer = 0
+    let ticking = false
+    const tiltFromScroll = () => {
+      ticking = false
+      const now = performance.now()
+      const y = scrollY
+      const velocity = Math.max(-2.5, Math.min(2.5, (y - lastY) / Math.max(now - lastT, 8)))
+      lastY = y
+      lastT = now
+      const leanX = Math.max(-14, Math.min(14, velocity * -9))
+      const swayZ = Math.max(-7, Math.min(7, velocity * 4))
+      scene.style.transform = `rotateX(${leanX.toFixed(2)}deg) rotateZ(${swayZ.toFixed(2)}deg)`
+      clearTimeout(settleTimer)
+      settleTimer = setTimeout(() => { scene.style.transform = '' }, 240)
+    }
+    addEventListener('scroll', () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(tiltFromScroll)
+    }, { passive: true })
+
+    // 光标 → 分层视差：只写两个 CSS 变量，层间倍率差在样式表里。
+    // 触屏设备（hover:none / pointer:coarse）不安装——移动端只保留倾斜。
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      addEventListener('pointermove', event => {
+        root.style.setProperty('--nx', ((event.clientX / innerWidth) * 2 - 1).toFixed(3))
+        root.style.setProperty('--ny', ((event.clientY / innerHeight) * 2 - 1).toFixed(3))
+      }, { passive: true })
+    }
+  }
 
   button.addEventListener('click', () => say(root, pickLine(COMPANION_LINES.poke), reducedMotion))
 
@@ -166,12 +307,14 @@ function initializeCompanion(doc) {
       if (detail.score === detail.total) {
         say(root, pickLine(COMPANION_LINES.quizPerfect), reducedMotion)
         cheer(root, reducedMotion)
+        pop(root, reducedMotion)
       } else {
         say(root, pickLine(COMPANION_LINES.quizMixed), reducedMotion)
       }
     } else if (detail.kind === 'done') {
       say(root, pickLine(COMPANION_LINES.done), reducedMotion)
       cheer(root, reducedMotion)
+      pop(root, reducedMotion)
     } else if (detail.kind === 'stuck') {
       say(root, stuckLine(pickLine(COMPANION_LINES.stuck), detail), reducedMotion)
     }

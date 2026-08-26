@@ -42,6 +42,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="spx-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="spx-ladder-title">三级台阶，从执行到截断</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form sb-controls" id="subprocess-form">
           <label><span>输出大小：<output id="spx-bytes-output">300</output> 字节</span><input id="spx-bytes" type="range" min="0" max="4000" step="50" value="300"></label>
           <label><span>内存上限 maxBytes：<output id="spx-cap-output">200</output> 字节</span><input id="spx-cap" type="range" min="50" max="2000" step="25" value="200"></label>

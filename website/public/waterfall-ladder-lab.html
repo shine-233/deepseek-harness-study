@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>瀑布语义阶梯实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css"><link rel="stylesheet" href="./study-lab-ladder.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#wf-main">跳到实验</a>
+  <main class="lab-shell" id="wf-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · Cordis 瀑布语义</p>
+        <h1>短路是设计，但只属于有决定权的那一级。</h1>
+        <p class="hero-lead">这个实验室只讲清一条规则是怎么一步步长出来的：从一次最简单的派发开始，每级台阶引入一个概念——注册顺序、next() 传值、短路、角色分工。上一级的模拟被你亲手跑过，下一级才会展开；急了就点「展开全部台阶」。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/02-Cordis与插件树.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./hook-flow-lab.html">打开 Hook 流实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界">
+        <span class="warning-index">MODEL / WF</span>
+        <strong>纯函数模型 · 独立校验。</strong>
+        <p>语义对照 vendored cordis/src/events.ts 与 docs/cordis-primer.md；页面不启动真实 Fiber。</p>
+      </aside>
+    </header>
+
+    <section class="card" aria-labelledby="ladder-section-title">
+      <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="ladder-section-title">五级台阶，从派发到短路</h2></div><span class="schema-pill">先预测，再拆解</span></div>
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">监听器 B 不调用 next() 而是直接 return，监听器 C 的命运是什么？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="still-runs"><span>照常执行，拿到的是 B 的原始输入</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="skipped"><span>完全不执行——合成结果就是 B 的返回值</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="whole-fails"><span>整次派发报错，结果丢失</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁五级台阶</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <div id="ladder-root"></div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="steps-title">
+      <div class="section-heading"><div><p class="section-label">完整文字替代</p><h2 id="steps-title">有序轨迹表</h2></div><span class="schema-pill">不用脚本也能读</span></div>
+      <div class="table-scroll">
+        <table>
+          <caption>五个台阶各自默认输入的完整轨迹</caption>
+          <thead><tr><th scope="col">台阶</th><th scope="col">阶段</th><th scope="col">位置</th><th scope="col">携带值</th><th scope="col">变换</th></tr></thead>
+          <tbody id="wf-steps-body"></tbody>
+        </table>
+      </div>
+      <details class="sb-oracle-details">
+        <summary>独立校验逐条判定（对每次派发重算）</summary>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </details>
+      <dl class="metric-grid" aria-label="校验结论">
+        <div class="metric-oracle"><dt>独立校验</dt><dd id="wf-oracle-badge">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="evidence-grid" aria-label="证据边界">
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns">
+          <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 零跳步 · 不连接任何 Host</span><a href="./study-labs.html">返回实验室总览</a></footer>
+  </main>
+  <script type="module" src="./waterfall-ladder-lab.js"></script>
+</body>
+</html>

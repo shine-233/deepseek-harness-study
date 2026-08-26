@@ -38,6 +38,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="tmk-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="tmk-ladder-title">三级台阶，读数怎么算出来</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form sb-controls" id="meter-form">
           <label><span>已有表面内容：<output id="tmk-existing-output">1200</output> 字符</span><input id="tmk-existing" type="range" min="0" max="20000" step="100" value="1200"></label>
           <label><span>新增内容：<output id="tmk-new-output">400</output> 字符</span><input id="tmk-new" type="range" min="0" max="20000" step="100" value="400"></label>

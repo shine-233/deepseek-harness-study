@@ -28,6 +28,8 @@ import {
 } from './sqlite-row-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -38,6 +40,7 @@ import { installThemeToggle } from './study-lab-theme.js'
 const SESSION_STATE_SCHEMA = {
   scenario: { enum: LOG_SCENARIOS.map(scenario => scenario.id) },
   upTo: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
+  faultType: { enum: ['none', 'tamper-replay-input'] },
   sqlitePacking: { enum: ['on', 'off'] },
   sqlitePayload: { enum: ['small', 'large'] },
   packN: { integerRange: [3, 260] },
@@ -231,6 +234,8 @@ function initializePage() {
     scenarioNote: document.querySelector('#scenario-note'),
     upTo: document.querySelector('#upto'),
     upToOutput: document.querySelector('#upto-output'),
+    faultType: document.querySelector('#fault-type'),
+    faultNote: document.querySelector('#fault-note'),
     feedback: document.querySelector('#session-feedback'),
     strip: document.querySelector('#strip-plot'),
     stripNote: document.querySelector('#strip-note'),
@@ -282,12 +287,17 @@ function initializePage() {
       const model = buildSessionLogModel({
         scenario: elements.scenario.value,
         upTo: Number(elements.upTo.value),
+        fault: elements.faultType.value,
       })
       const verdict = evaluateSessionLogOracle(model)
 
       elements.upTo.max = String(model.maxSequence)
       writeText(elements.upToOutput, String(model.input.upTo))
       writeText(elements.scenarioNote, model.scenario.description)
+      writeText(elements.faultNote, model.tamper === null
+        ? ''
+        : '把序号 ' + String(model.tamper.sequence) + ' 的 ' + model.tamper.type
+          + ' 载荷里 ok: true 改写成 false——原始日志保持原样作基准。')
       renderStrip(model, elements.strip, elements.stripNote)
       renderState(model, elements.stateGrid, elements.messageList)
       renderOracle(verdict, elements.oracleList, elements.oracle)
@@ -311,12 +321,19 @@ function initializePage() {
       writeText(elements.skipped, String(model.observations.skipped))
       writeText(elements.refused, model.observations.refusedAt === null ? '无' : '#' + String(model.observations.refusedAt))
       writeText(elements.messages, String(model.observations.messages))
-      setFeedback(model.observations.refusedAt === null
-        ? '已重放到第 ' + String(model.input.upTo) + ' 条：' + String(model.observations.applied)
-          + ' 条应用，' + String(model.observations.messages) + ' 条消息。'
-        : '加载在第 ' + String(model.observations.refusedAt) + ' 条被拒绝；之前的 '
-          + String(model.observations.applied) + ' 条已折叠成可用的部分状态。',
-      model.observations.refusedAt === null ? 'success' : 'notice')
+      if (!verdict.pass) {
+        setFeedback('注入的篡改被独立校验抓住了：下方未通过的那条给出分歧字段和期望、实测值。', 'error')
+      } else if (model.tamper !== null && model.input.upTo < model.tamper.sequence) {
+        setFeedback('篡改的序号 ' + String(model.tamper.sequence)
+          + ' 还在当前重放位置之后；把滑块拖过去，分歧才会出现。', 'notice')
+      } else {
+        setFeedback(model.observations.refusedAt === null
+          ? '已重放到第 ' + String(model.input.upTo) + ' 条：' + String(model.observations.applied)
+            + ' 条应用，' + String(model.observations.messages) + ' 条消息。'
+          : '加载在第 ' + String(model.observations.refusedAt) + ' 条被拒绝；之前的 '
+            + String(model.observations.applied) + ' 条已折叠成可用的部分状态。',
+        model.observations.refusedAt === null ? 'success' : 'notice')
+      }
       persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
@@ -331,6 +348,7 @@ function initializePage() {
       history.replaceState(null, '', writeStateToHash(location.hash, {
         scenario: elements.scenario.value,
         upTo: Number(elements.upTo.value),
+        faultType: elements.faultType.value,
         sqlitePacking: elements.sqlitePacking.value,
         sqlitePayload: elements.sqlitePayload.value,
         packN: Number(elements.packN.value),
@@ -361,6 +379,7 @@ function initializePage() {
     rebuild()
   })
   elements.upTo.addEventListener('input', rebuild)
+  elements.faultType.addEventListener('change', rebuild)
   // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
   bindRangeKeys(elements.upTo)
   const playButton = document.querySelector('#frame-play')
@@ -377,6 +396,7 @@ function initializePage() {
   if (restored !== null && restored.ok) {
     elements.scenario.value = restored.value.scenario
     elements.upTo.value = String(restored.value.upTo)
+    elements.faultType.value = restored.value.faultType
     elements.sqlitePacking.value = restored.value.sqlitePacking
     elements.sqlitePayload.value = restored.value.sqlitePayload
     if ('packN' in restored.value) elements.packN.value = String(restored.value.packN)
@@ -406,6 +426,43 @@ if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
   installScrollProgress()
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 把逐条处置映射成轨迹步骤：一条日志事件一级，处置结果就是相位。
+    const toSteps = model => model.partial.dispositions.map(entry => ({
+      lane: 'log',
+      phase: entry.disposition,
+      detail: `#${entry.sequence} ${entry.type}：${entry.reason}`,
+      index: entry.sequence,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'session-log-ladder',
+      rungs: replayRungs([
+        {
+          title: '重放就是逐条按序应用',
+          text: '完整日志从 session-start 开始，每条事件按序号应用一次，状态一路折叠到最后。先看这条干净轨迹。',
+          traces: [{ id: 'clean', label: '完整日志', steps: toSteps(buildSessionLogModel({ scenario: 'clean' })), focusPhases: ['applied'] }],
+        },
+        {
+          title: 'ignorable：显式的跳过声明',
+          text: '一条读不懂但标了 ignorable 的事件被明确跳过，其余照常重放。容忍不是猜——它写在事件自己的信封里。',
+          traces: [{ id: 'ignorable', label: '可忽略未知事件', steps: toSteps(buildSessionLogModel({ scenario: 'unknown-ignorable' })), focusPhases: ['skipped'] }],
+        },
+        {
+          title: '读不懂且必需：停在前一条，大声拒绝',
+          text: '没有 ignorable 标记的未知事件让加载停在它之前——绝不带着缺口继续折叠。fail loud 是默认，静默跳过才是需要声明的例外。',
+          traces: [{ id: 'required', label: '必需的未知事件', steps: toSteps(buildSessionLogModel({ scenario: 'unknown-required' })), focusPhases: ['refused'] }],
+        },
+        {
+          title: '序号缺口：连续性是可以校验的',
+          text: '缺了一条序号，加载在缺口处停下并报告「期望几、读到几」。日志不是一袋事件，是一条有序账本。',
+          traces: [{ id: 'gap', label: '序号有缺口', steps: toSteps(buildSessionLogModel({ scenario: 'gap' })), focusPhases: ['not-reached'] }],
+        },
+      ]),
+    })
+  }
+
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 

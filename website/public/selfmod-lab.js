@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements
   svgElement, writeText, installDeclaredIcons, installScrollProgress, pulseSignal } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -148,6 +150,36 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildSelfModModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'selfmod-ladder',
+      rungs: replayRungs([
+        {
+          title: '先看脚下，再动手：inspect 是第一动作',
+          text: '模型先用 cordis_inspect 查看自己装载了哪些包、哪些在运行。自修改不是盲改——每一步都从读取现状开始。',
+          traces: [{ id: 'run-only', label: '只运行不卸载', steps: trace({ actionId: 'run-only' }), focusPhases: ['inspect'] }],
+        },
+        {
+          title: '完整生命周期：schema 随挂载生长、随卸载收缩',
+          text: 'define → run → stop → undefine：动态包挂载后工具注册表长出新条目，卸载后精确缩回。模型看到的工具面随生命周期实时变化。',
+          traces: [{ id: 'full', label: '完整生命周期', steps: trace({ actionId: 'full-lifecycle' }) }],
+        },
+        {
+          title: '两道防线：guard 拦调用，坏 yml 挂不上',
+          text: 'broken-yml 在解析处失败：nothing-mounted，schema 纹丝不动。守卫插件还能拒绝敏感的动态调用——失败被关在最外层。',
+          traces: [
+            { id: 'broken', label: '坏 yml', steps: trace({ actionId: 'broken-yml' }), focusPhases: ['parse-fail', 'nothing-mounted'] },
+            { id: 'guarded', label: 'guard 拒绝', steps: trace({ actionId: 'full-lifecycle', guardDenies: true }), focusPhases: ['guard-denied'] },
+          ],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

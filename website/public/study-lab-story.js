@@ -58,6 +58,9 @@ export function installStoryRail() {
   const hero = main.querySelector('.hero-panel')
   if (hero === null) { main.prepend(rail); } else { hero.after(rail) }
 
+  // 无 IntersectionObserver 的环境（Node 冒烟垫片）跳过高亮，导航按钮仍可用。
+  if (typeof IntersectionObserver !== 'function') return
+
   const observer = new IntersectionObserver(entriesList => {
     for (const entry of entriesList) {
       if (!entry.isIntersecting) continue

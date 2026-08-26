@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, requireElements,
   svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -107,6 +109,33 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildLspModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'lsp-ladder',
+      rungs: replayRungs([
+        {
+          title: '预留扩展名，按扩展名路由查询',
+          text: '各语言服务器带品牌化 id 申请扩展名预留；查询到来时按文件扩展名路由到对应的 provider。一张注册表管住「谁会说哪种语言」。',
+          traces: [{ id: 'happy', label: '.ts 查询 hover', steps: trace({ queryExt: 'ts', queryOp: 'hover' }) }],
+        },
+        {
+          title: '预留冲突：先到先得，后来者被拒',
+          text: 'deno-lsp 也想要 .ts 时被显式拒绝：一个扩展名只有一个属主。拒绝是登记时的显式决定，不是运行时的静默覆盖。',
+          traces: [{ id: 'conflict', label: '.ts 冲突', steps: trace({ conflict: true, queryExt: 'ts', queryOp: 'goToDefinition' }), focusPhases: ['conflict-rejected'] }],
+        },
+        {
+          title: '非法声明不发布：坏 provider 不挡别人',
+          text: '声明空扩展名的 provider 被跳过，什么都没发布——其余 provider 照常注册、照常应答。配置错误 fail loud 在登记处，不扩散到查询。',
+          traces: [{ id: 'invalid', label: '含非法声明', steps: trace({ invalidExt: true, queryExt: 'py', queryOp: 'findReferences' }), focusPhases: ['invalid-registration', 'nothing-published'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

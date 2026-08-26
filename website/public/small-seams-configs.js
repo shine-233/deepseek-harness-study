@@ -1,10 +1,25 @@
 /**
  * 六个小缝实验页的共享配置。
  *
- * 每个条目描述一个页面的全部差异：标题、预测门、控件、指标与配套课链接。
- * 渲染逻辑在 small-seams-runtime.js；HTML 外壳由 study-tools/gen-small-seams.mjs
- * 从同一份配置生成——改一处，三处同步。
+ * 每个条目描述一个页面的全部差异：标题、预测门、控件、指标、步骤标签、
+ * 概念阶梯与配套课链接。渲染逻辑在 small-seams-runtime.js；HTML 外壳由
+ * study-tools/gen-small-seams.mjs 从同一份配置生成——改一处，三处同步。
  */
+
+import { buildPresetModel } from './preset-model.js'
+import { buildCheckpointModel } from './checkpoint-model.js'
+import { buildIdentityModel } from './identity-model.js'
+import { buildFeedbackModel } from './feedback-model.js'
+import { buildTimeModel } from './time-model.js'
+import { buildAttachmentModel } from './attachment-model.js'
+
+/** 把模型步骤收窄成轨迹引擎需要的 {lane,phase,detail,index}。 */
+const traceOf = build => input => build(input).steps.map(step => ({
+  lane: step.lane,
+  phase: step.phase,
+  detail: step.detail,
+  index: step.index,
+}))
 
 /** 与 time-model.js 的 TIME_ZONES 保持一致（避免跨模块耦合）。 */
 const SMALL_SEAM_TIME_ZONES = ['Asia/Shanghai', 'UTC', 'America/New_York']
@@ -44,6 +59,37 @@ export const SMALL_SEAMS_LABS = {
       { kind: 'check', id: 'duplicateMount', label: '再次装载同名预设（观察拒绝）' },
     ],
     metrics: [['分叉形态', 'forkShape'], ['挂载份数', 'mountCount'], ['agent 数', 'agents'], ['实例副本', 'instanceCopies'], ['冷读一致', 'coldReadResolvesSame']],
+    stepLabels: [
+      ['mount-once', '装载一次'],
+      ['duplicate-rejected', '再次装载被拒'],
+      ['join', '声明加入'],
+      ['bind-scope', '挂接作用域'],
+      ['shared-instance', '实例只有一份'],
+      ['capabilities-visible', '工具视图就绪'],
+    ],
+    ladder: {
+      title: '三级台阶，从常驻挂载到按名加入',
+      rungs: [
+        {
+          id: 'mount',
+          title: '装载一次：整个运行时只有一份',
+          text: '预设的 cordis.yml 以常驻挂载方式装进运行时：插件实例、工具注册、prompt 分区都只存在一份。后面的 agent 全部在这份挂载上加入。',
+          traces: [{ id: 'mount', label: '单 agent 加入', steps: traceOf(buildPresetModel)({ agents: 1 }) }],
+        },
+        {
+          id: 'join',
+          title: '加入而不是复制：作用域父子关系',
+          text: '每个 agent 把自己的作用域键挂到挂载的作用域下——挂载的注册对它可见，监听器也能收到它的事件。两个 agent 加入之后，实例仍然只有一份。',
+          traces: [{ id: 'join', label: '双 agent 加入', steps: traceOf(buildPresetModel)({ agents: 2 }), focusPhases: ['bind-scope', 'capabilities-visible'] }],
+        },
+        {
+          id: 'reject',
+          title: '再次装载同名预设会被拒',
+          text: '第二个同名挂载被直接拒绝：一个预设就是一份组合，不是每会话一份副本。要不同的组合，定义另一个预设。',
+          traces: [{ id: 'reject', label: '重复装载', steps: traceOf(buildPresetModel)({ agents: 1, duplicateMount: true }), focusPhases: ['duplicate-rejected'] }],
+        },
+      ],
+    },
     stateSchema: {
       agents: { integerRange: [1, 3] },
       presetId: { enum: PRESET_CATALOG_IDS() },
@@ -83,6 +129,38 @@ export const SMALL_SEAMS_LABS = {
       { kind: 'check', id: 'checkpointsEnabled', label: '启用检查点策略', value: true },
     ],
     metrics: [['分叉形态', 'forkShape'], ['最后 durable 拍', 'lastDurableTick'], ['可恢复拍数', 'recoverableCount'], ['可从日志重放', 'replayableFromLog']],
+    stepLabels: [
+      ['checkpoint', '落一个检查点'],
+      ['crash', '进程崩溃'],
+      ['request-issued', '发出请求'],
+      ['tool-dispatched', '执行工具'],
+      ['request-2', '发出第二次请求'],
+      ['answer', '产生回答'],
+      ['turn-end', '回合结束'],
+    ],
+    ladder: {
+      title: '三级台阶，从落盘时机到可恢复边界',
+      rungs: [
+        {
+          id: 'moments',
+          title: '三个语义时刻各落一个检查点',
+          text: '检查点策略钉住三个时刻：模型请求前、顶层工具派发前、下一请求边界。检查点先于同拍动作——先留痕，再执行。',
+          traces: [{ id: 'full', label: '完整一拍', steps: traceOf(buildCheckpointModel)({ crashAt: 6 }), focusPhases: ['checkpoint'] }],
+        },
+        {
+          id: 'crash',
+          title: '中途崩溃：只丢最后一个检查点之后的部分',
+          text: '进程在第 4 拍崩溃：此前已到达的语义时刻都 durable 了。恢复时从最后的检查点原样重放，不从零开始。',
+          traces: [{ id: 'crash4', label: '第 4 拍崩溃', steps: traceOf(buildCheckpointModel)({ crashAt: 4 }), focusPhases: ['crash'] }],
+        },
+        {
+          id: 'off',
+          title: '关掉检查点：崩溃即清零',
+          text: '同样的崩溃位置，关闭策略后什么也没留下——持久层没有可重放的内容。「可恢复」的全部前提是把语义时刻先写下来。',
+          traces: [{ id: 'disabled', label: '无检查点', steps: traceOf(buildCheckpointModel)({ crashAt: 4, checkpointsEnabled: false }) }],
+        },
+      ],
+    },
     stateSchema: {
       crashAt: { integerRange: [0, 6] },
       checkpointsEnabled: { boolean: true },
@@ -122,6 +200,38 @@ export const SMALL_SEAMS_LABS = {
       { kind: 'check', id: 'sameProcess', label: '同一个进程第二次读取' },
     ],
     metrics: [['分叉形态', 'forkShape'], ['当前 id', 'id']],
+    stepLabels: [
+      ['read', '请求身份'],
+      ['memo-hit', '命中进程记忆'],
+      ['disk-read', '读自文件'],
+      ['stored', '文件保持原样'],
+      ['file-gone-note', '文件已不在'],
+      ['mint', '铸造新身份'],
+      ['fresh-identity', '全新身份生效'],
+    ],
+    ladder: {
+      title: '三级台阶，从读盘到铸造',
+      rungs: [
+        {
+          id: 'disk',
+          title: '首次读取：id 住在 harness home 的一个文件里',
+          text: '匿名 id 是随机 UUID，以裸行形式存在 home 的 .anonymous-user-id 里。新进程第一次读取走磁盘；id 与主机名、网络地址、git remote 无关。',
+          traces: [{ id: 'disk', label: '新进程读盘', steps: traceOf(buildIdentityModel)({ fileExists: true, sameProcess: false }), focusPhases: ['disk-read'] }],
+        },
+        {
+          id: 'memo',
+          title: '同一进程只碰一次磁盘',
+          text: '读取结果按解析后的路径记忆在进程内。第二次请求直接返回记忆中的 id——运行期间不再碰文件系统。',
+          traces: [{ id: 'memo', label: '同进程复读', steps: traceOf(buildIdentityModel)({ fileExists: true, sameProcess: true }), focusPhases: ['memo-hit'] }],
+        },
+        {
+          id: 'mint',
+          title: '删掉文件：下次启动铸造全新身份',
+          text: '身份跟着 home 走，不跟机器走。文件缺失且无记忆时铸造新的随机 UUID 写回原路径，与删除前的任何 id 都无关。',
+          traces: [{ id: 'mint', label: '缺失即铸造', steps: traceOf(buildIdentityModel)({ fileExists: false, sameProcess: false }), focusPhases: ['mint', 'fresh-identity'] }],
+        },
+      ],
+    },
     stateSchema: {
       home: { enum: ['home-a', 'home-b'] },
       fileExists: { boolean: true },
@@ -163,6 +273,39 @@ export const SMALL_SEAMS_LABS = {
       { kind: 'check', id: 'optIn', label: '选择加入时间上下文', value: true },
     ],
     metrics: [['分叉形态', 'forkShape'], ['注入条数', 'injectedCount']],
+    stepLabels: [
+      ['pre-step', '轮前决策'],
+      ['skipped', '本轮跳过'],
+      ['inject', '注入时间读数'],
+      ['drift-attributed', '偏差带归因'],
+      ['logged-durable', '读数入历史'],
+    ],
+    ladder: {
+      title: '三级台阶，从注入到入册',
+      rungs: [
+        {
+          id: 'inject',
+          title: '选择加入的轮次才注入',
+          text: '每一轮的 pre-step 决策点先问「这一轮要给模型看钟表吗」。选择加入时，一条带来源的时间读数被追加进请求历史。',
+          traces: [{ id: 'on', label: '已加入', steps: traceOf(buildTimeModel)({ optIn: true, turns: 1 }), focusPhases: ['pre-step', 'inject'] }],
+        },
+        {
+          id: 'drift',
+          title: '读数署名：来源与时区一起交给模型',
+          text: '时钟偏差 90 分钟时，注入的读数带着归因说明。模型不仅知道现在几点，还知道这个数怎么来的、该打几折。',
+          traces: [{ id: 'drift', label: '偏差 90 分钟', steps: traceOf(buildTimeModel)({ optIn: true, clockDriftMinutes: 90, turns: 1 }), focusPhases: ['drift-attributed'] }],
+        },
+        {
+          id: 'durable',
+          title: 'durable：关掉开关也撤不回历史',
+          text: '已入册的读数是 durable 用户消息，重放原样回来；关闭 opt-in 只管「以后还注入吗」。未加入的轮次连 pre-step 注入都不发生，历史完全不变。',
+          traces: [
+            { id: 'two-on', label: '两轮都加入', steps: traceOf(buildTimeModel)({ optIn: true, turns: 2 }) },
+            { id: 'all-off', label: '从未加入', steps: traceOf(buildTimeModel)({ optIn: false, turns: 2 }), focusPhases: ['skipped'] },
+          ],
+        },
+      ],
+    },
     stateSchema: {
       timezone: { enum: [...SMALL_SEAM_TIME_ZONES] },
       clockDriftMinutes: { integerRange: [-720, 720] },
@@ -204,6 +347,39 @@ export const SMALL_SEAMS_LABS = {
       { kind: 'check', id: 'requestAllowed', label: 'RequestPolicy 允许取回', value: true },
     ],
     metrics: [['分叉形态', 'forkShape'], ['存储结果', 'requestOutcome'], ['工件字节', 'storedBytes']],
+    stepLabels: [
+      ['save-request', '请求保存图片'],
+      ['limit-rejected', '超限拒收'],
+      ['stored', '写入存储'],
+      ['request-ok', '按引用取回'],
+      ['request-denied', '策略拒绝取回'],
+    ],
+    ladder: {
+      title: '三级台阶，从保存到取回',
+      rungs: [
+        {
+          id: 'save',
+          title: 'saveImage：校验尺寸，写入存储，返回引用',
+          text: '保存一张 800 字节的图：尺寸校验通过后写入持久附件存储，返回一个可持久化的引用。引用可以进会话日志，字节不必跟着走。',
+          traces: [{ id: 'ok', label: '800 / 上限 1200', steps: traceOf(buildAttachmentModel)({ imageBytes: 800, maxBytes: 1200 }) }],
+        },
+        {
+          id: 'reject',
+          title: '超限在保存处拒收：引用根本不会诞生',
+          text: '把上限收到 500 再交同一张图：保存直接失败，零引用。fail loud 且不留半个句柄——半真半假的引用比没有更危险。',
+          traces: [{ id: 'reject', label: '超限拒收', steps: traceOf(buildAttachmentModel)({ imageBytes: 800, maxBytes: 500 }), focusPhases: ['limit-rejected'] }],
+        },
+        {
+          id: 'policy',
+          title: '存储了 ≠ 能进上下文：RequestPolicy 另算',
+          text: '按引用取回受 RequestPolicy 管辖：策略拒绝时工件还在存储里，但不会进入请求。存与用是两个决定。',
+          traces: [
+            { id: 'allowed', label: '允许取回', steps: traceOf(buildAttachmentModel)({ imageBytes: 800, maxBytes: 1200, requestAllowed: true }) },
+            { id: 'denied', label: '策略拒绝', steps: traceOf(buildAttachmentModel)({ imageBytes: 800, maxBytes: 1200, requestAllowed: false }), focusPhases: ['request-denied'] },
+          ],
+        },
+      ],
+    },
     stateSchema: {
       imageBytes: { integerRange: [100, 5000] },
       maxBytes: { integerRange: [200, 4000] },
@@ -243,6 +419,36 @@ export const SMALL_SEAMS_LABS = {
       { kind: 'check', id: 'finalized', label: '消息已定稿', value: true },
     ],
     metrics: [['分叉形态', 'forkShape'], ['产生记录', 'recorded']],
+    stepLabels: [
+      ['too-early', '消息未定稿'],
+      ['rejected', '通道不开放'],
+      ['act', '执行反馈动作'],
+      ['upsert', '更新既有记录'],
+      ['persisted', '随会话持久化'],
+    ],
+    ladder: {
+      title: '三级台阶，从生命周期到 upsert',
+      rungs: [
+        {
+          id: 'lifecycle',
+          title: '定稿之后，通道才开放',
+          text: '反馈绑定消息生命周期：只能评价已定稿的 assistant 消息。流式中的半截回答不接受反馈。',
+          traces: [{ id: 'early', label: '未定稿', steps: traceOf(buildFeedbackModel)({ finalized: false }), focusPhases: ['too-early'] }],
+        },
+        {
+          id: 'upsert',
+          title: '按消息 id upsert：更新而非追加',
+          text: '用户点赞后，记录按消息 id 写进 KV 表。重复反馈改的是同一条记录——历史不会长出一串重复行。',
+          traces: [{ id: 'rate', label: '点赞', steps: traceOf(buildFeedbackModel)({ action: 'rate-up' }), focusPhases: ['upsert'] }],
+        },
+        {
+          id: 'clear',
+          title: 'clear 是删除，不是打零分',
+          text: '清除动作移除该消息的反馈记录，之后推演里不再产生记录。评价与撤销是两个动作，共享同一个键。',
+          traces: [{ id: 'clear', label: '清除', steps: traceOf(buildFeedbackModel)({ action: 'clear' }) }],
+        },
+      ],
+    },
     stateSchema: {
       action: { enum: ['rate-up', 'rate-down', 'clear'] },
       finalized: { boolean: true },

@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, requireElements,
   svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -133,6 +135,37 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildSubprocessModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'subprocess-ladder',
+      rungs: replayRungs([
+        {
+          title: '一次受管的子进程执行',
+          text: '请求里显式声明 stdin 策略和输出上限；缝把 DSH_ 前缀的管理变量注入环境后再执行。尾部输出被收集回来，调用方环境不被污染。',
+          traces: [{ id: 'basic', label: '默认输入', steps: trace({}) }],
+        },
+        {
+          title: '超限截断：模型读到尾部，全文落成工件',
+          text: '输出超过 maxBytes 时只保留尾部视图，完整流写入 spill 文件。模型看到的是「截断后的尾巴＋工件引用」，不是全部原文。',
+          traces: [{ id: 'spill', label: '3000 字节 / 上限 200', steps: trace({ outputBytes: 3000, maxBytes: 200, spillEnabled: true }), focusPhases: ['tail-collected', 'spill-saved'] }],
+        },
+        {
+          title: 'stdin 三种处置，全在请求里声明',
+          text: '忽略时接到 /dev/null，pipe 把写端交给调用方交互，data 写入给定字节后立即关闭。缝不做猜测：stdin 怎么处置由请求显式说出。',
+          traces: [
+            { id: 'ignore', label: 'ignore', steps: trace({ stdinMode: 'ignore' }) },
+            { id: 'pipe', label: 'pipe', steps: trace({ stdinMode: 'pipe' }) },
+            { id: 'data', label: 'data', steps: trace({ stdinMode: 'data' }) },
+          ],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

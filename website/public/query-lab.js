@@ -5,6 +5,8 @@ import {
 } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -106,6 +108,36 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildQueryModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'query-ladder',
+      rungs: replayRungs([
+        {
+          title: '一次查询 = 一条请求＋一批记录',
+          text: 'session-query 带着种类过滤和窗口区间进来，事件记录逐条返回。查询是纯读取：日志本身一个字都不动。',
+          traces: [{ id: 'all', label: 'kind=all 全窗', steps: trace({ kindFilter: 'all', winStart: 0, winEnd: 11 }) }],
+        },
+        {
+          title: '种类过滤：按 kind 挑出关心的那部分',
+          text: 'tool/call 过滤只留下工具调用记录。过滤发生在查询层——日志保持全量，视图按需收窄。',
+          traces: [{ id: 'calls', label: '只要 tool/call', steps: trace({ kindFilter: 'tool/call', winStart: 0, winEnd: 11 }) }],
+        },
+        {
+          title: '窗口切片：只看 [start, end] 这一段',
+          text: '窗口参数把时间线切成段，越界自动夹紧。想看「刚才那次工具调用前后」就是给窗口定个位。',
+          traces: [
+            { id: 'early', label: '前半段 [0,5]', steps: trace({ kindFilter: 'all', winStart: 0, winEnd: 5 }) },
+            { id: 'late', label: '后半段 [6,11]', steps: trace({ kindFilter: 'all', winStart: 6, winEnd: 11 }) },
+          ],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

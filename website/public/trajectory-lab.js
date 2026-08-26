@@ -19,6 +19,8 @@ import {
 } from './trajectory-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -235,6 +237,37 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型产出事件流（kind/tool/outcome）：按 kind 分泳道，工具事件的字段拼成说明。
+    const trace = scenario => buildTrajectoryModel({ scenario }).events.map(event => ({
+      lane: event.kind.startsWith('tool/') ? 'tool' : 'chat',
+      phase: event.kind,
+      detail: event.detail ?? `${event.tool}${event.argsPreview ? ` ${event.argsPreview}` : ''}${event.outcome ? ` → ${event.outcome}` : ''}`,
+      index: event.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'trajectory-ladder',
+      rungs: replayRungs([
+        {
+          title: '原始剧本：一个完整 Turn 的事件流',
+          text: '会话日志是一条按序追加的事件流：user/message、assistant/chunk、assistant/message、tool/call、tool/result。投影消费这条流，卡片顺序即权威。',
+          traces: [{ id: 'canon', label: '完整 Turn', steps: trace('canon') }],
+        },
+        {
+          title: '中断的剧本：没有 result 就没有完成态',
+          text: '流式进行到一半戛然而止：tool/call 之后没有 tool/result。投影不脑补——没有对应结果事件，卡片就停在未完成的样子。',
+          traces: [{ id: 'interrupted', label: '被打断', steps: trace('interrupted'), focusPhases: ['tool/call'] }],
+        },
+        {
+          title: '失败也是事实：error 结果照常上卡',
+          text: 'old_str 不唯一的报错作为 tool/result 原样入流，下一条 assistant/message 解释被拒原因。投影如实呈现失败，不粉饰也不吞掉。',
+          traces: [{ id: 'failing', label: '工具失败', steps: trace('failing-tool'), focusPhases: ['tool/result'] }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

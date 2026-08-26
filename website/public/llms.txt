@@ -1,6 +1,6 @@
 # DSH 源码学习（shine-233 社区中文导读）
 
-> 面向 DeepSeek Harness（DSH，插件式 agent harness）固定基线 aa6c361a972c8369148dea7380bb5c21c24e07ec（上游 0.1.1-rc.2）的社区中文学习站：38 篇零基础友好课程、40 个离线可复现的确定性交互实验、2,973 个源文件的逐文件中文索引卡。非官方，不代表 DeepSeek AI。
+> 面向 DeepSeek Harness（DSH，插件式 agent harness）固定基线 aa6c361a972c8369148dea7380bb5c21c24e07ec（上游 0.1.1-rc.2）的社区中文学习站：38 篇零基础友好课程、55 个离线可复现的确定性交互实验、2,973 个源文件的逐文件中文索引卡。非官方，不代表 DeepSeek AI。
 
 ## 入口
 
@@ -46,6 +46,7 @@
 - [上下文压缩](https://shine-233.github.io/deepseek-harness-study/compaction-lab.html)：压缩前后各保留什么、丢什么。
 - [插件订阅与日志](https://shine-233.github.io/deepseek-harness-study/plugin-flow-lab.html)：订阅、策略拒绝与卸载的事件流。
 - [Hook 瀑布短路](https://shine-233.github.io/deepseek-harness-study/hook-flow-lab.html)：return 不调 next 时谁被跳过。
+- [瀑布语义阶梯](https://shine-233.github.io/deepseek-harness-study/waterfall-ladder-lab.html)：五级台阶零跳步，从派发走到 next() 传值与短路语义。
 - [审批流](https://shine-233.github.io/deepseek-harness-study/approval-flow-lab.html)：ask 的四种结局 allowed-once/rejected/cancelled/unavailable。
 - [Session fork 与修复](https://shine-233.github.io/deepseek-harness-study/session-fork-lab.html)：崩溃位点的诚实修复与 fork 前缀继承。
 - [subagent 委派](https://shine-233.github.io/deepseek-harness-study/subagent-delegate-lab.html)：深度上限在边界拦下委派。

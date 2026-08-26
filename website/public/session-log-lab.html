@@ -75,6 +75,14 @@
           <input id="upto" type="range" min="0" max="9" step="1" value="9">
           <small>从头折叠到这一条；再往后的事件不参与。键盘：焦点不在表单控件时，← / → 逐步，Home / End 直达首末。</small>
         </label>
+        <label>
+          <span>篡改实验</span>
+          <select id="fault-type" name="faultType">
+            <option value="none">不注入</option>
+            <option value="tamper-replay-input">改写一条已落盘事件的载荷</option>
+          </select>
+          <small id="fault-note"></small>
+        </label>
         <button class="button button-quiet" id="frame-play" type="button" aria-pressed="false">播放</button>
         <button class="button button-primary" type="submit">重放</button>
         <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
@@ -90,6 +98,10 @@
         <div><dt>消息</dt><dd id="metric-messages">—</dd></div>
         <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
       </dl>
+      <section class="card" aria-labelledby="log-ladder-title">
+        <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="log-ladder-title">四级台阶，从重放到拒绝</h2></div><span class="schema-pill">每级一个概念</span></div>
+        <div id="concept-ladder-root"></div>
+      </section>
     </div>
       </section>
 
@@ -114,7 +126,7 @@
         </div>
         <span class="schema-pill">纯折叠</span>
       </div>
-      <p class="section-intro">这一块完全由左边的重放位置决定。把滑块拖回去再拖回来，状态一定回到同一个值——独立校验（oracle） 会重放两次并逐字段比对。</p>
+      <p class="section-intro">这一块完全由左边的重放位置决定。把滑块拖回去再拖回来，状态一定回到同一个值——独立校验（oracle）会重放两次并逐字段比对。</p>
       <dl class="state-grid" id="state-grid"></dl>
       <div class="message-list-wrap">
         <h3>重建出的消息序列</h3>
@@ -127,7 +139,7 @@
         <div class="section-heading">
           <div>
             <p class="section-label" data-icon="beaker">独立校验</p>
-            <h2>确定性和拒绝规则由 独立校验 核对</h2>
+            <h2>确定性和拒绝规则由独立校验 核对</h2>
           </div>
           <span class="schema-pill schema-oracle">重放校验</span>
         </div>

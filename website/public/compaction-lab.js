@@ -24,12 +24,15 @@ import { installPredictionGate } from './study-lab-gate.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 
-// 状态链接的输入契约：场景是枚举，保留轮数的上限由模型在运行时给出，
+// 状态链接的输入契约：场景和篡改实验是枚举，保留轮数的上限由模型在运行时给出，
 // 所以这里只卡整数下界；越界值在恢复时会被拉回当前场景的总轮数。
 const COMPACTION_STATE_SCHEMA = {
   scenario: { enum: COMPACTION_SCENARIOS.map(scenario => scenario.id) },
   keepRecent: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
+  faultType: { enum: ['none', 'lossy-summary'] },
 }
 
 const EVENT_CLASSES = {
@@ -166,6 +169,7 @@ function initializePage() {
     scenarioNote: document.querySelector('#scenario-note'),
     keepRecent: document.querySelector('#keep-recent'),
     keepOutput: document.querySelector('#keep-output'),
+    faultType: document.querySelector('#fault-type'),
     feedback: document.querySelector('#compaction-feedback'),
     fold: document.querySelector('#fold-plot'),
     foldNote: document.querySelector('#fold-note'),
@@ -198,6 +202,7 @@ function initializePage() {
       const model = buildCompactionModel({
         scenario: elements.scenario.value,
         keepRecent: Number(elements.keepRecent.value),
+        fault: elements.faultType.value,
       })
       const verdict = evaluateCompactionOracle(model)
 
@@ -229,10 +234,16 @@ function initializePage() {
       writeText(elements.before, String(model.observations.tokensBefore))
       writeText(elements.after, String(model.observations.tokensAfter))
       writeText(elements.saved, String(model.observations.savedRatio) + '%')
-      setFeedback('已重新折叠：' + String(model.observations.eventCount) + ' 条事件折成 '
-        + String(model.observations.nodesAfter) + ' 个表面节点，估算 '
-        + String(model.observations.tokensBefore) + ' → ' + String(model.observations.tokensAfter)
-        + ' token。', 'success')
+      if (!verdict.pass) {
+        setFeedback('注入的故障被独立校验抓住了：下方未通过的那条给出被违反的规则和缺失的引用。', 'error')
+      } else if (elements.faultType.value !== 'none' && model.summary === null) {
+        setFeedback('这次折叠没有任何节点被替换，摘要无从漏引——把保留轮数调小再注入。', 'notice')
+      } else {
+        setFeedback('已重新折叠：' + String(model.observations.eventCount) + ' 条事件折成 '
+          + String(model.observations.nodesAfter) + ' 个表面节点，估算 '
+          + String(model.observations.tokensBefore) + ' → ' + String(model.observations.tokensAfter)
+          + ' token。', 'success')
+      }
       persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '输入无效。', 'error')
@@ -246,6 +257,7 @@ function initializePage() {
       const nextHash = writeStateToHash(location.hash, {
         scenario: elements.scenario.value,
         keepRecent: Number(elements.keepRecent.value),
+        faultType: elements.faultType.value,
       }, COMPACTION_STATE_SCHEMA)
       history.replaceState(null, '', nextHash)
     } catch {
@@ -266,6 +278,7 @@ function initializePage() {
     rebuild()
   })
   elements.keepRecent.addEventListener('input', rebuild)
+  elements.faultType.addEventListener('change', rebuild)
   // 焦点在页面其它地方时，← / → / Home / End 直接步进保留轮数。
   bindRangeKeys(elements.keepRecent)
   const playButton = document.querySelector('#frame-play')
@@ -276,6 +289,7 @@ function initializePage() {
   if (restored !== null && restored.ok) {
     elements.scenario.value = restored.value.scenario
     elements.keepRecent.value = String(restored.value.keepRecent)
+    elements.faultType.value = restored.value.faultType
   }
 
   rebuild()
@@ -298,6 +312,38 @@ if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
   installScrollProgress()
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // surfaceNodes 就是下一次请求真正看到的东西：一条摘要 + 近端保留的事件。
+    const toSteps = model => model.surfaceNodes.map(node => ({
+      lane: '请求上下文',
+      phase: node.kind === 'compaction-summary' ? 'summary' : 'kept',
+      detail: `${node.label}（${node.tokens} tok）`,
+      index: node.sourceEventSeqs?.[0] ?? 0,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'compaction-ladder',
+      rungs: replayRungs([
+        {
+          title: '全部保留：上下文就是完整历史',
+          text: '保留轮数拉满时，每一轮的每条事件都原样进入下一次请求。先看这条不折叠的基线。',
+          traces: [{ id: 'keep-all', label: '全部保留', steps: toSteps(buildCompactionModel({ scenario: 'twelve-turns', keepRecent: 12 })) }],
+        },
+        {
+          title: '近重留、旧重折：一条摘要顶替一段历史',
+          text: '只保留最近几轮，更早的事件被折叠成一条 compaction-summary。信息还在，粒度变了。',
+          traces: [{ id: 'fold', label: '折叠旧轮', steps: toSteps(buildCompactionModel({ scenario: 'twelve-turns', keepRecent: 3 })), focusPhases: ['summary'] }],
+        },
+        {
+          title: '有损摘要：省 token 的代价看得见',
+          text: '篡改实验把摘要换成有损版本——省下了 token，也丢掉了细节。压缩从来不是免费的，只是把损失换了个位置。',
+          traces: [{ id: 'lossy', label: '有损摘要', steps: toSteps(buildCompactionModel({ scenario: 'twelve-turns', keepRecent: 3, fault: 'lossy-summary' })), focusPhases: ['summary'] }],
+        },
+      ]),
+    })
+  }
+
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 

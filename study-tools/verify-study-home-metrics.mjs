@@ -33,6 +33,58 @@ function countLabsTotal(root = repositoryRoot) {
   return modelLabs + bridge
 }
 
+/** 1–99 的中文基数；实验数量级内的散文计数够用。 */
+export function zhCardinal(n) {
+  const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']
+  if (!Number.isInteger(n) || n < 0 || n > 99) throw new RangeError(`zhCardinal 只支持 0–99，收到 ${n}`)
+  if (n < 10) return digits[n]
+  const tens = Math.floor(n / 10)
+  const ones = n % 10
+  return (tens > 1 ? digits[tens] : '') + '十' + (ones === 0 ? '' : digits[ones])
+}
+
+/**
+ * 散文位计数对账：README 两份、START-HERE 和站点社交卡里的精确实验数必须与
+ * countLabsTotal 一致。这些位置历史上漂移过三次（35→54 手工追平两次），所以
+ * 从「靠人记得」改成「门禁记得」。
+ */
+function checkProseCounts(root, labTotal, errors) {
+  const zh = zhCardinal(labTotal)
+  const targets = [
+    {
+      file: 'README.md',
+      patterns: [
+        `并配套${zh}个可动手的确定性实验`,
+        `## ${zh}个可以动手的实验`,
+      ],
+    },
+    {
+      file: 'README.zh.md',
+      patterns: [
+        `并配套${zh}个可动手的确定性实验`,
+        `## ${zh}个可以动手的实验`,
+      ],
+    },
+    {
+      file: 'START-HERE.md',
+      patterns: [`${zh}个离线实验`],
+    },
+  ]
+  for (const { file, patterns } of targets) {
+    let text = null
+    try {
+      text = readFileSync(resolve(root, file), 'utf8')
+    } catch {
+      errors.push(`${file} 读取失败，无法对账实验计数`)
+      continue
+    }
+    for (const pattern of patterns) {
+      if (!text.includes(pattern)) errors.push(`${file} 的实验计数应为「${zh}」（当前仓库事实 ${labTotal}），找不到「${pattern}」——新增或删除实验室时请同步这处散文`)
+    }
+  }
+  // 站点社交卡不再带实验计数（og/twitter 描述已逐页化），散文对账只看上面三处。
+}
+
 /**
  * 从 JournalHome 组件源解析三张拍立得：figcaption 文案 → 写下的数字。
  *
@@ -92,6 +144,8 @@ export function inspectStudyHomeMetrics(root = repositoryRoot) {
   if (!Number.isNaN(structuralErrors) && structuralErrors !== 0) {
     errors.push(`索引结构错误应为 0，实际 ${String(structuralErrors)}`)
   }
+
+  checkProseCounts(root, countLabsTotal(root), errors)
 
   return { expected, actual, errors, structuralErrors }
 }

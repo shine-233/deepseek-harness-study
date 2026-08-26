@@ -24,6 +24,8 @@ import {
 } from './turn-flow-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -38,6 +40,8 @@ const TURN_STATE_SCHEMA = {
   sbFail: { integerRange: [0, TURN_SANDBOX_LIMITS.toolCalls.max] },
   sbRejected: { boolean: true },
   sbAbort: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
+  faultType: { enum: ['none', 'drop-tool-result-log'] },
+  faultIndex: { integerRange: [1, Number.MAX_SAFE_INTEGER] },
 }
 
 // 只带主表单两个字段的旧版链接：恢复时沙盒留在默认值，不报错打断阅读。
@@ -295,6 +299,12 @@ function initializePage() {
     sbOracleList: document.querySelector('#sb-oracle-list'),
     sbStepsBody: document.querySelector('#sb-steps-body'),
     sbCaption: document.querySelector('#sb-caption'),
+    // 篡改实验：控件住在沙盒表单里，注入的是主时间轴的模型。
+    sbFaultType: document.querySelector('#sb-fault-type'),
+    sbFaultIndex: document.querySelector('#sb-fault-index'),
+    sbFaultIndexLabel: document.querySelector('#sb-fault-index-label'),
+    sbFaultIndexOutput: document.querySelector('#sb-fault-index-output'),
+    faultNote: document.querySelector('#fault-note'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -308,10 +318,37 @@ function initializePage() {
 
   const rebuild = () => {
     try {
-      const model = buildTurnModel({
+      const baseModel = buildTurnModel({
         scenario: elements.scenario.value,
         upTo: Number(elements.upTo.value),
       })
+      /*
+       * 篡改实验：先按未注入构建拿到当前场景的工具结果总数，把数字输入夹紧到
+       * 合法区间，再带着故障重建一次。两次都是纯函数，第二次才产出对外展示的模型。
+       */
+      const resultCount = baseModel.steps
+        .filter(entry => entry.phase === 'tool-result-logged').length
+      elements.sbFaultIndex.max = String(Math.max(1, resultCount))
+      let fault = { type: 'none', index: 0 }
+      let faultSuffix = ''
+      if (elements.sbFaultType.value === 'drop-tool-result-log') {
+        if (resultCount === 0) {
+          elements.sbFaultIndex.value = '1'
+          faultSuffix = '当前场景没有工具结果可丢，注入未生效。'
+        } else {
+          const requested = Math.trunc(Number(elements.sbFaultIndex.value))
+          const index = Math.min(resultCount, Math.max(1, Number.isFinite(requested) ? requested : 1))
+          elements.sbFaultIndex.value = String(index)
+          fault = { type: 'drop-tool-result-log', index }
+          faultSuffix = '注入已生效：第 ' + String(index) + ' 条工具结果的日志写入被丢弃。'
+        }
+      }
+      writeText(elements.sbFaultIndexOutput, elements.sbFaultIndex.value)
+      elements.sbFaultIndexLabel.hidden =
+        elements.sbFaultType.value !== 'drop-tool-result-log' || fault.type !== 'drop-tool-result-log'
+      const model = fault.type === 'none'
+        ? baseModel
+        : buildTurnModel({ scenario: elements.scenario.value, upTo: Number(elements.upTo.value), fault })
       const verdict = evaluateTurnOracle(model)
 
       // 换场景时步数会变，上限跟着走；滑块停在越界值上会读出一个不存在的步骤。
@@ -322,6 +359,15 @@ function initializePage() {
       renderTrace(model, elements.trace, elements.traceNote)
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
+      if (fault.type === 'drop-tool-result-log' && !verdict.pass) {
+        writeText(elements.faultNote,
+          '你刚刚亲手造出了一份不可重建内容：第 ' + String(fault.index)
+          + ' 条工具结果没有写日志，它的内容照样进入了模型请求。'
+          + '抓住它的是 MODEL_VISIBLE_IS_LOGGED 这条校验——这就是那条规则被违反的样子。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       renderRows(elements.pairBody, model.pairs.map(pair => ({
         key: pair.payloadId,
@@ -357,7 +403,8 @@ function initializePage() {
       writeText(elements.orphan, String(model.observations.unreconstructable.length))
       setFeedback('已重建 Turn：' + String(model.observations.steps) + ' 步，'
         + String(model.observations.modelRequests) + ' 次模型请求，'
-        + String(model.observations.loggedEvents) + ' 个日志事件。', 'success')
+        + String(model.observations.loggedEvents) + ' 个日志事件。'
+        + faultSuffix, 'success')
       persistState()
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : '场景无效。', 'error')
@@ -377,6 +424,8 @@ function initializePage() {
         sbFail: Number(elements.sbFail.value),
         sbRejected: elements.sbRejected.checked,
         sbAbort: Number(elements.sbAbort.value),
+        faultType: elements.sbFaultType.value,
+        faultIndex: Number(elements.sbFaultIndex.value),
       }, TURN_STATE_SCHEMA)
       history.replaceState(null, '', nextHash)
     } catch {
@@ -385,7 +434,14 @@ function initializePage() {
   }
 
   // 恢复默认输入：清地址栏状态、表单回到 authored 默认值，再按当前输入重建一次。
-  installInputReset(elements.resetInputs, elements.form, { onReset: rebuild })
+  // 故障控件住在沙盒表单里，form.reset() 够不到，这里单独清掉。
+  installInputReset(elements.resetInputs, elements.form, {
+    onReset: () => {
+      elements.sbFaultType.value = 'none'
+      elements.sbFaultIndex.value = '1'
+      rebuild()
+    },
+  })
 
   elements.form.addEventListener('submit', (event) => {
     event.preventDefault()
@@ -397,6 +453,9 @@ function initializePage() {
     rebuild()
   })
   elements.upTo.addEventListener('input', rebuild)
+  // 篡改实验：改动走 change / input → 重建主轨迹；数字输入的越界在 rebuild 里夹紧。
+  elements.sbFaultType.addEventListener('change', rebuild)
+  elements.sbFaultIndex.addEventListener('input', rebuild)
   // 焦点在页面其它地方时，← / → / Home / End 直接步进这条主时间轴。
   bindRangeKeys(elements.upTo)
   // 反向联动：点步骤表里的一行，时间轴跳到那一步（linked views 的另一半）。
@@ -421,6 +480,8 @@ function initializePage() {
     elements.sbFail.value = String(restored.value.sbFail)
     elements.sbRejected.checked = restored.value.sbRejected
     elements.sbAbort.value = String(restored.value.sbAbort)
+    elements.sbFaultType.value = restored.value.faultType
+    elements.sbFaultIndex.value = String(restored.value.faultIndex)
   } else if (legacy !== null && legacy.ok) {
     elements.scenario.value = legacy.value.scenario
     elements.upTo.value = String(legacy.value.upTo)
@@ -507,6 +568,8 @@ function initializePage() {
     elements.sbFail.value = String(SB_DEFAULTS.fail)
     elements.sbAbort.value = String(SB_DEFAULTS.abort)
     elements.sbRejected.checked = SB_DEFAULTS.rejected
+    elements.sbFaultType.value = 'none'
+    elements.sbFaultIndex.value = '1'
     rebuildSandbox()
   })
   rebuildSandbox()
@@ -525,6 +588,42 @@ if (typeof document !== 'undefined') {
   initializePage()
   installDeclaredIcons()
   installScrollProgress()
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildTurnModel(input).steps
+    createConceptLadder(ladderRoot, {
+      storageKey: 'turn-flow-ladder',
+      rungs: replayRungs([
+        {
+          title: '骨架：一次没有工具的 Turn',
+          text: '把工具从场景里拿掉，Turn 剩下最短的四段：输入、装配、请求、回答。先看这条最短轨迹，后面每一级都只在它上面加一段。',
+          traces: [{ id: 'no-tools', label: '不调用工具', steps: trace({ scenario: 'no-tools' }) }],
+        },
+        {
+          title: '循环：每个工具结果都要带回模型',
+          text: '模型拿到工具结果后并不直接作答，而是带着结果发起下一次请求。关注相位已高亮——重放一遍，看「请求→调用→结果→再请求」这个循环怎么闭合。',
+          traces: [{ id: 'two-tools', label: '两次工具调用', steps: trace({ scenario: 'two-tools' }), focusPhases: ['request', 'tool-call'] }],
+        },
+        {
+          title: '失败也是步骤，重试再走一轮',
+          text: '写入失败时，失败本身照常入册并回到模型；重试只是同一循环里多走的一步。Turn 不因为一次 tool-failed 中断。',
+          traces: [{ id: 'retry', label: '含失败重试', steps: trace({ scenario: 'two-tools' }), focusPhases: ['tool-run', 'tool-failed', 'policy-denied'] }],
+        },
+        {
+          title: '拒绝：策略说不，但结果仍然存在',
+          text: '策略在主体执行前拒绝，policy-denied 取代了 tool-run。拒绝的结果照样回到模型、照样写日志——「被拒」不是「消失」。',
+          traces: [{ id: 'denied', label: '工具被策略拒绝', steps: trace({ scenario: 'denied-tool' }), focusPhases: ['policy-denied', 'tool-result-logged'] }],
+        },
+        {
+          title: '对账：抹掉一条日志，校验当场变红',
+          text: '凡是能到达模型请求的输入，都要能从 Session 日志重建。这条轨迹故意丢写一条工具结果日志，不可重建计数立即大于零——这就是那条规则长出来的地方。',
+          traces: [{ id: 'log-loss', label: '日志丢写故障', steps: trace({ scenario: 'two-tools', fault: { type: 'drop-tool-result-log', index: 1 } }), focusPhases: ['tool-result-logged'] }],
+        },
+      ]),
+    })
+  }
+
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 

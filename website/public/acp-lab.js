@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, requireElements, svgElement
   writeText, installDeclaredIcons, installScrollProgress, installInputReset,
   bindAutoAdvance, bindRangeKeys, bindPlotScrub } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -191,6 +193,47 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型产出 frames（tick/kind/lane/label/detail）：收窄成轨迹引擎的四元组；
+    // phase 帧没有泳道，统一落进「桥内」。
+    const trace = input => buildAcpModel(input).frames.map(frame => ({
+      lane: frame.lane ?? '桥内',
+      phase: frame.kind,
+      detail: `${frame.label}：${frame.detail}`,
+      index: frame.tick,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'acp-ladder',
+      rungs: replayRungs([
+        {
+          title: '一条 prompt 的正常旅程',
+          text: '客户端请求占用本会话唯一的 prompt 槽，消息经准入进入 Agent 的持久 inbox，认领后流式运行，静止后结算并回应。每一帧都按 tick 顺序发生。',
+          traces: [{ id: 'happy', label: '正常完成', steps: trace({ chunks: 3, cancelAt: 'off', ending: 'completed' }) }],
+        },
+        {
+          title: '三个取消窗口，三种效果',
+          text: '取消越晚，语义越不同：准入中获胜则消息根本不入队；入队未认领时取消要走 agent.cancel({kind:"user"})；流式中途取消把当前 Turn 停下来。三个窗口的最终 stopReason 都是 cancelled。',
+          traces: [
+            { id: 'admission', label: '准入中', steps: trace({ chunks: 2, cancelAt: 'admission', ending: 'completed' }), focusPhases: ['settle'] },
+            { id: 'queued', label: '已入队', steps: trace({ chunks: 2, cancelAt: 'queued', ending: 'completed' }), focusPhases: ['settle'] },
+            { id: 'claimed', label: '流式中', steps: trace({ chunks: 2, cancelAt: 'claimed', ending: 'completed' }), focusPhases: ['settle'] },
+          ],
+        },
+        {
+          title: '五种收尾，一个 prompt 级词表',
+          text: 'Turn 级的结束方式映射到桥的固定词表后才发给客户端。token 上限在结算处被改写成 end_turn——cancelled 是保留字，只留给显式取消与连接处置。',
+          traces: [
+            { id: 'completed', label: '正常完成', steps: trace({ chunks: 2, cancelAt: 'off', ending: 'completed' }) },
+            { id: 'max-tokens', label: 'token 上限', steps: trace({ chunks: 8, cancelAt: 'off', ending: 'max-tokens' }), focusPhases: ['settle', 'wire'] },
+            { id: 'aborted', label: 'hook 中止', steps: trace({ chunks: 2, cancelAt: 'off', ending: 'aborted' }), focusPhases: ['settle', 'wire'] },
+          ],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

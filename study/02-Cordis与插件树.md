@@ -72,6 +72,8 @@ Context 还有三个对初学者很重要的性质：
 
 这就是为什么官方架构文档说“一切皆插件”：核心系统靠稳定的 Context 契约连接起来，而不是靠每个模块直接导入另一个模块的私有实现。
 
+Context 上注册出来的服务入口长什么样，可以看一个具体例子：[上下文指令发现实验](/context-lab.html)沿 agent-instructions 的扫描链演示服务怎样从项目根到 cwd 逐层发现指令文件。
+
 ## Fiber：一个插件实例的生命周期账本
 
 [`vendor/cordis/src/fiber.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/aa6c361a972c8369148dea7380bb5c21c24e07ec/vendor/cordis/src/fiber.ts) 是理解“可卸载插件”的关键。

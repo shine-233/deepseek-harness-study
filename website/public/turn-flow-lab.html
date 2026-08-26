@@ -90,6 +90,10 @@
         <div><dt>不可重建</dt><dd id="metric-orphan">—</dd></div>
         <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
       </dl>
+      <section class="card" aria-labelledby="ladder-title">
+        <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="ladder-title">五级台阶，从骨架到对账</h2></div><span class="schema-pill">每级一个概念</span></div>
+        <div id="concept-ladder-root"></div>
+      </section>
     </div>
       </section>
 
@@ -140,6 +144,19 @@
           <input id="sb-rejected" type="checkbox">
           <span>首次领取被拒——整条 Turn 塌缩成一条结束事件，没有任何 Step</span>
         </label>
+        <label>
+          <span>篡改实验（亲手制造违规）</span>
+          <select id="sb-fault-type" name="faultType">
+            <option value="none">不注入</option>
+            <option value="drop-tool-result-log">丢弃一条工具结果的日志写入</option>
+          </select>
+          <small>上面的旋钮只改变形状；这个开关会真的打破规则：被选中的工具结果不再写日志，主时间轴的独立校验会当场变红，并指出哪一步不可重建。</small>
+        </label>
+        <label id="sb-fault-index-label" hidden>
+          <span>丢弃第 <output id="sb-fault-index-output">1</output> 条工具结果日志</span>
+          <input id="sb-fault-index" type="number" min="1" max="3" step="1" value="1">
+          <small>按当前场景里工具结果事件的顺序计数；越界值会被拉回最后一条。</small>
+        </label>
         <button class="button button-quiet" type="button" id="sb-reset">恢复沙盒默认值</button>
       </form>
       <div class="plot-scroll" id="sb-plot"></div>
@@ -180,7 +197,7 @@
         </div>
         <span class="schema-pill">载荷配对</span>
       </div>
-      <p class="section-intro">一行一份内容。左边是它进入模型请求的步骤，右边是它写入日志的步骤。任何一行右边为空，就说明有内容进了模型却无法从日志重建——独立校验（oracle） 会因此失败。</p>
+      <p class="section-intro">一行一份内容。左边是它进入模型请求的步骤，右边是它写入日志的步骤。任何一行右边为空，就说明有内容进了模型却无法从日志重建——独立校验（oracle）会因此失败。</p>
       <div class="table-scroll">
         <table>
           <caption id="pair-caption">当前场景的载荷配对</caption>
@@ -202,7 +219,7 @@
         <div class="section-heading">
           <div>
             <p class="section-label" data-icon="beaker">独立校验</p>
-            <h2>那条规则由 独立校验 逐条配对</h2>
+            <h2>那条规则由独立校验 逐条配对</h2>
           </div>
           <span class="schema-pill schema-oracle">轨迹校验</span>
         </div>
@@ -219,7 +236,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="fault-note" hidden></p></div>
         </div>
       </article>
     </section>

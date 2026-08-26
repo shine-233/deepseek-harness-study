@@ -38,6 +38,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="acp-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="acp-ladder-title">三级台阶，从入队到收尾</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form" id="acp-form">
           <label><span>内容块数</span><input type="range" id="acp-chunks" min="1" max="8" step="1" value="3"><output id="acp-chunks-out" for="acp-chunks">3 块</output></label>
           <label><span>取消时机</span><select id="acp-cancel">

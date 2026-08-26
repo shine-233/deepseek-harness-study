@@ -19,7 +19,7 @@
     <header class="hero-panel">
       <div class="hero-copy">
         <p class="eyebrow">DSH 学习 · 实验室总览</p>
-        <h1><span data-lab-count-all>48</span> 个能上手拆的实验。</h1>
+        <h1><span data-lab-count-all>55</span> 个能上手拆的实验室</h1>
         <p class="hero-lead">每个实验固定输入、固定输出、自带 oracle；不联网、不调模型，结论当场可查。先按目的挑一个，做完再回配套课对答案。</p>
         <div class="hero-actions">
           <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
@@ -38,7 +38,7 @@
       <dl class="metric-grid">
         <div><dt>亲手做过的实验</dt><dd id="metric-labs-done">—</dd></div>
         <div><dt>已读配套课</dt><dd id="metric-lessons-read">—</dd></div>
-        <div><dt>计入进度</dt><dd>39 / 40 个页面</dd></div>
+        <div><dt>计入进度</dt><dd id="metric-tracked">54 / 55 个实验</dd></div>
       </dl>
       <p class="feedback" id="labs-progress-feedback" role="status" aria-live="polite">进度只写本机浏览器，不上传。</p>
     </section>
@@ -393,6 +393,58 @@
             <p class="lab-card-links">
               <a class="button button-primary" href="./hook-flow-lab.html">进实验室</a>
               <a class="lab-lesson-link" href="./study/lessons/14-官方HookBridge与兼容层.html">配套课 · Hook Bridge</a>
+            </p>
+          </div>
+        </li>
+        <li class="lab-card" data-group="main" data-lab="acp" data-lesson="07-HostClient示例测试发布">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="8" y="14" width="34" height="40" rx="4"/>
+            <path class="lm-arrow" d="M46 34 h16 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-bar" x="66" y="12" width="46" height="9" rx="2"/>
+            <rect class="lm-bar lm-hi" x="66" y="26" width="46" height="9" rx="2"/>
+            <path d="M66 48 h20 m0 -4 l4 4 l-4 4 m4 -4 l-4 -4" stroke-width="2"/>
+            <circle class="lm-dot" cx="104" cy="48" r="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>ACP 桥删减视图</h3>
+            <p class="lab-card-question">自动化客户端在 stdin/stdout 上按行走 JSON-RPC：原始 chunk、推理、工具和计划留在线内，只有提交后的助手文本变成 agent_message_chunk。对照看桥的两侧各拿到什么。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">行协议 JSON-RPC</li><li class="schema-pill">线内留痕</li><li class="schema-pill">删减投影</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./acp-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/07-HostClient示例测试发布.html">配套课 · Host/Client/发布</a></p>
+          </div>
+        </li>
+
+<li class="lab-card" data-group="main" data-lab="acp" data-lesson="07-HostClient示例测试发布">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box lm-accent" x="8" y="14" width="34" height="40" rx="4"/>
+            <path class="lm-arrow" d="M46 34 h16 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-bar" x="66" y="12" width="46" height="9" rx="2"/>
+            <rect class="lm-bar lm-hi" x="66" y="26" width="46" height="9" rx="2"/>
+            <path d="M66 48 h20 m0 -4 l4 4 l-4 4 m4 -4 l-4 -4" stroke-width="2"/>
+            <circle class="lm-dot" cx="104" cy="48" r="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>ACP 桥删减视图</h3>
+            <p class="lab-card-question">自动化客户端在 stdin/stdout 上按行走 JSON-RPC：原始 chunk、推理、工具和计划留在线内，只有提交后的助手文本变成 agent_message_chunk。对照看桥的两侧各拿到什么。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">行协议 JSON-RPC</li><li class="schema-pill">线内留痕</li><li class="schema-pill">删减投影</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./acp-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/07-HostClient示例测试发布.html">配套课 · Host/Client/发布</a></p>
+          </div>
+        </li>
+
+<li class="lab-card" data-group="main" data-lab="waterfall-ladder" data-lesson="02-Cordis与插件树">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true"><rect class="lm-box lm-accent" x="10" y="18" width="100" height="32" rx="4"/></svg>
+          <div class="lab-card-body">
+            <h3>瀑布语义阶梯</h3>
+            <p class="lab-card-question">五级台阶从一次最简单的派发走到完整的 waterfall 语义：注册顺序、next() 传值、短路、谁可以短路。上一级亲手跑过，下一级才展开。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list">
+              <li class="schema-pill">零跳步</li>
+              <li class="schema-pill">概念阶梯</li>
+            </ul>
+            <p class="lab-card-links">
+              <a class="button button-primary" href="./waterfall-ladder-lab.html">进实验室</a>
+              <a class="lab-lesson-link" href="./study/lessons/02-Cordis与插件树.html">配套课 · Cordis 与插件树</a>
             </p>
           </div>
         </li>
@@ -1034,6 +1086,22 @@
           </div>
         </li>
 
+        <li class="lab-card" data-group="main" data-lab="tool-budget" data-lesson="27-工具预算与插件责任决策卡">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-bar lm-hi" x="8" y="8" width="104" height="9" rx="2"/>
+            <rect class="lm-bar" x="8" y="21" width="64" height="9" rx="2"/>
+            <rect class="lm-bar lm-hi" x="8" y="34" width="40" height="9" rx="2"/>
+            <rect class="lm-bar" x="8" y="47" width="40" height="9" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>工具预算收窄实验室</h3>
+            <p class="lab-card-question">18 个已注册工具要过五道收窄才轮得到模型：restrict 排掉谁、谁没拿到原生 schema 名额、宿主能力和审批又拦下谁——五层漏斗当场重算，挡下名单逐行可查。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">五层漏斗</li><li class="schema-pill">挡下名单</li><li class="schema-pill">守恒校验</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./tool-budget-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/27-工具预算与插件责任决策卡.html">配套课 · 工具预算决策卡</a></p>
+          </div>
+        </li>
+
         <li class="lab-card" data-group="main" data-lab="host-gateway" data-lesson="07-HostClient示例测试发布">
           <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
             <circle class="lm-dot" cx="12" cy="34" r="6"/>
@@ -1081,6 +1149,117 @@
             <p class="lab-card-progress" hidden></p>
             <ul class="lab-card-tags" role="list"><li class="schema-pill">切面可选</li><li class="schema-pill">名字门</li><li class="schema-pill">resolve 即持久</li></ul>
             <p class="lab-card-links"><a class="button button-primary" href="./storage-hub-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · Session 日志与恢复</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="context">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box" x="8" y="10" width="36" height="11" rx="3"/>
+            <rect class="lm-box" x="8" y="25" width="36" height="11" rx="3"/>
+            <rect class="lm-box" x="8" y="40" width="36" height="11" rx="3"/>
+            <path class="lm-arrow" d="M48 30 h18 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-bar lm-hi" x="70" y="24" width="42" height="12" rx="3"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>上下文指令发现</h3>
+            <p class="lab-card-question">agent-instructions 在每个 pre-step 从项目根到 cwd 扫描 AGENTS.md、CLAUDE.md 等候选名，同目录内字节相同的内容去重取最早；发现的指令以 durable user-role 消息注入。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">层级扫描</li><li class="schema-pill">同内容去重</li><li class="schema-pill">durable 注入</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./context-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="query">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-cell" x="8" y="14" width="46" height="9" rx="2"/>
+            <rect class="lm-cell" x="8" y="28" width="46" height="9" rx="2"/>
+            <rect class="lm-cell" x="8" y="42" width="46" height="9" rx="2"/>
+            <circle class="lm-dot" cx="70" cy="18" r="4"/>
+            <circle class="lm-dot" cx="84" cy="33" r="4"/>
+            <rect class="lm-bar lm-hi" x="66" y="44" width="44" height="10" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Session 日志查询</h3>
+            <p class="lab-card-question">session-query 对已落盘的事件流做读取、过滤与全文搜索：窗口是序号闭区间，搜索是大小写不敏感的子串匹配，三者叠加时逐条合取。纯读——不改日志、不触发副作用。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">序号窗口</li><li class="schema-pill">子串搜索</li><li class="schema-pill">合取过滤</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./query-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="evidence" data-lab="sandbox">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <rect class="lm-box" x="10" y="16" width="26" height="38" rx="3"/>
+            <rect class="lm-box" x="42" y="16" width="26" height="38" rx="3"/>
+            <rect class="lm-box lm-accent" x="74" y="16" width="26" height="38" rx="3"/>
+            <circle class="lm-dot" cx="23" cy="35" r="5"/>
+            <path class="lm-arrow" d="M55 30 v12 m-4 -5 l4 5 l4 -5"/>
+            <circle class="lm-dot lm-accent" cx="87" cy="35" r="5"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>沙箱策略边界</h3>
+            <p class="lab-card-question">read-only 只许读；workspace-write 放行工作区内与平台临时区；danger-full-access 不设限。sandbox/mode 事件作为模型历史入册，重放时重建同一策略；拒绝不是终点，升级指引随结果返回。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">三种模式</li><li class="schema-pill">模式覆盖入册</li><li class="schema-pill">升级指引</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./sandbox-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="session-projection" data-lesson="05-Session日志与恢复">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <line class="lm-line" x1="8" y1="34" x2="34" y2="34"/>
+            <line class="lm-line" x1="40" y1="34" x2="58" y2="14"/>
+            <line class="lm-line" x1="40" y1="34" x2="58" y2="28"/>
+            <line class="lm-line" x1="40" y1="34" x2="58" y2="42"/>
+            <line class="lm-line" x1="40" y1="34" x2="58" y2="56"/>
+            <rect class="lm-bar" x="62" y="9" width="48" height="9" rx="2"/>
+            <rect class="lm-bar lm-hi" x="62" y="24" width="48" height="9" rx="2"/>
+            <rect class="lm-bar" x="62" y="39" width="48" height="9" rx="2"/>
+            <rect class="lm-bar" x="62" y="54" width="48" height="9" rx="2"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>会话投影折叠</h3>
+            <p class="lab-card-question">SessionProjectionMap 的每个键对应一个独立的折叠单元：todos 只看 todo/write、planMode 只看 plan/mode、goal 只看 goal/change；无关事件返回同一个引用，下游零开销。拖动滑杆逐条重放。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">四投影并行</li><li class="schema-pill">键控折叠</li><li class="schema-pill">滑杆重放</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./session-projection-lab.html">打开实验</a><a class="lab-lesson-link" href="./study/lessons/05-Session日志与恢复.html">配套课 · Session 日志与恢复</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="main" data-lab="typert">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <line class="lm-line" x1="24" y1="20" x2="60" y2="34"/>
+            <line class="lm-line" x1="60" y1="34" x2="96" y2="18"/>
+            <line class="lm-line" x1="60" y1="34" x2="92" y2="52"/>
+            <circle class="lm-dot" cx="24" cy="20" r="6"/>
+            <circle class="lm-dot lm-accent" cx="60" cy="34" r="7"/>
+            <circle class="lm-dot" cx="96" cy="18" r="6"/>
+            <circle class="lm-dot" cx="92" cy="52" r="6"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>Typert 类型图</h3>
+            <p class="lab-card-question">typert-generator 把 TS 源抽成编译器无关的类型图（declarations 加节点），renderer 只消费这张图；registry 用两阶段提交管理 invocation：prepare 全量校验端点与 id 唯一性，冲突在变更前抛错零残留。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">编译器无关</li><li class="schema-pill">两阶段提交</li><li class="schema-pill">冲突零残留</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./typert-lab.html">打开实验</a></p>
+          </div>
+        </li>
+
+        <li class="lab-card" data-group="evidence" data-lab="workspace">
+          <svg class="lab-mini" viewBox="0 0 120 68" aria-hidden="true">
+            <path class="lm-arrow" d="M10 24 h26 m-5 -4 l5 4 l-5 4"/>
+            <path class="lm-arrow" d="M10 44 h26 m-5 -4 l5 4 l-5 4"/>
+            <rect class="lm-box lm-accent" x="42" y="16" width="44" height="15" rx="3"/>
+            <rect class="lm-box" x="42" y="37" width="44" height="15" rx="3"/>
+            <path class="lm-arrow" d="M92 44 h14 m-4 -4 l4 4 l-4 4"/>
+            <path d="M104 12 l8 8 m0 -8 l-8 8"/>
+          </svg>
+          <div class="lab-card-body">
+            <h3>工作区注册表</h3>
+            <p class="lab-card-question">workspace 注册表按 realpath 规范化后的根路径去重：重复注册返回同一条记录而非新增一行；注册序稳定，先到者永远排在前；会话经 header 校验后才能挂到工作区名下，非法移动抛错且原记录不动。</p>
+            <p class="lab-card-progress" hidden></p>
+            <ul class="lab-card-tags" role="list"><li class="schema-pill">realpath 去重</li><li class="schema-pill">注册序稳定</li><li class="schema-pill">移动校验</li></ul>
+            <p class="lab-card-links"><a class="button button-primary" href="./workspace-lab.html">打开实验</a></p>
           </div>
         </li>
 

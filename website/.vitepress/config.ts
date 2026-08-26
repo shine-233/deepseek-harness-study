@@ -1,6 +1,6 @@
 /** VitePress configuration for the locally projected documentation site. */
 
-import { readdirSync, readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import type { DefaultTheme, PageData } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
@@ -8,6 +8,86 @@ import { docsPages, landingLink, orderedPages, routeLink, sectionSpec, type Docs
 import { docsSourceFiles, projectDocs } from '../../scripts/project-doc-site.ts'
 
 projectDocs()
+
+/**
+ * 给投影出的每个页面写逐页社交卡与搜索摘要：description、og:title、
+ * og:description、twitter:description 不再共用站点级默认值。全局头里的
+ * og:description / twitter:description 已随之摘除，避免双标签。
+ * 必须在 VitePress 读取页面之前写进生成文件的 frontmatter——构建期的
+ * transformPageData 改 frontmatter 已错过 head 解析时机，实测无效。
+ */
+function injectPageDescriptions(): void {
+  const rootDir = resolve(import.meta.dirname, '../.generated')
+  const quote = (text: string): string => `"${text.replaceAll('"', '\\"')}"`
+  const inject = (full: string, entryName: string): void => {
+    const source = readFileSync(full, 'utf8')
+    // 自带 head 的页面（如 en/index 重定向）自己管理标签，跳过；
+    // 已注入过 og:description 的也跳过，保证幂等。
+    if (/(^|\r?\n)head:[ \t]*(\r?\n|$)/.test(source) || source.includes('og:description')) return
+    const hasFrontmatter = source.startsWith('---')
+    const body = (hasFrontmatter ? source.replace(/^---[\s\S]*?\r?\n---\r?\n/, '') : source)
+      .replace(/<!--[\s\S]*?-->/g, '')
+    const paragraph = body
+      .split(/\n{2,}/)
+      .map(part => part.trim())
+      .find(part => part.length > 0 && !part.startsWith('#') && !part.startsWith('>'))
+    // 组件渲染页（如首页）正文可能没有自然段：退回站点级文案，保证社交卡不空。
+    const descPlain = paragraph === undefined
+      ? '面向 DSH 社区的非官方源码学习和生态研究材料：从首页分流到固定版本源文件，按步骤理解插件、工具和运行边界。'
+      : paragraph.replace(/[`*[\]()#]/g, '').replace(/\s+/g, ' ').trim().slice(0, 110)
+    if (descPlain.length === 0) return
+    const titleMatch = /^#\s+(.+)$/m.exec(body)
+    const title = titleMatch !== null && titleMatch[1] !== undefined
+      ? titleMatch[1].replace(/[`*[\]()#]/g, '').trim()
+      : entryName.replace(/\.md$/, '')
+    const headLines = [
+      'head:',
+      '  - - meta',
+      '    - property: og:title',
+      `      content: ${quote(title)}`,
+      '  - - meta',
+      '    - property: og:description',
+      `      content: ${quote(descPlain)}`,
+      '  - - meta',
+      '    - name: twitter:description',
+      `      content: ${quote(descPlain)}`,
+    ]
+    let injected: string
+    if (hasFrontmatter) {
+      const lines = source.split('\n')
+      let closeIdx = -1
+      for (let i = 1; i < lines.length; i += 1) {
+        if (lines[i]?.trim() === '---') {
+          closeIdx = i
+          break
+        }
+      }
+      if (closeIdx === -1) return
+      lines.splice(closeIdx, 0, ...headLines)
+      injected = lines.join('\n')
+      if (!/\bdescription:/.test(injected)) {
+        injected = injected.replace(/^---\n/, `---\ndescription: ${quote(descPlain)}\n`)
+      }
+    } else {
+      injected = ['---', `description: ${quote(descPlain)}`, ...headLines, '---', '', source].join('\n')
+    }
+    writeFileSync(full, injected)
+  }
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = resolve(dir, entry.name)
+      if (entry.isDirectory()) {
+        walk(full)
+        continue
+      }
+      if (!entry.name.endsWith('.md')) continue
+      inject(full, entry.name)
+    }
+  }
+  walk(rootDir)
+}
+
+injectPageDescriptions()
 
 function sidebar(locale: DocsLocale, collection: NonNullable<DocsPage['sidebar']>): DefaultTheme.SidebarItem[] {
   // `orderedPages` already sorts by section placement, so insertion order
@@ -442,7 +522,8 @@ export default withMermaid({
     ['meta', { name: 'color-scheme', content: 'light dark' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'DSH 社区源码学习｜非官方中文导读' }],
-    ['meta', { property: 'og:description', content: '面向 DSH 社区的非官方源码学习和生态研究材料：从首页分流到固定版本源文件，按步骤理解插件、工具和运行边界。' }],
+    // og:description / twitter:description 不放全局：injectPageDescriptions
+    // 给每个页面写各自的版本，全局兜底会造成双标签。
     ['meta', { property: 'og:url', content: 'https://shine-233.github.io/deepseek-harness-study/' }],
     ['meta', { property: 'og:image', content: 'https://shine-233.github.io/deepseek-harness-study/og-image.png' }],
     ['meta', { property: 'og:image:width', content: '1200' }],
@@ -450,7 +531,6 @@ export default withMermaid({
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'DSH 社区源码学习｜非官方中文导读' }],
-    ['meta', { name: 'twitter:description', content: '面向 DSH 社区的非官方源码学习材料：38 课 · 35 个离线实验 · 2,973 张逐文件索引卡。' }],
     ['meta', { name: 'twitter:image', content: 'https://shine-233.github.io/deepseek-harness-study/og-image.png' }],
     ['style', {}, siteStyle],
     ['script', {}, readingProgressScript],
@@ -467,20 +547,14 @@ export default withMermaid({
       themeConfig: {
         siteTitle: siteTitle('社区导读'),
         nav: [
-          // 五项上限：一级只留高频决定，低频入口收进「更多」下拉。
-          { text: '学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/(?:$|lessons/)' },
+          { text: '开始学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/(?:$|lessons/)' },
           { text: '实验室', link: `${base}study-labs.html`, activeMatch: '^(?:/study-labs|-lab\\.html)' },
-          { text: '进度', link: `${base}progress.html`, activeMatch: '^/progress' },
-          { text: '索引', link: studyPageLink('study/文件索引/README.md'), activeMatch: '^/study/files' },
-          {
-            text: '更多',
-            items: [
-              { text: '最小示例', link: studyPageLink('study-examples/minimal-observer-plugin/README.zh.md') },
-              { text: '工具箱', link: studyPageLink('study/31-学习工具箱.md') },
-              { text: '入门指南', link: landingLink('root', guideModules.root.guide) },
-              ...moduleNav('root').map(({ text, link }) => ({ text, link })),
-            ],
-          },
+          { text: '学习进度', link: `${base}progress.html`, activeMatch: '^/progress' },
+          { text: '最小示例', link: studyPageLink('study-examples/minimal-observer-plugin/README.zh.md'), activeMatch: '^/study/examples' },
+          { text: '工具箱', link: studyPageLink('study/31-学习工具箱.md'), activeMatch: '^/study/lessons/31-' },
+          { text: '逐文件索引', link: studyPageLink('study/文件索引/README.md'), activeMatch: '^/study/files' },
+          { text: '入门', link: landingLink('root', guideModules.root.guide), activeMatch: '^/guide/' },
+          ...moduleNav('root'),
         ],
         sidebar: {
           '/study/': studySidebar(),
@@ -547,7 +621,13 @@ export default withMermaid({
   vite: {
     define: {
       // 首页拍立得的实验数：构建期计算，单一事实来源（门禁会与仓库事实对账）。
-      __DSH_LAB_COUNT__: JSON.stringify(readdirSync(resolve(import.meta.dirname, '../public')).filter(name => name.endsWith('-lab.html')).length),
+      // 口径与 verify-study-home-metrics 的 countLabsTotal 一致：*-lab.html 模型
+      // 实验 + 不进进度名单的研究桥工作台。
+      __DSH_LAB_COUNT__: JSON.stringify(
+        readdirSync(resolve(import.meta.dirname, '../public'))
+          .filter(name => name.endsWith('-lab.html') || name === 'research-debug-bridge.html')
+          .length,
+      ),
     },
     // `srcDir` puts the Vite root inside the disposable generated tree, whose
     // own `public/` no tracked asset can live in.

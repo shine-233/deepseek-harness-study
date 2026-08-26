@@ -131,18 +131,49 @@ function resolveInput(input = {}) {
   if (typeof upTo !== 'number' || Number.isNaN(upTo)) {
     throw new TypeError('upTo must be a number')
   }
-  return { scenario, upTo }
+  const fault = resolveFault(input.fault)
+  return { scenario, upTo, fault }
+}
+
+/*
+ * 教学故障注入：让读者亲手制造一条被违反的不变量。
+ * none 是唯一默认；drop-tool-result-log 把第 index 条工具结果事件的「已写日志」
+ * 抹掉，模拟一次日志丢写。其余步骤一律不变，这样 oracle 变红时只有一个原因。
+ */
+function resolveFault(fault) {
+  const type = fault?.type ?? 'none'
+  if (type === 'none') return { type: 'none', index: 0 }
+  if (type !== 'drop-tool-result-log') {
+    throw new RangeError('unknown fault type: ' + String(type))
+  }
+  const index = fault?.index ?? 1
+  if (!Number.isInteger(index) || index < 1) {
+    throw new TypeError('fault.index must be an integer >= 1')
+  }
+  return { type, index }
+}
+
+function applyTurnFault(steps, fault) {
+  if (fault.type !== 'drop-tool-result-log') return steps
+  const targets = steps.filter(entry => entry.phase === 'tool-result-logged')
+  const target = targets[fault.index - 1]
+  if (target === undefined) {
+    throw new RangeError('fault points to a missing tool result: #' + String(fault.index))
+  }
+  target.logged = false
+  return steps
 }
 
 /**
  * 展开一次 Turn。
  *
- * @param input - `scenario` 为 TURN_SCENARIOS 里的 id。
+ * @param input - `scenario` 为 TURN_SCENARIOS 里的 id；`fault` 可注入教学故障，
+ *   `{ type: 'drop-tool-result-log', index: K }` 把第 K 条工具结果的日志写入抹掉。
  */
 export function buildTurnModel(input = {}) {
   const resolved = resolveInput(input)
   const scenario = TURN_SCENARIOS.find(candidate => candidate.id === resolved.scenario)
-  const allSteps = buildSteps(resolved.scenario)
+  const allSteps = applyTurnFault(buildSteps(resolved.scenario), resolved.fault)
 
   /*
    * 推进到第 upTo 步为止。
@@ -189,7 +220,7 @@ export function buildTurnModel(input = {}) {
   const requests = steps.filter(entry => entry.phase === 'request')
 
   return {
-    input: { scenario: resolved.scenario, upTo },
+    input: { scenario: resolved.scenario, upTo, fault: resolved.fault },
     scenario: { id: scenario.id, label: scenario.label, description: scenario.description },
     lanes: LANES,
     steps,
@@ -262,9 +293,14 @@ export function evaluateTurnOracle(model) {  if (typeof model !== 'object' || mo
   const orphan = missing.filter(payloadId => !pendingIds.has(payloadId))
   const pending = missing.filter(payloadId => pendingIds.has(payloadId))
   const pendingNote = pending.length === 0 ? '' : '，另有 ' + String(pending.length) + ' 份日志事件还在后面'
+  // actual 带上「第几步进入模型请求」，读者不用自己回表找断点在哪。
+  const describeOrphan = (payloadId) => {
+    const seenAt = model.steps.find(entry => entry.modelVisible && entry.payloadId === payloadId)
+    return payloadId + '：第 ' + String(seenAt.index) + ' 步进入模型请求，日志事件 0 条'
+  }
   add('MODEL_VISIBLE_IS_LOGGED', '进入模型请求的每一份内容都有日志事件',
     orphan.length === 0, '0 份无法重建',
-    (orphan.join('、') || '0 份无法重建') + pendingNote)
+    (orphan.map(describeOrphan).join('；') || '0 份无法重建') + pendingNote)
 
   /*
    * 三条与「Turn 走到哪」有关的检查只在相关步骤已经出现时才判定。中途停下时，

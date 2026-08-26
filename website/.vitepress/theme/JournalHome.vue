@@ -245,40 +245,6 @@ watchEffect(() => {
     <div class="dj-grid">
       <!-- 左栏便签 -->
       <aside class="dj-side">
-        <div class="dj-mascot-card">
-          <svg
-            :data-mood="mood"
-            class="dj-mascot"
-            :viewBox="`0 0 ${MASCOT_GRID_W} ${MASCOT_SPRITE.length}`"
-            shape-rendering="crispEdges"
-            role="button"
-            tabindex="0"
-            aria-label="吉祥物阿溟：戳一下换一句台词"
-            @click="poke"
-            @keydown.enter.prevent="poke"
-            @keydown.space.prevent="poke"
-          >
-            <g v-for="rect in BASE_RECTS" :key="`p${rect.x}-${rect.y}`">
-              <rect :class="{ 'dj-eye': rect.eye }" :x="rect.x" :y="rect.y" width="1" height="1" :fill="rect.fill" />
-            </g>
-            <g fill="#5e9bff">
-              <rect x="19" y="15" width="2" height="1" />
-              <rect x="20" y="16" width="2" height="1" />
-              <rect x="21" y="17" width="1" height="2" />
-            </g>
-            <g :fill="MOUTH_FILL">
-              <rect
-                v-for="(part, i) in MOUTHS[mood]"
-                :key="`m${i}`"
-                :x="part.x"
-                :y="part.y"
-                :width="part.w"
-                height="1"
-              />
-            </g>
-          </svg>
-          <p class="dj-mascot-note">{{ note }}</p>
-        </div>
         <div class="dj-stamp-card">
           <svg class="dj-rough-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <path :d="stampFrameA" />
@@ -312,6 +278,41 @@ watchEffect(() => {
               </span>
             </li>
           </ul>
+        </div>
+
+        <div class="dj-mascot-card">
+          <svg
+            :data-mood="mood"
+            class="dj-mascot"
+            :viewBox="`0 0 ${MASCOT_GRID_W} ${MASCOT_SPRITE.length}`"
+            shape-rendering="crispEdges"
+            role="button"
+            tabindex="0"
+            aria-label="吉祥物阿溟：戳一下换一句台词"
+            @click="poke"
+            @keydown.enter.prevent="poke"
+            @keydown.space.prevent="poke"
+          >
+            <g v-for="rect in BASE_RECTS" :key="`p${rect.x}-${rect.y}`">
+              <rect :class="{ 'dj-eye': rect.eye }" :x="rect.x" :y="rect.y" width="1" height="1" :fill="rect.fill" />
+            </g>
+            <g fill="#5e9bff">
+              <rect x="19" y="15" width="2" height="1" />
+              <rect x="20" y="16" width="2" height="1" />
+              <rect x="21" y="17" width="1" height="2" />
+            </g>
+            <g :fill="MOUTH_FILL">
+              <rect
+                v-for="(part, i) in MOUTHS[mood]"
+                :key="`m${i}`"
+                :x="part.x"
+                :y="part.y"
+                :width="part.w"
+                height="1"
+              />
+            </g>
+          </svg>
+          <p class="dj-mascot-note">{{ note }}</p>
         </div>
 
         <nav class="dj-toc" aria-label="翻到哪页了">
@@ -376,6 +377,28 @@ watchEffect(() => {
             <a :href="withBase('/study/examples/minimal-observer')">查看最小示例 →</a>
           </article>
 
+          <div class="dj-course-map">
+            <h4>整本手账的目录</h4>
+            <div class="dj-stage-grid">
+              <div class="dj-stage">
+                <b>① 认识 DSH</b>
+                <p><a :href="withBase('/study/')">00 开始这里</a> · 01 仓库地图 · 02 Cordis 与插件树 · 25 动手任务单 · 27 工具预算决策卡</p>
+              </div>
+              <div class="dj-stage">
+                <b>② 主链路精读</b>
+                <p>03 核心文件精读 · 04 Agent 与 Turn · 05 Session 日志与恢复 · 06 LLM 与工具执行 · 07 Host/Client 与发布</p>
+              </div>
+              <div class="dj-stage">
+                <b>③ 插件与生态</b>
+                <p>10 扩展边界 · <a :href="withBase('/study/lessons/11-如何写一个合规插件')">11 写一个合规插件</a> · 13 工具插件契约 · 15 Bundle / Profile / Loader · 22 工具可见性 · 28 最小插件工作台</p>
+              </div>
+              <div class="dj-stage">
+                <b>④ 实验与治理</b>
+                <p>16 学习工作簿 · 19 测试卸载证据 · 29 质量检查与审阅 · 33 可视化实验协议 · 34 作者的判断与理由</p>
+              </div>
+            </div>
+          </div>
+
           <div class="dj-turn">
             <h4>顺手玩一下 · 一次 Turn 的形状</h4>
             <ol class="dj-turn-track" aria-label="一次 Turn 的五步缩微模型">
@@ -404,28 +427,6 @@ watchEffect(() => {
               </div>
             </div>
             <p class="dj-note">缩微模型只讲形状；能逐步验证的完整证据在<a :href="withBase('/turn-flow-lab.html')">Turn 流程实验室</a>。</p>
-          </div>
-
-          <div class="dj-course-map">
-            <h4>整本手账的目录</h4>
-            <div class="dj-stage-grid">
-              <div class="dj-stage">
-                <b>① 认识 DSH</b>
-                <p><a :href="withBase('/study/')">00 开始这里</a> · 01 仓库地图 · 02 Cordis 与插件树 · 25 动手任务单 · 27 工具预算决策卡</p>
-              </div>
-              <div class="dj-stage">
-                <b>② 主链路精读</b>
-                <p>03 核心文件精读 · 04 Agent 与 Turn · 05 Session 日志与恢复 · 06 LLM 与工具执行 · 07 Host/Client 与发布</p>
-              </div>
-              <div class="dj-stage">
-                <b>③ 插件与生态</b>
-                <p>10 扩展边界 · <a :href="withBase('/study/lessons/11-如何写一个合规插件')">11 写一个合规插件</a> · 13 工具插件契约 · 15 Bundle / Profile / Loader · 22 工具可见性 · 28 最小插件工作台</p>
-              </div>
-              <div class="dj-stage">
-                <b>④ 实验与治理</b>
-                <p>16 学习工作簿 · 19 测试卸载证据 · 29 质量检查与审阅 · 33 可视化实验协议 · 34 作者的判断与理由</p>
-              </div>
-            </div>
           </div>
         </section>
 

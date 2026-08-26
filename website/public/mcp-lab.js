@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements
   svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -169,6 +171,33 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildMcpModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'mcp-ladder',
+      rungs: replayRungs([
+        {
+          title: '握手、协商、注册：一台服务器一条链',
+          text: 'mcp-client 插件加载后与服务器握手协商，把对方声明的工具注册进注册表。一个插件实例只负责一台服务器——多台就多份实例。',
+          traces: [{ id: 'connect', label: '连接并列出工具', steps: trace({ action: 'connect-list' }) }],
+        },
+        {
+          title: '连不上：退避重试，重试耗尽就是空注册表',
+          text: '服务器不可用时按退避表重试：每次延迟翻倍、封顶封次。预算耗尽后放弃本次加载——模型看不到这台服务器的任何工具。',
+          traces: [{ id: 'retry', label: '宕机 + 重连', steps: trace({ action: 'connect-list', serverDown: true, reconnect: true }), focusPhases: ['retry', 'none-registered'] }],
+        },
+        {
+          title: '工具报错也是结果：错误照常结算回上下文',
+          text: '远端工具执行失败时，错误以结果的形式回到模型上下文，会话继续而不是中断。失败是数据，不是异常抛出。',
+          traces: [{ id: 'fail', label: '调用失败', steps: trace({ action: 'call-tool', callFails: true }), focusPhases: ['remote-error', 'error-settles'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

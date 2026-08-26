@@ -21,6 +21,8 @@ import {
 } from './approval-flow-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -303,6 +305,36 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildApprovalFlowModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase ?? step.kind ?? 'step', detail: step.detail ?? '', index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'approval-flow-ladder',
+      rungs: replayRungs([
+        {
+          title: '批准链全绿：请求、裁决、执行、审计',
+          text: 'ask 策略下 UI 应答者放行，工具主体照常执行，Session 日志留下完整审计。先看这条最顺的轨迹。',
+          traces: [{ id: 'allow', label: '允许', steps: trace({ policy: 'ask', responder: 'ui-answerer', decision: 'allow', abort: 'live' }) }],
+        },
+        {
+          title: '拒绝：主体不跑，事实照记',
+          text: '同一张请求换成 deny——execute 一次都不出现，audit 照写。「没发生」和「没记录」是两件事。',
+          traces: [{ id: 'deny', label: '拒绝', steps: trace({ policy: 'ask', responder: 'ui-answerer', decision: 'deny', abort: 'live' }), focusPhases: ['skip'] }],
+        },
+        {
+          title: '无人应答与预中止：两种「没有裁决」',
+          text: '应答者缺位时请求不能悬着，预中止的会话连问都问不出。切换模式对比这两种收束。',
+          traces: [
+            { id: 'no-responder', label: '无人应答', steps: trace({ policy: 'ask', responder: 'none', decision: 'allow', abort: 'live' }) },
+            { id: 'pre-aborted', label: '预中止', steps: trace({ policy: 'ask', responder: 'ui-answerer', decision: 'allow', abort: 'pre-aborted' }) },
+          ],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

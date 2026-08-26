@@ -6,6 +6,8 @@ import { revealOnScroll } from './study-lab-reveal.js'
 
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import {
   installDeclaredIcons,
@@ -1342,6 +1344,38 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   // 主题切换：默认跟随系统，用户点过之后写 data-theme 显式覆盖。
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  // 零跳步概念阶梯：本文件的 simulateCodeMode 就是事件源，events 已带
+  // tick/phase/lane/detail，按相位分组聚合后交给轨迹引擎重放。
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => simulateCodeMode(input).events.map(event => ({
+      lane: event.scope === 'outer' ? '外层调用' : event.lane === 'child' ? '子调用' : '管线',
+      phase: event.phase,
+      detail: event.detail,
+      index: event.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'code-mode-evidence-ladder',
+      rungs: replayRungs([
+        {
+          title: '每个子调用都过同一条权限管线',
+          text: 'dispatch 之后先 pre-execute、再 policy-check、拿到 dispatch 决定才轮到 body 执行。子调用不因为来自 run_code 内部就绕过检查。',
+          traces: [{ id: 'deny-write', label: 'deny-write 策略', steps: trace({ seed: 17, policy: 'deny-write', parallelism: 2 }) }],
+        },
+        {
+          title: '拒绝发生在主体之前：没有 dispatch 就没有 body',
+          text: 'deny 分支返回 post-result 而不是 dispatch——工具主体拿不到执行权，body-start 不会出现。拒绝是管线的正常出口之一。',
+          traces: [{ id: 'deny-all', label: 'deny-all 策略', steps: trace({ seed: 17, policy: 'deny-all', parallelism: 2 }), focusPhases: ['policy-decision'] }],
+        },
+        {
+          title: '全部放行时，policy-check 依然每次都在',
+          text: '切到 allow-all 后四次调用各自仍有自己的 policy-check：放行是逐次判定的结果，不是全局开关。',
+          traces: [{ id: 'allow-all', label: 'allow-all 策略', steps: trace({ seed: 17, policy: 'allow-all', parallelism: 3 }), focusPhases: ['policy-check', 'policy-decision'] }],
+        },
+      ]),
+    })
+  }
 
   // 预测题门控：先押注，再解锁参数控件。答错也解锁。
   installPredictionGate({

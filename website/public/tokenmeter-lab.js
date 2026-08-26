@@ -4,6 +4,8 @@ import { makeFeedback, renderBoundary, renderOracle, requireElements,
   bindAutoAdvance, bindRangeKeys } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -197,6 +199,33 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildMeterModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'tokenmeter-ladder',
+      rungs: replayRungs([
+        {
+          title: '两个口径：日志重放 × 实测基线',
+          text: '重放日志前缀把 header 与表面内容逐事件累加；provider 返回过 usage 时再用实测基线锚定一次。两个口径对得上，读数才可信。',
+          traces: [{ id: 'calm', label: '低压力', steps: trace({ existingChars: 1200, newChars: 400, windowTokens: 8000 }) }],
+        },
+        {
+          title: '没有实测基线就按常数估算',
+          text: 'provider 从未返回 usage 时，基线退化为按字符常数的估算。读数仍然给出，但它自带「这是估算」的身份。',
+          traces: [{ id: 'estimated', label: '无实测基线', steps: trace({ existingChars: 1200, newChars: 400, windowTokens: 8000, measuredBaseline: false }), focusPhases: ['baseline'] }],
+        },
+        {
+          title: '压力线：越过 80% 就该谈瘦身了',
+          text: '窗口 4000、总读数逼近上限时，压力读数越过提示线。计量不是目的——它是压缩与溢出决策的输入。',
+          traces: [{ id: 'pressure', label: '高压力', steps: trace({ existingChars: 8000, newChars: 9000, windowTokens: 4000 }), focusPhases: ['pressure'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

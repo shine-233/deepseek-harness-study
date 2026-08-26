@@ -24,6 +24,8 @@ import {
 } from './code-run-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -263,6 +265,40 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const defaultBinding = BINDING_CANDIDATES[0]
+    // 步骤没有天然泳道，统一放进「run_code」一条泳道按序重放。
+    const toSteps = model => model.steps.map(step => ({
+      lane: 'run_code',
+      phase: step.kind ?? 'step',
+      detail: step.detail ?? step.op,
+      index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'code-run-ladder',
+      rungs: replayRungs([
+        {
+          title: '一次成功运行：校验、执行、回传',
+          text: '模型写的 TypeScript 先过 bindings 命名空间校验，再进沙盒执行，结果按协议回传。先看这条成功轨迹。',
+          traces: [{ id: 'success', label: '成功', steps: toSteps(buildCodeRunModel({ scenario: 'success', binding: defaultBinding })) }],
+        },
+        {
+          title: '四种失败，一种结算',
+          text: '异常、超时、中止、线程退出——失败原因各有标签，但结算方式只有一个：带错误种类的结果照常回到模型。切换模式各重放一遍。',
+          traces: ['exception', 'timeout', 'abort', 'worker-exit'].map(kind => ({
+            id: kind, label: kind, steps: toSteps(buildCodeRunModel({ scenario: kind, binding: defaultBinding })),
+          })),
+        },
+        {
+          title: '跑成功不等于输出合法',
+          text: 'invalid-output 场景里程序正常退出，但返回值过不了 schema 校验，照样以失败结算。边界校验发生在回传那一刻。',
+          traces: [{ id: 'invalid', label: '非法输出', steps: toSteps(buildCodeRunModel({ scenario: 'invalid-output', binding: defaultBinding })) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

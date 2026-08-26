@@ -17,6 +17,8 @@ import {
 } from './worker-protocol-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -198,6 +200,37 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 协议消息天然分两条泳道：方向即泳道，消息标签即相位。
+    const toSteps = model => model.messages.map(msg => ({
+      lane: msg.dir,
+      phase: msg.tag,
+      detail: `${msg.tag}：${msg.detail}`,
+      index: msg.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'worker-protocol-ladder',
+      rungs: replayRungs([
+        {
+          title: '一次正常往返：Start、Started、Result',
+          text: '宿主发 Start，工作线程回 Started，干完活再回 Result。协议就是这条双向消息序列——没有别的魔法。',
+          traces: [{ id: 'normal', label: '正常往返', steps: toSteps(buildProtocolModel({ scenario: 'normal' })) }],
+        },
+        {
+          title: '中途取消：取消本身也是一条消息',
+          text: '活干到一半被取消时，协议不靠异常逃逸，而是让取消在消息流里留痕。谁在哪一步停下，日志说得清。',
+          traces: [{ id: 'cancel', label: '中途取消', steps: toSteps(buildProtocolModel({ scenario: 'cancel-mid-flight' })) }],
+        },
+        {
+          title: '启动失败：ChildStartError 也是回复',
+          text: '子线程根本没起来时，回应不是沉默而是一条 ChildStartError。错误被协议化之后，调用方才有可能确定性地结算。',
+          traces: [{ id: 'start-error', label: '启动失败', steps: toSteps(buildProtocolModel({ scenario: 'child-start-error' })) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

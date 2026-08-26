@@ -22,6 +22,8 @@ import {
 } from './orchestration-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -238,6 +240,33 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildWorkflowModel(input).steps.map(step => ({
+      lane: step.lane ?? '编排', phase: step.phase ?? step.kind ?? 'step', detail: step.detail ?? '', index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'orchestration-ladder',
+      rungs: replayRungs([
+        {
+          title: '顺序两步，走完即成',
+          text: '两个子代理按序执行、全部完成——最短的一条完整编排轨迹。',
+          traces: [{ id: 'seq-ok', label: '顺序·完成', steps: trace({ shape: 'sequential-2', ending: 'completed' }) }],
+        },
+        {
+          title: '并行三路，一路失败',
+          text: '并行扇出里一个子代理报错：失败被如实上报，其余兄弟不被牵连，整体以 error 结算。',
+          traces: [{ id: 'par-err', label: '并行·出错', steps: trace({ shape: 'parallel-3-one-fails', ending: 'error' }), focusPhases: ['error'] }],
+        },
+        {
+          title: '取消：宽限与强制结算',
+          text: 'cancel 给有界宽限；脚本不肯停也要被引擎推到 cancelled——绝不悬挂在卡死的子任务上。',
+          traces: [{ id: 'cancel', label: '取消', steps: trace({ shape: 'sequential-2', ending: 'cancelled' }) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

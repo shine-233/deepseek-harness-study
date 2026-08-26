@@ -5,6 +5,8 @@ import {
 } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -94,6 +96,33 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildWorkspaceModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'workspace-ladder',
+      rungs: replayRungs([
+        {
+          title: '注册即规范化：realpath 进域存储',
+          text: '/repo/app 注册时先做 realpath 规范化再入库——符号链接和相对路径在这里被钉成唯一形态。',
+          traces: [{ id: 'basic', label: '注册＋附加会话', steps: trace({ attachSession: true }) }],
+        },
+        {
+          title: '重复注册是去重，不是报错',
+          text: '同一个已注册路径再次注册会命中去重逻辑：域存储里仍然只有一份。身份相同就共享，不制造第二份状态。',
+          traces: [{ id: 'dup', label: '重复注册', steps: trace({ duplicate: true }), focusPhases: ['re-register', 'dedupe'] }],
+        },
+        {
+          title: '移动到不存在的目标：显式拒绝',
+          text: '目标 stat 失败时 move 被拒并说明原因。工作区之间的迁移同样走显式校验——绝不悄悄落到半一致的状态。',
+          traces: [{ id: 'move', label: '非法移动', steps: trace({ moveInvalid: true }), focusPhases: ['move-rejected'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

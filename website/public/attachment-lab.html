@@ -41,6 +41,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="seam-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="seam-ladder-title">三级台阶，从保存到取回</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form sb-controls" id="seam-form">
           <label><span>图片大小：<output id="ctl-imageBytes-output">800</output></span><input id="ctl-imageBytes" type="range" min="100" max="5000" step="50" value="800"></label>
           <label><span>尺寸上限：<output id="ctl-maxBytes-output">1200</output></span><input id="ctl-maxBytes" type="range" min="200" max="4000" step="50" value="1200"></label>

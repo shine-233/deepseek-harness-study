@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements
   svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -113,6 +115,35 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型步骤没有 index 字段：轨迹引擎按数组位置定位，这里补上序号。
+    const trace = input => buildCredentialModel(input).steps.map((step, index) => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'credential-ladder',
+      rungs: replayRungs([
+        {
+          title: '三步流水线：声明、询问、结算',
+          text: '配置只声明「我要用哪个凭据」，值由注册的 Provider 逐个询问供应。命中时凭据走安全通道注入 ctx.authorization——值本身不进日志。',
+          traces: [{ id: 'env-hit', label: 'env 命中', steps: trace({ refName: 'github-token', source: 'env' }) }],
+        },
+        {
+          title: '零个 Provider：fail-closed 拒绝',
+          text: '没有任何 Provider 声明过这个引用时，解析直接拒绝。工具调用被整体阻止——不是返回空值让调用方猜。',
+          traces: [{ id: 'unknown', label: 'unknown-ref', steps: trace({ refName: 'unknown-ref', source: 'env' }), focusPhases: ['miss', 'settle-fail'] }],
+        },
+        {
+          title: '来源标记不等于供应能力',
+          text: '来源 none 表示没有已注册的 Provider 可查：声明写得再完整也兑现不出凭据。能兑现引用的是注册进来的 Provider，不是配置文本。',
+          traces: [{ id: 'none', label: '无 Provider', steps: trace({ refName: 'api-key', source: 'none' }), focusPhases: ['settle-fail'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

@@ -45,7 +45,7 @@ pnpm --dir study-examples/minimal-observer-plugin run demo
 | 你想做什么 | 现在点击哪里 | 做完后应该能回答什么 |
 | --- | --- | --- |
 | 我完全不知道 DSH 是什么 | [00-开始这里](study/00-开始这里.md) → [01-仓库地图](study/01-仓库地图.md) | 插件、服务、事件、Profile、Bundle、Turn 分别是什么 |
-| 我想先动手拆一个实验再读课文 | <a href="../study-labs.html" target="_blank" rel="noreferrer">实验室总览</a>（网页版入口；在 GitHub 页面上请从 README 的实验表进） | 四十个离线实验各自回答什么问题、有哪些控件、进度记在哪里 |
+| 我想先动手拆一个实验再读课文 | <a href="../study-labs.html" target="_blank" rel="noreferrer">实验室总览</a>（网页版入口；在 GitHub 页面上请从 README 的实验表进） | 五十八个离线实验各自回答什么问题、有哪些控件、进度记在哪里 |
 | 我想知道一次请求怎么跑 | [03-核心文件精读](study/03-核心文件精读.md) → [04-Agent与Turn流程](study/04-Agent与Turn流程.md) | 用户输入怎样变成模型请求、工具调用和 Session 事件 |
 | 我想读懂 Session 和恢复 | [05-Session日志与恢复](study/05-Session日志与恢复.md) | 为什么模型可见内容必须能从事件日志重建 |
 | 我想写普通插件 | [27-工具预算与插件责任决策卡](study/27-工具预算与插件责任决策卡.md) → [10-社区生态与扩展边界](study/10-社区生态与扩展边界.md) → [11-如何写一个合规插件](study/11-如何写一个合规插件.md) | 哪些是公开扩展点，插件怎样挂载、测试和卸载 |

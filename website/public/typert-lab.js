@@ -16,6 +16,8 @@ import {
 } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -142,6 +144,37 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 注册表模型的步骤自带贡献/注册/变更三条泳道，直接按序重放。
+    const toSteps = model => model.steps.map(step => ({
+      lane: step.lane,
+      phase: step.phase,
+      detail: `${step.lane} · ${step.detail}`,
+      index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'typert-ladder',
+      rungs: replayRungs([
+        {
+          title: '干净注册：贡献面到注册面的落地',
+          text: '一个端点从贡献面提交，注册面登记，变更面记录这次变更。先看一条没有任何意外的轨迹。',
+          traces: [{ id: 'clean', label: 'clean', steps: toSteps(buildTypertRegistryModel({ scenario: 'clean' })) }],
+        },
+        {
+          title: '端点重复：同名登记当场被拒',
+          text: '两个来源想注册同一个端点名——重复在最早的解析点被拒绝，而不是最后静默覆盖。',
+          traces: [{ id: 'dup-endpoint', label: 'endpoint-dup', steps: toSteps(buildTypertRegistryModel({ scenario: 'endpoint-dup' })) }],
+        },
+        {
+          title: 'id 重复：另一条唯一性红线',
+          text: '端点名可以别名共存，id 不行。第二类唯一性约束由同一套 fail loud 语义守护。',
+          traces: [{ id: 'dup-id', label: 'id-dup', steps: toSteps(buildTypertRegistryModel({ scenario: 'id-dup' })) }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

@@ -5,6 +5,8 @@ import {
 } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -91,6 +93,36 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildSandboxModel(input).steps.map((step, index) => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index ?? index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'sandbox-ladder',
+      rungs: replayRungs([
+        {
+          title: '部署默认先行：read-only 挡下写入',
+          text: '请求声明「要写工作区」，策略解析读出部署默认 read-only，文件沙箱在执行前拒绝写效应。拒绝连同升级指引一起返回给模型——被拒不等于死路。',
+          traces: [{ id: 'deny', label: '只读 × 写入', steps: trace({ mode: 'read-only', op: 'write-in-workspace' }), focusPhases: ['enforce-deny', 'denial-guidance'] }],
+        },
+        {
+          title: '放开一档：workspace-write 放行工作区内',
+          text: '同一操作换到 workspace-write 就能通过：策略是档位不是开关，放行的范围由模式明确圈定。',
+          traces: [{ id: 'allow', label: '工作区可写', steps: trace({ mode: 'workspace-write', op: 'write-in-workspace' }), focusPhases: ['enforce-allow', 'done-allow'] }],
+        },
+        {
+          title: '临时文件与界外路径：同一次判定分开对待',
+          text: 'write-temp 通常随工作区可写一起放行；写到界外则始终需要更高档位。路径落在哪里，决定它归哪条规则管。',
+          traces: [
+            { id: 'temp', label: '写临时目录', steps: trace({ mode: 'workspace-write', op: 'write-temp' }) },
+            { id: 'outside', label: '写界外', steps: trace({ mode: 'workspace-write', op: 'write-outside' }), focusPhases: ['enforce-deny'] },
+          ],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

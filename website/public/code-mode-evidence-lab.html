@@ -86,6 +86,10 @@
         </form>
 
         <div id="gated-controls">
+        <section class="card" aria-labelledby="cme-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="cme-ladder-title">三级台阶，一次调用的权限管线</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form id="lab-config-form">
           <label>
             <span>固定 seed</span>
@@ -154,7 +158,7 @@
 
         <div class="frame-inspector">
           <div class="frame-summary">
-            <span class="summary-label">CURRENT FRAME</span>
+            <span class="summary-label">当前帧</span>
             <strong id="frame-summary">首帧：外层 run_code 已分发，尚无内部工具主体执行。</strong>
           </div>
           <div class="inspector-columns">
@@ -207,7 +211,7 @@
           </div>
           <span class="schema-pill schema-oracle">事件校验</span>
         </div>
-        <p class="section-intro">独立校验（oracle） 重新读取事件流，独立核对 parent、阶段顺序、策略结果、主体执行次数、并发上限和外层结算顺序。测试还会篡改一条 deny 事件，确认 独立校验 能报错。</p>
+        <p class="section-intro">独立校验（oracle）重新读取事件流，独立核对 parent、阶段顺序、策略结果、主体执行次数、并发上限和外层结算顺序。测试还会篡改一条 deny 事件，确认 独立校验 能报错。</p>
         <ul class="oracle-list" id="oracle-list">
           <li data-pass="true"><strong>PASS · 等待模型运行</strong><span>页面载入后会显示逐项 expected / actual。</span></li>
         </ul>
@@ -280,7 +284,7 @@
     </section>
 
     <footer class="page-footer">
-      <span>fixed seed · pure function · seekable frames · text fallback · no default connection</span>
+      <span>固定种子 · 纯函数 · 逐帧可拖 · 纯文本回退 · 不建立任何连接</span>
       <a href="./study/lessons/33-确定性可视化实验协议与Code-Mode权限管线.html">继续读配套章节</a>
     </footer>
   </main>

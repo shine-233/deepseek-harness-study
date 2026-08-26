@@ -11,14 +11,16 @@ import { installThemeToggle } from './study-lab-theme.js'
 
 const PROGRESS_STORAGE_KEY = 'dsh-study-progress-v2'
 
-/** research-debug-bridge 不在进度名单里，计数时按 29 个算。 */
+/** research-debug-bridge 是工作台不是模型实验，刻意不进进度名单；其余全部实验室入册。 */
 const TRACKED_LAB_IDS = new Set([
   'turn-flow',
   'package-graph',
   'profile-loader',
   'session-log',
-  'tool-visibility',
-  'fs-edit',
+   'tool-visibility',
+   'tool-budget',
+  'acp',
+   'fs-edit',
   'web-tool',
   'code-mode-evidence',
   'compaction',
@@ -26,6 +28,7 @@ const TRACKED_LAB_IDS = new Set([
   'llm-stream',
   'prompt-assembly',
   'hook-flow',
+  'waterfall-ladder',
   'approval-flow',
   'session-fork',
   'subagent-delegate',
@@ -61,6 +64,11 @@ const TRACKED_LAB_IDS = new Set([
   'host-gateway',
   'invariant',
   'storage-hub',
+  'session-projection',
+  'query',
+  'sandbox',
+  'typert',
+  'workspace',
 ])
 
 const VALID_GROUPS = new Set(['all', 'main', 'plugin', 'evidence'])
@@ -81,6 +89,11 @@ function fillChipCounts(cards) {
   // 大标题里的数字也由这里供给：实验室数量每周在变，硬编码会像上面那样过期。
   for (const node of document.querySelectorAll('[data-lab-count-all]')) {
     node.textContent = String(counts.all)
+  }
+  // 「计入进度」一行从本页卡片推导：入册数 / 本页卡片数，新实验上下后自动对齐。
+  const trackedOnPage = cards.filter(card => TRACKED_LAB_IDS.has(card.dataset.lab)).length
+  for (const node of document.querySelectorAll('#metric-tracked')) {
+    node.textContent = `${trackedOnPage} / ${counts.all} 个实验`
   }
   for (const node of document.querySelectorAll('.lab-chip-count')) {
     const key = node.dataset.count
@@ -151,7 +164,7 @@ function showProgressMetrics(state) {
     if (note) note.textContent = '这台浏览器读不到本地存储（隐私模式或 file://），进度照常可用，只是这里不显示。'
     return
   }
-  if (labsDone) labsDone.textContent = `${Object.keys(state.labs).length} / 9`
+  if (labsDone) labsDone.textContent = `${Object.keys(state.labs).length} / ${TRACKED_LAB_IDS.size}`
   if (lessonsRead) lessonsRead.textContent = String(Object.keys(state.lessons).length)
 }
 

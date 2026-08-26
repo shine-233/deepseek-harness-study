@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements
   svgElement, writeText, installDeclaredIcons, installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -131,6 +133,34 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildSettingsModel(input).steps.map((step, index) => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'settings-ladder',
+      rungs: replayRungs([
+        {
+          title: '写路径：写入锁 → 缝 → 热发布',
+          text: '每次写都先拿写入锁，经缝落盘后立刻热发布给所有订阅者。改完重新读取就是新值——本进程不需要重启。',
+          traces: [{ id: 'write', label: '经缝写入', steps: trace({ namespace: 'model', action: 'write' }), focusPhases: ['lock', 'hot-publish'] }],
+        },
+        {
+          title: '外部编辑走同一条热发布路',
+          text: '另一个进程直接改了文件：fs 监听器触发，缝收到新文档再热发布。共享同一个 harness home 时，对方的保存就是本进程的外部编辑。',
+          traces: [{ id: 'external', label: '外部编辑', steps: trace({ namespace: 'model', action: 'external-edit', externalEditValue: { maxTurns: 12 } }), focusPhases: ['ext-edit', 'hot-publish'] }],
+        },
+        {
+          title: '一份文档，各命名空间互不打扰',
+          text: '一个 YAML/JSON 文件承载全部命名空间段落，每次推演只读写自己那一段。approval 段的读取里看不到 model 段的任何变更。',
+          traces: [{ id: 'isolation', label: 'approval 段', steps: trace({ namespace: 'approval', action: 'write' }) }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

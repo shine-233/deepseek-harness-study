@@ -14,6 +14,8 @@ import { installStoryRail } from './study-lab-story.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import {
   GOAL_PHASES,
   GOAL_VERBS,
@@ -190,6 +192,81 @@ if (typeof document !== 'undefined') {
   installScrollProgress()
   installStoryRail()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 三个模型都不产 steps 时间线：这里把每次推演的判定顺序枚举成轨迹，
+    // detail 全部引用模型返回的字段，不新编事实。
+    const todoTrace = input => {
+      const model = buildTodoStackModel(input)
+      const steps = [{ lane: '入口校验', phase: 'validate', index: 0, detail: model.verdict.ok
+        ? `content/status/键形校验通过：${String(model.observations.itemCount)} 条。`
+        : model.verdict.error }]
+      if (model.verdict.ok) {
+        steps.push({ lane: '日志', phase: 'append', index: 1, detail: `整表快照追加为一条 ${model.appendedEvent}——没有增量接口。` })
+        steps.push({ lane: '投影', phase: 'confirm', index: 2,
+          detail: `计数确认：${String(model.counts.pending)} pending · ${String(model.counts.inProgress)} in_progress · ${String(model.counts.completed)} completed。` })
+      } else {
+        steps.push({ lane: '日志', phase: 'reject', index: 1, detail: '调用整体拒绝，一次都不写：旧清单保持原样。' })
+      }
+      return steps
+    }
+    const planTrace = input => {
+      const model = buildPlanModeModel(input)
+      return [
+        { lane: '读状态', phase: 'read', index: 0,
+          detail: `logged=${model.input.loggedActive ? 'active' : 'inactive'}，agent ${model.input.agentBusy ? '正在跑' : '空闲'}。` },
+        { lane: '状态机', phase: 'apply', index: 1, detail: `动作 ${model.input.action} → 结果 ${model.result}。` },
+        { lane: '落账', phase: 'settle', index: 2, detail: model.pendingAfter !== null
+          ? `挂起 pending=${String(model.pendingAfter)}，等下一个 pre-step 再生效。`
+          : `logged=${model.loggedAfter ? 'active' : 'inactive'}${model.result === 'noop' ? '（noop 不追加事件）' : ''}。` },
+      ]
+    }
+    const goalTrace = input => {
+      const model = buildGoalModel(input)
+      const steps = [{ lane: '迁移表', phase: 'lookup', index: 0, detail: `${model.input.phase} × ${model.input.verb}${model.input.roundsCapReached ? '（轮次上限已打满）' : ''}。` }]
+      if (model.illegal) {
+        steps.push({ lane: '结果', phase: 'reject', index: 1, detail: `${model.detail}——非法组合显式拒绝，不静默跳过。` })
+        return steps
+      }
+      steps.push({ lane: '结果', phase: 'transition', index: 1,
+        detail: `${String(model.from)} → ${String(model.to)}；revision ${String(model.revisionBefore)}→${String(model.revisionAfter)}。` })
+      steps.push({ lane: '权限与事件', phase: model.armed ? 'arm' : 'disarm', index: 2,
+        detail: `${model.armed ? '目标保持激活' : '撤权生效'}；${model.appendedEvent ?? 'disarm 不写事件——只撤进程本地的激活权'}。` })
+      return steps
+    }
+
+    createConceptLadder(ladderRoot, {
+      storageKey: 'plan-stack-ladder',
+      rungs: replayRungs([
+        {
+          title: 'todo_write：整表快照，拒绝也是整体的',
+          text: 'todo_write 没有增量接口：合法清单整表追加进日志并返回计数确认。空内容、重复条目在入口显式拒绝，文案逐字来自上游。',
+          traces: [
+            { id: 'valid', label: '合法清单', steps: todoTrace({ preset: 'validSingle' }) },
+            { id: 'dup', label: '重复 content', steps: todoTrace({ preset: 'duplicateContent' }), focusPhases: ['reject'] },
+            { id: 'parallel', label: '并行 vs strict', steps: todoTrace({ preset: 'validParallel', allowParallelInProgress: false }), focusPhases: ['reject'] },
+          ],
+        },
+        {
+          title: 'plan/mode：闲即提交，忙即排队',
+          text: 'logged 与 pending 是两个格子：空闲时动作立即 commit，agent 正在跑时挂起到下一个 pre-step。noop 表示请求与当前状态一致，不追加事件。',
+          traces: [
+            { id: 'idle', label: '空闲提交', steps: planTrace({ loggedActive: false, agentBusy: false, action: '/plan' }) },
+            { id: 'busy', label: '忙碌排队', steps: planTrace({ loggedActive: false, agentBusy: true, action: '/plan' }), focusPhases: ['settle'] },
+          ],
+        },
+        {
+          title: 'goal：封闭迁移表 + revision 栅栏',
+          text: '不在迁移表内的组合显式报 illegal transition；合法迁移让 revision 单调递增。pause/block/clear 都撤权，resume 在轮次上限打满时被拒。',
+          traces: [
+            { id: 'pause-resume', label: '暂停→恢复', steps: goalTrace({ phase: 'paused', verb: 'resume' }) },
+            { id: 'cap', label: '上限打满的 resume', steps: goalTrace({ phase: 'paused', verb: 'resume', roundsCapReached: true }), focusPhases: ['reject'] },
+          ],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

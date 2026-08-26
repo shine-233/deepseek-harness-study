@@ -21,6 +21,8 @@ import {
 } from './subagent-delegate-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -285,6 +287,36 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildSubagentDelegateModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase ?? step.kind ?? 'step', detail: step.detail ?? '', index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'subagent-delegate-ladder',
+      rungs: replayRungs([
+        {
+          title: '一次委派：创建、运行、回报、结算',
+          text: '父 Agent 建子任务、子 Agent 跑完回报、父侧结算收尾。先看这条标准链。',
+          traces: [{ id: 'report', label: '正常回报', steps: trace({ parentDepth: 1, outcome: 'report' }) }],
+        },
+        {
+          title: '失败也回报：settle 不看成败',
+          text: '子任务失败时同样走回报与结算——父层拿到的是确定性的终态，不是悬而未决的沉默。',
+          traces: [{ id: 'fail', label: '失败回报', steps: trace({ parentDepth: 1, outcome: 'fail' }), focusPhases: ['settle'] }],
+        },
+        {
+          title: '深度：子代还能再委派吗',
+          text: '把父深度调到 2——委派边界由深度决定，规则一致，层数有上限。',
+          traces: [
+            { id: 'd1', label: '深度 1', steps: trace({ parentDepth: 1, outcome: 'report' }) },
+            { id: 'd2', label: '深度 2', steps: trace({ parentDepth: 2, outcome: 'report' }) },
+          ],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

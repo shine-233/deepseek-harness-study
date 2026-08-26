@@ -50,6 +50,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="mcp-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="mcp-ladder-title">三级台阶，从握手到结算</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form sb-controls" id="mcp-form">
           <label><span>场景动作</span><select id="mc-action"><option value="connect-list">连接并列出工具</option><option value="call-tool">调用一个工具</option><option value="dispose">卸载插件实例</option></select></label>
           <label><span>首次重连延迟：<output id="mc-delay-output">500</output> ms</span><input id="mc-delay" type="range" min="125" max="2000" step="25" value="500"></label>

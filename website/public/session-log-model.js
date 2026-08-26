@@ -8,6 +8,10 @@
  *   2. 遇到读不懂的事件，只有带 `ignorable: true` 的才能跳过；必需事件必须拒绝加载，
  *      不能悄悄忽略。
  *
+ * 篡改实验 fault='tamper-replay-input'：重放前把落盘副本里一条 tool-result 的
+ * ok 改成 false（模拟存储被改）；原始日志保持基准，独立校验靠重放比对抓出分歧，
+ * 并指出违反的是「同一份日志重放多少次都得到同一个状态」。
+ *
  * 每个维度的含义：
  *   横轴 = 事件序号（离散顺序，不是时间戳）
  *   纵轴 = 事件类别 lane
@@ -88,6 +92,23 @@ function buildLog(scenario) {
     // 序号故意不重排：缺口就是这一场景要展示的东西。
   }
   return log
+}
+
+/**
+ * 篡改实验的目标必须让分歧留到最后：ok 为 true 的 tool-result 被翻成 false 后，
+ * 工具失败计数从此不同。标题这类字段会被后续事件覆盖，拖到末尾就看不到分歧了。
+ */
+function tamperTargetIn(log) {
+  return log.find(entry => !entry.ignorable
+    && entry.type === 'tool-result'
+    && entry.payload.ok === true) ?? null
+}
+
+/** 造一份被改过的落盘副本：只动指定事件的载荷字节，原始日志原样保留。 */
+function tamperStoredCopy(log, sequence) {
+  return log.map(entry => entry.sequence === sequence
+    ? { ...entry, payload: { ...entry.payload, ok: false } }
+    : entry)
 }
 
 /** 折叠一条事件到状态上。未知类型不在这里处理，由调用方先判定。 */
@@ -188,13 +209,19 @@ function resolveInput(input = {}) {
   if (!LOG_SCENARIOS.some(candidate => candidate.id === scenario)) {
     throw new RangeError('unknown scenario: ' + String(scenario))
   }
-  return { scenario, upTo: input.upTo ?? Number.POSITIVE_INFINITY }
+  const fault = input.fault ?? 'none'
+  if (fault !== 'none' && fault !== 'tamper-replay-input') {
+    throw new RangeError('未知篡改实验：' + String(fault))
+  }
+  return { scenario, upTo: input.upTo ?? Number.POSITIVE_INFINITY, fault }
 }
 
 /**
  * 建立一段日志和它的重放结果。
  *
- * @param input - `scenario` 为 LOG_SCENARIOS 的 id；`upTo` 为重放到的序号。
+ * @param input - `scenario` 为 LOG_SCENARIOS 的 id；`upTo` 为重放到的序号；
+ *   `fault` 为 'none' 或 'tamper-replay-input'，后者把 `tamperIndex`（默认取
+ *   第一条 ok 为 true 的非 ignorable tool-result）指认的事件在落盘副本里改写。
  */
 export function buildSessionLogModel(input = {}) {
   const resolved = resolveInput(input)
@@ -203,14 +230,30 @@ export function buildSessionLogModel(input = {}) {
   const maxSequence = Math.max(...log.map(entry => entry.sequence))
   const upTo = Number.isFinite(resolved.upTo) ? Math.max(0, Math.min(resolved.upTo, maxSequence)) : maxSequence
 
-  const full = replaySessionLog(log, maxSequence)
-  const partial = replaySessionLog(log, upTo)
+  let storedLog = log
+  let tamper = null
+  if (resolved.fault === 'tamper-replay-input') {
+    const target = input.tamperIndex === undefined
+      ? tamperTargetIn(log)
+      : log.find(entry => entry.sequence === input.tamperIndex) ?? null
+    if (target === null || target.ignorable || target.type !== 'tool-result' || target.payload.ok !== true) {
+      throw new RangeError('篡改目标须是一条 ok 为 true 且未标 ignorable 的 tool-result')
+    }
+    storedLog = tamperStoredCopy(log, target.sequence)
+    tamper = Object.freeze({ sequence: target.sequence, type: target.type, field: 'ok', before: true, after: false })
+  }
+
+  // 重放消费的是落盘副本；原始日志只作基准留给独立校验比对。
+  const full = replaySessionLog(storedLog, maxSequence)
+  const partial = replaySessionLog(storedLog, upTo)
 
   return {
-    input: { scenario: resolved.scenario, upTo },
+    input: { scenario: resolved.scenario, upTo, fault: resolved.fault },
     scenario: { id: scenario.id, label: scenario.label, description: scenario.description },
     formatVersion: SESSION_FORMAT_VERSION,
-    log,
+    log: storedLog,
+    originalLog: log,
+    tamper,
     maxSequence,
     partial,
     full,
@@ -243,9 +286,52 @@ export function buildSessionLogModel(input = {}) {
 }
 
 /**
+ * 逐字段比对两个重放状态，返回人读的分歧清单。
+ * 字段名与本页「折叠后的状态」块的叫法一致，指认时不用第二套词汇。
+ */
+function describeStateDivergence(expected, actual) {
+  const diffs = []
+  const push = (label, wanted, got) =>
+    diffs.push('字段「' + label + '」应为 ' + wanted + '，落盘副本重放出 ' + got)
+  if (expected.started !== actual.started) {
+    push('会话已开始', expected.started ? '是' : '否', actual.started ? '是' : '否')
+  }
+  if (expected.title !== actual.title) {
+    push('标题', '「' + String(expected.title ?? '（尚未设置）') + '」',
+      '「' + String(actual.title ?? '（尚未设置）') + '」')
+  }
+  if (expected.messages.length !== actual.messages.length) {
+    push('消息数', String(expected.messages.length), String(actual.messages.length))
+  } else {
+    for (let index = 0; index < expected.messages.length; index += 1) {
+      const wantedMessage = expected.messages[index]
+      const gotMessage = actual.messages[index]
+      if (wantedMessage.role !== gotMessage.role || wantedMessage.text !== gotMessage.text) {
+        const speaker = role => (role === 'user' ? '用户' : '助手')
+        diffs.push('第 ' + String(index + 1) + ' 条消息应为 '
+          + speaker(wantedMessage.role) + '「' + wantedMessage.text + '」，落盘副本重播出 '
+          + speaker(gotMessage.role) + '「' + gotMessage.text + '」')
+        break
+      }
+    }
+  }
+  if (expected.toolCalls !== actual.toolCalls) push('工具调用', String(expected.toolCalls), String(actual.toolCalls))
+  if (expected.toolFailures !== actual.toolFailures) {
+    push('工具失败', String(expected.toolFailures), String(actual.toolFailures))
+  }
+  if (expected.tokens !== actual.tokens) push('累计 token', String(expected.tokens), String(actual.tokens))
+  if (expected.appliedCount !== actual.appliedCount) {
+    push('已应用事件', String(expected.appliedCount), String(actual.appliedCount))
+  }
+  return diffs
+}
+
+/**
  * 独立核对重放的确定性和拒绝规则。
  *
- * oracle 自己重放两次、逐位置比对，并检查跳过与拒绝各自只发生在允许的条件下。
+ * 确定性以原始日志为基准：落盘副本必须重放出与原始日志相同的状态，存储一旦被改，
+ * 「同一份日志重放多少次都得到同一个状态」就在这里断开。跳过与拒绝各自只允许发生
+ * 在允许的条件下。
  */
 export function evaluateSessionLogOracle(model) {
   if (typeof model !== 'object' || model === null) throw new TypeError('model must be an object')
@@ -253,11 +339,21 @@ export function evaluateSessionLogOracle(model) {
   const checks = []
   const add = (id, label, pass, expected, actual) => checks.push({ id, label, pass, expected, actual })
 
-  const first = replaySessionLog(model.log, model.input.upTo)
-  const second = replaySessionLog(model.log, model.input.upTo)
+  const storedRun = replaySessionLog(model.log, model.input.upTo)
+  const originalLog = Array.isArray(model.originalLog) ? model.originalLog : model.log
+  const baselineFirst = replaySessionLog(originalLog, model.input.upTo)
+  const baselineSecond = replaySessionLog(originalLog, model.input.upTo)
+  const divergence = describeStateDivergence(baselineFirst.state, storedRun.state)
+  const baselineStable = JSON.stringify(baselineFirst.state) === JSON.stringify(baselineSecond.state)
+  const tamperPending = model.tamper != null && model.tamper.sequence > model.input.upTo
   add('REPLAY_IS_DETERMINISTIC', '同一段日志重放两次得到同一状态',
-    JSON.stringify(first.state) === JSON.stringify(second.state),
-    '两次结果相同', JSON.stringify(first.state) === JSON.stringify(second.state) ? '两次结果相同' : '两次结果不同')
+    baselineStable && divergence.length === 0,
+    '同一份日志重放多少次都得到同一个状态，落盘副本也不例外',
+    divergence.length === 0
+      ? '落盘副本重放出的状态与原始日志一致'
+        + (tamperPending ? '；篡改的序号 ' + String(model.tamper.sequence)
+          + ' 还在重放位置之后，分歧尚未出现' : '')
+      : divergence.join('；'))
 
   // 逐位置增量前进，和一次性重放到同一位置比对：任何位置不一致都说明状态不是事件的函数。
   const mismatches = []
@@ -270,7 +366,7 @@ export function evaluateSessionLogOracle(model) {
     mismatches.length === 0, '0 个位置不一致',
     mismatches.length === 0 ? '0 个位置不一致' : '位置 ' + mismatches.slice(0, 4).join('、'))
 
-  const skipped = first.dispositions.filter(entry => entry.disposition === 'skipped')
+  const skipped = storedRun.dispositions.filter(entry => entry.disposition === 'skipped')
   const badSkip = skipped.filter((entry) => {
     const source = model.log.find(candidate => candidate.sequence === entry.sequence)
     return source === undefined || source.ignorable !== true
@@ -279,24 +375,24 @@ export function evaluateSessionLogOracle(model) {
     badSkip.length === 0, '0 个违规跳过',
     badSkip.map(entry => entry.type).join('、') || '0 个违规跳过')
 
-  const refused = first.dispositions.filter(entry => entry.disposition === 'refused')
+  const refused = storedRun.dispositions.filter(entry => entry.disposition === 'refused')
   add('REFUSAL_STOPS_LOADING', '一旦拒绝，后面的事件都不再应用',
-    refused.length === 0 || first.dispositions.filter(entry => entry.disposition === 'applied'
+    refused.length === 0 || storedRun.dispositions.filter(entry => entry.disposition === 'applied'
       && entry.sequence > refused[0].sequence).length === 0,
     '拒绝之后 0 条应用',
     refused.length === 0 ? '本场景没有拒绝' : '拒绝之后 0 条应用')
 
-  const monotonic = first.dispositions.every((entry, index, all) =>
+  const monotonic = storedRun.dispositions.every((entry, index, all) =>
     index === 0 || all[index - 1].sequence < entry.sequence)
   add('DISPOSITIONS_ORDERED', '每条事件的去向按序号排列',
     monotonic, '严格递增', monotonic ? '严格递增' : '有乱序')
 
   const counted = model.observations
   add('OBSERVATIONS_MATCH', '观测读数与重放结果一致',
-    counted.applied === first.dispositions.filter(entry => entry.disposition === 'applied').length
-    && counted.messages === first.state.messages.length
-    && counted.tokens === first.state.tokens,
-    String(first.state.messages.length) + ' 条消息 / ' + String(first.state.tokens) + ' token',
+    counted.applied === storedRun.dispositions.filter(entry => entry.disposition === 'applied').length
+    && counted.messages === storedRun.state.messages.length
+    && counted.tokens === storedRun.state.tokens,
+    String(storedRun.state.messages.length) + ' 条消息 / ' + String(storedRun.state.tokens) + ' token',
     String(counted.messages) + ' 条消息 / ' + String(counted.tokens) + ' token')
 
   return { pass: checks.every(check => check.pass), checks }
