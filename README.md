@@ -72,7 +72,7 @@
 | [会话投影折叠](https://shine-233.github.io/deepseek-harness-study/session-projection-lab.html) | 四条投影并行折叠同一条事件流；无关事件返回同一引用，下游零开销 |
 | [存储后端契约](https://shine-233.github.io/deepseek-harness-study/storage-hub-lab.html) | 单元名同时当文件名和 SQL 标识符；版本戳对不上拒开；写完即持久，close 后报 closed |
 | [Typert 类型图](https://shine-233.github.io/deepseek-harness-study/typert-lab.html) | TS 源抽成编译器无关的类型图；registry 两阶段提交，冲突在变更前抛错零残留 |
-| [工作区注册表](https://shine-233.github.io/deepseek-harness-study/workspace-lab.html) | realpath 规范化后去重，先到者排前；header 校验挂靠，非法移动抛错原记录不动
+| [工作区注册表](https://shine-233.github.io/deepseek-harness-study/workspace-lab.html) | realpath 规范化后去重，先到者排前；header 校验挂靠，非法移动抛错原记录不动 |
 | [ACP 桥实验室](https://shine-233.github.io/deepseek-harness-study/acp-lab.html) | 自动化客户端看到的 Turn 怎样被桥删减：stdin/stdout 按行 JSON-RPC，只有提交后的助手文本过线 |
 | [研究 ↔ Debug 离线桥](https://shine-233.github.io/deepseek-harness-study/research-debug-bridge.html) | 课程网站与独立 Debug 工具怎样用显式文件交接 |
 | [工具预算收窄实验室](https://shine-233.github.io/deepseek-harness-study/tool-budget-lab.html) | 已注册的工具要过注册、restrict、原生呈现、宿主能力、审批五层才轮得到模型：18 个最后剩几个，当场算给你看 |
