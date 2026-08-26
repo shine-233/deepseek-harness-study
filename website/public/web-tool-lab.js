@@ -18,6 +18,8 @@ import {
 } from './web-tool-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -205,6 +207,40 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // fetch 与 search 两个模型都以 stage 序列返回管线步骤。
+    const fetchTrace = page => buildWebFetchModel({ page, url: `https://example.com/${page}` }).steps.map((step, index) => ({
+      lane: 'ctx.web.fetch', phase: step.stage, index, detail: step.detail,
+    }))
+    const searchTrace = query => buildWebSearchModel({ query }).steps.map((step, index) => ({
+      lane: 'ctx.web.search', phase: step.stage, index, detail: step.detail,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'web-tool-ladder',
+      rungs: replayRungs([
+        {
+          title: '抓取：参数解析 → 取回 → 渲染 → 截断判定',
+          text: '一次 fetch 先解析参数再经 ctx.web.fetch 取回；HTML 渲染后做截断判定，超长部分封顶并在 meta 里说明。每一步都有明确的是/否结论。',
+          traces: [{ id: 'docs', label: '抓取文档页', steps: fetchTrace('docs') }],
+        },
+        {
+          title: '搜索：并发发出，合并器统一出口',
+          text: 'search 把查询并发发给已注册 provider，结果经合并器归一为统一列表。查询是并发的，出口只有一个形状。',
+          traces: [{ id: 'search', label: 'cache policy', steps: searchTrace('cache policy') }],
+        },
+        {
+          title: 'provider 截断是输入事实，不是错误',
+          text: 'slow 页面被 provider 预先截断：工具如实标注 truncated 继续结算。非 2xx 也是结果——WebError 只留给无法安全取回的情形。',
+          traces: [
+            { id: 'plain', label: '纯文本页', steps: fetchTrace('plain') },
+            { id: 'trunc', label: '被截断的长页', steps: fetchTrace('slow') },
+          ],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

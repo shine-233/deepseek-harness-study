@@ -20,6 +20,8 @@ import {
 } from './session-projection-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -192,6 +194,38 @@ if (typeof document !== 'undefined') {
   installStoryRail()
   installRelatedLabs()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型产出 trace（{seq, kind, changes}）：changes 里为 true 的键就是被触及的投影。
+    const trace = upto => buildProjectionModel({ upto }).trace.map(entry => {
+      const touched = Object.entries(entry.changes ?? {}).filter(([, changed]) => changed).map(([key]) => key)
+      return {
+        lane: '投影', phase: entry.kind, index: entry.seq,
+        detail: touched.length > 0 ? `事件到达，触及投影：${touched.join('、')}。` : '事件到达，不改变任何投影。',
+      }
+    })
+    createConceptLadder(ladderRoot, {
+      storageKey: 'session-projection-ladder',
+      rungs: replayRungs([
+        {
+          title: '投影是函数：日志前缀决定四张视图',
+          text: 'todos、planMode、goal、schedule 四个投影都是「日志前缀 → 视图」的纯函数。事件逐条到达，谁变了立刻可见。',
+          traces: [{ id: 'head', label: '前 4 条事件', steps: trace(4) }],
+        },
+        {
+          title: '多数事件只影响自己那一格',
+          text: 'todo/write 只动 todos，plan/mode 只动 planMode——changes 表里永远只有一格亮起。互不干扰是投影可独立重建的前提。',
+          traces: [{ id: 'mid', label: '中段窗口', steps: trace(6), focusPhases: ['todo/write', 'plan/mode'] }],
+        },
+        {
+          title: '重放到任意一步，四张视图同时成立',
+          text: '把 upto 拨到任何位置，四个投影都处于一致的历史切片上。这就是「从日志恢复会话」的全部秘密：视图永远是日志的函数。',
+          traces: [{ id: 'full', label: '全部 8 条', steps: trace(8) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

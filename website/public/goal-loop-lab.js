@@ -4,6 +4,8 @@ import { makeFeedback, renderBoundary, renderOracle, requireElements,
   bindAutoAdvance, bindRangeKeys } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -111,6 +113,36 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型产出 frames（{tick, kind, label, detail}）：逐帧映射成轨迹步骤。
+    const trace = pattern => buildGoalModel({ pattern }).frames.map(frame => ({
+      lane: '目标循环', phase: frame.kind, index: frame.tick,
+      detail: `${frame.label}：${frame.detail}`,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'goal-loop-ladder',
+      rungs: replayRungs([
+        {
+          title: '一轮完成：目标在第一次验证就闭合',
+          text: '子代理带着不可变目标启动，第一轮就通过验证并 complete。这是循环最短的形状——没有交接，没有重来。',
+          traces: [{ id: 'pass', label: '一轮完成', steps: trace('pass-first') }],
+        },
+        {
+          title: '两轮收敛：continue 交接，第二轮通过',
+          text: '第一轮 continue 时把进度压缩成交手内容传给下一轮——交接字节数有预算上限。收敛靠的是可传递的中间状态。',
+          traces: [{ id: 'converge', label: '两轮收敛', steps: trace('fail-then-pass'), focusPhases: ['handoff'] }],
+        },
+        {
+          title: '持续受阻：blocked 到预算耗尽为止',
+          text: '每轮都 blocked 时循环不无限空转：轮数预算耗尽即停。失败路径同样有界，这是目标循环与死循环的分界。',
+          traces: [{ id: 'blocked', label: '持续受阻', steps: trace('always-blocked') }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

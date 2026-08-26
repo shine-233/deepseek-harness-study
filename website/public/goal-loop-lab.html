@@ -38,6 +38,10 @@
         <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
       </form>
       <div id="gated-controls">
+        <section class="card" aria-labelledby="goal-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="goal-ladder-title">三级台阶，目标驱动的循环</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
         <form class="lab-form" id="goal-form">
           <label><span>轮数上限：<output id="gl-rounds-out">3 轮</output></span><input id="gl-rounds" type="range" min="1" max="8" step="1" value="3"></label>
           <label><span>交接预算：<output id="gl-budget-out">120 字符</output></span><input id="gl-budget" type="range" min="40" max="400" step="20" value="120"></label>

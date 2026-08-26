@@ -13,6 +13,9 @@
 import { icon } from './study-lab-icons.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
+import graphFixture from './package-graph.json' with { type: 'json' }
 import { installScrollProgress } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
@@ -877,6 +880,50 @@ if (typeof document !== 'undefined') {
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 
   // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 依赖图不是时间线：把「枢纽排名 / 分组规模」枚举成轨迹，数字取自模型节点。
+    const hubTrace = () => {
+      const model = buildPackageGraphModel(graphFixture, { group: 'all', sort: 'lines' })
+      return [...model.nodes]
+        .sort((a, b) => b.dependedOnBy - a.dependedOnBy)
+        .slice(0, 6)
+        .map((node, index) => ({
+          lane: '依赖图', phase: 'hub', index,
+          detail: `${node.id}：被 ${String(node.dependedOnBy)} 个包依赖，自身 ${String(node.srcLines)} 行。`,
+        }))
+    }
+    const groupTrace = () => {
+      const model = buildPackageGraphModel(graphFixture, { group: 'all', sort: 'lines' })
+      const byGroup = new Map()
+      for (const node of model.nodes) {
+        byGroup.set(node.group, (byGroup.get(node.group) ?? 0) + 1)
+      }
+      return [...byGroup.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6)
+        .map(([group, count], index) => ({
+          lane: '分组规模', phase: 'group', index,
+          detail: `${group} 组：${String(count)} 个包进入本视图。`,
+        }))
+    }
+    createConceptLadder(ladderRoot, {
+      storageKey: 'package-graph-ladder',
+      rungs: replayRungs([
+        {
+          title: '被依赖最多的包就是枢纽',
+          text: 'client/runtime 一类枢纽包被几十个包依赖：它们是「一切之上」的地基。改动枢纽的代价由整个扇出承担。',
+          traces: [{ id: 'hubs', label: '枢纽 top6', steps: hubTrace() }],
+        },
+        {
+          title: '分组规模：一眼看出重灾区',
+          text: '按 group 聚合后，包数量最多的小组一目了然。视图上限之内装得下的才是当前分析的范围。',
+          traces: [{ id: 'groups', label: '分组 top6', steps: groupTrace(), focusPhases: ['group'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

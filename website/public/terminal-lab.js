@@ -3,6 +3,8 @@ import { makeFeedback, renderBoundary, renderOracle, renderRows, requireElements
   svgElement, writeText, installDeclaredIcons, installScrollProgress, pulseSignal } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
@@ -170,6 +172,28 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = scriptId => buildTerminalModel({ scriptId }).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'terminal-ladder',
+      rungs: replayRungs([
+        {
+          title: 'spawn 一个会话：状态从此有了居所',
+          text: '终端缝按稳定 type 注册后端，spawn 返回一个尚未发布的会话。此后每一次 send 都路由进同一份 PTY 状态。',
+          traces: [{ id: 'cwd', label: 'cd /tmp → pwd', steps: trace('cwd') }],
+        },
+        {
+          title: '状态延续：第二次命令记得第一次',
+          text: 'cd 之后再 pwd 得到 /tmp，export 之后能读到 A=1——状态活在会话里，不是每次命令重新开进程。这正是终端缝与一次性 shell 的分界。',
+          traces: [{ id: 'env', label: 'export A=1 → echo $A', steps: trace('env'), focusPhases: ['state', 'output'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

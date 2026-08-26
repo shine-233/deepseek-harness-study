@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="从固定上游提交读出的 DSH 包依赖图：体量、被依赖次数与组结构，含文字表格与独立 oracle">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -64,6 +64,10 @@
         </form>
 
         <div id="gated-controls">
+        <section class="card" aria-labelledby="pg-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="pg-ladder-title">三级台阶，枢纽与分组</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
       <form id="graph-form">
         <label>
           <span>按组筛选</span>

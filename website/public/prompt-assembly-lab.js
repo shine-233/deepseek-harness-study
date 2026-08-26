@@ -22,6 +22,8 @@ import {
 } from './prompt-assembly-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -196,6 +198,40 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型产出 segments（{lane, source, text, bytes}）：一段一步，字节与来源照抄。
+    const trace = input => buildPromptAssemblyModel(input).segments.map((segment, index) => ({
+      lane: segment.lane ?? '提示词',
+      phase: segment.source ?? 'segment',
+      index,
+      detail: `${String(segment.bytes)} 字节 · 来源 ${segment.source}`,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'prompt-assembly-ladder',
+      rungs: replayRungs([
+        {
+          title: '请求是一条有序的分段序列',
+          text: '平台前导、persona、策略、工具清单按固定次序拼成一次请求。每段都有自己的泳道、来源和字节数——顺序即语义。',
+          traces: [{ id: 'v1', label: 'v1 persona 基线', steps: trace({ personaVersion: 'v1', policy: 'ask', toolOrder: 'default', changeTarget: 'none' }) }],
+        },
+        {
+          title: '换 persona 版本：只动那一段',
+          text: 'v1 → v2 只替换 persona 段的文本，前后段一字不动。分段的意义就在这里：局部升级不惊动整份请求。',
+          traces: [{ id: 'v2', label: '升到 v2', steps: trace({ personaVersion: 'v2', policy: 'ask', toolOrder: 'default', changeTarget: 'none' }) }],
+        },
+        {
+          title: 'policy absent：缺一段而不是空一段',
+          text: '策略设为 absent 时该段整体不出现——请求变短而不是塞进一句「无」。工具顺序换成 custom-first 同理只重排 tools 段。',
+          traces: [
+            { id: 'absent', label: 'policy 缺席', steps: trace({ personaVersion: 'v1', policy: 'absent', toolOrder: 'default', changeTarget: 'none' }) },
+            { id: 'custom', label: 'custom-first 工具序', steps: trace({ personaVersion: 'v1', policy: 'ask', toolOrder: 'custom-first', changeTarget: 'none' }), focusPhases: ['tools'] },
+          ],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

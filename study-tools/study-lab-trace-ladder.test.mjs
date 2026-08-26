@@ -28,17 +28,19 @@ test('replayRungs：traces 原样透传给 build 的闭包（不在此处求值�
   assert.equal(typeof rung.build, 'function')
 })
 
-/** 已接入阶梯的实验室（29 个，2026-08-26 与 Agent Note 2026-08-25-zero-skip-concept-ladder 同步）：
+/** 已接入阶梯的实验室（57 个 = 全部离线实验室，2026-08-26 与 Agent Note 2026-08-25-zero-skip-concept-ladder 同步）：
  *  waterfall-ladder turn-flow plugin-flow session-log llm-stream compaction storage-hub
  *  worker-protocol code-run typert approval-flow guard-loop jobs orchestration invariant
  *  tool-visibility session-fork subagent-delegate preset checkpoint identity feedback
- *  credential settings plan-stack tool-budget acp-lab time attachment
- *  （其中六个小缝页由 gen-small-seams.mjs 从 small-seams-configs.js 的 ladder 配置生成，
- *  运行时挂载在 small-seams-runtime.js。）
- *  待接队列：fs-edit / code-mode-evidence 需专用映射层（自由字符串输入，非枚举场景）；
- *  其余 timeline 型（client provider mcp selfmod subprocess lsp wire shell-seam
- *  trajectory skill-catalog context query sandbox workspace host-gateway spill）
- *  按配方：读模型 → {lane,phase,detail} 轨迹 → replayRungs + 门内挂载点。 */
+ *  credential settings plan-stack tool-budget acp-lab time attachment client provider mcp
+ *  selfmod subprocess lsp wire shell-seam trajectory skill-catalog context query sandbox
+ *  workspace host-gateway spill fs-edit code-mode-evidence tokenmeter workflow-node web-tool
+ *  terminal session-projection prompt-assembly profile-loader package-graph hook-flow goal-loop
+ *  （六个小缝页由 gen-small-seams.mjs 从 small-seams-configs.js 的 ladder 配置生成，
+ *  运行时挂载在 small-seams-runtime.js；其余页面各自在门内挂载。terminal 与
+ *  package-graph 为两级台阶，其余均为三级。）
+ *  名单已收口；后续新增实验室按配方：
+ *  读模型 → {lane,phase,detail} 轨迹 → replayRungs + 门内挂载点，并同步本名单。 */
 export const LADDER_LABS = [
   'waterfall-ladder',
   'turn-flow',
@@ -69,4 +71,32 @@ export const LADDER_LABS = [
   'acp-lab',
   'time',
   'attachment',
+  'client',
+  'provider',
+  'mcp',
+  'selfmod',
+  'subprocess',
+  'lsp',
+  'wire',
+  'shell-seam',
+  'trajectory',
+  'skill-catalog',
+  'context',
+  'query',
+  'sandbox',
+  'workspace',
+  'host-gateway',
+  'spill',
+  'fs-edit',
+  'code-mode-evidence',
+  'tokenmeter',
+  'workflow-node',
+  'web-tool',
+  'terminal',
+  'session-projection',
+  'prompt-assembly',
+  'profile-loader',
+  'package-graph',
+  'hook-flow',
+  'goal-loop',
 ]

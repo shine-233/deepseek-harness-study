@@ -18,6 +18,10 @@ Status: implemented
 
 第二批接入 11 个实验室：preset、checkpoint、identity、time、attachment、feedback、credential、settings、plan-stack、tool-budget、acp-lab。其中六个小缝页改在生成器层接入：[gen-small-seams.mjs](../../../../study-tools/gen-small-seams.mjs) 按 `config.ladder` 在 HTML 外壳里展开挂载点，[small-seams-runtime.js](../../../../website/public/small-seams-runtime.js) 挂载 `replayRungs(config.ladder.rungs)`；没有步骤时间线的模型（plan-stack、tool-budget）配了显式枚举层，把每次推演的判定顺序收窄成轨迹步骤，说明文字全部逐字引用模型字段。`createConceptLadder` 现在按页懒注入共享样式表，此前十七个页面不改动 HTML 也能渲染出带样式的台阶。
 
+第三批接入 19 个实验室：client、provider、mcp、selfmod、subprocess、lsp、wire、shell-seam、trajectory、skill-catalog、context、query、sandbox、workspace、host-gateway、spill、fs-edit、code-mode-evidence、tokenmeter。多面板页面（client、provider）把每个面板的状态序列映射成轨迹；shell-seam 以规格条目的 `source` 标签为相位逐键重放；code-mode-evidence 直接把本页导出的 `simulateCodeMode` 事件流交给引擎；fs-edit 逐字引用管线阶段与匹配数结局。
+
+最后一批接入从未进过队列的 9 个：workflow-node、web-tool、terminal、session-projection、prompt-assembly、profile-loader、package-graph、hook-flow、goal-loop——57 个离线实验室至此全部完成。非时间线模型同样给了诚实的枚举：prompt-assembly 逐段列出字节数与来源；package-graph 从静态 fixture（以 JSON 模块导入，取代页面运行时的 fetch）按 `dependedOnBy` 排枢纽、按分组数规模；workflow-node 重放 run 的事件记录；goal-loop 逐帧照抄 tick 序列。terminal 只有两级台阶——脚本只有两个，凑数就是编造。名单收口后，新实验室按同一配方接入并同步名单。
+
 登记点全部同步：`study-labs.html` 名单卡、`study-labs.js` TRACKED_LAB_IDS、`study-progress-core.js` LAB_PAGE_IDS、`public/llms.txt`、无 JS 时的静态计数（55 个实验）。
 
 ## Alternatives considered

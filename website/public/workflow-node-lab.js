@@ -19,6 +19,8 @@ import {
 } from './workflow-node-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 
@@ -225,6 +227,42 @@ if (typeof document !== 'undefined') {
   installDeclaredIcons()
   installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
+
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型产出 workflow 运行事件流（records）：逐条映射成轨迹步骤。
+    const trace = input => buildWorkflowNodeModel(input).records.map((record, index) => {
+      const short = record.event.replace('tool-workflow/', '')
+      const detail = short === 'member-start'
+        ? `成员 ${record.label} 进入「${record.phase}」阶段。`
+        : short === 'member-end'
+          ? `成员第 ${String(record.seq)} 步结束：${String(record.outcome)}。`
+          : short === 'run-start'
+            ? `工作流 run 启动（${record.metaName}）。`
+            : '工作流 run 收束，卡片回到收起态。'
+      return { lane: '工作流卡', phase: short, index, detail }
+    })
+    createConceptLadder(ladderRoot, {
+      storageKey: 'workflow-node-ladder',
+      rungs: replayRungs([
+        {
+          title: '一张卡，一条有序运行记录',
+          text: 'workflow 工具运行时在原工具卡之后锚定一张工作流卡：run-start、每个成员的 start/end、最后的 run-end 都按序入册。卡片展开即重演这条记录。',
+          traces: [{ id: 'seq-ok', label: '顺序 × 完成 ', steps: trace({ shape: 'sequential-2', ending: 'completed' }) }],
+        },
+        {
+          title: '并行三成员：一个失败不影响其余',
+          text: '三个成员并行推进时各自有 start/end 记录；其中之一以 error 收尾只是它自己的结局，兄弟成员照常完成。',
+          traces: [{ id: 'par-fail', label: '并行 × 一员失败', steps: trace({ shape: 'parallel-3-one-fails', ending: 'error' }), focusPhases: ['member-end'] }],
+        },
+        {
+          title: '取消也是完整的记录',
+          text: '执行层取消时 run 照常走到 run-end：已完成的成员留档，未开始的不再出现。日志里没有「凭空消失」的成员。',
+          traces: [{ id: 'cancel', label: '中途取消', steps: trace({ shape: 'sequential-2', ending: 'cancelled' }) }],
+        },
+      ]),
+    })
+  }
 
   installPredictionGate({
     form: document.getElementById('prediction-gate'),

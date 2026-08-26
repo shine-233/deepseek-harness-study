@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Profile、Bundle 与 Loader 的解析顺序：顺序决定最终配置，配置错误显式失败">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -64,6 +64,10 @@
         </form>
 
         <div id="gated-controls">
+        <section class="card" aria-labelledby="pl-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="pl-ladder-title">三级台阶，配置怎么叠出来</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
       <form class="lab-form" id="profile-form">
         <label>
           <span>Bundle 顺序（点箭头调整）</span>

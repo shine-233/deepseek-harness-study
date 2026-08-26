@@ -24,6 +24,8 @@ import {
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 
 const DEFAULT_ORDER = ['base', 'web-tools', 'shell-tools', 'observability', 'strict-limits']
@@ -528,6 +530,42 @@ if (typeof document !== 'undefined') {
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 
   // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    // 模型步骤 kind=bundle/overlay：bundle 按 source 分泳道，overlay 单列。
+    const trace = input => buildProfileModel(input).steps.map((step, index) => ({
+      lane: step.kind === 'overlay' ? 'overlay 覆盖' : `bundle · ${String(step.source ?? '')}`,
+      phase: step.kind,
+      index,
+      detail: Array.isArray(step.wrote) && step.wrote.length > 0
+        ? `${step.label ?? ''}写入 ${step.wrote.join('、')}`
+        : String(step.label ?? step.kind),
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'profile-loader-ladder',
+      rungs: replayRungs([
+        {
+          title: 'base bundle 先铺底',
+          text: '一个 profile 由若干 bundle 依序叠放：每个 bundle 写入自己的键。没有叠加时最后一份 base 就是全部配置。',
+          traces: [{ id: 'base', label: '仅 base', steps: trace({ order: ['base'], overlay: 'none' }) }],
+        },
+        {
+          title: 'overlay 只覆盖它声明的键',
+          text: '用户目录 overlay 把 telemetry 改为 off：其余键保持 bundle 写入的值。覆盖是按键精确进行的，不做整份替换。',
+          traces: [{ id: 'overlay', label: '+ 用户目录 overlay', steps: trace({ order: ['base'], overlay: 'user-dir' }), focusPhases: ['overlay'] }],
+        },
+        {
+          title: '多层叠加：后写的赢',
+          text: '用户目录再叠命令行：maxTurns 与 model 被命令行再次改写。同键后写优先，冲突在叠加时就地解决。',
+          traces: [
+            { id: 'cli', label: '仅命令行 overlay', steps: trace({ order: ['base'], overlay: 'cli' }) },
+            { id: 'both', label: '目录 + 命令行', steps: trace({ order: ['base'], overlay: 'user-then-cli' }), focusPhases: ['overlay'] },
+          ],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),

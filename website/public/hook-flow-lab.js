@@ -23,6 +23,8 @@ import {
 } from './hook-flow-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
+import { createConceptLadder } from './study-lab-ladder.js'
+import { replayRungs } from './study-lab-trace-ladder.js'
 import { readStateFromHash, writeStateToHash } from './study-lab-state.js'
 import { icon } from './study-lab-icons.js'
 import { installThemeToggle } from './study-lab-theme.js'
@@ -294,6 +296,33 @@ if (typeof document !== 'undefined') {
   installThemeToggle(document.getElementById('theme-toggle'), name => icon(name, 15))
 
   // 预测题门控：先押注，再解锁参数控件。答错也解锁。
+  const ladderRoot = document.getElementById('concept-ladder-root')
+  if (ladderRoot !== null) {
+    const trace = input => buildHookFlowModel(input).steps.map(step => ({
+      lane: step.lane, phase: step.phase, detail: step.detail, index: step.index,
+    }))
+    createConceptLadder(ladderRoot, {
+      storageKey: 'hook-flow-ladder',
+      rungs: replayRungs([
+        {
+          title: '监听链：审计旁观，策略拍板',
+          text: '工具调用先经过审计监听器（只观察不拦截），再由策略监听器给出 allow/deny 决定。默认放行兜底——没人表态时调用照常。',
+          traces: [{ id: 'allow', label: '策略 allow', steps: trace({ behavior: 'call-next', verdict: 'allow' }) }],
+        },
+        {
+          title: 'deny 也要 next()：决定沿链结算',
+          text: '策略拒绝时调用 next() 把决定交给链上收尾，passthrough 结算成最终结果。拒绝是数据沿链传递，不是抛异常中断。',
+          traces: [{ id: 'deny', label: '策略 deny', steps: trace({ behavior: 'call-next', verdict: 'deny' }), focusPhases: ['decide', 'passthrough'] }],
+        },
+        {
+          title: 'return-direct：跳过链上其余人',
+          text: 'return-direct 行为让策略监听器直接返回结果，后续监听器被跳过（skip）。这是瀑布里唯一的短路方式，用一次少一次。',
+          traces: [{ id: 'direct', label: '直接返回', steps: trace({ behavior: 'return-direct', verdict: 'allow' }), focusPhases: ['skip'] }],
+        },
+      ]),
+    })
+  }
+
   installPredictionGate({
     form: document.getElementById('prediction-gate'),
     locked: document.getElementById('gated-controls'),
