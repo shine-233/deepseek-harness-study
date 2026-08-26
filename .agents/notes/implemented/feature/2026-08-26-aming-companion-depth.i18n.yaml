@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-26-aming-companion-depth.md
-2026-08-26-aming-companion-depth.md: b2ed8de6523263c267e104bab7ff9090936f23da
-2026-08-26-aming-companion-depth.zh.md: 5e4e3c4500f15698fd52e96a7d149107bbdee4b3
+2026-08-26-aming-companion-depth.md: 9a8da52ccf677393d9f4031a40593c478ea81503
+2026-08-26-aming-companion-depth.zh.md: 0abda4918b8123922040f4f02f7bb0c47fe818d8
