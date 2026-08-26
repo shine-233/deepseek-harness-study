@@ -22,6 +22,8 @@ Status: implemented
 
 最后一批接入从未进过队列的 9 个：workflow-node、web-tool、terminal、session-projection、prompt-assembly、profile-loader、package-graph、hook-flow、goal-loop——57 个离线实验室至此全部完成。非时间线模型同样给了诚实的枚举：prompt-assembly 逐段列出字节数与来源；package-graph 从静态 fixture（以 JSON 模块导入，取代页面运行时的 fetch）按 `dependedOnBy` 排枢纽、按分组数规模；workflow-node 重放 run 的事件记录；goal-loop 逐帧照抄 tick 序列。terminal 只有两级台阶——脚本只有两个，凑数就是编造。名单收口后，新实验室按同一配方接入并同步名单。
 
+覆盖完成后的交互审计发现轨迹图是被动观看——重放只能等，离这套图所对标的 Ciechanowski 标准（每张图都可操纵）差得远。引擎现在把图形当作控制器：横向拖拽直接驱动播放头（拖拽中自动重放让位），点击任一步圆点跳到该步，图形聚焦后 ←/→/Home/End 逐步步进，×1/×2/×4 变速让长轨迹可用（compaction 的 48 步在 ×4 下约五秒放完）。图形带滑杆语义（`role="slider"` 与实时 `aria-valuenow`），屏幕阅读器与明眼读者读到同一个步数。所有操纵都计入「真实交互」解锁契约；一处共享引擎改动同时抬升了全部轨迹页。
+
 登记点全部同步：`study-labs.html` 名单卡、`study-labs.js` TRACKED_LAB_IDS、`study-progress-core.js` LAB_PAGE_IDS、`public/llms.txt`、无 JS 时的静态计数（55 个实验）。
 
 ## Alternatives considered

@@ -22,6 +22,8 @@ Third batch (19 labs): client, provider, mcp, selfmod, subprocess, lsp, wire, sh
 
 Final batch (9 labs never on any queue): workflow-node, web-tool, terminal, session-projection, prompt-assembly, profile-loader, package-graph, hook-flow, goal-loop — completing all 57 offline labs. Non-timeline models get honest enumerations: prompt-assembly walks its segments with byte counts and sources; package-graph ranks hubs by `dependedOnBy` and groups by package count from the static fixture (imported as JSON instead of the page's runtime fetch); workflow-node replays the run's event records; goal-loop replays its tick frames verbatim. terminal carries two rungs rather than three — two scripts exist, and padding would invent content.
 
+Post-coverage interaction audit found the trace figures passive — replay was watch-only, far from the Ciechanowski standard every figure is built on. The engine now treats the figure as the controller: horizontal pointer drag drives the playhead directly (autoplay yields while dragging), clicking any step dot jumps to it, arrow/Home/End keys step when the figure is focused, and a ×1/×2/×4 toggle speeds long traces (compaction's 48-step rung replays in ~5s at ×4). The figure exposes slider semantics (`role="slider"` with live `aria-valuenow`) so screen readers track the same step sighted readers see. All manipulation counts as real interaction for the unlock contract; one shared-engine change carried it to every trace page at once.
+
 Registration points kept in sync: the `study-labs.html` roster card, `study-labs.js` TRACKED_LAB_IDS, `study-progress-core.js` LAB_PAGE_IDS, `public/llms.txt`, and the static no-JS counters (55 labs).
 
 ## Alternatives considered

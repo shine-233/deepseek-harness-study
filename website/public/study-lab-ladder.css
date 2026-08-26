@@ -114,3 +114,23 @@
 }
 
 .ladder-skip { margin-bottom: 12px; }
+
+/* 图形即控制器：拖拽、点选、键盘步进的可用性样式。 */
+.tl-wrap {
+  touch-action: pan-y;
+  border-radius: 8px;
+}
+
+.tl-wrap:focus-visible {
+  outline: 2px solid var(--brand, #3157c8);
+  outline-offset: 4px;
+}
+
+.tl-wrap .tl-svg { cursor: grab; }
+
+.tl-wrap.is-scrubbing .tl-svg,
+.tl-wrap.is-scrubbing .tl-svg * { cursor: grabbing; }
+
+.tl-svg circle[data-step] { cursor: pointer; }
+
+.tl-speed { font-variant-numeric: tabular-nums; }

@@ -13,7 +13,10 @@
  *   opts.onReplayed(activeTrace)，实验室用它触发 api.engage()。加载后的自动
  *   预览不回调 onReplayed——阶梯解锁必须来自真实交互，见 study-lab-ladder 的
  *   「一次真实交互才解锁」契约。
- * - reducedMotion 下直接呈现终态；同样只在读者亲手触发时回调。
+ * - 图形即控制器（Ciechanowski 式约定）：在图上横向拖拽直接驱动播放头，
+ *   点击任一步圆点跳到该步，聚焦后 ←/→/Home/End 逐步步进，×1/×2/×4 变速。
+ *   这些操纵都算真实交互；拖拽进行中自动重放让位。
+ * - reducedMotion 下直接呈现终态；拖拽与键盘照常可用，同样只在读者亲手触发时回调。
  */
 
 import { svgElement, writeText } from './study-lab-kit.js'
@@ -31,8 +34,15 @@ export function createTraceLadderSim(host, api, opts = {}) {
   let shownCount = traces[0].steps.length
   let rafStop = null
   let anim = null
+  let playSpeed = 1
+  const SPEEDS = [1, 2, 4]
 
   const wrap = document.createElement('div')
+  wrap.className = 'tl-wrap'
+  // 图形即控制器：整个画面可拖拽、可聚焦、可键盘步进。
+  wrap.tabIndex = 0
+  wrap.setAttribute('role', 'slider')
+  wrap.setAttribute('aria-label', '轨迹播放头：横向拖拽、点击圆点或用 ←/→ 键逐步')
   const controls = document.createElement('div')
   controls.className = 'ladder-sim-controls'
   const caption = document.createElement('p')
@@ -69,12 +79,71 @@ export function createTraceLadderSim(host, api, opts = {}) {
       interacted = true
       startReplay()
     })
-    controls.append(replay)
+    const speedBtn = document.createElement('button')
+    speedBtn.type = 'button'
+    speedBtn.className = 'button button-quiet tl-speed'
+    speedBtn.addEventListener('click', () => {
+      playSpeed = SPEEDS[(SPEEDS.indexOf(playSpeed) + 1) % SPEEDS.length]
+      writeText(speedBtn, '速度 ×' + String(playSpeed))
+    })
+    writeText(speedBtn, '速度 ×' + String(playSpeed))
+    controls.append(replay, speedBtn)
   }
 
   function activeTrace() {
     return traces[activeIndex]
   }
+
+  // 把指针横坐标换算成步数：图左缘是第 1 步，右缘是最后一步。
+  function countFromClientX(clientX) {
+    if (typeof wrap.getBoundingClientRect !== 'function') return null
+    const rect = wrap.getBoundingClientRect()
+    if (!(rect.width > 0)) return null
+    const frac = Math.min(1, Math.max(0, (clientX - rect.left - 96) / Math.max(1, rect.width - 96 - 30)))
+    return 1 + Math.round(frac * Math.max(0, activeTrace().steps.length - 1))
+  }
+
+  // 直接操纵：拖到某步 / 点某个圆点 / 键盘步进。都算真实交互，
+  // 并让正在进行的自动重放立刻让位——读者接管后画面只听他的。
+  function jumpTo(count) {
+    interacted = true
+    playing = false
+    renderStatic(Math.max(1, Math.min(activeTrace().steps.length, count)))
+  }
+
+  let scrubbing = false
+  wrap.addEventListener('pointerdown', event => {
+    scrubbing = true
+    wrap.classList.add('is-scrubbing')
+    try { if (typeof wrap.setPointerCapture === 'function') wrap.setPointerCapture(event.pointerId) } catch { /* 捕获失败不影响拖拽本身 */ }
+    const count = typeof event.clientX === 'number' ? countFromClientX(event.clientX) : null
+    if (count !== null) jumpTo(count)
+  })
+  wrap.addEventListener('pointermove', event => {
+    if (!scrubbing || typeof event.clientX !== 'number') return
+    const count = countFromClientX(event.clientX)
+    if (count !== null) jumpTo(count)
+  })
+  const endScrub = () => {
+    scrubbing = false
+    wrap.classList.remove('is-scrubbing')
+  }
+  wrap.addEventListener('pointerup', endScrub)
+  wrap.addEventListener('pointercancel', endScrub)
+
+  wrap.addEventListener('click', event => {
+    const dot = event.target instanceof Element ? event.target.closest('[data-step]') : null
+    if (dot !== null) jumpTo(Number(dot.getAttribute('data-step')) + 1)
+  })
+
+  wrap.addEventListener('keydown', event => {
+    const length = activeTrace().steps.length
+    const actions = { ArrowLeft: shownCount - 1, ArrowRight: shownCount + 1, Home: 1, End: length }
+    const next = actions[event.key]
+    if (next === undefined) return
+    event.preventDefault()
+    jumpTo(next)
+  })
 
   function lanesOf(trace) {
     const lanes = []
@@ -144,6 +213,7 @@ export function createTraceLadderSim(host, api, opts = {}) {
         stroke: lit ? (isFocus ? pal.signal : pal.brand) : pal.line,
         'stroke-width': isFocus ? 2.5 : 1.5,
         'fill-opacity': lit ? 0.92 : 0,
+        'data-step': String(i),
       })
       const title = svgElement('title', {}, `${i} ${step.phase}: ${step.detail}`)
       circle.append(title)
@@ -168,6 +238,10 @@ export function createTraceLadderSim(host, api, opts = {}) {
         ? `轨迹完整：${trace.steps.length} 步。${opts.summaryFor ? opts.summaryFor(trace) : ''}`
         : `${last.index ?? count - 1} · ${opts.laneLabels?.[last.lane] ?? last.lane} · ${last.detail}`)
     }
+    // 播放头语义同步到滑杆角色：屏幕阅读器读到的是同一步数。
+    wrap.setAttribute('aria-valuemin', '1')
+    wrap.setAttribute('aria-valuemax', String(trace.steps.length))
+    wrap.setAttribute('aria-valuenow', String(Math.max(1, Math.min(count, trace.steps.length))))
     return { svg, lanes, pal }
   }
 
@@ -186,7 +260,8 @@ export function createTraceLadderSim(host, api, opts = {}) {
     rafStop = api.everyFrame(now => {
       if (!playing) return
       if (startedAt === 0) startedAt = now
-      const shown = Math.min(trace.steps.length, Math.floor((now - startedAt) / stepMs) + 1)
+      const elapsed = (now - startedAt) * playSpeed
+      const shown = Math.min(trace.steps.length, Math.floor(elapsed / stepMs) + 1)
       if (shown !== lastShown) {
         lastShown = shown
         renderStatic(shown)
