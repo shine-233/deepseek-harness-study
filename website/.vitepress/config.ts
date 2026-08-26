@@ -297,12 +297,14 @@ const sharedTheme: Pick<DefaultTheme.Config, 'search' | 'socialLinks' | 'editLin
 const base = process.env.DOCS_BASE ?? '/'
 
 /**
- * The DeepSeek wordmark, inlined so its `currentColor` fills follow the active
- * theme. An `<img>` would freeze the mark at the colors the file declares.
+ * The DeepSeek wordmark ships once as `/wordmark.svg` (a `<symbol>` sprite) and
+ * every page references it through `<use>`. Inlining it into `siteTitle` made
+ * VitePress serialize the full 10 KB markup into each page's payload several
+ * times over — about 8 MB of duplication across the built site. An external
+ * reference keeps `currentColor` working: the symbol's fills resolve against
+ * the using document, so dark and light themes still repaint the mark.
  */
-const wordmark = readFileSync(resolve(import.meta.dirname, '../public/wordmark.svg'), 'utf8')
-  .trim()
-  .replace('<svg ', '<svg class="dsh-wordmark" ')
+const siteMark = `<svg class="dsh-wordmark" viewBox="0 0 143 23" aria-hidden="true"><use href="${base}wordmark.svg#dsh-mark"></use></svg>`
 
 /**
  * Styles the default theme does not provide, carried inline because the site
@@ -491,7 +493,7 @@ const scrollbarScript = `
  * @returns Markup placed beside the navigation-bar home link.
  */
 function siteTitle(previewTag: string): string {
-  return `<span class="dsh-lockup">${wordmark}<span class="dsh-tag">${previewTag}</span></span>`
+  return `<span class="dsh-lockup">${siteMark}<span class="dsh-tag">${previewTag}</span></span>`
 }
 
 export default withMermaid({
