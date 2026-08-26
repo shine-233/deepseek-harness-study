@@ -467,12 +467,20 @@ export default withMermaid({
       themeConfig: {
         siteTitle: siteTitle('社区导读'),
         nav: [
-          { text: '开始学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/(?:$|lessons/)' },
-          { text: '最小示例', link: studyPageLink('study-examples/minimal-observer-plugin/README.zh.md'), activeMatch: '^/study/examples' },
-          { text: '工具箱', link: studyPageLink('study/31-学习工具箱.md'), activeMatch: '^/study/lessons/31-' },
-          { text: '逐文件索引', link: studyPageLink('study/文件索引/README.md'), activeMatch: '^/study/files' },
-          { text: '入门', link: landingLink('root', guideModules.root.guide), activeMatch: '^/guide/' },
-          ...moduleNav('root'),
+          // 五项上限：一级只留高频决定，低频入口收进「更多」下拉。
+          { text: '学习', link: landingLink('root', 'zh-study'), activeMatch: '^/study/(?:$|lessons/)' },
+          { text: '实验室', link: `${base}study-labs.html`, activeMatch: '^(?:/study-labs|-lab\\.html)' },
+          { text: '进度', link: `${base}progress.html`, activeMatch: '^/progress' },
+          { text: '索引', link: studyPageLink('study/文件索引/README.md'), activeMatch: '^/study/files' },
+          {
+            text: '更多',
+            items: [
+              { text: '最小示例', link: studyPageLink('study-examples/minimal-observer-plugin/README.zh.md') },
+              { text: '工具箱', link: studyPageLink('study/31-学习工具箱.md') },
+              { text: '入门指南', link: landingLink('root', guideModules.root.guide) },
+              ...moduleNav('root').map(({ text, link }) => ({ text, link })),
+            ],
+          },
         ],
         sidebar: {
           '/study/': studySidebar(),

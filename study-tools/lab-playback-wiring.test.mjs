@@ -30,6 +30,7 @@ const STEPPER_LABS = [
   ['storage-hub', 'sh'],
   ['acp', 'acp'],
   ['tokenmeter', 'tmk'],
+  ['goal-loop', 'gl'],
 ]
 
 test('every stepper lab offers a play button and a speed select', () => {
