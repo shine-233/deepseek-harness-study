@@ -151,6 +151,7 @@ export function createConceptLadder(root, options = {}) {
     const section = sections[index]
     stopFrames(index)
     section.li.dataset.state = 'locked'
+    section.body.hidden = true
   }
 
   function mount(index) {

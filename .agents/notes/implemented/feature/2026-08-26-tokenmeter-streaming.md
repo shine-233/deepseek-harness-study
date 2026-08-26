@@ -23,8 +23,7 @@ Registration: `STEPPER_LABS` gains `['tokenmeter','tmk']`. Lesson copy untouched
 
 ## Alternatives considered
 
-Shipping a real tokenizer vocab in-browser — rejected: DeepSeek's tokenizer data is not in the pinned tree and an OpenAI vocab would fake provider numbers, violating the page's own cannotProve list. The honest upgrade is faithful structure plus visible time.
-Rewriting the page shell — rejected: the hero/gate/evidence layout passed every label and a11y gate; only sections were added.
+Shipping a real tokenizer vocab in-browser — rejected: DeepSeek's tokenizer data is not in the pinned tree and an OpenAI vocab would fake provider numbers, violating the page's own cannotProve list. The honest upgrade is faithful structure plus visible time. Rewriting the page shell — rejected: the hero/gate/evidence layout passed every label and a11y gate; only sections were added.
 
 ## Consequences
 

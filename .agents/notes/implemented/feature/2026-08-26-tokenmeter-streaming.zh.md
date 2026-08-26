@@ -23,8 +23,7 @@ Status: implemented
 
 ## 考虑过的替代方案
 
-浏览器里塞真 tokenizer 词表——否决：DeepSeek 分词数据不在固定树里，用 OpenAI 词表伪造 provider 数字会违反本页自己写的 cannotProve 清单。诚实的升级是把结构做忠实、让时间可见。
-重写页面外壳——否决：hero/门控/证据布局通过了全部标签与 A11y 门禁，本次只增节。
+浏览器里塞真 tokenizer 词表——否决：DeepSeek 分词数据不在固定树里，用 OpenAI 词表伪造 provider 数字会违反本页自己写的 cannotProve 清单。诚实的升级是把结构做忠实、让时间可见。重写页面外壳——否决：hero/门控/证据布局通过了全部标签与 A11y 门禁，本次只增节。
 
 ## 后果
 

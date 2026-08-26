@@ -21,9 +21,7 @@ Cut where another page owns the fact; keep every proposition that has no other h
 
 ## Alternatives considered
 
-Merging START-HERE/16/25 (three tellings of the same first round) — deferred: START-HERE was under concurrent edit and entry-page merges must move learning-contract gate expectations in the same change.
-Book-wide sweep of ~100 boundary disclaimers — rejected for the gate reason above; per-page consolidation gets the readability gain without fighting the quality system.
-Rewriting lesson 37's thin source coverage — left to the concurrent zero-skip ladder lab work landing there.
+Merging START-HERE/16/25 (three tellings of the same first round) — deferred: START-HERE was under concurrent edit and entry-page merges must move learning-contract gate expectations in the same change. Book-wide sweep of ~100 boundary disclaimers — rejected for the gate reason above; per-page consolidation gets the readability gain without fighting the quality system. Rewriting lesson 37's thin source coverage — left to the concurrent zero-skip ladder lab work landing there.
 
 ## Consequences
 

@@ -19,8 +19,7 @@ Make the stream an input while keeping every existing contract:
 
 ## Alternatives considered
 
-Free-form event editing (user types arbitrary JSON events) — rejected: it turns the lab into a debugger and invites malformed input far from the teaching point. Four curated scenarios cover each contract branch with zero-invalid-input guarantees.
-Also rewriting subagent-delegate in the same pass — deferred; it deserves its own spawn-tree simulation and its own note.
+Free-form event editing (user types arbitrary JSON events) — rejected: it turns the lab into a debugger and invites malformed input far from the teaching point. Four curated scenarios cover each contract branch with zero-invalid-input guarantees. Also rewriting subagent-delegate in the same pass — deferred; it deserves its own spawn-tree simulation and its own note.
 
 ## Consequences
 

@@ -22,8 +22,7 @@ Registration: `LAB_PAGE_IDS` gains `'acp'` (progress recording), `STEPPER_LABS` 
 
 ## Alternatives considered
 
-Building on the concurrent zero-skip ladder primitive (`study-lab-ladder.js`) — rejected for now: that module is uncommitted work from another session; coupling to a moving API risks breakage on either side. Revisit after it lands.
-Modeling `requestPermission` round-trips too — deferred to the approval-flow lab's scope; this page stays single-concept (one prompt's lifecycle).
+Building on the concurrent zero-skip ladder primitive (`study-lab-ladder.js`) — rejected for now: that module is uncommitted work from another session; coupling to a moving API risks breakage on either side. Revisit after it lands. Modeling `requestPermission` round-trips too — deferred to the approval-flow lab's scope; this page stays single-concept (one prompt's lifecycle).
 
 ## Consequences
 

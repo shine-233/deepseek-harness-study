@@ -22,8 +22,7 @@ Status: implemented
 
 ## 考虑过的替代方案
 
-搭车并行的零跳步阶梯原语（`study-lab-ladder.js`）——暂缓：那是另一 session 的未提交模块，耦合移动中的 API 两边都可能碎。等它落地后再评估。
-把 `requestPermission` 授权往返也建进来——归审批流实验的范围；本页保持单概念（一次 prompt 的生命周期）。
+搭车并行的零跳步阶梯原语（`study-lab-ladder.js`）——暂缓：那是另一 session 的未提交模块，耦合移动中的 API 两边都可能碎。等它落地后再评估。把 `requestPermission` 授权往返也建进来——归审批流实验的范围；本页保持单概念（一次 prompt 的生命周期）。
 
 ## 后果
 

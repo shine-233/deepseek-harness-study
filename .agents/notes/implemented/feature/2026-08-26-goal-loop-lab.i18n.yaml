@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-26-goal-loop-lab.md
-2026-08-26-goal-loop-lab.md: 5ae5b40c75b5c746101e06e84a3bcf447ce93440
-2026-08-26-goal-loop-lab.zh.md: b61c8329996e678d635ffec62d886479a993c4a2
+2026-08-26-goal-loop-lab.md: 52e506e8d1bf1bfe0213aad27dff7a0b00ad1f82
+2026-08-26-goal-loop-lab.zh.md: fd1e2dd38fa240b009fd91a4f21e509c426789a3
