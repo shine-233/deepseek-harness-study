@@ -61,6 +61,12 @@
 
       <div id="gated-controls">
         <form class="lab-form" id="traj-form">
+          <label><span>事件流场景</span><select id="traj-scenario">
+              <option value="canon">原始剧本：改 timeout 的完整 Turn</option>
+              <option value="unknown-tool">词表外工具：web_search 突然出现</option>
+              <option value="interrupted">中途打断：草稿块永远停在打字中</option>
+              <option value="failing-tool">工具失败：str_replace 报错收场</option>
+            </select></label>
           <div class="stepper" role="group" aria-label="事件重放">
             <label class="stepper-seek">
               <span>重放到第 <output id="traj-step-output">0</output> 步</span>

@@ -13,6 +13,7 @@ import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset } from './study-lab-kit.js'
 import {
   TRAJECTORY_EVENTS,
+  TRAJECTORY_SCENARIOS,
   buildTrajectoryModel,
   evaluateTrajectoryOracle,
 } from './trajectory-model.js'
@@ -118,6 +119,7 @@ function initializePage() {
     stepPrev: document.querySelector('#traj-step-prev'),
     stepNext: document.querySelector('#traj-step-next'),
     stepCaption: document.querySelector('#traj-step-caption'),
+    scenario: document.querySelector('#traj-scenario'),
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
@@ -126,9 +128,14 @@ function initializePage() {
 
   const rebuild = () => {
     try {
-      const model = buildTrajectoryModel({ upto: Number(elements.step.value) })
+      const model = buildTrajectoryModel({ upto: Number(elements.step.value), scenario: elements.scenario.value })
       const verdict = evaluateTrajectoryOracle(model)
       currentModel = model
+
+      elements.step.max = String(model.events.length - 1)
+      if (Number.parseInt(elements.step.value, 10) > model.events.length - 1) {
+        elements.step.value = String(model.events.length - 1)
+      }
 
       renderEvents(model, elements.events)
       renderCards(model, elements.cards)
@@ -147,7 +154,7 @@ function initializePage() {
       writeText(elements.pending, String(model.observations.pendingCards))
       writeText(elements.diff, String(model.observations.diffCards))
       writeText(elements.blocks, String(model.observations.finalizedAssistantBlocks))
-      setFeedback('已重放到第 ' + String(model.input.upto) + ' 步：' + String(model.observations.cards)
+      setFeedback('已重放到第 ' + String(model.input.upto) + ' 步（' + model.scenarioLabel + '）：' + String(model.observations.cards)
         + ' 张卡片、' + String(model.observations.pendingCards) + ' 张还在等待结果。', 'success')
       persistState()
     } catch (error) {
@@ -160,7 +167,8 @@ function initializePage() {
     try {
       history.replaceState(null, '', writeStateToHash(location.hash, {
         step: Number(elements.step.value),
-      }, { step: { integerRange: [0, Number.MAX_SAFE_INTEGER] } }))
+        scenario: elements.scenario.value,
+      }, { step: { integerRange: [0, Number.MAX_SAFE_INTEGER] }, scenario: { enum: TRAJECTORY_SCENARIOS.map(item => item.id) } }))
     } catch {
       // 保持安静。
     }
@@ -174,6 +182,13 @@ function initializePage() {
   })
 
   elements.step.max = String(TRAJECTORY_EVENTS.length - 1)
+
+  elements.scenario.addEventListener('change', () => {
+    elements.step.value = '0'
+    writeText(elements.stepOutput, '0')
+    rebuild()
+    persistState()
+  })
 
   elements.step.addEventListener('input', () => {
     writeText(elements.stepOutput, elements.step.value)
@@ -196,8 +211,11 @@ function initializePage() {
     nudgeStep(Number(item.dataset.step) - Number(elements.step.value))
   })
 
-  const restored = readStateFromHash(location.hash, { step: { integerRange: [0, Number.MAX_SAFE_INTEGER] } })
-  if (restored !== null && restored.ok) elements.step.value = String(restored.value.step)
+  const restored = readStateFromHash(location.hash, { step: { integerRange: [0, Number.MAX_SAFE_INTEGER] }, scenario: { enum: TRAJECTORY_SCENARIOS.map(item => item.id) } })
+  if (restored !== null && restored.ok) {
+    elements.step.value = String(restored.value.step)
+    if (typeof restored.value.scenario === 'string') elements.scenario.value = restored.value.scenario
+  }
   writeText(elements.stepOutput, elements.step.value)
 
   rebuild()

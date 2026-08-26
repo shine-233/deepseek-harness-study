@@ -32,6 +32,7 @@ export const TRAJECTORY_EVENTS = Object.freeze([
 /**
  * 呈现契约的教学切片：每个工具给出等待态与结果态的视图。
  * search 族在等待态保持 generic——那时还没有任何匹配可展示。
+ * 词表外的工具按上游的保守默认落 generic——契约对未知工具也成立。
  */
 const TOOL_VIEWS = Object.freeze({
   read_file: Object.freeze({ pendingCard: 'generic', pendingKind: 'read', resultCard: 'read' }),
@@ -39,6 +40,50 @@ const TOOL_VIEWS = Object.freeze({
   bash: Object.freeze({ pendingCard: 'terminal', pendingKind: null, resultCard: 'terminal' }),
   grep: Object.freeze({ pendingCard: 'generic', pendingKind: 'search', resultCard: 'search' }),
 })
+
+const UNKNOWN_TOOL_VIEWS = Object.freeze({ pendingCard: 'generic', pendingKind: null, resultCard: 'generic' })
+
+export const TRAJECTORY_SCENARIOS = Object.freeze([
+  { id: 'canon', label: '原始剧本：改 timeout 的完整 Turn' },
+  { id: 'unknown-tool', label: '词表外工具：web_search 突然出现' },
+  { id: 'interrupted', label: '中途打断：草稿块永远停在打字中' },
+  { id: 'failing-tool', label: '工具失败：str_replace 报错收场' },
+])
+
+/** 按场景组合事件流。每个场景都是一条真实可能发生的流，不是摆拍。 */
+function composeEvents(scenario) {
+  const base = () => TRAJECTORY_EVENTS.map(event => ({ ...event }))
+  if (scenario === 'unknown-tool') {
+    const events = base()
+    const tail = events.pop()
+    events.push(
+      { index: events.length, kind: 'tool/call', tool: 'web_search', argsPreview: 'DSH config timeout 默认值' },
+      { index: events.length, kind: 'tool/result', tool: 'web_search', outcome: '3 hits' },
+      { ...tail, index: events.length },
+    )
+    return events
+  }
+  if (scenario === 'interrupted') {
+    return [
+      { index: 0, kind: 'user/message', detail: '帮我把超时改成 45 秒' },
+      { index: 1, kind: 'assistant/chunk', detail: '我先看一下当前配置…' },
+      { index: 2, kind: 'assistant/message', detail: '我先看一下当前配置…' },
+      { index: 3, kind: 'tool/call', tool: 'read_file', argsPreview: '/workspace/config.yml' },
+      { index: 4, kind: 'assistant/chunk', detail: '找到 timeout 行了，正要替换——' },
+    ]
+  }
+  if (scenario === 'failing-tool') {
+    return [
+      { index: 0, kind: 'user/message', detail: '帮我把超时改成 45 秒' },
+      { index: 1, kind: 'assistant/chunk', detail: '先看配置，再直接替换。' },
+      { index: 2, kind: 'assistant/message', detail: '先看配置，再直接替换。' },
+      { index: 3, kind: 'tool/call', tool: 'str_replace_editor', argsPreview: 'timeout: 30s → 45s' },
+      { index: 4, kind: 'tool/result', tool: 'str_replace_editor', outcome: 'error: old_str 不唯一' },
+      { index: 5, kind: 'assistant/message', detail: '替换被拒：old_str 匹配到两处，需要更多上下文再试。' },
+    ]
+  }
+  return base()
+}
 
 /** 一条事件的投影增量：返回该事件让卡片列表发生的变化。 */
 function applyEvent(cards, event) {
@@ -66,7 +111,7 @@ function applyEvent(cards, event) {
     return
   }
   if (event.kind === 'tool/call') {
-    const views = TOOL_VIEWS[event.tool]
+    const views = TOOL_VIEWS[event.tool] ?? UNKNOWN_TOOL_VIEWS
     cards.push({
       id: 't' + String(event.index),
       lane: 'tools',
@@ -85,7 +130,7 @@ function applyEvent(cards, event) {
     const card = [...cards].reverse().find(candidate => candidate.type === 'tool' && candidate.tool === event.tool && candidate.state === 'pending')
     if (card === undefined) return
     card.state = 'settled'
-    card.resultCard = TOOL_VIEWS[event.tool].resultCard
+    card.resultCard = (TOOL_VIEWS[event.tool] ?? UNKNOWN_TOOL_VIEWS).resultCard
     card.outcome = event.outcome
     card.settledAt = event.index
   }
@@ -96,9 +141,48 @@ export function projectTrajectory(upto) {
   if (!Number.isInteger(upto)) throw new TypeError('upto 必须是整数')
   const max = TRAJECTORY_EVENTS.length - 1
   if (upto < 0 || upto > max) throw new RangeError(`upto 必须落在 [0, ${String(max)}]`)
+  return projectEvents(TRAJECTORY_EVENTS, upto)
+}
+
+export function buildTrajectoryModel(input = {}) {
+  const scenario = TRAJECTORY_SCENARIOS.some(item => item.id === input.scenario) ? input.scenario : 'canon'
+  const events = composeEvents(scenario)
+  const upto = Math.min(input.upto ?? events.length - 1, events.length - 1)
+  const projection = projectEvents(events, upto)
+  const toolCards = projection.cards.filter(card => card.type === 'tool')
+  return {
+    input: { upto, scenario },
+    scenarioLabel: TRAJECTORY_SCENARIOS.find(item => item.id === scenario)?.label ?? '',
+    events,
+    ...projection,
+    observations: {
+      cards: projection.cards.length,
+      toolCards: toolCards.length,
+      pendingCards: toolCards.filter(card => card.state === 'pending').length,
+      diffCards: toolCards.filter(card => (card.resultCard ?? card.pendingCard) === 'diff').length,
+      finalizedAssistantBlocks: projection.cards.filter(card => card.type === 'assistant').length,
+      streamingDrafts: projection.cards.filter(card => card.type === 'assistant-streaming').length,
+    },
+    canProve: Object.freeze([
+      '同一事件流重放两次得到完全相同的卡片列表（确定性）。',
+      '工具卡的视图类别遵循呈现契约：read/grep 等待态是 generic，bash 是 terminal，str_replace 是 diff。',
+      'grep 的等待态保持 generic——search 结果卡要等结果到来才出现。',
+      '词表外的工具按保守默认落 generic——契约对未知工具同样成立。',
+      'assistant 最终文本块的数量等于已到达的 assistant/message 数量；没有定稿事件的草稿块永远停在打字中。',
+    ]),
+    cannotProve: Object.freeze([
+      '真实 Web 客户端的 React 组件、样式或交互。',
+      '真实 Session 存储与恢复行为；这里的事件是教学场景，不是运行时 trace。',
+      '其他工具的视图映射；本页只收录四种代表性工具加保守回退。',
+    ]),
+  }
+}
+
+/** 按给定事件流重放到 upto（含）。buildTrajectoryModel 与旧入口共用这一实现。 */
+function projectEvents(events, upto) {
   const cards = []
   const consumed = []
-  for (const event of TRAJECTORY_EVENTS) {
+  for (const event of events) {
     if (event.index > upto) {
       consumed.push({ index: event.index, kind: event.kind, applied: false, note: '尚未到达' })
       continue
@@ -108,35 +192,6 @@ export function projectTrajectory(upto) {
     consumed.push({ index: event.index, kind: event.kind, applied: true, note: cards.length === before ? '更新已有卡片' : '新增 1 张卡片' })
   }
   return { upto, cards, consumed }
-}
-
-export function buildTrajectoryModel(input = {}) {
-  const upto = input.upto ?? TRAJECTORY_EVENTS.length - 1
-  const projection = projectTrajectory(upto)
-  const toolCards = projection.cards.filter(card => card.type === 'tool')
-  return {
-    input: { upto },
-    events: TRAJECTORY_EVENTS,
-    ...projection,
-    observations: {
-      cards: projection.cards.length,
-      toolCards: toolCards.length,
-      pendingCards: toolCards.filter(card => card.state === 'pending').length,
-      diffCards: toolCards.filter(card => (card.resultCard ?? card.pendingCard) === 'diff').length,
-      finalizedAssistantBlocks: projection.cards.filter(card => card.type === 'assistant').length,
-    },
-    canProve: Object.freeze([
-      '同一事件流重放两次得到完全相同的卡片列表（确定性）。',
-      '工具卡的视图类别遵循呈现契约：read/grep 等待态是 generic，bash 是 terminal，str_replace 是 diff。',
-      'grep 的等待态保持 generic——search 结果卡要等结果到来才出现。',
-      'assistant 最终文本块的数量等于已到达的 assistant/message 数量。',
-    ]),
-    cannotProve: Object.freeze([
-      '真实 Web 客户端的 React 组件、样式或交互。',
-      '真实 Session 存储与恢复行为；这里的事件是教学常量。',
-      '其他工具的视图映射；本页只收录四种代表性工具。',
-    ]),
-  }
 }
 
 export function evaluateTrajectoryOracle(model) {
@@ -150,12 +205,36 @@ export function evaluateTrajectoryOracle(model) {
 
   const badView = model.cards.filter((card) => {
     if (card.type !== 'tool') return false
-    const expected = TOOL_VIEWS[card.tool]
+    const expected = TOOL_VIEWS[card.tool] ?? UNKNOWN_TOOL_VIEWS
     return card.pendingCard !== expected.pendingCard || (card.state === 'settled' && card.resultCard !== expected.resultCard)
   })
   add('VIEW_KINDS_FOLLOW_CONTRACT', '工具卡视图类别与呈现契约一致',
     badView.length === 0, '0 个越界',
     badView.map(card => card.tool).join('、') || '0 个越界')
+
+  const unknownOk = model.input.scenario !== 'unknown-tool' || model.cards.every((card) => {
+    if (!(card.type === 'tool' && card.tool === 'web_search')) return true
+    const pendingGeneric = card.state === 'pending' ? card.pendingCard === 'generic' : true
+    const settledGeneric = card.state === 'settled' ? card.resultCard === 'generic' : true
+    return pendingGeneric && settledGeneric
+  })
+  add('UNKNOWN_TOOL_FALLS_BACK', '词表外工具按保守默认落 generic',
+    unknownOk, 'web_search 两态都是 generic', unknownOk ? '符合' : '有越界')
+
+  if (model.input.scenario === 'interrupted') {
+    const drafts = model.cards.filter(card => card.type === 'assistant-streaming')
+    add('INTERRUPTED_DRAFT_STAYS_DRAFT', '没有定稿事件的草稿块不进入最终历史',
+      drafts.length >= 1, '至少 1 个打字中草稿、0 个对应定稿',
+      `${String(drafts.length)} 个草稿`)
+  }
+
+  if (model.input.scenario === 'failing-tool') {
+    const failed = model.cards.filter(card => card.type === 'tool' && String(card.outcome ?? '').startsWith('error'))
+    add('FAILED_TOOL_STILL_SETTLES_IN_VIEW', '失败的调用照样按契约换上结果卡',
+      failed.length >= 1 && failed.every(card => card.state === 'settled'),
+      '失败结果卡已结算且视图类别不变',
+      `${String(failed.length)} 张失败结果卡`)
+  }
 
   const grepPendingGeneric = model.cards.every((card) => {
     if (!(card.type === 'tool' && card.tool === 'grep')) return true
