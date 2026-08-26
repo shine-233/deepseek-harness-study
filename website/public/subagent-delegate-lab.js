@@ -16,6 +16,7 @@ import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset, animateNumber, bindPlotScrub } from './study-lab-kit.js'
 import {
   DELEGATE_LANES,
+  DELEGATE_FAULT_TYPES,
   buildSubagentDelegateModel,
   evaluateSubagentDelegateOracle,
 } from './subagent-delegate-model.js'
@@ -32,6 +33,7 @@ import { installThemeToggle } from './study-lab-theme.js'
 const DELEGATE_STATE_SCHEMA = {
   depth: { enum: ['0', '1', '2', '3'] },
   outcome: { enum: ['report', 'fail'] },
+  fault: { enum: [...DELEGATE_FAULT_TYPES] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
@@ -106,6 +108,8 @@ function initializePage() {
     form: document.querySelector('#sd-form'),
     depth: document.querySelector('#depth'),
     outcome: document.querySelector('#outcome'),
+    faultType: document.querySelector('#sd-fault-type'),
+    faultNote: document.querySelector('#sd-fault-note'),
     feedback: document.querySelector('#sd-feedback'),
     flow: document.querySelector('#sd-plot'),
     flowNote: document.querySelector('#sd-note'),
@@ -170,14 +174,30 @@ function initializePage() {
       const input = {
         depth: elements.depth.value,
         outcome: elements.outcome.value,
+        fault: elements.faultType.value,
       }
-      const model = buildSubagentDelegateModel({ parentDepth: Number(input.depth), outcome: input.outcome })
+      const model = buildSubagentDelegateModel({ parentDepth: Number(input.depth), outcome: input.outcome, fault: input.fault })
       const verdict = evaluateSubagentDelegateOracle(model)
       currentModel = model
 
       renderFlow(model, elements.flow, elements.flowNote)
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
+
+      // 篡改实验的反馈：注入未生效或 oracle 变红时，指认被违反的那条规则。
+      if (input.fault === 'run-rejected-child' && !model.observations.rejected) {
+        writeText(elements.faultNote,
+          '这次委派没有超限，边界放行了——没有「被拒的子工作」可以伪造，注入未生效。把父深度调到 3 再试。')
+        elements.faultNote.hidden = false
+      } else if (input.fault === 'run-rejected-child' && !verdict.pass) {
+        writeText(elements.faultNote,
+          '你刚刚让一次被拒绝的委派偷偷跑了起来：SubagentDepthError 已经抛出，子 Session 却照样创建、'
+          + '运行、回报。抓住它的是 REJECTION_RULE——拒绝发生时子泳道必须为空，'
+          + '否则深度预算就是纸面上的数字。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       renderRows(elements.tableBody, model.steps.map(step => ({
         key: String(step.index),
@@ -213,6 +233,7 @@ function initializePage() {
       const nextHash = writeStateToHash(location.hash, {
         depth: elements.depth.value,
         outcome: elements.outcome.value,
+        fault: elements.faultType.value,
         step: Number(elements.step.value),
       }, DELEGATE_STATE_SCHEMA)
       history.replaceState(null, '', nextHash)
@@ -228,7 +249,7 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  for (const control of [elements.depth, elements.outcome]) {
+  for (const control of [elements.depth, elements.outcome, elements.faultType]) {
     control.addEventListener('change', () => {
       // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
       rebuild()
@@ -263,6 +284,7 @@ bindRangeKeys(elements.step)
   if (restored !== null && restored.ok) {
     elements.depth.value = restored.value.depth
     elements.outcome.value = restored.value.outcome
+    elements.faultType.value = restored.value.fault
     elements.step.value = String(restored.value.step)
   }
 

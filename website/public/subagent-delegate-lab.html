@@ -83,6 +83,14 @@
             </select>
             <small>失败也是一次完整结算：父对话需要知道发生了什么。</small>
           </label>
+          <label>
+            <span>篡改实验（亲手违反不变量）</span>
+            <select id="sd-fault-type" name="fault">
+              <option value="none">不注入</option>
+              <option value="run-rejected-child">让被拒绝的委派偷偷跑起来</option>
+            </select>
+            <small>只在父深度超限（=3）时生效：SubagentDepthError 已经抛出，子 Session 却照样创建、运行、回报。独立校验会当场变红，并指认是哪条规则被违反。</small>
+          </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
@@ -145,7 +153,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="sd-fault-note" hidden></p></div>
         </div>
       </article>
     </section>

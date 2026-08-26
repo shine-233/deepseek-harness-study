@@ -80,3 +80,25 @@ test('the page wires the shared gate, boundary lists and state link', () => {
     assert.match(script, new RegExp(`'${option}'`), 'missing explanation for ' + option)
   }
 })
+
+test('the fake-result-ok fault is caught by REPAIR_HONESTY alone', () => {
+  const input = { crash: 'crash-mid-tool', fork: 'fork', fault: 'fake-result-ok' }
+  const model = buildSessionForkModel(input)
+  const result = evaluateSessionForkOracle(model)
+  assert.equal(result.pass, false, 'the fabricated ok must fail the oracle')
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['REPAIR_HONESTY'],
+    'exactly one rule should catch the lie, got: ' + red.join(','))
+})
+
+test('the fake-result-ok fault is ineffective outside the crash-mid-tool shape', () => {
+  for (const crash of ['complete', 'crash-mid-stream', 'crash-open-turn']) {
+    const model = buildSessionForkModel({ crash, fork: 'no-fork', fault: 'fake-result-ok' })
+    const result = evaluateSessionForkOracle(model)
+    assert.equal(result.pass, true, crash + ': no forgeable result means no violation')
+  }
+})
+
+test('an unknown fault type fails loud at the model boundary', () => {
+  assert.throws(() => buildSessionForkModel({ crash: 'complete', fork: 'fork', fault: 'no-such-fault' }))
+})

@@ -14,6 +14,8 @@
  *
  * 这是教学模型：Bundle 名、工具名和策略都由本模块定义，不是任何真实部署的配置。
  * 模型是纯函数：同样的输入永远给同样的输出，页面只渲染返回值。
+ * 教学故障：fault='ghost-allow' 把一个被作用域挡住的工具偷偷放进允许执行集合，
+ * 页面读数全部自洽——抓住它的只有嵌套关系本身（ALLOWED_SUBSET_VISIBLE）。
  */
 
 /** 教学用的 Bundle 与工具清单。名字是虚构的，用来演示三层收窄，不是真实注册表。 */
@@ -78,6 +80,9 @@ export const EXECUTION_POLICIES = Object.freeze([
   }),
 ])
 
+/** 教学故障注入：把一个被作用域挡住的工具偷偷放进允许集合。none 是唯一默认。 */
+export const VISIBILITY_FAULT_TYPES = Object.freeze(['none', 'ghost-allow'])
+
 function resolveInput(input = {}) {
   const bundles = input.bundles ?? [...TOOL_BUNDLES]
   const scope = input.scope ?? 'reader'
@@ -95,6 +100,25 @@ function resolveInput(input = {}) {
   return { bundles: [...new Set(bundles)].sort(), scope, policy }
 }
 
+/*
+ * 教学故障注入：挑一个被 agent 作用域挡住的工具，把它的执行放行标记成 true，
+ * 并同步修好层级与被挡原因、观测计数——页面看起来完全自洽，唯一的破绽是
+ * 嵌套关系本身：一个模型看不见的工具出现在了允许执行集合里。
+ */
+function applyVisibilityFault(model, fault) {
+  if (fault !== 'ghost-allow') return model
+  const target = model.tools.find(tool => tool.reachedLevel === 1)
+  if (target === undefined) return model
+  target.executionAllowed = true
+  target.reachedLevel = 3
+  target.blockedBy = null
+  model.levels[2].members.push(target)
+  model.observations.executionAllowed += 1
+  model.observations.blockedByScope -= 1
+  model.observations.ghostAllowed = target.name
+  return model
+}
+
 /**
  * 算出三层集合。
  *
@@ -103,6 +127,10 @@ function resolveInput(input = {}) {
  */
 export function buildToolVisibilityModel(input = {}) {
   const resolved = resolveInput(input)
+  const faultRaw = input.fault ?? 'none'
+  if (!VISIBILITY_FAULT_TYPES.includes(faultRaw)) {
+    throw new RangeError('unknown fault: ' + String(faultRaw))
+  }
   const scope = AGENT_SCOPES.find(candidate => candidate.id === resolved.scope)
   const policy = EXECUTION_POLICIES.find(candidate => candidate.id === resolved.policy)
 
@@ -127,8 +155,8 @@ export function buildToolVisibilityModel(input = {}) {
     { id: 'execution-allowed', label: '允许执行', members: tools.filter(tool => tool.executionAllowed) },
   ]
 
-  return {
-    input: resolved,
+  const model = {
+    input: { ...resolved, fault: faultRaw },
     scope: { id: scope.id, label: scope.label, description: scope.description },
     policy: { id: policy.id, label: policy.label, description: policy.description },
     tools,
@@ -159,6 +187,7 @@ export function buildToolVisibilityModel(input = {}) {
       '不能用本页替代固定提交的工具契约源码、权限插件实现或真实运行日志。',
     ],
   }
+  return applyVisibilityFault(model, faultRaw)
 }
 
 /**

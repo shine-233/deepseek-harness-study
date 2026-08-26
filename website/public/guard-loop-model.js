@@ -13,6 +13,9 @@
  *
  * 没有测量：真实模型是否听从提醒、真实部署的 include/exclude 通配配置、真实
  * 工具超时插件的协作顺序。
+ * 教学故障：fault='overreach-block' 把最后一次调用标记成被守卫拦截——
+ * 建议性插件越权的标准造法，由 ADVISORY_ONLY 抓住。最后一次调用恰好在阈值上
+ * 时注入不生效（会同时弄脏链条记账，破坏单因红线）。
  */
 
 export const GUARD_LANES = Object.freeze(['Agent 循环', 'repeat-tool-reminder', '模型上下文'])
@@ -26,6 +29,9 @@ export const GUARD_RESET_MODES = Object.freeze([
   'key-reorder',
   'value-change',
 ])
+
+/** 教学故障注入：让守卫越权拦截一次调用。none 是唯一默认。 */
+export const GUARD_FAULT_TYPES = Object.freeze(['none', 'overreach-block'])
 
 /** 教学用的固定工具与两组参数：一组规范键，一组换值后的键。 */
 export const GUARD_TOOL_NAME = 'read_file'
@@ -180,10 +186,41 @@ export function buildGuardLoopModel(input) {
   if (guard === undefined) throw new RangeError('未知守卫开关：' + String(input.guard))
   const resetMode = GUARD_RESET_MODES.find(item => item === input.resetMode)
   if (resetMode === undefined) throw new RangeError('未知重置模式：' + String(input.resetMode))
+  const faultRaw = input.fault ?? 'none'
+  if (!GUARD_FAULT_TYPES.includes(faultRaw)) {
+    throw new RangeError('未知故障类型：' + String(faultRaw))
+  }
 
-  const normalized = { attempts: input.attempts, guard, resetMode }
-  const steps = buildSteps(normalized)
+  const normalized = { attempts: input.attempts, guard, resetMode, fault: faultRaw }
+  const steps = applyGuardFault(buildSteps(normalized), normalized)
+
+  /*
+   * 教学故障：overreach-block 把最后一次调用标记成被守卫拦截。提醒插件是
+   * 建议性的——它根本没有拦截权限，这一步就是越权本身。只有当最后一次
+   * 调用不在任何阈值上时才生效，否则会同时弄脏链条记账，破坏单因红线。
+   */
+  function applyGuardFault(steps, resolved) {
+    if (resolved.fault !== 'overreach-block' || resolved.guard !== 'on') return steps
+    if (GUARD_THRESHOLDS.includes(resolved.attempts)) return steps
+    for (let position = steps.length - 1; position >= 0; position -= 1) {
+      const step = steps[position]
+      if (step.phase === 'issue' && step.attempt === resolved.attempts) {
+        step.detail += '——【教学故障】这次调用被守卫越权拦截了：提醒插件本无权拦下任何调用'
+        steps.splice(position + 1, 0, {
+          index: position + 1,
+          lane: 'repeat-tool-reminder',
+          phase: 'block',
+          detail: '守卫越权：这个调用没有执行（真实插件做不出这件事）',
+          attempt: step.attempt,
+          blocked: true,
+        })
+        break
+      }
+    }
+    return steps.map((step, index) => ({ ...step, index }))
+  }
   const reminders = steps.filter(step => step.tier !== undefined)
+  const blockedSteps = steps.filter(step => step.blocked === true)
 
   return {
     input: { ...normalized },
@@ -197,8 +234,8 @@ export function buildGuardLoopModel(input) {
       detailedCount: reminders.filter(step => step.tier === 'detailed').length,
       remindersAt: reminders.map(step => ({ attempt: step.attempt, tier: step.tier, count: step.count })),
       chainResets: steps.filter(step => step.resets === true).length,
-      executedCount: normalized.attempts,
-      blockedCount: 0,
+      executedCount: normalized.attempts - blockedSteps.length,
+      blockedCount: blockedSteps.length,
     },
     canProve: Object.freeze([
       '阈值默认 [3, 5, 8]：第一档是温和提醒，之后各档是带工具名、连续次数和参数预览的详细报告',

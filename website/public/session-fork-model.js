@@ -11,6 +11,8 @@
  * interrupted 标记的 assistant/message；「领取输入后未开 Step」补写
  * interrupted 的 turn/end。任何时间线都不允许出现「意图有、结果缺、却标记
  * 成功」的幽灵成功。
+ * 教学故障：fault='fake-result-ok' 把 crash-mid-tool 的 unknown 修复替换成
+ * 一条伪造的「结果 ok」——幽灵成功的标准造法，由 REPAIR_HONESTY 抓住。
  * 没有测量：真实 SQLite/JSONL 后端、真实进程崩溃时机、真实 provider 行为。
  */
 
@@ -18,6 +20,9 @@ export const FORK_LANES = Object.freeze(['父 Session', '恢复阶段', '子 Ses
 
 export const FORK_CRASH_MODES = Object.freeze(['complete', 'crash-mid-tool', 'crash-mid-stream', 'crash-open-turn'])
 export const FORK_FORK_MODES = Object.freeze(['no-fork', 'fork'])
+
+/** 教学故障注入：伪造一条「结果 ok」把崩溃掩盖成成功。none 是唯一默认。 */
+export const FORK_FAULT_TYPES = Object.freeze(['none', 'fake-result-ok'])
 
 /** 每种崩溃形态在崩溃前留下的前缀长度与需要的修复类型。 */
 const CRASH_SHAPES = Object.freeze({
@@ -83,14 +88,42 @@ function buildSteps(input) {
   return steps
 }
 
+/*
+ * 教学故障注入：把 crash-mid-tool 的 unknown 修复替换成一条伪造的
+ * 「结果 ok」落册。其余步骤一律不变，这样 oracle 变红时只有一个原因：
+ * 恢复阶段的诚实修复被吞掉，换成了假装成功。
+ */
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!FORK_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
+
+function applyForkFault(steps, fault) {
+  if (fault !== 'fake-result-ok') return steps
+  // 只伪造工具结果的修复：流式中断和未开步的修复不是「结果」，没有可伪造的 ok。
+  const repairIndex = steps.findIndex(step => step.repairedAsUnknown === true)
+  if (repairIndex === -1) return steps
+  steps.splice(repairIndex, 1, {
+    index: repairIndex,
+    lane: '恢复阶段',
+    phase: 'result',
+    detail: '工具结果落册：ok（这条结果是伪造的——崩溃之后它从未真正到达）',
+  })
+  return steps
+}
+
 export function buildSessionForkModel(input) {
   const crash = FORK_CRASH_MODES.find(item => item === input.crash)
   if (crash === undefined) throw new RangeError('未知崩溃模式：' + String(input.crash))
   const fork = FORK_FORK_MODES.find(item => item === input.fork)
   if (fork === undefined) throw new RangeError('未知 fork 模式：' + String(input.fork))
+  const fault = resolveFault(input.fault)
 
-  const normalized = { crash, fork }
-  const steps = buildSteps(normalized)
+  const normalized = { crash, fork, fault }
+  const steps = applyForkFault(buildSteps(normalized), fault)
   const repairSteps = steps.filter(step => step.phase === 'repair')
   const inheritStep = steps.find(step => step.phase === 'inherit')
 

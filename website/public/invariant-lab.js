@@ -18,6 +18,7 @@ import { installStoryRail } from './study-lab-story.js'
 import {
   FILTER_LABELS,
   INVARIANT_FILTERS,
+  INVARIANT_FAULT_TYPES,
   INVARIANT_OUTCOMES,
   INVARIANT_PACKAGES,
   OUTCOME_LABELS,
@@ -36,6 +37,7 @@ const INVARIANT_STATE_SCHEMA = {
   packageName: { enum: INVARIANT_PACKAGES },
   filter: { enum: INVARIANT_FILTERS },
   outcome: { enum: INVARIANT_OUTCOMES },
+  fault: { enum: [...INVARIANT_FAULT_TYPES] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
@@ -91,6 +93,8 @@ function initializePage() {
     packageName: document.querySelector('#invariant-package'),
     filter: document.querySelector('#invariant-filter'),
     outcome: document.querySelector('#invariant-outcome'),
+    faultType: document.querySelector('#iv-fault-type'),
+    faultNote: document.querySelector('#iv-fault-note'),
     packageNote: document.querySelector('#invariant-package-note'),
     feedback: document.querySelector('#invariant-feedback'),
     timeline: document.querySelector('#iv-timeline'),
@@ -161,6 +165,7 @@ function initializePage() {
         packageName: elements.packageName.value,
         filter: elements.filter.value,
         outcome: elements.outcome.value,
+        fault: elements.faultType.value,
       })
       const verdict = evaluateInvariantOracle(model)
       currentModel = model
@@ -169,6 +174,23 @@ function initializePage() {
       renderTimeline(model, elements.timeline)
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
+
+      // 篡改实验的反馈：注入未生效或 oracle 变红时，指认被违反的那条规则。
+      const swallowActive = elements.faultType.value === 'swallow-violation'
+        && elements.outcome.value !== 'pass'
+      if (swallowActive && !model.observations.selected) {
+        writeText(elements.faultNote,
+          '过滤器把检查关掉了：没有真正跑起来的检查也就没有可吞掉的违规，注入未生效。')
+        elements.faultNote.hidden = false
+      } else if (swallowActive && !verdict.pass) {
+        writeText(elements.faultNote,
+          '你刚刚把一次真实违规吞成了「通过」：fail() 步骤被抹掉，错误凭据消失。'
+          + '抓住它的是 FAIL_ATTRIBUTES_PACKAGE——失败必须带包归属和稳定码，'
+          + '「没有错误」本身就是一条无法解释的观测。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       writeText(elements.reserved, '已保留（第 0 步）')
       writeText(elements.selected, model.observations.selected ? '是——子 fiber 安装' : '否——仅占名')
@@ -195,6 +217,7 @@ function initializePage() {
         packageName: elements.packageName.value,
         filter: elements.filter.value,
         outcome: elements.outcome.value,
+        fault: elements.faultType.value,
         step: Number(elements.step.value),
       }, INVARIANT_STATE_SCHEMA))
     } catch {
@@ -208,7 +231,7 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  for (const control of [elements.packageName, elements.filter, elements.outcome]) {
+  for (const control of [elements.packageName, elements.filter, elements.outcome, elements.faultType]) {
     control.addEventListener('change', () => {
       rebuild()
       elements.step.value = elements.step.max
@@ -245,6 +268,7 @@ function initializePage() {
     elements.packageName.value = restored.value.packageName
     elements.filter.value = restored.value.filter
     elements.outcome.value = restored.value.outcome
+    elements.faultType.value = restored.value.fault
     elements.step.value = String(restored.value.step)
   }
 

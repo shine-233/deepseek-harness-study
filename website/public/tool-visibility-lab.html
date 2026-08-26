@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="工具注册、模型可见与允许执行的三层嵌套集合教学实验，含完整表格与独立 oracle">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -84,6 +84,14 @@
           <select id="policy" name="policy"></select>
           <small id="policy-note"></small>
         </label>
+        <label>
+          <span>篡改实验（亲手违反不变量）</span>
+          <select id="tv-fault-type" name="fault">
+            <option value="none">不注入</option>
+            <option value="ghost-allow">放行一个模型看不见的工具</option>
+          </select>
+          <small>只在作用域真的挡下了工具时生效：被挡的那个工具被偷偷放进允许集合，层级与计数全部同步改好。页面看起来完全自洽——抓住它的只有嵌套关系本身。</small>
+        </label>
         <button class="button button-primary" type="submit">重建三层</button>
         <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
         <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
@@ -150,7 +158,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="tv-fault-note" hidden></p></div>
         </div>
       </article>
     </section>

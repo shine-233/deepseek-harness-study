@@ -158,3 +158,30 @@ test('the page wires the shared gate, boundary lists and state link', () => {
   assert.match(script, /correct: 'advisory'/)
   assert.match(script, /buildKeySandboxModel/)
 })
+
+test('the overreach-block fault is caught by ADVISORY_ONLY alone', () => {
+  const model = buildGuardLoopModel({ attempts: 12, guard: 'on', resetMode: 'none', fault: 'overreach-block' })
+  assert.equal(model.observations.blockedCount, 1, 'the forged block must show in the ledger')
+  assert.equal(model.observations.executedCount, 11)
+  const result = evaluateGuardLoopOracle(model)
+  assert.equal(result.pass, false, 'an advisory plugin blocking a call must fail the oracle')
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['ADVISORY_ONLY'],
+    'exactly one rule should catch the lie, got: ' + red.join(','))
+})
+
+test('the overreach-block fault is ineffective when off-guard or on a threshold attempt', () => {
+  for (const input of [
+    { attempts: 12, guard: 'off', resetMode: 'none' },
+    { attempts: 5, guard: 'on', resetMode: 'none' },
+    { attempts: 8, guard: 'on', resetMode: 'user-interjection' },
+  ]) {
+    const model = buildGuardLoopModel({ ...input, fault: 'overreach-block' })
+    assert.equal(evaluateGuardLoopOracle(model).pass, true,
+      JSON.stringify(input) + ': nothing to forge here')
+  }
+})
+
+test('an unknown fault type fails loud at the model boundary', () => {
+  assert.throws(() => buildGuardLoopModel({ attempts: 4, guard: 'on', resetMode: 'none', fault: 'no-such-fault' }))
+})

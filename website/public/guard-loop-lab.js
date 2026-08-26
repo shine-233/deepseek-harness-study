@@ -9,7 +9,7 @@ import {
   bindRangeKeys, bindPlotScrub,
 } from './study-lab-kit.js'
 import { bindAutoAdvance } from './study-lab-kit.js'
-import { buildGuardLoopModel, buildKeySandboxModel, evaluateGuardLoopOracle } from './guard-loop-model.js'
+import { buildGuardLoopModel, buildKeySandboxModel, evaluateGuardLoopOracle, GUARD_FAULT_TYPES } from './guard-loop-model.js'
 import { revealOnScroll } from './study-lab-reveal.js'
 import { installPredictionGate } from './study-lab-gate.js'
 import { createConceptLadder } from './study-lab-ladder.js'
@@ -22,6 +22,7 @@ const SCHEMA = {
   attempts: { integerRange: [1, 12] },
   guard: { enum: ['on', 'off'] },
   resetMode: { enum: ['none', 'user-interjection', 'key-reorder', 'value-change'] },
+  fault: { enum: [...GUARD_FAULT_TYPES] },
   // 这里只卡整数下界，越界值在恢复时被拉回当前输入的末步。
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
@@ -106,6 +107,8 @@ function initializePage() {
     attemptsOutput: document.querySelector('#attempts-output'),
     guard: document.querySelector('#guard'),
     resetMode: document.querySelector('#reset-mode'),
+    faultType: document.querySelector('#gl-fault-type'),
+    faultNote: document.querySelector('#gl-fault-note'),
     feedback: document.querySelector('#gl-feedback'),
     flow: document.querySelector('#gl-plot'),
     note: document.querySelector('#gl-note'),
@@ -182,12 +185,32 @@ function initializePage() {
         attempts: Number(el.attempts.value),
         guard: el.guard.value,
         resetMode: el.resetMode.value,
+        fault: el.faultType.value,
       })
       const v = evaluateGuardLoopOracle(model)
       currentModel = model
       renderFlow(model, el.flow, el.note)
       renderOracle(v, el.oracleList, el.oracle)
       renderBoundary(model, el.canProve, el.cannotProve)
+
+      // 篡改实验的反馈：注入未生效或 oracle 变红时，指认被违反的那条规则。
+      const overreach = el.faultType.value === 'overreach-block'
+      if (overreach && (el.guard.value !== 'on' || [3, 5, 8].includes(Number(el.attempts.value)))) {
+        writeText(el.faultNote, el.guard.value !== 'on'
+          ? '守卫是关着的：没有提醒插件在运行，也就没有可越权的拦截，注入未生效。'
+          : '最后一次调用恰好在阈值上：在那里拦截会同时弄脏链条记账，注入未生效。把次数调到不在 3/5/8 上再试。')
+        el.faultNote.hidden = false
+      } else if (overreach && !v.pass) {
+        writeText(el.faultNote,
+          '你刚刚让提醒插件越权了：第 ' + String(model.observations.attempts)
+          + ' 次调用被它拦下，而它本没有拦截权限。抓住它的是 ADVISORY_ONLY——'
+          + '账目对不上：' + String(model.observations.executedCount) + ' 次执行、'
+          + String(model.observations.blockedCount) + ' 次拦截。建议性与拦截是两回事。')
+        el.faultNote.hidden = false
+      } else {
+        el.faultNote.hidden = true
+      }
+
       renderRows(el.tableBody, model.steps.map(s => ({
         key: String(s.index),
         state: s.phase === 'remind' ? 'remind' : s.phase === 'receive' ? 'receive' : 'plain',
@@ -213,6 +236,7 @@ function initializePage() {
         attempts: Number(el.attempts.value),
         guard: el.guard.value,
         resetMode: el.resetMode.value,
+        fault: el.faultType.value,
         step: Number(el.step.value),
       }, SCHEMA))
     } catch {}
@@ -225,7 +249,7 @@ function initializePage() {
     writeText(el.attemptsOutput, el.attempts.value)
     rebuild()
   })
-  for (const c of [el.guard, el.resetMode]) c.addEventListener('change', () => {
+  for (const c of [el.guard, el.resetMode, el.faultType]) c.addEventListener('change', () => {
     // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
     rebuild()
     el.step.value = el.step.max
@@ -252,6 +276,7 @@ bindRangeKeys(el.step)
     el.attempts.value = String(r.value.attempts)
     el.guard.value = r.value.guard
     el.resetMode.value = r.value.resetMode
+    el.faultType.value = r.value.fault
     // 恢复前滑杆上界已放宽到 MAX_SAFE_INTEGER，这里的赋值不会被浏览器钳掉。
     el.step.value = String(r.value.step)
   }

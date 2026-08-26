@@ -83,6 +83,14 @@
             </select>
             <small>继承记录三件事：parent、seed length 和边界。</small>
           </label>
+          <label>
+            <span>篡改实验（亲手违反不变量）</span>
+            <select id="sf-fault-type" name="fault">
+              <option value="none">不注入</option>
+              <option value="fake-result-ok">把缺失的工具结果伪造成 ok</option>
+            </select>
+            <small>只在「工具中崩溃」形态生效：恢复阶段的 unknown 修复被换成一条伪造的成功落册。时间线看起来更漂亮了，独立校验会当场变红，并指出是哪条规则被违反。</small>
+          </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
@@ -146,7 +154,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="sf-fault-note" hidden></p></div>
         </div>
       </article>
     </section>

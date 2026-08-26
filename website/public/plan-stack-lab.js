@@ -20,6 +20,7 @@ import {
   GOAL_PHASES,
   GOAL_VERBS,
   PLAN_ACTIONS,
+  PLAN_STACK_FAULT_TYPES,
   TODO_PRESETS,
   TODO_STRICT_MODES,
   buildGoalModel,
@@ -67,6 +68,8 @@ function initializePage() {
     oracleList: document.querySelector('#oracle-list'),
     canProve: document.querySelector('#can-prove-list'),
     cannotProve: document.querySelector('#cannot-prove-list'),
+    faultType: document.querySelector('#ps-fault-type'),
+    faultNote: document.querySelector('#ps-fault-note'),
     oracle: document.querySelector('#metric-oracle'),
     resetInputs: document.querySelector('#reset-inputs'),
   }
@@ -116,21 +119,47 @@ function initializePage() {
         model = buildTodoStackModel({
           preset: elements.preset.value,
           allowParallelInProgress: elements.strictMode.value === 'parallel-allowed',
+          fault: elements.faultType.value,
         })
       } else if (mode === 'plan') {
         model = buildPlanModeModel({
           loggedActive: elements.loggedActive.checked,
           agentBusy: elements.agentBusy.checked,
           action: elements.planAction.value,
+          fault: elements.faultType.value,
         })
       } else {
         model = buildGoalModel({
           phase: elements.goalPhase.value,
           verb: elements.goalVerb.value,
           roundsCapReached: elements.goalCap.checked,
+          fault: elements.faultType.value,
         })
       }
       const verdict = evaluatePlanStackOracle(model)
+
+      // 篡改实验的反馈：故障按当前面板生效，选错面板或条件不满足时明说。
+      const fault = elements.faultType.value
+      const effective = (fault === 'bump-counts' && mode === 'todo' && model.verdict.ok)
+        || (fault === 'fake-commit' && mode === 'plan' && model.input.agentBusy && model.result === 'committed')
+        || (fault === 'fake-rearm' && mode === 'goal' && !model.illegal && ['pause', 'block', 'clear'].includes(model.input.verb))
+      if (fault !== 'none' && !effective) {
+        writeText(elements.faultNote, fault === 'bump-counts'
+          ? 'todo 面板的这个预设本来就被拒绝，没有可信的计数可篡改，注入未生效。换一个合法清单。'
+          : fault === 'fake-commit'
+            ? 'plan 面板当前组合不会产生 queued（忙时挂起），没有可伪造的挂起，注入未生效。勾上「agent 忙」再试。'
+            : 'goal 面板当前动词不是撤权动词（pause/block/clear），无权可撤也就无从伪造，注入未生效。')
+        elements.faultNote.hidden = false
+      } else if (fault !== 'none' && !verdict.pass) {
+        writeText(elements.faultNote, fault === 'bump-counts'
+          ? '你刚刚把 in_progress 的计数多报了一次：三类计数之和不再等于条目总数。抓住它的是 COUNTS_MATCH_ITEMS——快照机的账必须自洽。'
+          : fault === 'fake-commit'
+            ? '你刚刚把一次 queued 伪成了 committed：agent 还在忙，计划态却被立即改写。抓住它的是 IDLE_COMMITS_BUSY_QUEUES——闲即提交、忙即排队，二者互斥。'
+            : '你刚刚把一次撤权伪成了仍持权：' + String(model.input.verb) + ' 之后目标本应 disarm。抓住它的是 ARMING_MATCHES_VERB——撤权动词后必须失活。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       if (mode === 'todo') {
         elements.todoList.replaceChildren()

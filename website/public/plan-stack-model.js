@@ -20,6 +20,21 @@
 
 export const PLAN_STACK_MODES = Object.freeze(['todo', 'plan', 'goal'])
 
+/*
+ * 教学故障注入：按当前面板伪造结论。none 是唯一默认；
+ * todo→bump-counts 让三类计数失衡；plan→fake-commit 把 queued 伪造成 committed；
+ * goal→fake-rearm 把撤权伪造成 armed。各自只打红一条校验。
+ */
+export const PLAN_STACK_FAULT_TYPES = Object.freeze(['none', 'bump-counts', 'fake-commit', 'fake-rearm'])
+
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!PLAN_STACK_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
+
 /* ---------- Panel A：todo_write ---------- */
 
 export const TODO_STRICT_MODES = Object.freeze(['parallel-allowed', 'single-active'])
@@ -72,6 +87,7 @@ export function buildTodoStackModel(input = {}) {
   const todos = TODO_PRESETS[preset]
   if (todos === undefined) throw new RangeError('未知预设：' + String(preset))
   const allowParallelInProgress = input.allowParallelInProgress !== false
+  const fault = resolveFault(input.fault)
 
   const verdict = validateTodoList(todos, { allowParallelInProgress })
   const counts = {
@@ -79,10 +95,12 @@ export function buildTodoStackModel(input = {}) {
     inProgress: todos.filter(item => item.status === 'in_progress').length,
     completed: todos.filter(item => item.status === 'completed').length,
   }
+  // 教学故障：in_progress 计数被多报一次——三类计数之和不再等于条目总数。
+  if (fault === 'bump-counts' && verdict.ok) counts.inProgress += 1
 
   return {
     mode: 'todo',
-    input: { preset, allowParallelInProgress },
+    input: { preset, allowParallelInProgress, fault },
     todos: verdict.ok ? todos : [],
     verdict,
     counts,
@@ -116,6 +134,7 @@ export function buildPlanModeModel(input = {}) {
   const loggedActive = input.loggedActive === true
   const agentBusy = input.agentBusy === true
   const action = PLAN_ACTIONS.find(item => item === input.action) ?? '/plan'
+  const fault = resolveFault(input.fault)
 
   let result
   let nextLogged = loggedActive
@@ -160,9 +179,19 @@ export function buildPlanModeModel(input = {}) {
     result = loggedActive ? 'noop' : 'noop'
   }
 
+  /*
+   * 教学故障：agent 忙时本应挂起 queued，这里伪成立即 committed——
+   * 「闲即提交、忙即排队」的互斥被打破，IDLE_COMMITS_BUSY_QUEUES 抓住它。
+   */
+  if (fault === 'fake-commit' && result === 'queued') {
+    result = 'committed'
+    pendingSelection = null
+    nextLogged = action === '/plan'
+  }
+
   return {
     mode: 'plan',
-    input: { loggedActive, agentBusy, action },
+    input: { loggedActive, agentBusy, action, fault },
     result,
     loggedAfter: nextLogged,
     pendingAfter: pendingSelection,
@@ -215,6 +244,7 @@ export function buildGoalModel(input = {}) {
   const phase = GOAL_PHASES.find(item => item === input.phase) ?? 'none'
   const verb = GOAL_VERBS.find(item => item === input.verb) ?? 'create'
   const roundsCapReached = input.roundsCapReached === true
+  const fault = resolveFault(input.fault)
 
   const key = `${phase}/${verb}`
   const nextPhase = GOAL_TRANSITIONS[key] ?? null
@@ -244,12 +274,18 @@ export function buildGoalModel(input = {}) {
   }
 
   const disarmVerbs = ['pause', 'block', 'clear']
-  const armed = verb === 'disarm' || verb === 'resume' ? verb !== 'disarm' : !disarmVerbs.includes(verb)
+  let armed = verb === 'disarm' || verb === 'resume' ? verb !== 'disarm' : !disarmVerbs.includes(verb)
   const bumped = !(verb === 'disarm')
+
+  /*
+   * 教学故障：pause/block/clear 本应撤权，这里伪造成仍持权——
+   * ARMING_MATCHES_VERB 抓住它。disarm/resume 的 armed 语义不同，不在此列。
+   */
+  if (fault === 'fake-rearm' && !armed && verb !== 'disarm') armed = true
 
   return {
     mode: 'goal',
-    input: { phase, verb, roundsCapReached },
+    input: { phase, verb, roundsCapReached, fault },
     illegal: false,
     from: phase,
     to: nextPhase,

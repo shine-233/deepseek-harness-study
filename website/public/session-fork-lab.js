@@ -16,6 +16,7 @@ import { bindAutoAdvance } from './study-lab-kit.js'
 import { installInputReset, bindPlotScrub } from './study-lab-kit.js'
 import {
   FORK_LANES,
+  FORK_FAULT_TYPES,
   buildSessionForkModel,
   evaluateSessionForkOracle,
 } from './session-fork-model.js'
@@ -32,6 +33,7 @@ import { installThemeToggle } from './study-lab-theme.js'
 const FORK_STATE_SCHEMA = {
   crash: { enum: ['complete', 'crash-mid-tool', 'crash-mid-stream', 'crash-open-turn'] },
   fork: { enum: ['no-fork', 'fork'] },
+  fault: { enum: [...FORK_FAULT_TYPES] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
@@ -111,6 +113,8 @@ function initializePage() {
     form: document.querySelector('#sf-form'),
     crash: document.querySelector('#crash'),
     fork: document.querySelector('#fork'),
+    faultType: document.querySelector('#sf-fault-type'),
+    faultNote: document.querySelector('#sf-fault-note'),
     feedback: document.querySelector('#sf-feedback'),
     flow: document.querySelector('#sf-plot'),
     flowNote: document.querySelector('#sf-note'),
@@ -176,6 +180,7 @@ function initializePage() {
       const input = {
         crash: elements.crash.value,
         fork: elements.fork.value,
+        fault: elements.faultType.value,
       }
       const model = buildSessionForkModel(input)
       const verdict = evaluateSessionForkOracle(model)
@@ -184,6 +189,21 @@ function initializePage() {
       renderFlow(model, elements.flow, elements.flowNote)
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
+
+      // 篡改实验的反馈：注入未生效或 oracle 变红时，指认被违反的那条规则。
+      if (input.fault === 'fake-result-ok' && input.crash !== 'crash-mid-tool') {
+        writeText(elements.faultNote,
+          '当前崩溃形态没有可伪造的工具结果，注入未生效。切到「工具中崩溃」再看这条时间线怎么撒谎。')
+        elements.faultNote.hidden = false
+      } else if (input.fault === 'fake-result-ok' && !verdict.pass) {
+        writeText(elements.faultNote,
+          '你刚刚把一次崩溃伪装成了成功：那条 ok 结果从未真正到达。抓住它的是 REPAIR_HONESTY——'
+          + '恢复阶段必须诚实地补出 unknown，不能装没事。注意 NO_GHOST_SUCCESS 被骗过去了，'
+          + '它只查意图有没有去向；这正是校验要分层的理由。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       renderRows(elements.tableBody, model.steps.map(step => ({
         key: String(step.index),
@@ -227,6 +247,7 @@ function initializePage() {
       const nextHash = writeStateToHash(location.hash, {
         crash: elements.crash.value,
         fork: elements.fork.value,
+        fault: elements.faultType.value,
         step: Number(elements.step.value),
       }, FORK_STATE_SCHEMA)
       history.replaceState(null, '', nextHash)
@@ -242,7 +263,7 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  for (const control of [elements.crash, elements.fork]) {
+  for (const control of [elements.crash, elements.fork, elements.faultType]) {
     control.addEventListener('change', () => {
       // 换输入会改变步数：先按新输入重建，再把步进拉回末尾看完整时间线。
       rebuild()
@@ -277,6 +298,7 @@ bindRangeKeys(elements.step)
   if (restored !== null && restored.ok) {
     elements.crash.value = restored.value.crash
     elements.fork.value = restored.value.fork
+    elements.faultType.value = restored.value.fault
     elements.step.value = String(restored.value.step)
   }
 

@@ -21,6 +21,9 @@
  *
  * 教学约定：被拒绝的委派不产生任何子工作；启动的子工作恰好回报一次，
  * 成功摘要与失败原因都是完整结算；父子工作严格分泳道。
+ * 教学故障：fault='run-rejected-child' 让被拒的委派偷偷把子 Session 建出来、
+ * 跑起来、回报结算——「被拒不产生任何子工作」被整个违反，
+ * 由 REJECTION_RULE 抓住。父深度不超限时注入不生效。
  * 没有测量：真实 worker/子进程调度、真实工具过滤矩阵、真实并发委派时序。
  */
 
@@ -30,6 +33,9 @@ export const DELEGATE_LANES = Object.freeze(['父 Agent', '委派边界', '子 A
 export const DELEGATE_DEFAULT_MAX_DEPTH = 3
 export const DELEGATE_OUTCOMES = Object.freeze(['report', 'fail'])
 export const DELEGATE_PARENT_DEPTHS = Object.freeze([0, 1, 2, 3])
+
+/** 教学故障注入：让被拒绝的委派偷偷把子工作跑起来。none 是唯一默认。 */
+export const DELEGATE_FAULT_TYPES = Object.freeze(['none', 'run-rejected-child'])
 
 /**
  * 上游 delegationDepthOf 的教学镜像：header 记录权威且单调，
@@ -73,6 +79,28 @@ function buildSteps(input) {
   return steps
 }
 
+/*
+ * 教学故障注入：被 SubagentDepthError 拒绝之后，子 Session 照常创建、照常运行、
+ * 照常回报——「被拒不产生任何子工作」被整个违反。其余步骤不变，oracle 变红时
+ * 只有一个原因：REJECTION_RULE 发现拒绝发生而子泳道不为空。
+ */
+function applyDelegateFault(model, fault) {
+  if (fault !== 'run-rejected-child' || !model.observations.rejected) return model
+  const rejectIndex = model.steps.findIndex(step => step.rejected === true)
+  if (rejectIndex === -1) return model
+  const forged = [
+    { lane: '子 Agent', phase: 'create', detail: '创建子 Session：【教学故障】这次委派已经被拒绝了，这个子 Session 本不该存在' },
+    { lane: '子 Agent', phase: 'run', detail: '子代理开始运行：【教学故障】被拒的深度预算正在被偷偷消耗' },
+    { lane: '回报', phase: 'settle', detail: '子回报完成摘要：【教学故障】拒绝之后竟然还有结算', reportKind: 'report' },
+  ]
+  const before = model.steps.slice(0, rejectIndex + 1)
+  const after = model.steps.slice(rejectIndex + 1)
+  model.steps = [...before, ...forged, ...after].map((step, index) => ({ ...step, index }))
+  model.observations.steps = model.steps.length
+  model.observations.childRan = true
+  return model
+}
+
 export function buildSubagentDelegateModel(input) {
   if (!Number.isInteger(input.parentDepth)) throw new TypeError('parentDepth 必须是整数')
   if (!DELEGATE_PARENT_DEPTHS.includes(input.parentDepth)) {
@@ -80,12 +108,16 @@ export function buildSubagentDelegateModel(input) {
   }
   const outcome = DELEGATE_OUTCOMES.find(item => item === input.outcome)
   if (outcome === undefined) throw new RangeError('未知结局：' + String(input.outcome))
+  const faultRaw = input.fault ?? 'none'
+  if (!DELEGATE_FAULT_TYPES.includes(faultRaw)) {
+    throw new RangeError('未知故障类型：' + String(faultRaw))
+  }
 
-  const normalized = { parentDepth: input.parentDepth, outcome }
+  const normalized = { parentDepth: input.parentDepth, outcome, fault: faultRaw }
   const steps = buildSteps(normalized)
   const boundaryStep = steps.find(step => step.rejected !== undefined)
 
-  return {
+  const model = {
     input: { ...normalized },
     steps,
     observations: {
@@ -117,6 +149,7 @@ export function buildSubagentDelegateModel(input) {
       '真实并发委派的交错时序与结算顺序',
     ]),
   }
+  return applyDelegateFault(model, faultRaw)
 }
 
 /**

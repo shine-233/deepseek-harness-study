@@ -15,6 +15,8 @@
  *
  * 教学约定：两个包名与五档过滤器 × 三种结局是固定教学常量；
  * 没有 Cordis 注册表或真实 fiber。
+ * 教学故障：fault='swallow-violation' 把一次真实违规静默吞成「通过」——
+ * 恒真校验骗局的标准造法，由 FAIL_ATTRIBUTES_PACKAGE 抓住错误凭据缺失。
  */
 
 export const INVARIANT_PACKAGES = Object.freeze([
@@ -31,6 +33,9 @@ export const INVARIANT_FILTERS = Object.freeze([
 ])
 
 export const INVARIANT_OUTCOMES = Object.freeze(['pass', 'violation', 'startup-error'])
+
+/** 教学故障注入：把一次真实违规静默吞成「通过」。none 是唯一默认。 */
+export const INVARIANT_FAULT_TYPES = Object.freeze(['none', 'swallow-violation'])
 
 export const FILTER_LABELS = Object.freeze({
   unfiltered: '无过滤：enabled=true，名单为空',
@@ -50,6 +55,22 @@ function isSelected(filter) {
   return filter === 'unfiltered' || filter === 'allowlist-match'
 }
 
+/*
+ * 教学故障注入：违规发生时把 fail() 步骤从时间线里抹掉、错误置空——
+ * 检查「通过」了，但那条关系根本没有成立。其余步骤一律不变，
+ * oracle 变红时只有一个原因：FAIL_ATTRIBUTES_PACKAGE 发现错误凭据缺失。
+ */
+function applyInvariantFault(model, fault) {
+  if (fault !== 'swallow-violation' || model.input.outcome === 'pass') return model
+  const withoutViolation = model.steps
+    .filter(step => step.kind !== 'violate')
+    .map((step, index) => ({ ...step, index }))
+  model.steps = withoutViolation
+  model.observations.error = null
+  model.observations.checksRan = true
+  return model
+}
+
 export function buildInvariantModel(input = {}) {
   const packageName = INVARIANT_PACKAGES.find(item => item === input.packageName)
   if (packageName === undefined) throw new RangeError('未知包名：' + String(input.packageName))
@@ -57,6 +78,8 @@ export function buildInvariantModel(input = {}) {
   if (filter === undefined) throw new RangeError('未知过滤器：' + String(input.filter))
   const outcome = INVARIANT_OUTCOMES.find(item => item === input.outcome)
   if (outcome === undefined) throw new RangeError('未知结局：' + String(input.outcome))
+  const fault = INVARIANT_FAULT_TYPES.includes(input.fault ?? 'none') ? input.fault ?? 'none' : null
+  if (fault === null) throw new RangeError('未知故障类型：' + String(input.fault))
 
   const steps = []
   const push = (op, detail, extras = {}) => {
@@ -108,8 +131,8 @@ export function buildInvariantModel(input = {}) {
     }
   }
 
-  return {
-    input: { packageName, filter, outcome },
+  const model = {
+    input: { packageName, filter, outcome, fault },
     steps,
     observations: {
       reserved: true,
@@ -130,6 +153,7 @@ export function buildInvariantModel(input = {}) {
       '真实进程里诊断开关的热更新行为。',
     ]),
   }
+  return applyInvariantFault(model, fault)
 }
 
 export function evaluateInvariantOracle(model) {

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="包级运行时不变量：先保留包名，过滤只决定安装，失败带包归属并释放保留位">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -78,6 +78,14 @@
             <span>installer 结局</span>
             <select id="invariant-outcome" name="outcome"></select>
           </label>
+          <label>
+            <span>篡改实验（亲手违反不变量）</span>
+            <select id="iv-fault-type" name="fault">
+              <option value="none">不注入</option>
+              <option value="swallow-violation">把违规静默吞成「通过」</option>
+            </select>
+            <small>只在结局不是「通过」且检查真正安装时生效：fail() 步骤被从时间线里抹掉、错误凭据清空。时间线看起来干净了，独立校验会当场变红。</small>
+          </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
@@ -140,7 +148,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="iv-fault-note" hidden></p></div>
         </div>
       </article>
     </section>

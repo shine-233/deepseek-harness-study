@@ -18,6 +18,7 @@ import {
   AGENT_SCOPES,
   EXECUTION_POLICIES,
   TOOL_BUNDLES,
+  VISIBILITY_FAULT_TYPES,
   buildToolVisibilityModel,
   evaluateToolVisibilityOracle,
 } from './tool-visibility-model.js'
@@ -35,6 +36,7 @@ const VISIBILITY_STATE_SCHEMA = {
   bundles: { stringList: TOOL_BUNDLES },
   scope: { enum: AGENT_SCOPES.map(scope => scope.id) },
   policy: { enum: EXECUTION_POLICIES.map(policy => policy.id) },
+  fault: { enum: [...VISIBILITY_FAULT_TYPES] },
 }
 
 const LEVEL_LABELS = ['未注册', '已注册', '模型可见', '允许执行']
@@ -187,6 +189,8 @@ function initializePage() {
     scopeNote: document.querySelector('#scope-note'),
     policy: document.querySelector('#policy'),
     policyNote: document.querySelector('#policy-note'),
+    faultType: document.querySelector('#tv-fault-type'),
+    faultNote: document.querySelector('#tv-fault-note'),
     feedback: document.querySelector('#visibility-feedback'),
     nest: document.querySelector('#nest-plot'),
     nestNote: document.querySelector('#nest-note'),
@@ -334,6 +338,7 @@ function initializePage() {
         bundles,
         scope: elements.scope.value,
         policy: elements.policy.value,
+        fault: elements.faultType.value,
       })
       const verdict = evaluateToolVisibilityOracle(model)
       currentModel = model
@@ -344,6 +349,21 @@ function initializePage() {
       renderFunnel(model, elements.funnel, elements.funnelNote)
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
+
+      // 篡改实验的反馈：注入未生效或 oracle 变红时，指认被违反的那条规则。
+      if (elements.faultType.value === 'ghost-allow' && model.observations.ghostAllowed === undefined) {
+        writeText(elements.faultNote,
+          '当前作用域没有挡下任何工具，注入未生效。换一个更紧的 agent 作用域再看这条时间线怎么撒谎。')
+        elements.faultNote.hidden = false
+      } else if (elements.faultType.value === 'ghost-allow' && !verdict.pass) {
+        writeText(elements.faultNote,
+          '你刚刚放行了一个模型根本看不见的工具：「' + String(model.observations.ghostAllowed)
+          + '」从未出现在工具清单里，却已经允许执行。层级、计数和被挡原因都同步改好了——'
+          + '抓住它的只有 ALLOWED_SUBSET_VISIBLE 这条嵌套校验。这就是「已注册 ⊇ 可见 ⊇ 允许」存在的理由。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
       renderRows(elements.tableBody, model.tools.map(tool => ({
         key: tool.name,
         state: String(tool.reachedLevel),
@@ -379,6 +399,7 @@ function initializePage() {
         bundles: [...elements.bundleChecks.querySelectorAll('input:checked')].map(input => input.value),
         scope: elements.scope.value,
         policy: elements.policy.value,
+        fault: elements.faultType.value,
       }, VISIBILITY_STATE_SCHEMA))
     } catch {
       // 保持安静：hash 写不进去时页面行为不变。
@@ -394,6 +415,7 @@ function initializePage() {
   })
   elements.scope.addEventListener('change', rebuild)
   elements.policy.addEventListener('change', rebuild)
+  elements.faultType.addEventListener('change', rebuild)
 
   // 追踪交互：点图里的工具色块或表格行都指向同一个名字；键盘回车/空格等效点击。
   const toggleTrace = (name) => {
@@ -425,6 +447,7 @@ function initializePage() {
     }
     elements.scope.value = restored.value.scope
     elements.policy.value = restored.value.policy
+    elements.faultType.value = restored.value.fault
   }
 
   rebuild()

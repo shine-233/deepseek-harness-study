@@ -119,3 +119,26 @@ test('the page wires the shared gate, boundary lists and state link', () => {
     assert.match(script, new RegExp(`'${option}'`), 'missing explanation for ' + option)
   }
 })
+
+test('the run-rejected-child fault is caught by REJECTION_RULE alone', () => {
+  const model = buildSubagentDelegateModel({ parentDepth: 3, outcome: 'report', fault: 'run-rejected-child' })
+  assert.equal(model.observations.rejected, true, 'the delegation must still be marked rejected')
+  assert.equal(model.observations.childRan, true, 'the forged child must show as having run')
+  const result = evaluateSubagentDelegateOracle(model)
+  assert.equal(result.pass, false, 'child work after a rejection must fail the oracle')
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['REJECTION_RULE'],
+    'exactly one rule should catch the lie, got: ' + red.join(','))
+})
+
+test('the run-rejected-child fault is ineffective when the boundary admits the child', () => {
+  for (const parentDepth of [0, 1, 2]) {
+    const model = buildSubagentDelegateModel({ parentDepth, outcome: 'fail', fault: 'run-rejected-child' })
+    assert.equal(evaluateSubagentDelegateOracle(model).pass, true,
+      'parentDepth ' + String(parentDepth) + ': nothing to forge here')
+  }
+})
+
+test('an unknown fault type fails loud at the model boundary', () => {
+  assert.throws(() => buildSubagentDelegateModel({ parentDepth: 1, outcome: 'report', fault: 'no-such-fault' }))
+})

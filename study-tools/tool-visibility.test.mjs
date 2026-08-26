@@ -149,3 +149,27 @@ test('the evidence boundary names what a set diagram cannot show', () => {
     assert.ok(boundary.includes(absent), 'cannotProve must mention ' + absent)
   }
 })
+
+test('the ghost-allow fault is caught by ALLOWED_SUBSET_VISIBLE alone', () => {
+  const model = buildToolVisibilityModel({ scope: 'reader', policy: 'read-only', fault: 'ghost-allow' })
+  const ghost = model.observations.ghostAllowed
+  assert.equal(typeof ghost, 'string', 'a scope-blocked tool must be forged into the allowed set')
+  const result = evaluateToolVisibilityOracle(model)
+  assert.equal(result.pass, false, 'a tool allowed outside the visible set must fail the oracle')
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['ALLOWED_SUBSET_VISIBLE'],
+    'exactly one rule should catch the lie, got: ' + red.join(','))
+  const forged = model.tools.find(tool => tool.name === ghost)
+  assert.equal(forged.modelVisible, false, 'the ghost stays invisible to the model')
+  assert.equal(forged.executionAllowed, true, 'the ghost is allowed to execute')
+})
+
+test('the ghost-allow fault is ineffective when the scope blocks nothing', () => {
+  const model = buildToolVisibilityModel({ scope: 'full', policy: 'read-only', fault: 'ghost-allow' })
+  assert.equal(model.observations.ghostAllowed, undefined)
+  assert.equal(evaluateToolVisibilityOracle(model).pass, true)
+})
+
+test('an unknown fault type fails loud at the model boundary', () => {
+  assert.throws(() => buildToolVisibilityModel({ scope: 'reader', policy: 'read-only', fault: 'no-such-fault' }))
+})

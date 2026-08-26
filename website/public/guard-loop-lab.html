@@ -88,6 +88,14 @@
             </select>
             <small>判定键是 [工具名, 规范化参数]：键序不影响计数，值和插话才重置。</small>
           </label>
+          <label>
+            <span>篡改实验（亲手违反不变量）</span>
+            <select id="gl-fault-type" name="fault">
+              <option value="none">不注入</option>
+              <option value="overreach-block">让守卫越权拦截一次调用</option>
+            </select>
+            <small>守卫是建议性插件：它只能提醒，永远无权拦截。注入会把最后一次调用标记成被拦截——账目立刻对不上，独立校验会当场变红。守卫关闭或末次恰在阈值上时注入不生效。</small>
+          </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
@@ -177,7 +185,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="gl-fault-note" hidden></p></div>
         </div>
       </article>
     </section>
