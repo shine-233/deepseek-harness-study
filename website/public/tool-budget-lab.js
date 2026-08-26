@@ -14,6 +14,8 @@ import {
   installScrollProgress,
   installInputReset,
   svgElement,
+  animateNumber,
+  prefersReducedMotion,
 } from './study-lab-kit.js'
 import { installStoryRail } from './study-lab-story.js'
 import {
@@ -45,66 +47,145 @@ const FUNNEL_TOP_PAD = 8
 const FUNNEL_LABEL_X = 8
 const FUNNEL_BAR_X = 200
 const FUNNEL_BAR_MAX_WIDTH = 350
+const FUNNEL_TWEEN_MS = 280
 
-function renderFunnel(model, container) {
-  container.replaceChildren()
-  const svg = svgElement('svg', {
-    viewBox: FUNNEL_VIEW_BOX,
-    role: 'img',
-    'aria-label': '五层漏斗：' + model.layers.map(layer => `${layer.title} ${layer.count}`).join('，'),
-  })
-  const widest = Math.max(model.counts.registered, 1)
+/**
+ * 漏斗视图：SVG 骨架只建一次，输入变化时条宽与计数在帧间补间到新目标——
+ * 拖动滑杆看到的是漏斗在流动，不是整张图瞬移重画。
+ * reduced-motion 或无 rAF 环境直接落位；同一条补间链上新目标取消旧链。
+ */
+function createFunnelView(container) {
+  const rows = new Map()
+  const state = new Map()
+  let svg = null
+  let animToken = 0
 
-  model.layers.forEach((layer, index) => {
-    const rowY = FUNNEL_TOP_PAD + index * FUNNEL_ROW_HEIGHT
-    const group = svgElement('g', { 'data-reveal': '' })
+  const easeOutCubic = t => 1 - (1 - t) ** 3
 
-    group.append(svgElement('text', {
-      x: FUNNEL_LABEL_X, y: rowY + 18,
-      'font-size': 13, 'font-weight': 600, fill: 'var(--ink)',
-    }, `${layer.no} ${layer.title}`))
-    group.append(svgElement('text', {
-      x: FUNNEL_LABEL_X, y: rowY + 35,
-      'font-size': 11, fill: 'var(--muted)',
-    }, layer.mechanism))
+  function rowGeometry(index) {
+    return FUNNEL_TOP_PAD + index * FUNNEL_ROW_HEIGHT
+  }
 
-    if (layer.count > 0) {
-      const width = Math.max(3, Math.round((layer.count / widest) * FUNNEL_BAR_MAX_WIDTH))
-      group.append(svgElement('rect', {
-        x: FUNNEL_BAR_X, y: rowY + 4, width, height: 26, rx: 5,
+  function paint(id) {
+    const row = rows.get(id)
+    const current = state.get(id)
+    if (row === undefined || current === undefined) return
+    const width = Math.max(0, Math.round(current.width))
+    row.rect.setAttribute('width', String(width))
+    row.rect.setAttribute('fill-opacity', width > 0 ? '1' : '0')
+    row.countText.setAttribute('x', String(FUNNEL_BAR_X + current.width + 8))
+    writeText(row.countText, `${String(Math.round(current.count))} 个`)
+    row.countText.setAttribute('fill', current.count > 0 ? 'var(--ink)' : 'var(--muted)')
+  }
+
+  function build(model) {
+    container.replaceChildren()
+    svg = svgElement('svg', {
+      viewBox: FUNNEL_VIEW_BOX,
+      role: 'img',
+      'aria-label': '',
+    })
+    model.layers.forEach((layer, index) => {
+      const rowY = rowGeometry(index)
+      const group = svgElement('g', { 'data-reveal': '' })
+
+      group.append(svgElement('text', {
+        x: FUNNEL_LABEL_X, y: rowY + 18,
+        'font-size': 13, 'font-weight': 600, fill: 'var(--ink)',
+      }, `${layer.no} ${layer.title}`))
+      group.append(svgElement('text', {
+        x: FUNNEL_LABEL_X, y: rowY + 35,
+        'font-size': 11, fill: 'var(--muted)',
+      }, layer.mechanism))
+
+      const rect = svgElement('rect', {
+        x: FUNNEL_BAR_X, y: rowY + 4, width: 0, height: 26, rx: 5,
         fill: layer.id === 'approved' ? 'var(--allow)' : 'var(--brand)',
-      }))
-      group.append(svgElement('text', {
-        x: FUNNEL_BAR_X + width + 8, y: rowY + 23,
-        'font-size': 14, 'font-weight': 600, fill: 'var(--ink)',
-      }, `${layer.count} 个`))
-    } else {
-      group.append(svgElement('text', {
-        x: FUNNEL_BAR_X + 4, y: rowY + 23,
-        'font-size': 14, 'font-weight': 600, fill: 'var(--muted)',
-      }, '0 个'))
-    }
-
-    if (index < model.layers.length - 1) {
-      const blocked = Object.values(model.blocked)[index]
-      const arrowY = rowY + 40
-      const arrow = svgElement('path', {
-        d: `M${FUNNEL_BAR_X + 30} ${arrowY} v10 m-4 -5 l4 5 l4 -5`,
-        fill: 'none', stroke: 'var(--deny-ink)', 'stroke-width': 1.5,
       })
-      const note = svgElement('text', {
-        x: FUNNEL_BAR_X + 44, y: arrowY + 9,
-        'font-size': 11, fill: 'var(--deny-ink)',
-      }, `这层挡下 ${blocked} 个`)
-      if (blocked === 0) note.setAttribute('fill', 'var(--muted)')
-      group.append(arrow, note)
+      const countText = svgElement('text', {
+        x: FUNNEL_BAR_X + 8, y: rowY + 23,
+        'font-size': 14, 'font-weight': 600, fill: 'var(--ink)',
+      }, '')
+      group.append(rect, countText)
+
+      let note = null
+      if (index < model.layers.length - 1) {
+        const arrowY = rowY + 40
+        const arrow = svgElement('path', {
+          d: `M${FUNNEL_BAR_X + 30} ${arrowY} v10 m-4 -5 l4 5 l4 -5`,
+          fill: 'none', stroke: 'var(--deny-ink)', 'stroke-width': 1.5,
+        })
+        note = svgElement('text', {
+          x: FUNNEL_BAR_X + 44, y: arrowY + 9,
+          'font-size': 11, fill: 'var(--deny-ink)',
+        }, '')
+        group.append(arrow, note)
+      }
+
+      svg.append(group)
+      rows.set(layer.id, { rect, countText, note })
+      state.set(layer.id, { width: 0, count: 0 })
+    })
+    container.append(svg)
+    revealOnScroll(container)
+  }
+
+  function syncNotesAndAria(model) {
+    svg?.setAttribute('aria-label', '五层漏斗：' + model.layers.map(layer => `${layer.title} ${layer.count}`).join('，'))
+    model.layers.forEach((layer, index) => {
+      const row = rows.get(layer.id)
+      if (row?.note === null || row === undefined) return
+      const blocked = Object.values(model.blocked)[index]
+      writeText(row.note, `这层挡下 ${blocked} 个`)
+      row.note.setAttribute('fill', blocked === 0 ? 'var(--muted)' : 'var(--deny-ink)')
+    })
+  }
+
+  function update(model) {
+    if (svg === null) build(model)
+    syncNotesAndAria(model)
+
+    const widest = Math.max(model.counts.registered, 1)
+    const targets = new Map()
+    for (const layer of model.layers) {
+      targets.set(layer.id, {
+        width: layer.count > 0
+          ? Math.max(3, (layer.count / widest) * FUNNEL_BAR_MAX_WIDTH)
+          : 0,
+        count: layer.count,
+      })
     }
 
-    svg.append(group)
-  })
+    const canAnimate = typeof requestAnimationFrame === 'function' && !prefersReducedMotion()
+    if (!canAnimate) {
+      for (const [id, target] of targets) state.set(id, target)
+      for (const id of rows.keys()) paint(id)
+      return
+    }
 
-  container.append(svg)
-  revealOnScroll(container)
+    const starts = new Map()
+    for (const [id, target] of targets) {
+      starts.set(id, { ...state.get(id), target })
+    }
+    const token = ++animToken
+    const startAt = performance.now()
+    const tick = now => {
+      if (token !== animToken) return
+      const progress = Math.min(1, (now - startAt) / FUNNEL_TWEEN_MS)
+      const eased = easeOutCubic(progress)
+      for (const [id, start] of starts) {
+        state.set(id, {
+          width: start.width + (start.target.width - start.width) * eased,
+          count: start.count + (start.target.count - start.count) * eased,
+        })
+        paint(id)
+      }
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }
+
+  return { update }
 }
 
 function initializePage() {
@@ -135,6 +216,7 @@ function initializePage() {
   }
   if (!requireElements(elements)) return
   const setFeedback = makeFeedback(elements.feedback)
+  const funnelView = createFunnelView(elements.funnel)
 
   const syncOutputs = () => {
     writeText(elements.pluginsOut, elements.plugins.value)
@@ -172,18 +254,18 @@ function initializePage() {
       })
       const verdict = evaluateToolBudgetOracle(model)
 
-      renderFunnel(model, elements.funnel)
+      funnelView.update(model)
       renderRows(elements.tableBody, model.tools.map(tool => ({
         cells: [tool.name, tool.kindLabel, tool.stopLabel, tool.reason],
       })))
       renderOracle(verdict, elements.oracleList, elements.oracle)
       renderBoundary(model, elements.canProve, elements.cannotProve)
 
-      writeText(elements.registered, model.counts.registered)
-      writeText(elements.visible, model.counts.visible)
-      writeText(elements.nativeCount, model.counts.native)
-      writeText(elements.capable, model.counts.capable)
-      writeText(elements.approved, model.counts.approved)
+      animateNumber(elements.registered, model.counts.registered)
+      animateNumber(elements.visible, model.counts.visible)
+      animateNumber(elements.nativeCount, model.counts.native)
+      animateNumber(elements.capable, model.counts.capable)
+      animateNumber(elements.approved, model.counts.approved)
 
       setFeedback(`已重算：${model.counts.registered} 注册 → ${model.counts.visible} 可见 → `
         + `${model.counts.native} 原生呈现 → ${model.counts.capable} 能力放行 → `
