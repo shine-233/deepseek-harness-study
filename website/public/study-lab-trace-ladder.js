@@ -304,7 +304,7 @@ export function replayRungs(defs) {
     title: def.title,
     text: def.text,
     build(host, api) {
-      return createTraceLadderSim(host, api, {
+      const sim = createTraceLadderSim(host, api, {
         traces: def.traces,
         laneLabels: def.laneLabels,
         stepMs: def.stepMs,
@@ -314,6 +314,9 @@ export function replayRungs(defs) {
           if (def.engageOnReplay !== false) api.engage()
         },
       })
+      // 实验室专属的级内附加控件（如「应用到表单」）：画在模拟之后。
+      if (typeof def.aside === 'function') def.aside(host)
+      return sim
     },
   }))
 }

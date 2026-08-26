@@ -24,6 +24,8 @@ Status: implemented
 
 覆盖完成后的交互审计发现轨迹图是被动观看——重放只能等，离这套图所对标的 Ciechanowski 标准（每张图都可操纵）差得远。引擎现在把图形当作控制器：横向拖拽直接驱动播放头（拖拽中自动重放让位），点击任一步圆点跳到该步，图形聚焦后 ←/→/Home/End 逐步步进，×1/×2/×4 变速让长轨迹可用（compaction 的 48 步在 ×4 下约五秒放完）。图形带滑杆语义（`role="slider"` 与实时 `aria-valuenow`），屏幕阅读器与明眼读者读到同一个步数。所有操纵都计入「真实交互」解锁契约；一处共享引擎改动同时抬升了全部轨迹页。
 
+两个收尾堵住了剩余缺口。小缝页里教特定输入的级别获得了 `apply`——一枚「把这套输入装进下方表单」按钮，一键还原轨迹演示的控件组合，阶梯与沙盒不再是两个世界。waterfall 旗舰画布也成了播放头：拖拽或 Home/End 从提示序列逐帧重建世界（`role="slider"`、拖拽中动画让位、touched 语义不变）。第二个 3D 页评估后被否决：session-fork 的数据是两条泳道的共享前缀时间线而非树——没有信息量的降维装饰正是 slop 门禁禁止的东西，package-graph 已承载全站唯一真正空间化的模型。
+
 登记点全部同步：`study-labs.html` 名单卡、`study-labs.js` TRACKED_LAB_IDS、`study-progress-core.js` LAB_PAGE_IDS、`public/llms.txt`、无 JS 时的静态计数（55 个实验）。
 
 ## Alternatives considered

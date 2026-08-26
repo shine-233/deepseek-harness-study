@@ -336,11 +336,35 @@ async function initializePage(labId, config, modelModule) {
 
   // 零跳步概念阶梯：轨迹定义在 config.ladder（small-seams-configs.js），
   // 每级一条固定输入推演出的泳道轨迹，重放完整走完一次即解锁下一级。
+  // 声明了 apply 的级别额外获得「把这套输入装进下方表单」按钮——
+  // 阶梯讲的配置与读者手下的沙盒从此双向可达。
   const ladderRoot = document.getElementById('concept-ladder-root')
   if (ladderRoot !== null && config.ladder !== undefined) {
+    const applyToForm = apply => host => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'button button-quiet tl-apply'
+      button.textContent = '把这套输入装进下方表单'
+      button.addEventListener('click', () => {
+        // Node 冒烟垫片里裸 Event 可能不存在：从表单自己的视图取构造器。
+        const EventCtor = form.ownerDocument?.defaultView?.Event ?? Event
+        for (const [key, value] of Object.entries(apply)) {
+          const input = document.getElementById('ctl-' + key)
+          if (input === null) continue
+          if (input.type === 'checkbox') input.checked = Boolean(value)
+          else input.value = String(value)
+          input.dispatchEvent(new EventCtor('change', { bubbles: true }))
+        }
+        form.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      })
+      host.append(button)
+    }
     createConceptLadder(ladderRoot, {
       storageKey: labId + '-ladder',
-      rungs: replayRungs(config.ladder.rungs),
+      rungs: replayRungs(config.ladder.rungs.map(def => ({
+        ...def,
+        aside: def.apply === undefined ? undefined : applyToForm(def.apply),
+      }))),
     })
   }
 

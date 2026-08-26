@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-25-zero-skip-concept-ladder.md
-2026-08-25-zero-skip-concept-ladder.md: c9fdb5f27e2b1e64b7d5c164904cb9b9165c7f1f
-2026-08-25-zero-skip-concept-ladder.zh.md: bb438abc877d8332333ed04136902df1bb857a2f
+2026-08-25-zero-skip-concept-ladder.md: 3a34f293ef91d55eabacb91800806e8ecc8fcaea
+2026-08-25-zero-skip-concept-ladder.zh.md: 63e8b2a97065e7a2109729e853143c21c3a01ee7

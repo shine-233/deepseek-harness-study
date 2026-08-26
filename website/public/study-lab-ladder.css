@@ -134,3 +134,21 @@
 .tl-svg circle[data-step] { cursor: pointer; }
 
 .tl-speed { font-variant-numeric: tabular-nums; }
+
+/* 阶梯→表单联动：把本级输入装进下方沙盒。 */
+.tl-apply { margin-top: 10px; }
+
+/* waterfall 旗舰画布：同为播放头控制器。 */
+.wf-stage {
+  touch-action: pan-y;
+  border-radius: 8px;
+  cursor: grab;
+  width: 100%;
+}
+
+.wf-stage:focus-visible {
+  outline: 2px solid var(--brand, #3157c8);
+  outline-offset: 4px;
+}
+
+.wf-stage.is-scrubbing { cursor: grabbing; }

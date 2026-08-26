@@ -28,7 +28,11 @@ let uidCounter = 0
 function makeChainSim(host, api, opts) {
   const reduced = api.reducedMotion
   const canvas = document.createElement('canvas')
-  canvas.setAttribute('aria-hidden', 'true')
+  canvas.className = 'wf-stage'
+  // 图形即控制器：画布本身就是播放头，可拖拽、可聚焦、可键盘逐拍。
+  canvas.setAttribute('role', 'slider')
+  canvas.tabIndex = 0
+  canvas.setAttribute('aria-label', '瀑布链播放头：横向拖拽或用 ←/→ 键逐拍查看')
   const controls = document.createElement('div')
   controls.className = 'ladder-sim-controls'
   const caption = document.createElement('p')
@@ -45,6 +49,9 @@ function makeChainSim(host, api, opts) {
   let dirty = true
   let chain = ['A', 'B', 'C']
   const state = { ball: null, gateValues: new Map(), flashes: new Map(), short: null, result: null }
+  // 最近一次派发的轨迹与提示序列：拖拽/键盘按拍回看时从这里重建。
+  let lastTrace = null
+  let lastCues = null
   const fit = () => {
     W = Math.max(360, host.clientWidth || 640)
     canvas.width = Math.round(W * ratio)
@@ -200,13 +207,16 @@ function makeChainSim(host, api, opts) {
   function dispatch(silent) {
     touched = true
     const trace = opts.trace(readInputs())
+    lastTrace = trace
+    lastCues = toCues(trace)
+    canvas.setAttribute('aria-valuemax', String(lastCues.length))
     if (reduced) {
       applyEnd(trace)
       say(capResult(trace))
       opts.onFinish(trace, { silent })
       return
     }
-    anim = { cues: toCues(trace), i: 0, acc: 0, last: 0, started: false, trace, silent }
+    anim = { cues: lastCues, i: 0, acc: 0, last: 0, started: false, trace, silent }
     dirty = true
   }
 
@@ -266,6 +276,75 @@ function makeChainSim(host, api, opts) {
   api.everyFrame(now => {
     if (anim !== null) { advance(now); draw(now); return }
     if (dirty) { draw(now); dirty = false }
+  })
+
+  // 按拍回看：把世界重建为「前 k 条提示完成之后」的样子。
+  // 与动画共享同一份 state/draw，拖到哪一拍，画面就是哪一拍的定格。
+  function scrubTo(k) {
+    if (lastTrace === null || lastCues === null) return
+    touched = true
+    anim = null
+    const kk = Math.max(0, Math.min(lastCues.length, k))
+    const pts = positions()
+    const st = { ball: null, gateValues: new Map(), flashes: new Map(), short: null, result: null }
+    for (let i = 0; i < kk; i += 1) {
+      const cue = lastCues[i]
+      if (cue.kind === 'hop') st.ball = { x: pts.get(cue.to).x, value: cue.value }
+      else if (cue.kind === 'run') st.gateValues.set(cue.at, cue.vout)
+      else if (cue.kind === 'stop') {
+        st.short = { at: cue.at, skipped: cue.skipped.slice() }
+        st.ball = { x: pts.get(cue.at).x, value: cue.value }
+      } else if (cue.kind === 'result') {
+        st.result = { value: cue.value, verdict: cue.verdict }
+        st.ball = null
+      }
+    }
+    chain = lastTrace.chain.slice()
+    state.ball = st.ball
+    state.gateValues = st.gateValues
+    state.flashes = st.flashes
+    state.short = st.short
+    state.result = st.result
+    say(kk === 0 ? '起点：值还在 ctx，尚未派发。' : (lastCues[kk - 1].cap ?? capResult(lastTrace)))
+    canvas.setAttribute('aria-valuenow', String(kk))
+    dirty = true
+  }
+
+  let scrubbingWf = false
+  const cueFromClientX = clientX => {
+    if (typeof canvas.getBoundingClientRect !== 'function') return null
+    const rect = canvas.getBoundingClientRect()
+    if (!(rect.width > 0)) return null
+    const frac = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
+    return Math.round(frac * lastCues.length)
+  }
+  canvas.addEventListener('pointerdown', event => {
+    if (lastCues === null) return
+    scrubbingWf = true
+    canvas.classList.add('is-scrubbing')
+    try { if (typeof canvas.setPointerCapture === 'function') canvas.setPointerCapture(event.pointerId) } catch { /* 捕获失败不影响拖拽本身 */ }
+    const k = typeof event.clientX === 'number' ? cueFromClientX(event.clientX) : null
+    if (k !== null) scrubTo(k)
+  })
+  canvas.addEventListener('pointermove', event => {
+    if (!scrubbingWf || typeof event.clientX !== 'number') return
+    const k = cueFromClientX(event.clientX)
+    if (k !== null) scrubTo(k)
+  })
+  const endScrubWf = () => {
+    scrubbingWf = false
+    canvas.classList.remove('is-scrubbing')
+  }
+  canvas.addEventListener('pointerup', endScrubWf)
+  canvas.addEventListener('pointercancel', endScrubWf)
+
+  canvas.addEventListener('keydown', event => {
+    if (lastCues === null) return
+    const actions = { ArrowLeft: (Number(canvas.getAttribute('aria-valuenow') ?? 0) || 0) - 1, ArrowRight: (Number(canvas.getAttribute('aria-valuenow') ?? 0) || 0) + 1, Home: 0, End: lastCues.length }
+    const next = actions[event.key]
+    if (next === undefined) return
+    event.preventDefault()
+    scrubTo(next)
   })
 
   function draw(now) {
