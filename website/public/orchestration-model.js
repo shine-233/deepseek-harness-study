@@ -32,6 +32,7 @@ export function buildScheduleModel(input = {}) {
   if (kind === undefined) throw new RangeError('未知触发器：' + String(input.kind))
   const sessionState = SESSION_STATES.find(item => item === input.sessionState)
   if (sessionState === undefined) throw new RangeError('未知会话状态：' + String(input.sessionState))
+  const fault = resolveFault(input.fault)
 
   const steps = []
   const push = (op, detail, extras = {}) =>
@@ -88,9 +89,9 @@ export function buildScheduleModel(input = {}) {
 
   const dispatchStep = steps.find(step => step.kind === 'dispatch')
   const everyActive = kind === 'every'
-  return {
+  const model = {
     mode: 'schedule',
-    input: { kind, sessionState },
+    input: { kind, sessionState, fault },
     label,
     steps,
     observations: {
@@ -113,16 +114,34 @@ export function buildScheduleModel(input = {}) {
       '模型回合是否真的回答成功；派发不等于已读。',
     ]),
   }
+  /*
+   * 教学故障：账本把滑过的锚点谎报成零——「不补票」被伪造成了已补票。
+   * 时间线里的 overdue 步骤原样保留，所以矛盾肉眼可见：CATCHUP_LATEST_ONLY 抓住它。
+   */
+  if (fault === 'replay-missed') model.observations.skippedAnchors = 0
+  return model
 }
 
 export const WORKFLOW_ENDINGS = Object.freeze(['completed', 'error', 'cancelled'])
 export const WORKFLOW_SHAPES = Object.freeze(['sequential-2', 'parallel-3-one-fails'])
+
+/** 教学故障注入：按模式各一个。schedule→账本谎报补投；workflow→吞掉一条配对端。 */
+export const ORCH_FAULT_TYPES = Object.freeze(['none', 'replay-missed', 'drop-agent-end'])
+
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!ORCH_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
 
 export function buildWorkflowModel(input = {}) {
   const ending = WORKFLOW_ENDINGS.find(item => item === input.ending)
   if (ending === undefined) throw new RangeError('未知结局：' + String(input.ending))
   const shape = WORKFLOW_SHAPES.find(item => item === input.shape)
   if (shape === undefined) throw new RangeError('未知形状：' + String(input.shape))
+  const fault = resolveFault(input.fault)
 
   const steps = []
   const push = (op, detail, extras = {}) => steps.push({ index: steps.length, op, detail, ...extras })
@@ -190,9 +209,9 @@ export function buildWorkflowModel(input = {}) {
   const synthesizedEnds = steps.filter(step => step.synthesized === true).length
   const nullMapped = failedChildren > 0 && ending !== 'error'
 
-  return {
+  const model = {
     mode: 'workflow',
-    input: { ending, shape },
+    input: { ending, shape, fault },
     steps,
     observations: {
       agentStarts: starts,
@@ -214,6 +233,21 @@ export function buildWorkflowModel(input = {}) {
       'UI Conversation Node 的折叠渲染细节。',
     ]),
   }
+  /*
+   * 教学故障：吞掉最后一条 workflow/agent-end——start/end 按 seq 配对是观察者的
+   * 生命线。取消路径不生效（那里靠合成端记账，吞掉会同时弄脏两处校验）。
+   */
+  if (fault === 'drop-agent-end' && ending !== 'cancelled') {
+    for (let position = model.steps.length - 1; position >= 0; position -= 1) {
+      if (model.steps[position].event === 'workflow/agent-end') {
+        model.steps.splice(position, 1)
+        model.steps.forEach((step, index) => { step.index = index })
+        model.observations.agentEnds -= 1
+        break
+      }
+    }
+  }
+  return model
 }
 
 export function evaluateOrchestrationOracle(model) {

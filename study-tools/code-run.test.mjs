@@ -66,3 +66,23 @@ test('unknown inputs are rejected loudly', () => {
   assert.throws(() => buildCodeRunModel({ scenario: 'nope', binding: 'tools' }), RangeError)
   assert.throws(() => buildCodeRunModel({ scenario: 'abort', binding: 'window' }), RangeError)
 })
+
+test('the silent-stringify fault is caught by LOSSLESS_JSON_BOUNDARY alone', () => {
+  for (const scenario of ['timeout', 'abort', 'worker-exit', 'invalid-output', 'output-limit']) {
+    const model = buildCodeRunModel({ scenario, binding: 'tools', fault: 'silent-stringify' })
+    assert.equal(typeof model.result.value, 'string', 'a forged value must be a string')
+    const result = evaluateCodeRunOracle(model)
+    const red = result.checks.filter(check => !check.pass).map(check => check.id)
+    assert.deepEqual(red, ['LOSSLESS_JSON_BOUNDARY'],
+      scenario + ': exactly one rule should catch the lie, got ' + red.join(','))
+  }
+})
+
+test('the silent-stringify fault is ineffective on success and blocked-before-run paths', () => {
+  assert.equal(evaluateCodeRunOracle(buildCodeRunModel({ scenario: 'success', binding: 'tools', fault: 'silent-stringify' })).pass, true)
+  assert.equal(evaluateCodeRunOracle(buildCodeRunModel({ scenario: 'exception', binding: 'console', fault: 'silent-stringify' })).pass, true)
+})
+
+test('an unknown fault type fails loud at the model boundary', () => {
+  assert.throws(() => buildCodeRunModel({ scenario: 'success', binding: 'tools', fault: 'no-such-fault' }))
+})

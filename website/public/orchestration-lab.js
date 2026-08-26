@@ -16,6 +16,7 @@ import {
   SESSION_STATES,
   WORKFLOW_ENDINGS,
   WORKFLOW_SHAPES,
+  ORCH_FAULT_TYPES,
   buildScheduleModel,
   buildWorkflowModel,
   evaluateOrchestrationOracle,
@@ -83,6 +84,8 @@ function initializePage() {
     sessionState: document.querySelector('#sched-state'),
     ending: document.querySelector('#wf-ending'),
     shape: document.querySelector('#wf-shape'),
+    faultType: document.querySelector('#orch-fault-type'),
+    faultNote: document.querySelector('#orch-fault-note'),
     feedback: document.querySelector('#orch-feedback'),
     timeline: document.querySelector('#orch-timeline'),
     oracleList: document.querySelector('#oracle-list'),
@@ -163,15 +166,37 @@ function initializePage() {
         model = buildScheduleModel({
           kind: elements.kind.value,
           sessionState: elements.sessionState.value,
+          fault: elements.faultType.value,
         })
       } else {
         model = buildWorkflowModel({
           ending: elements.ending.value,
           shape: elements.shape.value,
+          fault: elements.faultType.value,
         })
       }
       const verdict = evaluateOrchestrationOracle(model)
       currentModel = model
+
+      // 篡改实验的反馈：按当前模式判定生效条件，不满足就明说。
+      const fault = elements.faultType.value
+      const effective = (fault === 'replay-missed' && isSchedule && model.input.sessionState !== 'live-idle')
+        || (fault === 'drop-agent-end' && !isSchedule && model.input.ending !== 'cancelled')
+      if (fault !== 'none' && !effective) {
+        writeText(elements.faultNote, isSchedule
+          ? 'live-idle 会话没有滑过的锚点，账本无可谎报，注入未生效。切到忙/冷会话再看。'
+          : '取消路径靠引擎合成端记账：在那里吞端会同时弄脏两处校验，注入未生效。换个结局。')
+        elements.faultNote.hidden = false
+      } else if (fault !== 'none' && !verdict.pass) {
+        writeText(elements.faultNote, isSchedule
+          ? '你刚刚让账本谎报了补票：滑过的锚点被记成零，而时间线里的 overdue 步骤还在原地。'
+            + '抓住它的是 CATCHUP_LATEST_ONLY——错过的区间不枚举、也不许被「已补投」。'
+          : '你刚刚吞掉了一条 workflow/agent-end：start/end 按 seq 配对是观察者的生命线。'
+            + '抓住它的是 AGENT_PAIRING——少一条端，配对当场报缺。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       renderTimeline(model, elements.timeline)
       renderOracle(verdict, elements.oracleList, elements.oracle)
@@ -206,7 +231,7 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  for (const control of [elements.mode, elements.kind, elements.sessionState, elements.ending, elements.shape]) {
+  for (const control of [elements.mode, elements.kind, elements.sessionState, elements.ending, elements.shape, elements.faultType]) {
     control.addEventListener('change', () => {
       rebuild()
       elements.step.value = elements.step.max

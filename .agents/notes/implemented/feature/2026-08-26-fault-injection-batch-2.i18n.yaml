@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-26-fault-injection-batch-2.md
-2026-08-26-fault-injection-batch-2.md: 3477930af1003d5be6328ec09032f26c772cf2cb
-2026-08-26-fault-injection-batch-2.zh.md: 3be05e907f4eebbe2020be9db15ddc36d6f29caa
+2026-08-26-fault-injection-batch-2.md: 0ff1e5e24c399ef8a3a412272f1be54b3f65fb6c
+2026-08-26-fault-injection-batch-2.zh.md: efc8931164adb2af8b09d23f7326c771541797fd

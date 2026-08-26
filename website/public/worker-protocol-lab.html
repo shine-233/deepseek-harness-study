@@ -70,6 +70,14 @@
             <span>场景</span>
             <select id="wp-scenario"></select>
           </label>
+          <label>
+            <span>篡改实验（亲手违反不变量）</span>
+            <select id="wp-fault-type" name="fault">
+              <option value="none">不注入</option>
+              <option value="drop-child-reply">吞掉一条 ChildStart 的回复</option>
+            </select>
+            <small>取消场景没有 RPC，注入不生效。丢掉回复后，宿主侧状态机会把子代理永远挂在「已请求、无人应答」上——独立校验当场变红。</small>
+          </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
@@ -132,7 +140,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="wp-fault-note" hidden></p></div>
         </div>
       </article>
     </section>

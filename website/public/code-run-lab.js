@@ -19,6 +19,7 @@ import {
   BINDING_CANDIDATES,
   BINDING_LABELS,
   CODE_RUN_SCENARIOS,
+  CODE_RUN_FAULT_TYPES,
   buildCodeRunModel,
   evaluateCodeRunOracle,
 } from './code-run-model.js'
@@ -33,6 +34,7 @@ import { installThemeToggle } from './study-lab-theme.js'
 const CODE_RUN_STATE_SCHEMA = {
   scenario: { enum: CODE_RUN_SCENARIOS },
   binding: { enum: BINDING_CANDIDATES },
+  fault: { enum: [...CODE_RUN_FAULT_TYPES] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
@@ -91,6 +93,8 @@ function initializePage() {
     form: document.querySelector('#code-run-form'),
     scenario: document.querySelector('#code-run-scenario'),
     binding: document.querySelector('#code-run-binding'),
+    faultType: document.querySelector('#cr-fault-type'),
+    faultNote: document.querySelector('#cr-fault-note'),
     scenarioNote: document.querySelector('#code-run-scenario-note'),
     feedback: document.querySelector('#code-run-feedback'),
     timeline: document.querySelector('#cr-timeline'),
@@ -154,9 +158,28 @@ function initializePage() {
       const model = buildCodeRunModel({
         scenario: elements.scenario.value,
         binding: elements.binding.value,
+        fault: elements.faultType.value,
       })
       const verdict = evaluateCodeRunOracle(model)
       currentModel = model
+
+      // 篡改实验的反馈：注入未生效或 oracle 变红时，指认被违反的那条规则。
+      const stringifyBlocked = elements.faultType.value === 'silent-stringify'
+        && (elements.scenario.value === 'success' || model.result.blockedBeforeRun === true)
+      if (stringifyBlocked) {
+        writeText(elements.faultNote,
+          model.result.blockedBeforeRun
+            ? '装配在启动前就被拒绝了：没有可顶替的完成值，注入未生效。换一个合法命名空间和失败剧本再试。'
+            : '成功剧本的完成值本来就是合法 JSON：没有缺席值可伪造，注入未生效。切到任一失败剧本再看。')
+        elements.faultNote.hidden = false
+      } else if (elements.faultType.value === 'silent-stringify' && !verdict.pass) {
+        writeText(elements.faultNote,
+          '你刚刚偷偷把完成值渲染成字符串顶替了缺席：失败剧本本该让 value 保持缺席、只带 error 字段。'
+          + '抓住它的是 LOSSLESS_JSON_BOUNDARY——无损边界不收伪造的替代品。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       writeText(elements.scenarioNote, SCENARIO_LABELS[model.input.scenario]
         + ' × 命名空间 ' + model.input.binding)
@@ -191,6 +214,7 @@ function initializePage() {
       history.replaceState(null, '', writeStateToHash(location.hash, {
         scenario: elements.scenario.value,
         binding: elements.binding.value,
+        fault: elements.faultType.value,
         step: Number(elements.step.value),
       }, CODE_RUN_STATE_SCHEMA))
     } catch {
@@ -204,7 +228,7 @@ function initializePage() {
     event.preventDefault()
     rebuild()
   })
-  for (const control of [elements.scenario, elements.binding]) {
+  for (const control of [elements.scenario, elements.binding, elements.faultType]) {
     control.addEventListener('change', () => {
       rebuild()
       elements.step.value = elements.step.max
@@ -240,6 +264,7 @@ function initializePage() {
   if (restored !== null && restored.ok) {
     elements.scenario.value = restored.value.scenario
     elements.binding.value = restored.value.binding
+    elements.faultType.value = restored.value.fault
     elements.step.value = String(restored.value.step)
   }
 

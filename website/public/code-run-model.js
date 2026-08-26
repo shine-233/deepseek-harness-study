@@ -62,6 +62,17 @@ export const BINDING_LABELS = Object.freeze({
   for: 'for —— 保留字',
 })
 
+/** 教学故障注入：失败剧本里偷偷把值渲染成字符串顶替。none 是唯一默认。 */
+export const CODE_RUN_FAULT_TYPES = Object.freeze(['none', 'silent-stringify'])
+
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!CODE_RUN_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
+
 function validateBindingNamespace(globalName) {
   if (!PORTABLE_IDENTIFIER.test(globalName)) {
     return { ok: false, reason: `global 必须匹配 [A-Za-z_][A-Za-z0-9_]*：「${globalName}」在任何后端都不接受` }
@@ -119,6 +130,7 @@ export function buildCodeRunModel(input = {}) {
   if (scenario === undefined) throw new RangeError('未知剧本：' + String(input.scenario))
   const binding = BINDING_CANDIDATES.find(item => item === input.binding)
   if (binding === undefined) throw new RangeError('未知命名空间：' + String(input.binding))
+  const fault = resolveFault(input.fault)
 
   const bindingCheck = validateBindingNamespace(binding)
   const steps = []
@@ -132,7 +144,7 @@ export function buildCodeRunModel(input = {}) {
 
   if (!bindingCheck.ok) {
     return {
-      input: { scenario, binding },
+      input: { scenario, binding, fault },
       bindingCheck,
       steps,
       result: { resolved: true, value: null, logs: [], error: null, blockedBeforeRun: true },
@@ -156,8 +168,8 @@ export function buildCodeRunModel(input = {}) {
   const failureKind = failed ? scenario : null
   const logCount = scenario === 'success' ? 1 : 0
 
-  return {
-    input: { scenario, binding },
+  const model = {
+    input: { scenario, binding, fault },
     bindingCheck,
     steps,
     result: {
@@ -185,6 +197,15 @@ export function buildCodeRunModel(input = {}) {
       'worker 线程底座的真实崩溃现场（core dump 级别的证据）。',
     ]),
   }
+  /*
+   * 教学故障：失败剧本里偷偷伪造一个字符串完成值——「不渲染字符串顶替」
+   * 被原样违反。LOSSLESS_JSON_BOUNDARY 抓住它。成功剧本没有可顶替的缺席值，
+   * 注入不生效。
+   */
+  if (fault === 'silent-stringify' && failed) {
+    model.result.value = JSON.stringify('伪造的完成值')
+  }
+  return model
 }
 
 export function evaluateCodeRunOracle(model) {

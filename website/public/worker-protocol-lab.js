@@ -12,6 +12,7 @@ import {
 import { installInputReset } from './study-lab-kit.js'
 import {
   PROTOCOL_SCENARIOS,
+  WP_FAULT_TYPES,
   buildProtocolModel,
   evaluateProtocolOracle,
 } from './worker-protocol-model.js'
@@ -31,6 +32,7 @@ const SCENARIO_LABELS = {
 
 const WP_STATE_SCHEMA = {
   scenario: { enum: PROTOCOL_SCENARIOS },
+  fault: { enum: [...WP_FAULT_TYPES] },
   step: { integerRange: [0, Number.MAX_SAFE_INTEGER] },
 }
 
@@ -38,6 +40,8 @@ function initializePage() {
   const elements = {
     form: document.querySelector('#wp-form'),
     scenario: document.querySelector('#wp-scenario'),
+    faultType: document.querySelector('#wp-fault-type'),
+    faultNote: document.querySelector('#wp-fault-note'),
     feedback: document.querySelector('#wp-feedback'),
     timeline: document.querySelector('#wp-timeline'),
     oracleList: document.querySelector('#oracle-list'),
@@ -92,9 +96,23 @@ function initializePage() {
 
   const rebuild = () => {
     try {
-      const model = buildProtocolModel({ scenario: elements.scenario.value })
+      const model = buildProtocolModel({ scenario: elements.scenario.value, fault: elements.faultType.value })
       const verdict = evaluateProtocolOracle(model)
       currentModel = model
+
+      // 篡改实验的反馈：注入未生效或 oracle 变红时，指认被违反的那条规则。
+      if (elements.faultType.value === 'drop-child-reply' && elements.scenario.value === 'cancel-mid-flight') {
+        writeText(elements.faultNote,
+          '取消场景没有 ChildStart RPC：没有回复可吞，注入未生效。切到正常或子启动失败场景再看。')
+        elements.faultNote.hidden = false
+      } else if (elements.faultType.value === 'drop-child-reply' && !verdict.pass) {
+        writeText(elements.faultNote,
+          '你刚刚吞掉了一条 ChildStart 的回复：宿主侧状态机会把这个子代理永远挂在「已请求、无人应答」上。'
+          + '抓住它的是 CHILD_RPC_PAIRED——每个 ChildStart 恰好一个回复，少一条就当场报缺。')
+        elements.faultNote.hidden = false
+      } else {
+        elements.faultNote.hidden = true
+      }
 
       elements.timeline.replaceChildren()
       for (const msg of model.messages) {
@@ -138,6 +156,7 @@ function initializePage() {
     try {
       history.replaceState(null, '', writeStateToHash(location.hash, {
         scenario: elements.scenario.value,
+        fault: elements.faultType.value,
         step: Number(elements.step.value),
       }, WP_STATE_SCHEMA))
     } catch { /* 保持安静 */ }
@@ -150,6 +169,7 @@ function initializePage() {
     rebuild()
   })
   elements.scenario.addEventListener('change', rebuild)
+  elements.faultType.addEventListener('change', rebuild)
 
   elements.step.addEventListener('input', () => {
     syncStep()
@@ -176,6 +196,7 @@ function initializePage() {
   const restored = readStateFromHash(location.hash, WP_STATE_SCHEMA)
   if (restored !== null && restored.ok) {
     elements.scenario.value = restored.value.scenario
+    elements.faultType.value = restored.value.fault
     elements.step.value = String(restored.value.step)
   }
 

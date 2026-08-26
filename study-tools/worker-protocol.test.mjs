@@ -75,3 +75,29 @@ test('all tags are from the declared enums', () => {
     }
   }
 })
+
+test('the drop-child-reply fault is caught by CHILD_RPC_PAIRED alone', () => {
+  const model = buildProtocolModel({ scenario: 'normal', fault: 'drop-child-reply' })
+  assert.equal(model.observations.childReplies, 1, 'one of two replies must be gone')
+  const result = evaluateProtocolOracle(model)
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['CHILD_RPC_PAIRED'],
+    'exactly one rule should catch the lie, got: ' + red.join(','))
+})
+
+test('the drop-child-reply fault also catches the ChildStartError path', () => {
+  const model = buildProtocolModel({ scenario: 'child-start-error', fault: 'drop-child-reply' })
+  const result = evaluateProtocolOracle(model)
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['CHILD_RPC_PAIRED'])
+})
+
+test('the drop-child-reply fault is ineffective without RPC traffic', () => {
+  const model = buildProtocolModel({ scenario: 'cancel-mid-flight', fault: 'drop-child-reply' })
+  assert.equal(evaluateProtocolOracle(model).pass, true,
+    'cancel-mid-flight carries no ChildStart, so nothing can go missing')
+})
+
+test('an unknown fault type fails loud at the model boundary', () => {
+  assert.throws(() => buildProtocolModel({ scenario: 'normal', fault: 'no-such-fault' }))
+})

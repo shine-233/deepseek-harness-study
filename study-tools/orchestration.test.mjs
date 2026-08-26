@@ -84,3 +84,38 @@ test('script errors rethrow fatal instead of mapping to null', () => {
   assert.ok(model.steps.some(step => step.kind === 'fatal'))
   assert.equal(model.observations.stopReason, 'error')
 })
+
+test('the replay-missed fault is caught by CATCHUP_LATEST_ONLY alone', () => {
+  const model = buildScheduleModel({ kind: 'every', sessionState: 'cold-reopen', fault: 'replay-missed' })
+  assert.equal(model.observations.skippedAnchors, 0, 'the ledger must lie about the skipped anchors')
+  assert.ok(model.steps.some(step => step.kind === 'overdue'), 'the timeline still shows what really happened')
+  const result = evaluateOrchestrationOracle(model)
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['CATCHUP_LATEST_ONLY'],
+    'exactly one rule should catch the lie, got: ' + red.join(','))
+})
+
+test('the replay-missed fault is ineffective when no anchors were missed', () => {
+  const model = buildScheduleModel({ kind: 'after', sessionState: 'live-idle', fault: 'replay-missed' })
+  assert.equal(evaluateOrchestrationOracle(model).pass, true)
+})
+
+test('the drop-agent-end fault is caught by AGENT_PAIRING alone', () => {
+  const model = buildWorkflowModel({ ending: 'completed', shape: 'parallel-3-one-fails', fault: 'drop-agent-end' })
+  assert.equal(model.observations.agentEnds, model.observations.agentStarts - 1)
+  const result = evaluateOrchestrationOracle(model)
+  const red = result.checks.filter(check => !check.pass).map(check => check.id)
+  assert.deepEqual(red, ['AGENT_PAIRING'],
+    'exactly one rule should catch the lie, got: ' + red.join(','))
+})
+
+test('the drop-agent-end fault is ineffective on the cancelled path', () => {
+  const model = buildWorkflowModel({ ending: 'cancelled', shape: 'sequential-2', fault: 'drop-agent-end' })
+  assert.equal(evaluateOrchestrationOracle(model).pass, true,
+    'synthesized ends are load-bearing; the fault must not fire there')
+})
+
+test('unknown fault types fail loud at the model boundary', () => {
+  assert.throws(() => buildScheduleModel({ kind: 'after', sessionState: 'busy', fault: 'no-such-fault' }))
+  assert.throws(() => buildWorkflowModel({ ending: 'error', shape: 'sequential-2', fault: 'no-such-fault' }))
+})

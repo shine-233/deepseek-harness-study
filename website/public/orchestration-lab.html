@@ -73,6 +73,15 @@
               <option value="workflow">workflow —— 脚本编排子代理</option>
             </select>
           </label>
+          <label>
+            <span>篡改实验（亲手违反不变量）</span>
+            <select id="orch-fault-type" name="fault">
+              <option value="none">不注入</option>
+              <option value="replay-missed">schedule：让账本谎报补票</option>
+              <option value="drop-agent-end">workflow：吞掉一条配对端</option>
+            </select>
+            <small>故障只对当前编排面生效，条件不满足时明说。独立校验会当场变红，并指认是哪条规则被违反。</small>
+          </label>
 
           <div id="panel-schedule">
             <label>
@@ -156,7 +165,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="orch-fault-note" hidden></p></div>
         </div>
       </article>
     </section>

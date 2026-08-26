@@ -25,6 +25,17 @@ export const HOST_TO_WORKER = Object.freeze([
 export const PROTOCOL_SCENARIOS = Object.freeze(['normal', 'cancel-mid-flight', 'child-start-error'])
 export const PROTOCOL_DIRECTIONS = Object.freeze(['host→worker', 'worker→host'])
 
+/** 教学故障注入：吞掉一条 ChildStarted/ChildStartError 回复。none 是唯一默认。 */
+export const WP_FAULT_TYPES = Object.freeze(['none', 'drop-child-reply'])
+
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!WP_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
+
 /**
  * 组装一条确定性的双向消息流。
  *
@@ -120,7 +131,20 @@ function buildMessages(scenario) {
 export function buildProtocolModel(input = {}) {
   const scenario = PROTOCOL_SCENARIOS.find(item => item === input.scenario)
   if (scenario === undefined) throw new RangeError('未知场景：' + String(input.scenario))
-  const messages = buildMessages(scenario)
+  const fault = resolveFault(input.fault)
+  let messages = buildMessages(scenario)
+
+  /*
+   * 教学故障：吞掉第一条 ChildStart 的回复——「每个 ChildStart 恰好一个回复」
+   * 是宿主状态机的生命线，丢回复意味着子代理永远无人认领。
+   * CHILD_RPC_PAIRED 抓住它。cancel-mid-flight 没有 RPC，注入不生效。
+   */
+  if (fault === 'drop-child-reply') {
+    const replyIndex = messages.findIndex(msg => msg.tag === 'ChildStarted' || msg.tag === 'ChildStartError')
+    if (replyIndex !== -1) {
+      messages = messages.filter((msg, index) => index !== replyIndex).map((msg, index) => ({ ...msg, index }))
+    }
+  }
 
   const childStarts = messages.filter(msg => msg.tag === 'ChildStart')
   const childReplies = messages.filter(msg =>
@@ -129,7 +153,7 @@ export function buildProtocolModel(input = {}) {
 
   return {
     mode: 'protocol',
-    input: { scenario },
+    input: { scenario, fault },
     messages,
     observations: {
       total: messages.length,

@@ -74,6 +74,14 @@
             <span>binding 命名空间</span>
             <select id="code-run-binding" name="binding"></select>
           </label>
+          <label>
+            <span>篡改实验（亲手违反不变量）</span>
+            <select id="cr-fault-type" name="fault">
+              <option value="none">不注入</option>
+              <option value="silent-stringify">偷偷把完成值渲染成字符串顶替</option>
+            </select>
+            <small>只在失败剧本且命名空间合法时生效：失败本该让 value 缺席、只带 error 字段。独立校验会当场变红，并指认是哪条规则被违反。</small>
+          </label>
           <button class="button button-primary" type="submit">重新推演</button>
           <button class="button button-quiet" type="button" id="copy-state-link">复制状态链接</button>
           <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
@@ -136,7 +144,7 @@
         </div>
         <div class="boundary-columns">
           <div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div>
-          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div>
+          <div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul><p id="cr-fault-note" hidden></p></div>
         </div>
       </article>
     </section>
