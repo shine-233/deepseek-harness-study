@@ -6,3 +6,52 @@
 .cap-line { stroke: var(--deny-ink, #c62828); stroke-width: 2; stroke-dasharray: 5 4; }
 .cap-label { fill: var(--deny-ink, #c62828); font-size: 12px; font-weight: 700; }
 .sb-controls .sb-check { flex-direction: row; align-items: center; gap: 8px; }
+
+/* 流式时间线与块级账本（2026-08-26 升级） */
+.tmk-stream-track {
+  height: 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted, #9aa3ad) 25%, transparent);
+  overflow: hidden;
+  margin: 6px 0;
+}
+.tmk-stream-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--brand);
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tmk-log { max-height: 300px; }
+.stepper-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.stepper-row .step-slider { display: flex; align-items: center; gap: 8px; flex: 1 1 220px; min-width: 200px; }
+.stepper-row .step-slider input[type="range"] { flex: 1; }
+.log-row {
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 7px 12px;
+  border: 1px solid var(--vp-c-divider, rgba(0, 0, 0, 0.12));
+  border-radius: 8px;
+  cursor: pointer;
+}
+.log-row small { grid-column: 2; color: var(--vp-c-text-2); }
+.log-row.is-current { border-color: var(--brand); box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 30%, transparent); }
+.log-kind {
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  padding: 0 7px;
+  text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tmk-stream-fill { transition: none; }
+}

@@ -22,9 +22,56 @@ export const METER_LIMITS = Object.freeze({
   windowTokens: Object.freeze({ min: 1000, max: 32000 }),
 })
 
-const estimate = chars => Math.ceil(chars / 4)
+/**
+ * 结构化定价常量，逐条对照上游 estimate.ts:13-19：
+ * 文本密度每 4 字符 1 token；每个内容块加 JSON 框架与类型标签的结构开销；
+ * 每条消息再加角色字段框架开销。
+ */
+export const METER_ESTIMATE_CONSTANTS = Object.freeze({
+  CHARS_PER_TOKEN: 4,
+  BLOCK_OVERHEAD: 4,
+  ROLE_OVERHEAD: 4,
+})
 
-function resolveInput(input = {}) {
+const { CHARS_PER_TOKEN, BLOCK_OVERHEAD, ROLE_OVERHEAD } = METER_ESTIMATE_CONSTANTS
+
+const ceilDiv = (chars) => Math.ceil(chars / CHARS_PER_TOKEN)
+
+/**
+ * 递归定价内容块数组——上游 estimateContent 的忠实移植。
+ * @param {Array<{ kind: string, label: string, nameChars?: number, argsChars?: number, textChars?: number, children?: Array }> | undefined} blocks
+ * @returns {{ tokens: number, rows: Array<{ label: string, formula: string, tokens: number }> }}
+ */
+export function estimateBlocks(blocks) {
+  let tokens = 0
+  const rows = []
+  for (const block of blocks ?? []) {
+    if (block.kind === 'text') {
+      const price = ceilDiv(block.textChars) + BLOCK_OVERHEAD
+      tokens += price
+      rows.push({ label: block.label, formula: `⌈${String(block.textChars)}/4⌉ + 块开销4`, tokens: price })
+    } else if (block.kind === 'tool-call') {
+      const price = ceilDiv(block.nameChars) + ceilDiv(block.argsChars) + BLOCK_OVERHEAD
+      tokens += price
+      rows.push({ label: block.label, formula: `⌈名${String(block.nameChars)}/4⌉+⌈参${String(block.argsChars)}/4⌉ + 块开销4`, tokens: price })
+    } else if (block.kind === 'tool-result') {
+      const inner = estimateBlocks(block.children)
+      const price = inner.tokens + BLOCK_OVERHEAD
+      tokens += price
+      rows.push({ label: block.label, formula: `嵌套 ${String(inner.tokens)} + 块开销4（递归进入子内容）`, tokens: price })
+    } else {
+      throw new TypeError('未知块类型：' + String(block?.kind))
+    }
+  }
+  return { tokens, rows }
+}
+
+/** 系统提示词定价：文本 + 角色框架开销（estimateSystemTokens）。 */
+export function estimateSystemTokens(systemChars) {
+  return ceilDiv(systemChars) + ROLE_OVERHEAD
+}
+
+const resolveInput = function (input = {}) {
   const intNonNeg = (name, value) => {
     if (typeof value !== 'number' || !Number.isInteger(value)) throw new TypeError(name + ' 必须是整数')
     if (value < 0 || value > 20000) throw new RangeError(name + ' 超出范围：' + String(value))
@@ -35,18 +82,41 @@ function resolveInput(input = {}) {
   if (input.measuredBaseline !== undefined && typeof input.measuredBaseline !== 'boolean') {
     throw new TypeError('measuredBaseline 必须是布尔值')
   }
+  if (input.withToolPair !== undefined && typeof input.withToolPair !== 'boolean') {
+    throw new TypeError('withToolPair 必须是布尔值')
+  }
   const windowTokens = input.windowTokens ?? 8000
   if (typeof windowTokens !== 'number' || !Number.isInteger(windowTokens)
     || windowTokens < METER_LIMITS.windowTokens.min || windowTokens > METER_LIMITS.windowTokens.max) {
     throw new RangeError('windowTokens 超出范围：' + String(windowTokens))
   }
-  return { headerChars: 120, existingChars, newChars, measuredBaseline: input.measuredBaseline !== false, windowTokens }
+  return {
+    headerChars: 120, existingChars, newChars,
+    measuredBaseline: input.measuredBaseline !== false,
+    withToolPair: input.withToolPair === true,
+    windowTokens,
+  }
+}
+
+/** 新表面的块计划：一段新增文本，可选一对工具调用与结果。 */
+function surfaceBlocks(withToolPair, newChars) {
+  const blocks = [{ kind: 'text', label: '新增助手文本', textChars: newChars }]
+  if (withToolPair) {
+    blocks.push({ kind: 'tool-call', label: 'tool-call read_file', nameChars: 9, argsChars: 120 })
+    blocks.push({ kind: 'tool-result', label: 'tool-result（内嵌 200 字符文本）', children: [{ kind: 'text', label: '工具输出正文', textChars: 200 }] })
+  }
+  return blocks
 }
 
 /** 从日志前缀推演出计量读数。 */
 export function buildMeterModel(input = {}) {
   const resolved = resolveInput(input)
-  const { headerChars, existingChars, newChars, measuredBaseline, windowTokens } = resolved
+  const { headerChars, existingChars, newChars, measuredBaseline, withToolPair, windowTokens } = resolved
+
+  const headerTokens = estimateSystemTokens(headerChars)
+  const newSurface = estimateBlocks(surfaceBlocks(withToolPair, newChars))
+  const existingSurface = estimateBlocks([{ kind: 'text', label: '已有助手文本', textChars: existingChars }])
+  const everything = estimateBlocks([...surfaceBlocks(withToolPair, newChars), { kind: 'text', label: '已有助手文本', textChars: existingChars }])
 
   const steps = []
   const push = (laneIdx, phase, detail, extra = {}) => {
@@ -55,12 +125,12 @@ export function buildMeterModel(input = {}) {
 
   push(0, 'replay', '重放日志前缀：header 与表面内容逐事件累加，consumedEvents 记账到当前为止。')
   const baselineTokens = measuredBaseline
-    ? estimate(headerChars) + estimate(existingChars)
-    : estimate(headerChars)
-  const surfaceDeltaTokens = measuredBaseline ? estimate(newChars) : estimate(existingChars + newChars)
+    ? headerTokens + existingSurface.tokens
+    : headerTokens
+  const surfaceDeltaTokens = measuredBaseline ? newSurface.tokens : everything.tokens
   push(1, 'baseline', measuredBaseline
     ? 'provider 返回过 usage：实测基线锚定 header + 已有表面 = ' + String(baselineTokens) + ' tokens。'
-    : '没有 usage：估算基线只有 header = ' + String(baselineTokens) + ' tokens。')
+    : '没有 usage：估算基线只有 header（⌈120/4⌉+角色开销4）= ' + String(baselineTokens) + ' tokens。')
   push(1, 'surface-delta', '表面增量 +' + String(surfaceDeltaTokens) + ' tokens（'
     + (measuredBaseline ? '仅锚定之后的新增内容' : '全部表面内容') + '）。')
   const totalTokens = Math.max(0, baselineTokens + surfaceDeltaTokens)
@@ -73,6 +143,12 @@ export function buildMeterModel(input = {}) {
     input: { ...resolved },
     lanes: METER_LANES,
     steps,
+    breakdown: {
+      headerFormula: `⌈${String(headerChars)}/4⌉ + 角色开销4`,
+      headerTokens,
+      rows: [...newSurface.rows, ...existingSurface.rows],
+      totalTokens,
+    },
     observations: {
       baselineKind: measuredBaseline ? 'measured' : 'estimated',
       baselineTokens,
@@ -86,8 +162,9 @@ export function buildMeterModel(input = {}) {
     canProve: [
       '同一日志前缀重放出同一读数（确定性）。',
       'totalTokens = max(0, baseline + surfaceDelta)；两种基线口径的总数一致。',
+      '块级定价规则与上游 estimate.ts 逐条一致：文本 ⌈字符/4⌉+4、工具调用名与参数分开计价、工具结果递归进入子内容、每条消息再加角色开销。',
       '压力只是读数：计量器不做截断，也不承诺 provider 口径的精确值。',
-      '估算口径是每字符 0.25 token 的粗账——不是 tokenizer。',
+      '估算口径是固定密度的粗账——不是 tokenizer。',
     ],
     cannotProve: [
       '不能证明真实 provider 的 input/cached token 字段值。',
@@ -96,6 +173,53 @@ export function buildMeterModel(input = {}) {
       '不能用本页替代 compaction 的瘦身决策。',
     ],
   }
+}
+
+/**
+ * 流式时间线：新增表面按 chunk 逐拍到达，计量读数逐拍上涨；
+ * 最后一拍是「usage 是否落地」的判定——measured 口径在这里完成归属切换，
+ * estimated 口径则宣布整段都留在增量里。
+ * @param {object} input - 与 buildMeterModel 相同的输入。
+ * @returns {{ frames: Array<{ tick: number, label: string, detail: string, totalTokens: number, baselineKind: string }>, finalTotal: number }}
+ */
+export function buildStreamFrames(input = {}) {
+  const model = buildMeterModel(input)
+  const { newChars, measuredBaseline } = model.input
+  const chunkCount = Math.min(12, Math.max(1, Math.ceil(newChars / 80)))
+  const perChunkChars = Math.ceil(newChars / chunkCount)
+  const frames = []
+  for (let i = 1; i <= chunkCount; i += 1) {
+    const partialInput = { ...model.input, newChars: perChunkChars * i }
+    const partial = buildMeterModel(partialInput)
+    frames.push({
+      tick: frames.length,
+      label: `chunk ${String(i)}/${String(chunkCount)} 到达`,
+      detail: `+${String(perChunkChars)} 字符 → 读数 ${String(partial.observations.totalTokens)} tokens（压力 ${String(partial.observations.pressurePct)}%）。`,
+      totalTokens: partial.observations.totalTokens,
+      pressurePct: partial.observations.pressurePct,
+      baselineKind: partial.observations.baselineKind,
+    })
+  }
+  if (measuredBaseline) {
+    frames.push({
+      tick: frames.length,
+      label: 'usage 落地',
+      detail: `provider usage 到达：已有表面划入实测基线，归属切换、总数不变 ${String(model.observations.totalTokens)} tokens。`,
+      totalTokens: model.observations.totalTokens,
+      pressurePct: model.observations.pressurePct,
+      baselineKind: 'measured',
+    })
+  } else {
+    frames.push({
+      tick: frames.length,
+      label: '无 usage',
+      detail: `provider 没有返回 usage：整段保持估算增量，总读数仍是 ${String(model.observations.totalTokens)} tokens——粗账可用，但别当实测报。`,
+      totalTokens: model.observations.totalTokens,
+      pressurePct: model.observations.pressurePct,
+      baselineKind: 'estimated',
+    })
+  }
+  return { frames, finalTotal: model.observations.totalTokens }
 }
 
 /** 独立校验：只读 steps 与 observations，自己重算账目。 */

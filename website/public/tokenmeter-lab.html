@@ -58,6 +58,34 @@
       </div>
     </section>
 
+    <section class="trace-card card" aria-labelledby="tmk-stream-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="wave">流式时间线</p><h2 id="tmk-stream-title">chunk 逐拍到达，读数逐拍上涨</h2></div><span class="schema-pill">播放 × 跳拍</span></div>
+      <p class="section-intro">每一拍是一个 chunk 到达后的重放读数；最后一拍是判定时刻——usage 落地就完成归属切换，没落地整段留在估算增量里。点日志任意一行跳到那一拍。</p>
+      <div class="stepper-row">
+        <button type="button" class="button button-quiet" id="tmk-play" aria-label="连播或暂停">▶ 连播</button>
+        <label class="step-slider"><span>步进</span><input type="range" id="tmk-step" min="0" max="6" step="1" value="0" aria-describedby="tmk-step-caption"></label>
+        <label><span>速度</span><select id="tmk-speed">
+          <option value="1240">0.5×</option>
+          <option value="620" selected>1×</option>
+          <option value="310">2×</option>
+          <option value="150">4×</option>
+        </select></label>
+      </div>
+      <p class="chart-note" id="tmk-step-caption" role="status" aria-live="polite"></p>
+      <div class="tmk-stream-track" aria-hidden="true"><div class="tmk-stream-fill" id="tmk-stream-bar"></div></div>
+      <p class="chart-note" id="tmk-stream-note"></p>
+      <ol class="tmk-log" id="tmk-frames"></ol>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="tmk-ledger-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="list">块级账本</p><h2 id="tmk-ledger-title">每一段内容怎么被计价</h2></div><span class="schema-pill">对照 estimate.ts</span></div>
+      <p class="section-intro">固定密度的粗账也有结构：文本按 ⌈字符/4⌉ 计价、每个块加 4 的框架开销、工具调用把名和参数分开计、工具结果递归进入子内容、header 另加角色开销。行加总等于总读数。</p>
+      <div class="plot-scroll"><table class="stoprules" id="tmk-ledger-table">
+        <thead><tr><th scope="col">内容块</th><th scope="col">计价公式</th><th scope="col">读数（tokens）</th></tr></thead>
+        <tbody id="tmk-ledger"></tbody>
+      </table></div>
+    </section>
+
     <section class="trace-card card" aria-labelledby="tmk-title">
       <div class="section-heading"><div><p class="section-label" data-icon="gauge">压力表</p><h2 id="tmk-title">总读数占窗口的比例</h2></div><span class="schema-pill">tokens × 窗口</span></div>
       <p class="section-intro">条内分段显示两种口径各自的贡献：实测口径把已有表面计入基线、增量只算新增；估算口径基线只剩 header，全部表面都算增量。总数恒等。</p>
