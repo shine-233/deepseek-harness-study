@@ -10,7 +10,7 @@ The course-page companion mascot was a flat sprite. The original proposal assume
 
 ## Decision
 
-The companion ships a 2.5D sprite depth layer built entirely with CSS transforms inside [study-companion.js](../../../website/public/study-companion.js):
+The companion ships a 2.5D sprite depth layer built entirely with CSS transforms inside [study-companion.js](../../../../website/public/study-companion.js):
 
 - Three `preserve-3d` layers wrap the sprite: a blurred dimmed aura behind (`translateZ(-22px)`), the body at `0`, and the eye glints in front (`translateZ(20px)`).
 - Scroll velocity drives a tilt angle (`rotateX` up to ±14° plus a slight `rotateZ` sway), eased back to rest when scrolling stops.

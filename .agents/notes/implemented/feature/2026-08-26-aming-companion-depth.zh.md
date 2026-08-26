@@ -10,7 +10,7 @@ Status: implemented
 
 ## 决策
 
-伴侣在 [study-companion.js](../../../website/public/study-companion.js) 内以纯 CSS transform 实现 2.5D 精灵深度层：
+伴侣在 [study-companion.js](../../../../website/public/study-companion.js) 内以纯 CSS transform 实现 2.5D 精灵深度层：
 
 - 三片 `preserve-3d` 层包裹精灵：模糊减淡的背景晕影（`translateZ(-22px)`）、z=0 的身体、置前的眼神高光（`translateZ(20px)`）。
 - 滚动速度驱动倾斜角（`rotateX` 至 ±14°，附轻微 `rotateZ` 摆动），停止滚动后缓回正。
