@@ -12,7 +12,10 @@ English | [中文](2026-08-26-wordmark-symbol-sprite.zh.md)
 
 `website/public/wordmark.svg` is now a `<symbol id="dsh-mark">` sprite, and `siteTitle` embeds a ~130-byte stub: `<svg class="dsh-wordmark" viewBox="0 0 143 23" aria-hidden="true"><use href="…/wordmark.svg#dsh-mark"/></svg>`. The external reference keeps `currentColor` working — the symbol's fills resolve against the using document, so dark and light themes still repaint the mark without any JavaScript.
 
-Rejected alternatives: an `<img src>` (one line simpler, but it freezes the mark at whatever fills the file declares, breaking dark mode), and keeping the inline markup (the status quo that caused the duplication).
+## Alternatives considered
+
+- **An `<img src>` to the sprite** — one line simpler, but it freezes the mark at whatever fills the file declares, breaking dark-mode repaint.
+- **Keep the inline markup in `siteTitle`** — the status quo that caused the duplication (≈8 MB and 859 copies across the site).
 
 ## Consequences
 
