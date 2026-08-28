@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="color-scheme" content="light dark">
+  <meta name="description" content="Schedule 实验室：schedule/change 事件流怎样推出持久提醒——错过不补发的最新一拍、触发即除名的一次性形态、fork 不继承的边界，可步进重放">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>定时提醒实验室</title>
+  <link rel="stylesheet" href="./study-tokens.css"><link rel="stylesheet" href="./study-lab-shell.css"><link rel="stylesheet" href="./acp-lab.css"><link rel="stylesheet" href="./schedule-lab.css">
+  <link rel="icon" href="./favicon.svg"><script src="./study-theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#sch-main">跳到实验</a>
+  <main class="lab-shell" id="sch-main">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">DSH 学习 · 时间与调度</p>
+        <h1>重启不丢、错过不补——定时提醒的全部状态都在事件日志里。</h1>
+        <p class="hero-lead">schedule 的持久状态只有 schedule/change 事件流：create、delete、dispatch 三种操作逐条重放，活动提醒是 fold 的推论而不是一份独立存档。一次性提醒触发后除名；固定频率提醒醒来时只补锚点对齐的最新一拍，错过的队列不重放。fork 按 seedLength 切日志，子会话连 id 计数都从零开始。</p>
+        <div class="hero-actions">
+          <button type="button" class="theme-toggle" id="motion-toggle" aria-pressed="false">暂停动画</button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">跟随系统</button>
+          <a class="button button-primary" href="./study/lessons/37-计划栈.html">阅读配套课程</a>
+          <a class="button button-secondary" href="./time-lab.html">打开时间上下文实验</a>
+        </div>
+      </div>
+      <aside class="model-warning" aria-label="证据边界"><span class="warning-index">MODEL / 03</span><strong>规则钉在 domain.ts 顶注与常量。</strong><p>MIN_EVERY_INTERVAL_SECONDS=300、SCHEDULE_CHANGE_VERSION=1、latest-only 补发与 seedLength 边界都来自 packages/schedule/schedule/src/domain.ts（基线 aa6c361a）。教学时钟固定在 2026-08-26T00:00Z，不启动真实定时器。</p></aside>
+    </header>
+
+    <section class="control-strip card" aria-label="先预测，再改参数">
+      <form id="prediction-gate" class="prediction-gate">
+        <p class="gate-question" id="gate-question">先押一个注：会话睡过了固定频率提醒的三个间隔，醒来后这条提醒补发几次？</p>
+        <div class="gate-options" role="radiogroup" aria-labelledby="gate-question">
+          <label class="gate-option"><input type="radio" name="prediction" value="backlog"><span>逐拍补发三次——错过的每一拍都欠着</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="latest"><span>只补最新一拍，其余跳过</span></label>
+          <label class="gate-option"><input type="radio" name="prediction" value="void"><span>提醒作废——错过即失效</span></label>
+        </div>
+        <div class="gate-actions"><button class="button button-primary" type="submit">提交预测，解锁控件</button><button class="button button-quiet" type="button" data-gate-skip>跳过</button></div>
+        <p class="feedback" id="gate-feedback" role="status" aria-live="polite"></p>
+      </form>
+      <div id="gated-controls">
+        <section class="card" aria-labelledby="schedule-ladder-title">
+          <div class="section-heading"><div><p class="section-label">零跳步概念阶梯</p><h2 id="schedule-ladder-title">三级台阶，事件日志里的时间</h2></div><span class="schema-pill">每级一个概念</span></div>
+          <div id="concept-ladder-root"></div>
+        </section>
+        <form class="lab-form" id="sch-form">
+          <label><span>场景</span><select id="sch-scenario">
+            <option value="catch-up">固定频率：睡过几拍只补最新一拍</option>
+            <option value="one-shot">一次性提醒：到点触发后除名</option>
+            <option value="fork">fork 边界：子会话不继承提醒</option>
+          </select></label>
+          <label><span>醒来时刻：<output id="sch-clock-out">T0+900s</output></span><input id="sch-clock" type="range" min="0" max="2400" step="30" value="900"></label>
+          <label><span>固定频率间隔：<output id="sch-every-out">300 秒</output></span><input id="sch-every" type="range" min="300" max="900" step="60" value="300"></label>
+          <button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>
+          <small>当前选择写在地址栏 #state= 后面：刷新不丢。间隔滑杆只影响固定频率场景。</small>
+        </form>
+        <p class="feedback" id="sch-feedback" role="status" aria-live="polite"></p>
+        <dl class="metric-grid" aria-label="定时提醒观测值">
+          <div><dt>活动提醒</dt><dd id="metric-active">—</dd></div>
+          <div><dt>错过拍数</dt><dd id="metric-skipped">—</dd></div>
+          <div><dt>下一拍</dt><dd id="metric-next">—</dd></div>
+          <div class="metric-oracle"><dt>独立校验</dt><dd id="metric-oracle">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="trace-card card" aria-labelledby="sch-title">
+      <div class="section-heading"><div><p class="section-label" data-icon="route">事件日志重放</p><h2 id="sch-title">一拍一步：创建 → 触发 → fold</h2></div><span class="schema-pill">播放 × 跳拍</span></div>
+      <p class="section-intro">每一行都是一条 schedule/change 事件；fold 面板是「重放到当前行为止」的活动提醒。把醒来时刻拉过一个间隔以上，看错过队列怎样被跳过。</p>
+      <div class="stepper-row">
+        <button type="button" class="button button-quiet" id="sch-play" aria-label="连播或暂停">▶ 连播</button>
+        <label class="step-slider"><span>步进</span><input type="range" id="sch-step" min="0" max="1" step="1" value="0" aria-describedby="sch-step-caption"></label>
+        <label><span>速度</span><select id="sch-speed">
+          <option value="1360">0.5×</option>
+          <option value="680" selected>1×</option>
+          <option value="340">2×</option>
+          <option value="170">4×</option>
+        </select></label>
+      </div>
+      <p class="chart-note" id="sch-step-caption" role="status" aria-live="polite"></p>
+      <div class="sch-ruler" id="sch-ruler" hidden aria-label="锚点对齐示意：锚点、跳过的拍、补发的拍与下一拍"></div>
+      <ol class="acp-log" id="sch-log"></ol>
+      <h3 class="section-subtitle" id="sch-fold-title">当前 fold · 活动提醒</h3>
+      <ul class="sch-fold-list" id="sch-fold" aria-labelledby="sch-fold-title"></ul>
+    </section>
+
+    <section class="evidence-grid" aria-label="Oracle 与证明边界">
+      <article class="oracle-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="beaker">独立校验</p><h2>规则逐条重算</h2></div><span class="schema-pill schema-oracle">调度校验</span></div>
+        <p class="section-intro">独立校验直接对帧里的变更重放硬规则；它不读渲染层的任何中间量。</p>
+        <ol class="oracle-list" id="oracle-list"></ol>
+      </article>
+      <article class="boundary-card card">
+        <div class="section-heading"><div><p class="section-label" data-icon="shield">证据边界</p><h2>哪些结论可以带走</h2></div></div>
+        <div class="boundary-columns"><div class="boundary-yes"><h3>能证明什么</h3><ul id="can-prove-list"></ul></div><div class="boundary-no"><h3>不能证明什么</h3><ul id="cannot-prove-list"></ul></div></div>
+      </article>
+    </section>
+
+    <footer class="page-footer"><span>纯函数模型 · 独立校验 · 不启动真实定时器</span><a href="./time-lab.html">继续看时间上下文实验</a></footer>
+  </main>
+  <script type="module" src="./schedule-lab.js"></script>
+</body>
+</html>

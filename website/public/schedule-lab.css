@@ -1,0 +1,27 @@
+/* Schedule 实验室专用：锚点对齐尺与 fold 活动面板。
+   其余版式复用 acp-lab.css / study-lab-shell.css；这里只补缺口。 */
+
+.sch-ruler{position:relative;height:74px;margin:14px 0 6px;border:1px solid rgba(127,143,165,.35);
+  border-radius:6px;background:rgba(127,143,165,.06);overflow:hidden;}
+.sch-ruler[hidden]{display:none;}
+.sch-ruler .sch-track{position:absolute;left:16px;right:16px;top:50%;height:2px;background:rgba(127,143,165,.45);}
+.sch-ruler .sch-mark{position:absolute;top:50%;width:2px;height:18px;margin:-9px 0 0 -1px;background:#7a94b8;}
+.sch-ruler .sch-mark.sch-anchor{background:#2f7d5f;height:26px;margin-top:-13px;}
+.sch-ruler .sch-mark.sch-occurrence{background:#b8862f;height:30px;margin-top:-15px;}
+.sch-ruler .sch-mark.sch-accepted{background:#a34d3d;height:34px;margin-top:-17px;}
+.sch-ruler .sch-mark.sch-missed{background:#9aa8b6;height:12px;margin-top:-6px;}
+.sch-ruler .sch-label{position:absolute;top:3px;font-size:11px;line-height:1.4;color:inherit;opacity:.75;
+  transform:translateX(-50%);white-space:nowrap;}
+.sch-ruler .sch-legend{position:absolute;right:8px;bottom:4px;font-size:11px;opacity:.7;}
+.sch-fold-list{list-style:none;margin:10px 0 0;padding:0;}
+.sch-fold-list li{display:flex;gap:10px;align-items:baseline;padding:6px 2px;border-bottom:1px dashed rgba(127,143,165,.35);
+  font-size:13.5px;line-height:1.6;}
+.sch-fold-list li:last-child{border-bottom:none;}
+.sch-fold-list .sch-fold-id{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;flex:0 0 auto;}
+.sch-fold-list .sch-fold-state{margin-left:auto;flex:0 0 auto;font-size:12px;opacity:.8;}
+.sch-fold-list .sch-fold-state.sch-overdue{color:#a34d3d;}
+.sch-fold-empty{font-size:13px;opacity:.7;margin:10px 0 0;}
+html.dark .sch-ruler{background:rgba(127,143,165,.10);}
+html.dark .sch-ruler .sch-mark.sch-anchor{background:#5fae8c;}
+html.dark .sch-ruler .sch-mark.sch-occurrence{background:#d4a94f;}
+html.dark .sch-ruler .sch-mark.sch-accepted{background:#cf7a68;}
