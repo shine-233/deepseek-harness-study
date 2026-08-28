@@ -160,6 +160,32 @@ export const MASCOT_SPRITE_NAP = Object.freeze([
   '....rrrrrrrrrrrrrr....',
 ])
 
+/**
+ * 首页手账卡专用：阿溟的远房表哥「鲸鱼学长」。
+ * 侧视构图（头左尾右）：喷水柱、腮红、奶白肚皮、连体双叶尾鳍。
+ * 旧版首页直接放大阿溟立绘，断开的浮点像素在大尺寸下糊成噪点，故重画。
+ */
+export const WHALE_GRID_W = 30
+
+export const MASCOT_SPRITE_WHALE = Object.freeze([
+  '.........hh...................',
+  '....h...hT....................',
+  '.....h..T.h...................',
+  '....HHHH......................',
+  '...HHHHHHH....................',
+  '..HHHHHHHHHD..................',
+  '.HWEHHHHHHHHDD................',
+  '.HHHHHHHHHHHDD................',
+  '.HBBHHHHHHHHHHHDD.............',
+  '.SSHHHHHHHHHHHHHHHDDDD........',
+  '..SSSHHHHHHHHHHHHHHHDDDDDD....',
+  '...SSHHHHHHHHHHHHHHHHHDDDDDDD.',
+  '....SShHHHHHHHHHHHHHHHHHDDDD..',
+  '.....SSShhhhhhhhhhhhhhDDDDDD..',
+  '.......hhh.........hhh...DDD..',
+  '..............................',
+])
+
 /** 具名帧注册表：行为插件按名字取帧。 */
 export const MASCOT_FRAMES = Object.freeze({
   idle: MASCOT_SPRITE,
@@ -171,14 +197,15 @@ export const MASCOT_FRAMES = Object.freeze({
 
 /**
  * 同色横向贪婪合并成 rect；眼睛格单独标记以便做眨眼动画。
- * 返回 { x, y, w, fill, eye } 数组，坐标系为 22×21 的字符网格。
+ * 返回 { x, y, w, fill, eye } 数组，宽度取网格最宽行（≥22），高度为行数。
  *
  * @param {string[]} [grid] - 字符网格，缺省用待机帧。
  */
 export function buildMascotRects(grid = MASCOT_SPRITE) {
   const rects = []
+  const gridW = Math.max(MASCOT_GRID_W, ...grid.map((row) => row.length))
   grid.forEach((row, y) => {
-    const cells = row.padEnd(MASCOT_GRID_W, '.').slice(0, MASCOT_GRID_W).split('')
+    const cells = row.padEnd(gridW, '.').slice(0, gridW).split('')
     let x = 0
     while (x < cells.length) {
       const ch = cells[x]

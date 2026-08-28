@@ -52,3 +52,4 @@ worktrees/
 
 # Local VitePress build and run logs captured during website debugging.
 /website/dsh-*.log
+.mimosa/

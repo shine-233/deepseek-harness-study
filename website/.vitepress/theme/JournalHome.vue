@@ -11,9 +11,9 @@
  */
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { withBase } from 'vitepress'
-import { MASCOT_GRID_W, MASCOT_SPRITE, buildMascotRects } from '../../public/mascot-sprite.js'
+import { MASCOT_SPRITE_WHALE, WHALE_GRID_W, buildMascotRects } from '../../public/mascot-sprite.js'
 
-/* ---------- 像素画阿溟 ---------- */
+/* ---------- 像素画鲸鱼学长（阿溟的远房表哥；旧版放大阿溟立绘会糊成噪点，故首页专用侧视鲸） ---------- */
 
 interface PixelRect {
   x: number
@@ -23,16 +23,13 @@ interface PixelRect {
   eye?: boolean
 }
 
-const BASE_RECTS = buildMascotRects() as PixelRect[]
+const BASE_RECTS = buildMascotRects(MASCOT_SPRITE_WHALE) as PixelRect[]
+const WHALE_H = MASCOT_SPRITE_WHALE.length
 
 /** 表情切换的嘴部覆盖块（普通嘴 / 开心嘴）。 */
 const MOUTHS: Record<'normal' | 'happy', { x: number; y: number; w: number }[]> = {
-  normal: [{ x: 10, y: 14, w: 2 }],
-  happy: [
-    { x: 8, y: 14, w: 6 },
-    { x: 9, y: 13, w: 1 },
-    { x: 14, y: 13, w: 1 },
-  ],
+  normal: [{ x: 2, y: 9, w: 2 }],
+  happy: [{ x: 1, y: 9, w: 4 }],
 }
 const MOUTH_FILL = '#c9566b'
 
@@ -284,22 +281,17 @@ watchEffect(() => {
           <svg
             :data-mood="mood"
             class="dj-mascot"
-            :viewBox="`0 0 ${MASCOT_GRID_W} ${MASCOT_SPRITE.length}`"
+            :viewBox="`0 0 ${WHALE_GRID_W} ${WHALE_H}`"
             shape-rendering="crispEdges"
             role="button"
             tabindex="0"
-            aria-label="吉祥物阿溟：戳一下换一句台词"
+            aria-label="吉祥物鲸鱼学长（阿溟的远房表哥）：戳一下换一句台词"
             @click="poke"
             @keydown.enter.prevent="poke"
             @keydown.space.prevent="poke"
           >
             <g v-for="rect in BASE_RECTS" :key="`p${rect.x}-${rect.y}`">
               <rect :class="{ 'dj-eye': rect.eye }" :x="rect.x" :y="rect.y" width="1" height="1" :fill="rect.fill" />
-            </g>
-            <g fill="#5e9bff">
-              <rect x="19" y="15" width="2" height="1" />
-              <rect x="20" y="16" width="2" height="1" />
-              <rect x="21" y="17" width="1" height="2" />
             </g>
             <g :fill="MOUTH_FILL">
               <rect
