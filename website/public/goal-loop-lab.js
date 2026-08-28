@@ -44,16 +44,16 @@ function initializePage() {
 
   let frames = []
 
-  function renderFrame(at) {
+  function renderFrame(at, { scroll = true } = {}) {
     for (const [index, row] of el.log.querySelectorAll('[data-index]').entries()) {
       row.classList.toggle('is-current', index === at)
     }
     const current = el.log.querySelector('.is-current')
-    if (current !== null) current.scrollIntoView({ block: 'nearest' })
+    if (scroll && current !== null) current.scrollIntoView({ block: 'nearest' })
     if (frames[at] === undefined) return
     writeText(el.caption, `${frames[at].label} —— ${frames[at].detail}`)
     writeText(el.mRounds, String(Math.ceil((at + 1) / 3)))
-    writeText(el.mHandoff, String(frames[at].handoffChars))
+    writeText(el.mHandoff, frames[at].handoffChars === undefined ? '—' : String(frames[at].handoffChars))
   }
 
   function rebuild() {
@@ -75,7 +75,7 @@ function initializePage() {
       const rows = frames.map((frame, index) =>
         `<li data-index="${String(index)}" class="log-row"><span class="log-kind">${frame.kind === 'spawn' ? '启动' : frame.kind === 'report' ? '回报' : frame.kind === 'carry' ? '交接' : '出口'}</span><strong>${frame.label}</strong><small>${frame.detail}</small></li>`)
       el.log.innerHTML = rows.join('')
-      renderFrame(frames.length - 1)
+      renderFrame(frames.length - 1, { scroll: false })
       fb(`循环在 ${String(model.observations.usedRounds)} 轮内以 ${model.observations.finalStatus} 结束。`, 'success')
       persistState()
     } catch (error) {
@@ -113,7 +113,6 @@ function initializePage() {
 if (typeof document !== 'undefined') {
   initializePage(); installDeclaredIcons(); installScrollProgress()
   installThemeToggle(document.getElementById('theme-toggle'), n => icon(n, 15))
-
   const ladderRoot = document.getElementById('concept-ladder-root')
   if (ladderRoot !== null) {
     // 模型产出 frames（{tick, kind, label, detail}）：逐帧映射成轨迹步骤。

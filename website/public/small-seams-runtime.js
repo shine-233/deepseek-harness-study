@@ -93,69 +93,80 @@ async function initializePage(labId, config, modelModule) {
   // 预测门的问题与三个选项（选项由生成器静态写入；这里只回填问题文案）。
   safeWrite('#gate-question', config.gate.q)
 
-  // 控件按配置构建。
+  // 控件：生成器已把静态控件写进外壳（门禁要求静态可读）——运行时收养它们，
+  // 只有缺失时才动态补建。绝不追加第二份，否则页面出现一簇死控件。
   const form = document.querySelector('#seam-form')
   const controls = []
   for (const control of config.controls) {
-    const labelEl = document.createElement('label')
-    const span = document.createElement('span')
-    let input
-    if (control.kind === 'range') {
-      input = document.createElement('input')
-      input.type = 'range'
-      input.min = String(control.min); input.max = String(control.max); input.step = String(control.step); input.value = String(control.value)
-      const out = document.createElement('output')
-      out.id = 'ctl-' + control.id + '-output'
-      out.textContent = String(control.value)
-      span.append(control.label + '：', input, out)
-      labelEl.append(span)
-    } else if (control.kind === 'select') {
-      input = document.createElement('select')
-      for (const [value, labelText] of control.options) {
-        const option = document.createElement('option')
-        option.value = value
-        option.textContent = labelText
-        input.append(option)
+    let node = document.getElementById('ctl-' + control.id)
+    if (node === null) {
+      const labelEl = document.createElement('label')
+      const span = document.createElement('span')
+      if (control.kind === 'range') {
+        node = document.createElement('input')
+        node.type = 'range'
+        node.min = String(control.min); node.max = String(control.max); node.step = String(control.step); node.value = String(control.value)
+        const out = document.createElement('output')
+        out.id = 'ctl-' + control.id + '-output'
+        out.textContent = String(control.value)
+        span.append(control.label + '：', node, out)
+        labelEl.append(span)
+      } else if (control.kind === 'select') {
+        node = document.createElement('select')
+        for (const [value, labelText] of control.options) {
+          const option = document.createElement('option')
+          option.value = value
+          option.textContent = labelText
+          node.append(option)
+        }
+        span.textContent = control.label
+        labelEl.append(span, node)
+      } else {
+        node = document.createElement('input')
+        node.type = 'checkbox'
+        node.checked = control.value === true
+        span.textContent = control.label
+        labelEl.className = 'sb-check'
+        labelEl.append(node, span)
       }
-      span.textContent = control.label
-      labelEl.append(span, input)
-    } else {
-      input = document.createElement('input')
-      input.type = 'checkbox'
-      input.checked = control.value === true
-      span.textContent = control.label
-      labelEl.className = 'sb-check'
-      labelEl.append(input, span)
+      node.id = 'ctl-' + control.id
+      form.append(labelEl)
     }
-    input.id = 'ctl-' + control.id
-    controls.push({ control, node: input })
-    form.append(labelEl)
+    controls.push({ control, node })
   }
   // range 的输出位补进 span 后面（上面 range 分支已插入）。
-  form.insertAdjacentHTML('beforeend',
-    '<button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>'
-    + '<small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>')
+  if (form.querySelector('#reset-inputs') === null) {
+    form.insertAdjacentHTML('beforeend',
+      '<button class="button button-quiet" type="button" id="reset-inputs">恢复默认输入</button>'
+      + '<small>当前选择写在地址栏 #state= 后面：刷新不丢。</small>')
+  }
 
-  // 指标格：forkShape 之外逐项建 dd。
+  // 指标格：生成器已emit全部 dd——收养引用；缺失才补建。oracle 行同理。
   const dl = document.querySelector('dl.metric-grid')
   const extraNodes = {}
   for (const [label, key] of config.metrics.slice(1)) {
-    const row = document.createElement('div')
-    const dt = document.createElement('dt')
-    const dd = document.createElement('dd')
-    dd.id = 'metric-' + key
-    writeText(dd, '—')
-    writeText(dt, label)
-    row.append(dt, dd)
-    dl.append(row)
+    let dd = document.getElementById('metric-' + key)
+    if (dd === null) {
+      const row = document.createElement('div')
+      const dt = document.createElement('dt')
+      dd = document.createElement('dd')
+      dd.id = 'metric-' + key
+      writeText(dd, '—')
+      writeText(dt, label)
+      row.append(dt, dd)
+      dl.append(row)
+    }
     extraNodes[key] = dd
   }
-  const oracleRow = document.createElement('div')
-  oracleRow.className = 'metric-oracle'
-  const odt = document.createElement('dt'); writeText(odt, '独立校验')
-  const odd = document.createElement('dd'); odd.id = 'metric-oracle'; writeText(odd, '—')
-  oracleRow.append(odt, odd)
-  dl.append(oracleRow)
+  let oracleBadge = document.getElementById('metric-oracle')
+  if (oracleBadge === null) {
+    const oracleRow = document.createElement('div')
+    oracleRow.className = 'metric-oracle'
+    const odt = document.createElement('dt'); writeText(odt, '独立校验')
+    oracleBadge = document.createElement('dd'); oracleBadge.id = 'metric-oracle'; writeText(oracleBadge, '—')
+    oracleRow.append(odt, oracleBadge)
+    dl.append(oracleRow)
+  }
 
   const elements = {
     form,

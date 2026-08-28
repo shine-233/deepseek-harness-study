@@ -37,6 +37,17 @@ export const APPROVAL_OUTCOMES = Object.freeze([
   'unavailable',
 ])
 
+/** 教学故障注入：吞掉 approval/asked 审计事件，让放行无据可查。none 是唯一默认。 */
+export const APPROVAL_FAULT_TYPES = Object.freeze(['none', 'drop-asked-audit'])
+
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!APPROVAL_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
+
 /** 组装一条确定性的教学时间线。所有文本和状态都来自固定常量与输入枚举。 */
 function buildSteps(input) {
   const steps = []
@@ -96,13 +107,27 @@ export function buildApprovalFlowModel(input) {
   if (decision === undefined) throw new RangeError('未知裁决：' + String(input.decision))
   const abort = APPROVAL_ABORTS.find(item => item === input.abort)
   if (abort === undefined) throw new RangeError('未知中止状态：' + String(input.abort))
+  const fault = resolveFault(input.fault)
 
-  const normalized = { policy, responder, decision, abort }
+  const normalized = { policy, responder, decision, abort, fault }
   const steps = buildSteps(normalized)
   const settleStep = steps.find(step => step.phase === 'settle')
   const bodyStep = steps.find(step => typeof step.bodyRan === 'boolean')
-  const askedSteps = steps.filter(step => step.audit === 'asked')
+  let askedSteps = steps.filter(step => step.audit === 'asked')
   const decidedSteps = steps.filter(step => step.audit === 'decided')
+
+  /*
+   * 教学故障：吞掉 approval/asked——「每次 ask 恰好一对审计事件」被违反，
+   * 放行变得无据可查。AUDIT_PAIR_CLOSED 抓住它。所有路径都有审计对，注入恒生效。
+   */
+  if (fault === 'drop-asked-audit') {
+    const askedIndex = steps.findIndex(step => step.audit === 'asked')
+    if (askedIndex !== -1) {
+      steps.splice(askedIndex, 1)
+      steps.forEach((step, index) => { step.index = index })
+    }
+    askedSteps = steps.filter(step => step.audit === 'asked')
+  }
 
   return {
     input: { ...normalized },

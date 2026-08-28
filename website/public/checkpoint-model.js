@@ -19,6 +19,17 @@ export const CKPT_POINTS = Object.freeze([
   Object.freeze({ id: 'step-boundary', label: '下一请求边界（步骤完成）' }),
 ])
 
+/** 教学故障注入：夸大崩溃后可恢复的范围。none 是唯一默认。 */
+export const CKPT_FAULT_TYPES = Object.freeze(['none', 'overclaim-recovery'])
+
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!CKPT_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
+
 function resolveInput(input = {}) {
   if (typeof input.crashAt !== 'number' || !Number.isInteger(input.crashAt) || input.crashAt < 0 || input.crashAt > 6) {
     throw new RangeError('crashAt 必须是 0..6 的整数')
@@ -104,7 +115,7 @@ export function buildCheckpointModel(input = {}) {
 
   const recoverableBeats = beats.filter(b => b.at <= lastDurableTick)
 
-  return {
+  const model = {
     input: { ...resolved },
     lanes: CKPT_LANES,
     steps,
@@ -131,6 +142,17 @@ export function buildCheckpointModel(input = {}) {
       '不能用本页替代 session-persistence 的物理实现。',
     ],
   }
+  /*
+   * 教学故障：把可恢复范围夸大到 durable 界之外——「能恢复的恰是最后一个
+   * 已通过检查点之前的全部内容」被违反。CK_RECOVERY_HONEST 抓住它。
+   * 最后 durable 拍为 0 时无可夸大，注入不生效。
+   */
+  if (resolveFault(input.fault) === 'overclaim-recovery' && model.observations.lastDurableTick > 0) {
+    model.observations.recoverableCount = lastDurableTick + 2
+    model.observations.forkShape = '【教学故障】声称可恢复到第 '
+      + String(lastDurableTick + 2) + ' 拍之后——超出了 durable 边界'
+  }
+  return model
 }
 
 /** 独立校验。 */

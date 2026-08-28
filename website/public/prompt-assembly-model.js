@@ -43,6 +43,17 @@ export const PA_POLICIES = Object.freeze(['ask', 'never', 'absent'])
 export const PA_CHANGE_TARGETS = Object.freeze(['none', 'persona', 'policy', 'tools'])
 export const PA_TOOL_ORDERS = Object.freeze(['default', 'custom-first'])
 
+/** 教学故障注入：把缓存命中账目伪造成全量命中。none 是唯一默认。 */
+export const PA_FAULT_TYPES = Object.freeze(['none', 'fake-full-cache-hit'])
+
+function resolveFault(fault) {
+  const type = fault ?? 'none'
+  if (!PA_FAULT_TYPES.includes(type)) {
+    throw new RangeError('未知故障类型：' + String(type))
+  }
+  return type
+}
+
 function utf8(text) {
   return ENCODER.encode(text).length
 }
@@ -114,8 +125,9 @@ export function buildPromptAssemblyModel(input) {
   if (changeTarget === undefined) throw new RangeError('未知变化目标：' + String(input.changeTarget))
   const toolOrder = PA_TOOL_ORDERS.find(item => item === input.toolOrder)
   if (toolOrder === undefined) throw new RangeError('未知工具顺序：' + String(input.toolOrder))
+  const fault = resolveFault(input.fault)
 
-  const normalized = { personaVersion, policy, changeTarget, toolOrder }
+  const normalized = { personaVersion, policy, changeTarget, toolOrder, fault }
   const segments = buildSegments(normalized)
 
   // 升序不变量：上游按 order 升序拼接，这里排序后必须与构造顺序一致。
@@ -123,10 +135,19 @@ export function buildPromptAssemblyModel(input) {
   const sortedOk = orders.every((order, index) => index === 0 || orders[index - 1] <= order)
 
   const boundary = changedIndex(normalized)
-  const cachedBytes = boundary === null
+  let cachedBytes = boundary === null
     ? segments.reduce((sum, segment) => sum + segment.bytes, 0)
     : segments.slice(0, boundary).reduce((sum, segment) => sum + segment.bytes, 0)
   const totalBytes = segments.reduce((sum, segment) => sum + segment.bytes, 0)
+
+  /*
+   * 教学故障：有变化段时谎报全量命中——「变化段之前的字节才命中」被违反。
+   * 账目自洽（cached+fresh=total），抓住它的只有 CACHE_BOUNDARY_ARITHMETIC
+   * 的独立重算。无变化段（changeTarget=none）时全量命中本来就是事实，注入不生效。
+   */
+  if (fault === 'fake-full-cache-hit' && boundary !== null) {
+    cachedBytes = totalBytes
+  }
 
   return {
     input: { ...normalized },
