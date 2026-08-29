@@ -291,7 +291,7 @@ watchEffect(() => {
             @keydown.space.prevent="poke"
           >
             <g v-for="rect in BASE_RECTS" :key="`p${rect.x}-${rect.y}`">
-              <rect :class="{ 'dj-eye': rect.eye }" :x="rect.x" :y="rect.y" width="1" height="1" :fill="rect.fill" />
+              <rect :class="{ 'dj-eye': rect.eye }" :x="rect.x" :y="rect.y" :width="rect.w" height="1" :fill="rect.fill" />
             </g>
             <g :fill="MOUTH_FILL">
               <rect
@@ -524,7 +524,7 @@ watchEffect(() => {
 .dj-mascot-card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px 14px 12px;
   position:relative;transform:rotate(-1.6deg);box-shadow:3px 4px 0 rgba(43,90,166,.10);transition:.25s;text-align:center;}
 .dj-mascot-card:hover{transform:rotate(0);}
-.dj-mascot{width:150px;height:auto;display:block;margin:0 auto;cursor:pointer;
+.dj-mascot{width:190px;height:auto;display:block;margin:0 auto;cursor:pointer;
   image-rendering:pixelated;animation:dj-float 3.4s steps(2,end) infinite alternate;}
 @keyframes dj-float{from{transform:translateY(0)}to{transform:translateY(-3px)}}
 .dj-eye{animation:dj-blink 4.6s steps(1,end) infinite;}
