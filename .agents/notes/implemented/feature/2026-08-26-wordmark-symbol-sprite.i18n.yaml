@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-26-wordmark-symbol-sprite.md
-2026-08-26-wordmark-symbol-sprite.md: 1298903a50023068e91c966032337ba0ee2fc054
+2026-08-26-wordmark-symbol-sprite.md: 50bcfa6446919fe86ea11905357324e15bdb14cc
 2026-08-26-wordmark-symbol-sprite.zh.md: adbbf95567c999ce4ca0ad4080c527dcb21c4218

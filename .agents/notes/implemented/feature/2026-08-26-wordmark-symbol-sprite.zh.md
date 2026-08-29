@@ -12,7 +12,10 @@ Status: implemented
 
 `website/public/wordmark.svg` 改为 `<symbol id="dsh-mark">` sprite，`siteTitle` 只嵌一个约 130 字节的存根：`<svg class="dsh-wordmark" viewBox="0 0 143 23" aria-hidden="true"><use href="…/wordmark.svg#dsh-mark"/></svg>`。外部引用保住了 `currentColor`——symbol 的填充解析到使用方文档，暗色与亮色主题依旧无需 JavaScript 即可重绘标志。
 
-否决的替代方案：`<img src>`（更省一行，但会把标志冻结在文件声明的填充色上，破坏暗色模式）；维持内联（即造成重复的现状）。
+否决的替代方案：
+
+- **`<img src>` 引 sprite**——更省一行，但会把标志冻结在文件声明的填充色上，破坏暗色模式重绘。
+- **继续内联在 `siteTitle`**——即造成重复的现状（全站 859 份副本、约 8MB 冗余）。
 
 ## 后果
 
