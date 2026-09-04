@@ -3,4 +3,4 @@
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-26-wordmark-symbol-sprite.md
 2026-08-26-wordmark-symbol-sprite.md: 50bcfa6446919fe86ea11905357324e15bdb14cc
-2026-08-26-wordmark-symbol-sprite.zh.md: 8de9235ff010840404fd9e3b2a0c26969bee1821
+2026-08-26-wordmark-symbol-sprite.zh.md: 56d62a2a8253438e633085d5d300924a7908226c
