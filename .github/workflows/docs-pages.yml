@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - '.github/workflows/docs-pages.yml'
+      - '.agents/**'
       - 'docs/**'
       - 'study/**'
       - 'study-examples/**'
