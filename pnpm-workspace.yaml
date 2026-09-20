@@ -30,15 +30,20 @@ overrides:
   # Keep known patched transitive versions in the published lockfile. These
   # are compatibility-preserving patch/minor pins, not a blanket audit fix.
   '@hono/node-server': '1.19.15'
-  hono: '4.12.34'
+  hono: '4.13.5'
   protobufjs: '7.6.5'
-  fast-uri: '3.1.5'
+  fast-uri: '3.1.6'
   ip-address: '10.3.1'
   undici: '7.29.0'
   postcss: '8.5.23'
   nanoid: '3.3.18'
   dompurify: '3.4.13'
-  js-yaml: '4.3.1'
+  js-yaml: '4.3.2'
+  # Purely transitive — pulled by @babel/helper-compilation-targets and
+  # update-browserslist-db — so `pnpm update <pkg>` has no direct declaration to
+  # move and cannot reach it. Pinning is the only lever.
+  browserslist: '4.28.7'
+  baseline-browser-mapping: '2.11.0'
   'minimatch@9>brace-expansion': '2.1.4'
   'minimatch@10>brace-expansion': '5.0.9'
   # VitePress 1.6.4's peer graph otherwise resolves a vulnerable Vite 5
